@@ -3,14 +3,16 @@ set -e -o pipefail
 
 : ${GITHUB_TOKEN:?"missing env var"}
 
-echo "Syncing GitHub schema..."
-get-graphql-schema https://api.github.com/graphql --header "Authorization=Bearer $GITHUB_TOKEN" > api.github.com/schema.graphql
-get-graphql-schema https://api.github.com/graphql --header "Authorization=Bearer $GITHUB_TOKEN" --json > api.github.com/schema.json
+sync_schema() {
+    local domain="$1"
+    shift
+    echo "Syncing schema for $domain"
+    mkdir -p "$domain"
+    get-graphql-schema https://$domain/graphql "$@" > "$domain/schema.graphql"
+    get-graphql-schema https://$domain/graphql "$@" --json > "$domain/schema.json"
+}
 
-echo "Syncing Grafbase schema..."
-get-graphql-schema https://api.grafbase.com/graphql > api.grafbase.com/schema.graphql
-get-graphql-schema https://api.grafbase.com/graphql --json > api.grafbase.com/schema.json
-
-echo "Syncing Linear schema..."
-get-graphql-schema https://api.linear.app/graphql > api.linear.app/schema.graphql
-get-graphql-schema https://api.linear.app/graphql --json > api.linear.app/schema.json
+# Sorted alphabetically
+sync_schema api.github.com --header "Authorization=Bearer $GITHUB_TOKEN"
+sync_schema api.grafbase.com
+sync_schema api.linear.app
