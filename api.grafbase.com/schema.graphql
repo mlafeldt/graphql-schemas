@@ -1,0 +1,346 @@
+schema {
+  query: QueryRoot
+  mutation: MutationRoot
+}
+
+interface Account {
+  id: ID!
+  slug: String!
+  createdAt: DateTime!
+  projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
+}
+
+type AccountConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [AccountEdge]
+}
+
+"""An edge in a connection."""
+type AccountEdge {
+  """The item at the end of the edge"""
+  node: Account!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""
+Implement the DateTime scalar
+
+The input/output is a string in RFC3339 format, with "Z" suffix instead of "+00:00"
+Implementation is based on
+[async_graphql::types::external::datetime](https://github.com/async-graphql/async-graphql/blob/5d03592d98f41ad00a792ff131304497e6161fa1/src/types/external/datetime.rs)
+"""
+scalar DateTime
+
+type Deployment {
+  id: ID!
+  commitSha: String!
+  subdomain: String!
+  branch: String!
+  createdAt: DateTime!
+  logEntries: [DeploymentLogEntry!]!
+}
+
+type DeploymentConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [DeploymentEdge]
+}
+
+"""An edge in a connection."""
+type DeploymentEdge {
+  """The item at the end of the edge"""
+  node: Deployment!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type DeploymentLogEntry {
+  createdAt: DateTime!
+  message: String!
+}
+
+enum Environment {
+  PREVIEW
+  PRODUCTION
+}
+
+type EnvironmentVariable {
+  id: ID!
+  environment: Environment!
+  key: String!
+  value: String!
+  createdAt: DateTime!
+  project: Project!
+}
+
+input EnvironmentVariableCreateInput {
+  projectId: ID!
+  environment: Environment!
+  key: String!
+  value: String!
+}
+
+type EnvironmentVariableCreatePayload {
+  record: EnvironmentVariable!
+  query: QueryRoot!
+}
+
+input EnvironmentVariableDeleteInput {
+  id: ID!
+}
+
+type EnvironmentVariableDeletePayload {
+  query: QueryRoot!
+}
+
+input EnvironmentVariableUpdateInput {
+  id: ID!
+  environment: Environment!
+  key: String!
+  value: String!
+}
+
+type EnvironmentVariableUpdatePayload {
+  record: EnvironmentVariable!
+  query: QueryRoot!
+}
+
+enum GitProvider {
+  GITHUB
+}
+
+type GitRepository {
+  provider: GitProvider!
+  gitUrl: String!
+}
+
+input GitRepositoryInput {
+  provider: GitProvider!
+  gitUrl: String!
+}
+
+type Invite {
+  id: ID!
+  status: InviteStatus!
+  createdAt: DateTime!
+}
+
+type InviteConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [InviteEdge]
+}
+
+"""An edge in a connection."""
+type InviteEdge {
+  """The item at the end of the edge"""
+  node: Invite!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+enum InviteStatus {
+  SENT
+  JOINED
+  EXPIRED
+}
+
+type LoginPayload {
+  user: User!
+}
+
+type Member {
+  id: ID!
+  role: MemberRole!
+  createdAt: DateTime!
+  account: Account!
+  user: User!
+}
+
+type MemberConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [MemberEdge]
+}
+
+"""An edge in a connection."""
+type MemberEdge {
+  """The item at the end of the edge"""
+  node: Member!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""A member can only have ONE role"""
+enum MemberRole {
+  OWNER
+  MEMBER
+}
+
+type MutationRoot {
+  """
+  Create new organization account owned by the current user. Slug must be unique.
+  """
+  organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
+  login: LoginPayload!
+
+  """
+  Create new project owned by the current user. Slug must be unique for given account.
+  """
+  projectCreate(input: ProjectCreateInput!): ProjectCreatePayload!
+  projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
+
+  """Create new environment variable."""
+  environmentVariableCreate(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
+
+  """Update an environment variable."""
+  environmentVariableUpdate(input: EnvironmentVariableUpdateInput!): EnvironmentVariableUpdatePayload!
+
+  """Delete an environment variable."""
+  environmentVariableDelete(input: EnvironmentVariableDeleteInput!): EnvironmentVariableDeletePayload!
+}
+
+type Organization implements Account {
+  id: ID!
+  slug: String!
+  name: String!
+  createdAt: DateTime!
+  projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
+  invites(after: String, before: String, first: Int, last: Int): InviteConnection!
+  members(after: String, before: String, first: Int, last: Int): MemberConnection!
+}
+
+type OrganizationConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [OrganizationEdge]
+}
+
+input OrganizationCreateInput {
+  slug: String!
+  name: String!
+}
+
+type OrganizationCreatePayload {
+  record: Organization!
+  query: QueryRoot!
+}
+
+"""An edge in a connection."""
+type OrganizationEdge {
+  """The item at the end of the edge"""
+  node: Organization!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""Information about pagination in a connection"""
+type PageInfo {
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+type PersonalAccount implements Account {
+  id: ID!
+  slug: String!
+  createdAt: DateTime!
+  projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
+}
+
+type Project {
+  id: ID!
+  sk: ID!
+  slug: String!
+  accountId: ID!
+  accountSlug: String!
+  createdAt: DateTime!
+  repository: GitRepository!
+  deployments(after: String, before: String, first: Int, last: Int): DeploymentConnection!
+}
+
+type ProjectConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ProjectEdge]
+}
+
+input ProjectCreateInput {
+  accountId: ID!
+  slug: String!
+  repository: GitRepositoryInput!
+}
+
+type ProjectCreatePayload {
+  record: Project!
+  query: QueryRoot!
+}
+
+input ProjectDeleteInput {
+  id: ID!
+}
+
+type ProjectDeletePayload {
+  query: QueryRoot!
+}
+
+"""An edge in a connection."""
+type ProjectEdge {
+  """The item at the end of the edge"""
+  node: Project!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type QueryRoot {
+  """Give the actual connected user."""
+  viewer: User
+  account(
+    """ID of the account"""
+    id: String!
+  ): Account
+  accountBySlug(
+    """slug of the account"""
+    slug: String!
+  ): Account
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  avatarUrl: String
+  createdAt: DateTime!
+  accounts(after: String, before: String, first: Int, last: Int): AccountConnection!
+  organizations(after: String, before: String, first: Int, last: Int): OrganizationConnection!
+  personalAccount: PersonalAccount!
+}
+
