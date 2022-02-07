@@ -158,7 +158,7 @@
       {
         "kind": "OBJECT",
         "name": "Deployment",
-        "description": null,
+        "description": "Deployment",
         "fields": [
           {
             "name": "id",
@@ -177,15 +177,31 @@
             "deprecationReason": null
           },
           {
-            "name": "commitSha",
+            "name": "project",
+            "description": "Project linked to this deployment\nUnimplemented",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Project",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "commitMetadata",
             "description": null,
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
+                "kind": "OBJECT",
+                "name": "GitCommit",
                 "ofType": null
               }
             },
@@ -400,29 +416,6 @@
         "possibleTypes": null
       },
       {
-        "kind": "ENUM",
-        "name": "Environment",
-        "description": null,
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "PREVIEW",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "PRODUCTION",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
-      },
-      {
         "kind": "OBJECT",
         "name": "EnvironmentVariable",
         "description": null,
@@ -437,22 +430,6 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "ID",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "environment",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "Environment",
                 "ofType": null
               }
             },
@@ -506,22 +483,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "project",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Project",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -536,7 +497,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "projectId",
+            "name": "environmentId",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -550,22 +511,8 @@
             "defaultValue": null
           },
           {
-            "name": "environment",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "Environment",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
             "name": "key",
-            "description": null,
+            "description": "Must not be already assigned.",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -579,7 +526,7 @@
           },
           {
             "name": "value",
-            "description": null,
+            "description": "Must not start with `GRAFBASE_`.",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -602,7 +549,7 @@
         "description": null,
         "fields": [
           {
-            "name": "record",
+            "name": "environmentVariable",
             "description": null,
             "args": [],
             "type": {
@@ -670,6 +617,22 @@
         "description": null,
         "fields": [
           {
+            "name": "deletedId",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "query",
             "description": null,
             "args": [],
@@ -712,22 +675,8 @@
             "defaultValue": null
           },
           {
-            "name": "environment",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "Environment",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
             "name": "key",
-            "description": null,
+            "description": "Must not be already assigned.",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -741,7 +690,7 @@
           },
           {
             "name": "value",
-            "description": null,
+            "description": "Must not start with `GRAFBASE_`.",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -764,7 +713,7 @@
         "description": null,
         "fields": [
           {
-            "name": "record",
+            "name": "environmentVariable",
             "description": null,
             "args": [],
             "type": {
@@ -808,6 +757,33 @@
         "fields": null,
         "inputFields": null,
         "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "GitCommit",
+        "description": null,
+        "fields": [
+          {
+            "name": "commitSha",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -1447,7 +1423,7 @@
           },
           {
             "name": "environmentVariableCreate",
-            "description": "Create new environment variable.",
+            "description": "Create new environment variable for the targeted Environment",
             "args": [
               {
                 "name": "input",
@@ -1478,7 +1454,7 @@
           },
           {
             "name": "environmentVariableUpdate",
-            "description": "Update an environment variable.",
+            "description": "Update an environment variable.\nMocked up.",
             "args": [
               {
                 "name": "input",
@@ -1509,7 +1485,7 @@
           },
           {
             "name": "environmentVariableDelete",
-            "description": "Delete an environment variable.",
+            "description": "Delete an environment variable.\nMocked up.",
             "args": [
               {
                 "name": "input",

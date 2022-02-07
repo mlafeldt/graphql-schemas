@@ -19,9 +19,16 @@ Implementation is based on
 """
 scalar DateTime
 
+"""Deployment"""
 type Deployment {
   id: ID!
-  commitSha: String!
+
+  """
+  Project linked to this deployment
+  Unimplemented
+  """
+  project: Project!
+  commitMetadata: GitCommit!
   subdomain: String!
   branch: String!
   createdAt: DateTime!
@@ -50,29 +57,25 @@ type DeploymentLogEntry {
   message: String!
 }
 
-enum Environment {
-  PREVIEW
-  PRODUCTION
-}
-
 type EnvironmentVariable {
   id: ID!
-  environment: Environment!
   key: String!
   value: String!
   createdAt: DateTime!
-  project: Project!
 }
 
 input EnvironmentVariableCreateInput {
-  projectId: ID!
-  environment: Environment!
+  environmentId: ID!
+
+  """Must not be already assigned."""
   key: String!
+
+  """Must not start with `GRAFBASE_`."""
   value: String!
 }
 
 type EnvironmentVariableCreatePayload {
-  record: EnvironmentVariable!
+  environmentVariable: EnvironmentVariable!
   query: QueryRoot!
 }
 
@@ -81,19 +84,27 @@ input EnvironmentVariableDeleteInput {
 }
 
 type EnvironmentVariableDeletePayload {
+  deletedId: ID!
   query: QueryRoot!
 }
 
 input EnvironmentVariableUpdateInput {
   id: ID!
-  environment: Environment!
+
+  """Must not be already assigned."""
   key: String!
+
+  """Must not start with `GRAFBASE_`."""
   value: String!
 }
 
 type EnvironmentVariableUpdatePayload {
-  record: EnvironmentVariable!
+  environmentVariable: EnvironmentVariable!
   query: QueryRoot!
+}
+
+type GitCommit {
+  commitSha: String!
 }
 
 enum GitProvider {
@@ -187,13 +198,19 @@ type MutationRoot {
   projectCreate(input: ProjectCreateInput!): ProjectCreatePayload!
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
 
-  """Create new environment variable."""
+  """Create new environment variable for the targeted Environment"""
   environmentVariableCreate(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
 
-  """Update an environment variable."""
+  """
+  Update an environment variable.
+  Mocked up.
+  """
   environmentVariableUpdate(input: EnvironmentVariableUpdateInput!): EnvironmentVariableUpdatePayload!
 
-  """Delete an environment variable."""
+  """
+  Delete an environment variable.
+  Mocked up.
+  """
   environmentVariableDelete(input: EnvironmentVariableDeleteInput!): EnvironmentVariableDeletePayload!
 }
 
