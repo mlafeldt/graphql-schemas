@@ -258,10 +258,7 @@ type PersonalAccount implements Account {
 
 type Project {
   id: ID!
-  sk: ID!
   slug: String!
-  accountId: ID!
-  accountSlug: String!
   createdAt: DateTime!
   repository: GitRepository!
   deployments(after: String, before: String, first: Int, last: Int): DeploymentConnection!
@@ -282,7 +279,7 @@ input ProjectCreateInput {
 }
 
 type ProjectCreatePayload {
-  record: Project!
+  project: Project!
   query: QueryRoot!
 }
 
@@ -306,6 +303,15 @@ type ProjectEdge {
 type QueryRoot {
   """Give the actual connected user."""
   viewer: User
+
+  """Give the actual connected user."""
+  projectByAccountSlug(
+    """slug of the account"""
+    accountSlug: String!
+
+    """slug of the project"""
+    projectSlug: String!
+  ): Project
   account(
     """ID of the account"""
     id: String!
