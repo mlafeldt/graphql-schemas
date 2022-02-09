@@ -57,6 +57,35 @@ type DeploymentLogEntry {
   message: String!
 }
 
+type Environment {
+  id: ID!
+  name: EnvironmentKind!
+  createdAt: DateTime!
+  environmentVariables: [EnvironmentVariable!]!
+}
+
+type EnvironmentConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [EnvironmentEdge]
+}
+
+"""An edge in a connection."""
+type EnvironmentEdge {
+  """The item at the end of the edge"""
+  node: Environment!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+enum EnvironmentKind {
+  PREVIEW
+  PRODUCTION
+}
+
 type EnvironmentVariable {
   id: ID!
   key: String!
@@ -279,6 +308,7 @@ type Project {
   createdAt: DateTime!
   repository: GitRepository!
   deployments(after: String, before: String, first: Int, last: Int): DeploymentConnection!
+  environments(after: String, before: String, first: Int, last: Int): EnvironmentConnection!
 }
 
 type ProjectConnection {
