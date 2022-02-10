@@ -205,6 +205,15 @@ type MemberConnection {
   edges: [MemberEdge]
 }
 
+input MemberDeleteInput {
+  id: ID!
+}
+
+type MemberDeletePayload {
+  deletedMemberId: ID!
+  query: QueryRoot!
+}
+
 """An edge in a connection."""
 type MemberEdge {
   """The item at the end of the edge"""
@@ -218,6 +227,16 @@ type MemberEdge {
 enum MemberRole {
   OWNER
   MEMBER
+}
+
+input MemberUpdateInput {
+  id: ID!
+  role: MemberRole
+}
+
+type MemberUpdatePayload {
+  member: Member!
+  query: QueryRoot!
 }
 
 type MutationRoot {
@@ -247,6 +266,12 @@ type MutationRoot {
   Mocked up.
   """
   environmentVariableDelete(input: EnvironmentVariableDeleteInput!): EnvironmentVariableDeletePayload!
+
+  """Update role of an organization member"""
+  memberUpdate(input: MemberUpdateInput!): MemberUpdatePayload!
+
+  """Remove member from an organization"""
+  memberDelete(input: MemberDeleteInput!): MemberDeletePayload!
 }
 
 type Organization implements Account {
@@ -382,6 +407,7 @@ type User {
   avatarUrl: String
   createdAt: DateTime!
   organizations(after: String, before: String, first: Int, last: Int): OrganizationConnection!
+  organizationMemberships(after: String, before: String, first: Int, last: Int): MemberConnection!
   personalAccount: PersonalAccount!
 }
 
