@@ -267,7 +267,7 @@ input OrganizationCreateInput {
 }
 
 type OrganizationCreatePayload {
-  record: Organization!
+  organization: Organization!
   query: QueryRoot!
 }
 
@@ -348,6 +348,11 @@ type ProjectEdge {
 }
 
 type QueryRoot {
+  accountBySlug(
+    """slug of the account"""
+    slug: String!
+  ): Account
+
   """Give the actual connected user."""
   viewer: User
 
@@ -359,14 +364,6 @@ type QueryRoot {
     """slug of the project"""
     projectSlug: String!
   ): Project
-  account(
-    """ID of the account"""
-    id: String!
-  ): Account
-  accountBySlug(
-    """slug of the account"""
-    slug: String!
-  ): Account
 }
 
 type User {
