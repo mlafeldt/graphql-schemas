@@ -297,7 +297,9 @@ input OrganizationCreateInput {
   name: String!
 }
 
-type OrganizationCreatePayload {
+union OrganizationCreatePayload = OrganizationCreateSuccess | SlugError | SizeCheckError | ReservedSlugsCheckError
+
+type OrganizationCreateSuccess {
   organization: Organization!
   query: QueryRoot!
 }
@@ -398,6 +400,21 @@ type QueryRoot {
 
   """Return a list of connected git accounts."""
   connectedGitAccounts(provider: GitProvider!): [GitAccount!]!
+}
+
+type ReservedSlugsCheckError {
+  message: String!
+}
+
+type SizeCheckError {
+  maxLength: Int!
+  message: String!
+}
+
+type SlugError {
+  message: String!
+  actual: String!
+  expected: String!
 }
 
 type User {
