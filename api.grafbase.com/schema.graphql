@@ -6,6 +6,7 @@ schema {
 interface Account {
   id: ID!
   slug: String!
+  name: String!
   createdAt: DateTime!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
 }
@@ -274,6 +275,11 @@ type MutationRoot {
   memberDelete(input: MemberDeleteInput!): MemberDeletePayload!
 }
 
+type NameSizeCheckError {
+  maxLength: Int!
+  message: String!
+}
+
 type Organization implements Account {
   id: ID!
   slug: String!
@@ -297,7 +303,7 @@ input OrganizationCreateInput {
   name: String!
 }
 
-union OrganizationCreatePayload = OrganizationCreateSuccess | SlugError | SizeCheckError | ReservedSlugsCheckError
+union OrganizationCreatePayload = OrganizationCreateSuccess | SlugError | SlugSizeCheckError | NameSizeCheckError | ReservedSlugsCheckError
 
 type OrganizationCreateSuccess {
   organization: Organization!
@@ -332,6 +338,7 @@ type PageInfo {
 type PersonalAccount implements Account {
   id: ID!
   slug: String!
+  name: String!
   createdAt: DateTime!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
 }
@@ -407,15 +414,15 @@ type ReservedSlugsCheckError {
   message: String!
 }
 
-type SizeCheckError {
-  maxLength: Int!
-  message: String!
-}
-
 type SlugError {
   message: String!
   actual: String!
   expected: String!
+}
+
+type SlugSizeCheckError {
+  maxLength: Int!
+  message: String!
 }
 
 type User {
