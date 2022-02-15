@@ -24037,7 +24037,16 @@ type RepositoryVulnerabilityAlert implements Node & RepositoryNode {
 
   """The user who dismissed the alert"""
   dismisser: User
+
+  """The reason the alert was marked as fixed."""
+  fixReason: String
+
+  """When was the alert fixed?"""
+  fixedAt: DateTime
   id: ID!
+
+  """Identifies the alert number."""
+  number: Int!
 
   """The associated repository"""
   repository: Repository!
@@ -24047,6 +24056,9 @@ type RepositoryVulnerabilityAlert implements Node & RepositoryNode {
 
   """The associated security vulnerability"""
   securityVulnerability: SecurityVulnerability
+
+  """Identifies the state of the alert."""
+  state: RepositoryVulnerabilityAlertState!
 
   """The vulnerable manifest filename"""
   vulnerableManifestFilename: String!
@@ -24080,6 +24092,18 @@ type RepositoryVulnerabilityAlertEdge {
 
   """The item at the end of the edge."""
   node: RepositoryVulnerabilityAlert
+}
+
+"""The possible states of an alert"""
+enum RepositoryVulnerabilityAlertState {
+  """An alert that is still open."""
+  OPEN
+
+  """An alert that has been resolved by a code change."""
+  FIXED
+
+  """An alert that has been manually closed by a user."""
+  DISMISSED
 }
 
 """The possible states that can be requested when creating a check run."""
