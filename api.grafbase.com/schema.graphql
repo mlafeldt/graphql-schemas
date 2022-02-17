@@ -224,7 +224,6 @@ type MemberEdge {
   cursor: String!
 }
 
-"""A member can only have ONE role"""
 enum MemberRole {
   OWNER
   MEMBER
@@ -245,13 +244,6 @@ type MutationRoot {
   Create new organization account owned by the current user. Slug must be unique.
   """
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
-  login: LoginPayload!
-
-  """
-  Create new project owned by the current user. Slug must be unique for given account.
-  """
-  projectCreate(input: ProjectCreateInput!): ProjectCreatePayload!
-  projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
 
   """Create new environment variable for the targeted Environment"""
   environmentVariableCreate(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
@@ -273,6 +265,13 @@ type MutationRoot {
 
   """Remove member from an organization"""
   memberDelete(input: MemberDeleteInput!): MemberDeletePayload!
+
+  """
+  Create new project owned by the current user. Slug must be unique for given account.
+  """
+  projectCreate(input: ProjectCreateInput!): ProjectCreatePayload!
+  projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
+  login: LoginPayload!
 }
 
 type NameSizeCheckError {
@@ -394,8 +393,8 @@ type QueryRoot {
     slug: String!
   ): Account
 
-  """Give the actual connected user."""
-  viewer: User
+  """Return a list of connected git accounts."""
+  connectedGitAccounts(provider: GitProvider!): [GitAccount!]!
 
   """Get project by account slug and slug of the project itself."""
   projectByAccountSlug(
@@ -406,8 +405,8 @@ type QueryRoot {
     projectSlug: String!
   ): Project
 
-  """Return a list of connected git accounts."""
-  connectedGitAccounts(provider: GitProvider!): [GitAccount!]!
+  """Give the actual connected user."""
+  viewer: User
 }
 
 type ReservedSlugsCheckError {
