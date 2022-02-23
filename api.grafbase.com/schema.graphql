@@ -149,14 +149,26 @@ enum GitProvider {
 
 type GitRepository {
   provider: GitProvider!
+  id: String!
+  owner: String!
+  name: String!
+  slug: String!
   gitUrl: String!
-  providerId: String!
+  defaultBranch: String!
+  private: Boolean!
+  updatedAt: DateTime!
 }
 
 input GitRepositoryInput {
   provider: GitProvider!
+  id: String!
+  owner: String!
+  name: String!
+  slug: String!
   gitUrl: String!
-  providerId: String!
+  defaultBranch: String!
+  private: Boolean!
+  updatedAt: DateTime!
 }
 
 type Invite {
@@ -400,6 +412,9 @@ type QueryRoot {
 
   """Return a list of connected git accounts."""
   connectedGitAccounts(provider: GitProvider!): [GitAccount!]!
+
+  """Return a list of connected git repositories."""
+  connectedGitRepos(provider: GitProvider!, gitAccountId: String!, query: String): [GitRepository!]!
 
   """Get project by account slug and slug of the project itself."""
   projectByAccountSlug(
