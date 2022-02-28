@@ -3381,27 +3381,6 @@ type Mutation {
     id: String!
   ): ArchivePayload!
 
-  """Creates a new comment."""
-  commentCreate(
-    """The comment object to create."""
-    input: CommentCreateInput!
-  ): CommentPayload!
-
-  """Updates a comment."""
-  commentUpdate(
-    """A partial comment object to update the comment with."""
-    input: CommentUpdateInput!
-
-    """The identifier of the comment to update."""
-    id: String!
-  ): CommentPayload!
-
-  """Deletes a comment."""
-  commentDelete(
-    """The identifier of the comment to delete."""
-    id: String!
-  ): ArchivePayload!
-
   """
   [Alpha] Creates a new attachment, or updates existing if the same `url` and `issueId` is used.
   """
@@ -3538,6 +3517,27 @@ type Mutation {
 
   """Update collaborative document with client steps."""
   collaborativeDocumentUpdate(input: CollaborationDocumentUpdateInput!): CollaborationDocumentUpdatePayload!
+
+  """Creates a new comment."""
+  commentCreate(
+    """The comment object to create."""
+    input: CommentCreateInput!
+  ): CommentPayload!
+
+  """Updates a comment."""
+  commentUpdate(
+    """A partial comment object to update the comment with."""
+    input: CommentUpdateInput!
+
+    """The identifier of the comment to update."""
+    id: String!
+  ): CommentPayload!
+
+  """Deletes a comment."""
+  commentDelete(
+    """The identifier of the comment to delete."""
+    id: String!
+  ): ArchivePayload!
 
   """Saves user message."""
   contactCreate(
@@ -6628,42 +6628,6 @@ type Query {
   """Get all authorized applications for a user"""
   authorizedApplications: [AuthorizedApplication!]!
 
-  """All comments."""
-  comments(
-    """[Alpha] Filter returned comments."""
-    filter: CommentFilter
-
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): CommentConnection!
-
-  """A specific comment."""
-  comment(
-    """The identifier of the comment to retrieve."""
-    id: String!
-  ): Comment!
-
   """
   [Alpha] All issue attachments.
     
@@ -6806,6 +6770,42 @@ type Query {
     """Document version."""
     version: Int!
   ): CollaborationDocumentUpdatePayload!
+
+  """All comments."""
+  comments(
+    """[Alpha] Filter returned comments."""
+    filter: CommentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CommentConnection!
+
+  """A specific comment."""
+  comment(
+    """The identifier of the comment to retrieve."""
+    id: String!
+  ): Comment!
 
   """Custom views for the user."""
   customViews(
