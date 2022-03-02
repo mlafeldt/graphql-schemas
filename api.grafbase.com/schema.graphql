@@ -179,12 +179,39 @@ type Invite {
   createdAt: DateTime!
 }
 
+input InviteAcceptInput {
+  id: ID!
+}
+
+type InviteAcceptPayload {
+  invite: Invite!
+  query: QueryRoot!
+}
+
+input InviteCancelInput {
+  id: ID!
+}
+
+type InviteCancelPayload {
+  id: ID!
+  query: QueryRoot!
+}
+
 type InviteConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
   """A list of edges."""
   edges: [InviteEdge]
+}
+
+input InviteDeclineInput {
+  id: ID!
+}
+
+type InviteDeclinePayload {
+  invite: Invite!
+  query: QueryRoot!
 }
 
 """An edge in a connection."""
@@ -194,6 +221,17 @@ type InviteEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+input InviteSendInput {
+  organizationId: ID!
+  email: String!
+  role: MemberRole!
+}
+
+type InviteSendPayload {
+  invite: Invite!
+  query: QueryRoot!
 }
 
 enum InviteStatus {
@@ -287,6 +325,10 @@ type MutationRoot {
   projectCreate(input: ProjectCreateInput!): ProjectCreatePayload!
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
   login: LoginPayload!
+  inviteSend(input: InviteSendInput!): InviteSendPayload!
+  inviteCancel(input: InviteCancelInput!): InviteCancelPayload!
+  inviteAccept(input: InviteAcceptInput!): InviteAcceptPayload!
+  inviteDecline(input: InviteDeclineInput!): InviteDeclinePayload!
 }
 
 type NameSizeCheckError {
