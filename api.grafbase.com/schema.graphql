@@ -151,7 +151,6 @@ type GitRepository {
   provider: GitProvider!
   id: String!
   owner: String!
-  name: String!
   slug: String!
   gitUrl: String!
   defaultBranch: String!
@@ -163,7 +162,6 @@ input GitRepositoryInput {
   provider: GitProvider!
   id: String!
   owner: String!
-  name: String!
   slug: String!
   gitUrl: String!
   defaultBranch: String!
@@ -420,6 +418,9 @@ type QueryRoot {
   """
   connectedGitRepos(provider: GitProvider!, gitAccountId: String!, query: String): [GitRepository!]!
 
+  """Returns details about a specific git repository identified by its URL."""
+  gitRepoByUrl(url: Url!): GitRepository!
+
   """Get project by account slug and slug of the project itself."""
   projectByAccountSlug(
     """slug of the account"""
@@ -447,6 +448,11 @@ type SlugSizeCheckError {
   maxLength: Int!
   message: String!
 }
+
+"""
+URL is a String implementing the [URL Standard](http://url.spec.whatwg.org/)
+"""
+scalar Url
 
 type User {
   id: ID!
