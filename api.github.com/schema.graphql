@@ -17254,7 +17254,7 @@ type ProjectNextEdge {
 }
 
 """A field inside a project."""
-type ProjectNextField {
+type ProjectNextField implements ProjectNextFieldCommon & Node {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
 
@@ -17268,7 +17268,31 @@ type ProjectNextField {
   """The project field's name."""
   name: String!
 
-  """The project that contains this column."""
+  """The project that contains this field."""
+  project: ProjectNext!
+
+  """The field's settings."""
+  settings: String
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+}
+
+"""Common fields across different field types"""
+interface ProjectNextFieldCommon {
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+
+  """The field's type."""
+  dataType: ProjectNextFieldType!
+
+  """Identifies the primary key from the database."""
+  databaseId: Int
+
+  """The project field's name."""
+  name: String!
+
+  """The project that contains this field."""
   project: ProjectNext!
 
   """The field's settings."""
@@ -29400,10 +29424,8 @@ input UpdateProjectNextItemFieldInput {
   """The id of the item to be updated."""
   itemId: ID!
 
-  """
-  The id of the field to be updated. Only supports custom fields and status for now.
-  """
-  fieldId: ID!
+  """The id of the field to be updated."""
+  fieldId: ID
 
   """The value which will be set on the field."""
   value: String!
