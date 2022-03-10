@@ -4296,6 +4296,28 @@ type Mutation {
   ): OrganizationPayload!
 
   """
+  [INTERNAL] Configure organization SAML by XML. Administrator privileges required.
+  """
+  organizationConfigureSamlViaXml(
+    """XML metadata URL to configure SAML."""
+    samlConfigXmlUrl: String
+
+    """XML metadata to configure SAML."""
+    samlConfigXml: String
+
+    """SAML allowed domains."""
+    samlAllowedDomains: [String!]
+  ): OrganizationConfigureSamlPayload!
+
+  """
+  [INTERNAL] Configure organization SAML by XML. Administrator privileges required.
+  """
+  organizationConfigureSaml(
+    """SAML configuration for the organization."""
+    samlConfiguration: SamlConfigurationInput
+  ): OrganizationConfigureSamlPayload!
+
+  """
   Get an organization's delete confirmation token. Administrator privileges required.
   """
   organizationDeleteChallenge: OrganizationDeletePayload!
@@ -5658,6 +5680,17 @@ type Organization implements Node {
 type OrganizationCancelDeletePayload {
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+type OrganizationConfigureSamlPayload {
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """Any errors encountered when processing the XML configuration."""
+  xmlErrors: [String!]
+
+  """The current state of the SAML configuration."""
+  samlConfiguration: SamlConfiguration
 }
 
 type OrganizationDeletePayload {
