@@ -11,6 +11,11 @@ interface Account {
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
 }
 
+type BranchMetrics {
+  latency: Distribution!
+  request: Distribution!
+}
+
 """
 Implement the DateTime scalar
 
@@ -64,6 +69,16 @@ enum DeploymentStatus {
   ACTIVE
   INACTIVE
   FAILED
+}
+
+type Distribution {
+  unit: UnitType!
+  values: [DistributionValue!]!
+}
+
+type DistributionValue {
+  bucket: DateTime!
+  value: Int!
 }
 
 type Environment {
@@ -458,6 +473,7 @@ type QueryRoot {
     """slug of the account"""
     slug: String!
   ): Account
+  metricsByBranch(accountId: ID!, projectSlug: ID!, branch: ID!, startDate: DateTime!, endDate: DateTime!): BranchMetrics!
 
   """Return a list of git accounts accessible by the current user."""
   gitAccounts(provider: GitProvider!): [GitAccount!]!
@@ -499,6 +515,11 @@ type SlugError {
 type SlugSizeCheckError {
   maxLength: Int!
   message: String!
+}
+
+enum UnitType {
+  NO_UNIT
+  MILLI_SECONDS
 }
 
 """
