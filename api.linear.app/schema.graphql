@@ -7422,6 +7422,9 @@ type Query {
   """Sends a test push message."""
   pushSubscriptionTest: PushSubscriptionTestPayload!
 
+  """The status of the rate limiter."""
+  rateLimitStatus: RateLimitPayload!
+
   """All comment emoji reactions."""
   reactions(
     """A cursor to be used with last for backward pagination."""
@@ -7680,6 +7683,39 @@ type Query {
 
   """One specific state."""
   workflowState(id: String!): WorkflowState!
+}
+
+type RateLimitPayload {
+  """The identifier we rate limit on."""
+  identifier: String
+
+  """The kind of rate limit selected for this request."""
+  kind: String!
+
+  """The state of the rate limit."""
+  limits: [RateLimitResultPayload!]!
+}
+
+type RateLimitResultPayload {
+  """What is being rate limited."""
+  type: String!
+
+  """The requested quantity for this type of limit."""
+  requestedAmount: Float!
+
+  """The total allowed quantity for this type of limit."""
+  allowedAmount: Float!
+
+  """The period in which the rate limit is fully replenished in ms."""
+  period: Float!
+
+  """The remaining quantity for this type of limit after this request."""
+  remainingAmount: Float!
+
+  """
+  The timestamp after the rate limit is fully replenished as a UNIX timestamp.
+  """
+  reset: Float!
 }
 
 """A reaction associated with a comment."""
