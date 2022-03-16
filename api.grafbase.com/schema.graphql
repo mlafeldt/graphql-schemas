@@ -347,6 +347,11 @@ type MutationRoot {
   Create new project owned by the current user. Slug must be unique for given account.
   """
   projectCreate(input: ProjectCreateInput!): ProjectCreatePayload!
+
+  """
+  Create new project owned by the current user. Slug must be unique for given account.
+  """
+  projectCreateFromRepo(input: ProjectCreateFromRepoInput!): ProjectCreateFromRepoPayload!
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
   login: LoginPayload!
   inviteSend(input: InviteSendInput!): InviteSendPayload!
@@ -438,6 +443,19 @@ type ProjectConnection {
 
   """A list of edges."""
   edges: [ProjectEdge]
+}
+
+input ProjectCreateFromRepoInput {
+  accountId: ID!
+  projectSlug: String!
+  gitRepoUrl: Url!
+  gitAccountId: String!
+  productionBranch: String!
+}
+
+type ProjectCreateFromRepoPayload {
+  project: Project!
+  query: QueryRoot!
 }
 
 input ProjectCreateInput {
