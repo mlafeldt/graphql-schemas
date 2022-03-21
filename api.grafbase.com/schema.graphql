@@ -181,17 +181,6 @@ type GitRepository {
   updatedAt: DateTime!
 }
 
-input GitRepositoryInput {
-  provider: GitProvider!
-  id: String!
-  owner: String!
-  slug: String!
-  url: String!
-  defaultBranch: String!
-  private: Boolean!
-  updatedAt: DateTime!
-}
-
 type Invite {
   id: ID!
   role: MemberRole!
@@ -200,6 +189,7 @@ type Invite {
   lastRenewedAt: DateTime!
   status: InviteStatus!
   createdAt: DateTime!
+  organization: Organization!
 }
 
 input InviteAcceptInput {
@@ -346,11 +336,6 @@ type MutationRoot {
   """
   Create new project owned by the current user. Slug must be unique for given account.
   """
-  projectCreate(input: ProjectCreateInput!): ProjectCreatePayload!
-
-  """
-  Create new project owned by the current user. Slug must be unique for given account.
-  """
   projectCreateFromRepo(input: ProjectCreateFromRepoInput!): ProjectCreateFromRepoPayload!
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
   login: LoginPayload!
@@ -454,18 +439,6 @@ input ProjectCreateFromRepoInput {
 }
 
 type ProjectCreateFromRepoPayload {
-  project: Project!
-  query: QueryRoot!
-}
-
-input ProjectCreateInput {
-  accountId: ID!
-  slug: String!
-  gitAccountId: Int
-  repository: GitRepositoryInput!
-}
-
-type ProjectCreatePayload {
   project: Project!
   query: QueryRoot!
 }
