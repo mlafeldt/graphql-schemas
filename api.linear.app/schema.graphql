@@ -4378,13 +4378,23 @@ type Mutation {
     id: String!
   ): ProjectPayload!
 
+  """
+  Deletes a project. All issues will be disassociated from the deleted project.
+  """
+  projectDelete(
+    """
+    The identifier of the project to delete. Also the identifier from the URL is accepted.
+    """
+    id: String!
+  ): ArchivePayload!
+
   """Archives a project."""
   projectArchive(
     """
     The identifier of the project to archive. Also the identifier from the URL is accepted.
     """
     id: String!
-  ): ArchivePayload!
+  ): ArchivePayload! @deprecated(reason: "Deprecated in favor of projectDelete.")
 
   """Unarchives a project."""
   projectUnarchive(
