@@ -11,6 +11,31 @@ interface Account {
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
 }
 
+type Branch {
+  id: ID!
+  name: String!
+  latestDeployment: Deployment
+  activeDeployment: Deployment
+  deployments(after: String, before: String, first: Int, last: Int): DeploymentConnection!
+}
+
+type BranchConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [BranchEdge]
+}
+
+"""An edge in a connection."""
+type BranchEdge {
+  """The item at the end of the edge"""
+  node: Branch!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
 type BranchMetrics {
   latency: Distribution!
   request: Distribution!
@@ -79,35 +104,6 @@ type Distribution {
 type DistributionValue {
   bucket: DateTime!
   value: Int!
-}
-
-type Environment {
-  id: ID!
-  name: EnvironmentKind!
-  createdAt: DateTime!
-  environmentVariables: [EnvironmentVariable!]!
-}
-
-type EnvironmentConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
-  edges: [EnvironmentEdge]
-}
-
-"""An edge in a connection."""
-type EnvironmentEdge {
-  """The item at the end of the edge"""
-  node: Environment!
-
-  """A cursor for use in pagination"""
-  cursor: String!
-}
-
-enum EnvironmentKind {
-  PREVIEW
-  PRODUCTION
 }
 
 type EnvironmentVariable {
@@ -418,8 +414,8 @@ type Project {
   slug: String!
   createdAt: DateTime!
   repository: GitRepository!
-  deployments(after: String, before: String, first: Int, last: Int): DeploymentConnection!
-  environments(after: String, before: String, first: Int, last: Int): EnvironmentConnection!
+  branches(after: String, before: String, first: Int, last: Int): BranchConnection!
+  productionBranch: String!
 }
 
 type ProjectConnection {
