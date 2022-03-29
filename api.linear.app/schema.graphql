@@ -208,6 +208,12 @@ input AttachmentCreateInput {
   [Internal] Create a linked comment with Prosemirror body. Please use `commentBody` instead
   """
   commentBodyData: JSONObject
+
+  """
+  Create attachment as a user with the provided name. This option is only
+  available to OAuth applications creating attachments in `actor=application` mode.
+  """
+  createAsUser: String
 }
 
 type AttachmentEdge {
@@ -574,6 +580,12 @@ input CommentCreateInput {
 
   """The issue to associate the comment with."""
   issueId: String!
+
+  """
+  Create comment as a user with the provided name. This option is only available
+  to OAuth applications creating comments in `actor=application` mode.
+  """
+  createAsUser: String
 }
 
 type CommentEdge {
@@ -2495,6 +2507,12 @@ input IssueCreateInput {
 
   """The date at which the issue is due."""
   dueDate: TimelessDate
+
+  """
+  Create issue as a user with the provided name. This option is only available
+  to OAuth applications creating issues in `actor=application` mode.
+  """
+  createAsUser: String
 }
 
 type IssueEdge {
@@ -3764,6 +3782,15 @@ type Mutation {
     """
     input: IntercomSettingsInput!
   ): IntegrationPayload! @deprecated(reason: "This mutation is deprecated, please use `integrationSettingsUpdate` instead")
+
+  """Integrates the organization with Discord."""
+  integrationDiscord(
+    """The Discord OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Discord OAuth code."""
+    code: String!
+  ): IntegrationPayload!
 
   """Integrates the organization with Slack."""
   integrationSlack(
