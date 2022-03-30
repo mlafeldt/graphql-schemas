@@ -334,6 +334,7 @@ type MutationRoot {
   Create new project owned by the current user. Slug must be unique for given account.
   """
   projectCreateFromRepo(input: ProjectCreateFromRepoInput!): ProjectCreateFromRepoPayload!
+  projectUpdate(input: ProjectUpdateInput!): ProjectUpdatePayload!
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
   login(input: LoginInput): LoginPayload!
   inviteSend(input: InviteSendInput!): InviteSendPayload!
@@ -455,6 +456,17 @@ type ProjectEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+input ProjectUpdateInput {
+  id: ID!
+  projectSlug: String
+  productionBranch: String
+}
+
+type ProjectUpdatePayload {
+  project: Project!
+  query: QueryRoot!
 }
 
 type QueryRoot {
