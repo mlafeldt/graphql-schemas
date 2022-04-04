@@ -254,6 +254,7 @@ input LoginInput {
 type LoginPayload {
   user: User!
   isFirstLogin: Boolean!
+  query: QueryRoot!
 }
 
 type Member {
@@ -311,6 +312,7 @@ type MutationRoot {
   """
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
+  organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
 
   """Create new environment variable for the targeted Environment"""
   environmentVariableCreate(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
@@ -382,6 +384,15 @@ type OrganizationCreateSuccess {
   query: QueryRoot!
 }
 
+input OrganizationDeleteInput {
+  id: ID!
+}
+
+type OrganizationDeletePayload {
+  deletedId: ID!
+  query: QueryRoot!
+}
+
 """An edge in a connection."""
 type OrganizationEdge {
   """The item at the end of the edge"""
@@ -415,7 +426,7 @@ type PersonalAccount implements Account {
 }
 
 type PersonalAccountDeletePayload {
-  id: ID!
+  deletedId: ID!
 }
 
 type Project {
