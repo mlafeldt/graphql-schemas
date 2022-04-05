@@ -519,6 +519,9 @@ type Comment implements Node {
   """The issue that the comment is associated with."""
   issue: Issue!
 
+  """The parent of the comment."""
+  parent: Comment
+
   """The user who wrote the comment."""
   user: User!
 
@@ -527,6 +530,36 @@ type Comment implements Node {
 
   """Comment's URL."""
   url: String!
+
+  """The children of the comment."""
+  children(
+    """[Alpha] Filter returned comments."""
+    filter: CommentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CommentConnection!
 }
 
 """[Alpha] Comment filtering options."""
@@ -580,6 +613,9 @@ input CommentCreateInput {
 
   """The issue to associate the comment with."""
   issueId: String!
+
+  """[Internal] The parent under which to nest the comment."""
+  parentId: String
 
   """
   Create comment as a user with the provided name. This option is only available
