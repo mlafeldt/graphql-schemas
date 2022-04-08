@@ -629,21 +629,9 @@
       },
       {
         "kind": "OBJECT",
-        "name": "SamlConfiguration",
-        "description": "The integration resource's settings",
+        "name": "SamlConfigurationPayload",
+        "description": "The organization's SAML configuration",
         "fields": [
-          {
-            "name": "ssoSigningCert",
-            "description": "X.509 Signing Certificate in string form.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "ssoEndpoint",
             "description": "Sign in endpoint URL for the identity provider.",
@@ -703,6 +691,97 @@
           {
             "name": "issuerEntityId",
             "description": "The issuer's custom entity ID.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "SamlConfiguration",
+        "description": null,
+        "fields": [
+          {
+            "name": "ssoEndpoint",
+            "description": "Sign in endpoint URL for the identity provider.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ssoBinding",
+            "description": "Binding method for authentication call. Can be either `post` (default) or `redirect`.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ssoSignAlgo",
+            "description": "The algorithm of the Signing Certificate. Can be one of `sha1`, `sha256` (default), or `sha512`.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "allowedDomains",
+            "description": "List of allowed email domains for SAML authentication.",
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issuerEntityId",
+            "description": "The issuer's custom entity ID.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ssoSigningCert",
+            "description": "X.509 Signing Certificate in string form.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -20448,65 +20527,6 @@
                 "name": "Boolean",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "OrganizationConfigureSamlPayload",
-        "description": null,
-        "fields": [
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "xmlErrors",
-            "description": "Any errors encountered when processing the XML configuration.",
-            "args": [],
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "samlConfiguration",
-            "description": "The current state of the SAML configuration.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "SamlConfiguration",
-              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -41117,88 +41137,6 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "OrganizationPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizationConfigureSamlViaXml",
-            "description": "[INTERNAL] Configure organization SAML by XML. Administrator privileges required.",
-            "args": [
-              {
-                "name": "samlConfigXmlUrl",
-                "description": "XML metadata URL to configure SAML.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "samlConfigXml",
-                "description": "XML metadata to configure SAML.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "samlAllowedDomains",
-                "description": "SAML allowed domains.",
-                "type": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "SCALAR",
-                      "name": "String",
-                      "ofType": null
-                    }
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationConfigureSamlPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizationConfigureSaml",
-            "description": "[INTERNAL] Configure organization SAML by XML. Administrator privileges required.",
-            "args": [
-              {
-                "name": "samlConfiguration",
-                "description": "SAML configuration for the organization.",
-                "type": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "SamlConfigurationInput",
-                  "ofType": null
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationConfigureSamlPayload",
                 "ofType": null
               }
             },

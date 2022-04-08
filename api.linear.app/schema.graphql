@@ -4379,28 +4379,6 @@ type Mutation {
   ): OrganizationPayload!
 
   """
-  [INTERNAL] Configure organization SAML by XML. Administrator privileges required.
-  """
-  organizationConfigureSamlViaXml(
-    """XML metadata URL to configure SAML."""
-    samlConfigXmlUrl: String
-
-    """XML metadata to configure SAML."""
-    samlConfigXml: String
-
-    """SAML allowed domains."""
-    samlAllowedDomains: [String!]
-  ): OrganizationConfigureSamlPayload!
-
-  """
-  [INTERNAL] Configure organization SAML by XML. Administrator privileges required.
-  """
-  organizationConfigureSaml(
-    """SAML configuration for the organization."""
-    samlConfiguration: SamlConfigurationInput
-  ): OrganizationConfigureSamlPayload!
-
-  """
   Get an organization's delete confirmation token. Administrator privileges required.
   """
   organizationDeleteChallenge: OrganizationDeletePayload!
@@ -5791,17 +5769,6 @@ type Organization implements Node {
 type OrganizationCancelDeletePayload {
   """Whether the operation was successful."""
   success: Boolean!
-}
-
-type OrganizationConfigureSamlPayload {
-  """Whether the operation was successful."""
-  success: Boolean!
-
-  """Any errors encountered when processing the XML configuration."""
-  xmlErrors: [String!]
-
-  """The current state of the SAML configuration."""
-  samlConfiguration: SamlConfiguration
 }
 
 type OrganizationDeletePayload {
@@ -7899,8 +7866,31 @@ type RotateSecretPayload {
   success: Boolean!
 }
 
-"""The integration resource's settings"""
 type SamlConfiguration {
+  """Sign in endpoint URL for the identity provider."""
+  ssoEndpoint: String
+
+  """
+  Binding method for authentication call. Can be either `post` (default) or `redirect`.
+  """
+  ssoBinding: String
+
+  """
+  The algorithm of the Signing Certificate. Can be one of `sha1`, `sha256` (default), or `sha512`.
+  """
+  ssoSignAlgo: String
+
+  """List of allowed email domains for SAML authentication."""
+  allowedDomains: [String!]
+
+  """The issuer's custom entity ID."""
+  issuerEntityId: String
+
+  """X.509 Signing Certificate in string form."""
+  ssoSigningCert: String
+}
+
+input SamlConfigurationInput {
   """X.509 Signing Certificate in string form."""
   ssoSigningCert: String
 
@@ -7924,10 +7914,8 @@ type SamlConfiguration {
   issuerEntityId: String
 }
 
-input SamlConfigurationInput {
-  """X.509 Signing Certificate in string form."""
-  ssoSigningCert: String
-
+"""The organization's SAML configuration"""
+type SamlConfigurationPayload {
   """Sign in endpoint URL for the identity provider."""
   ssoEndpoint: String
 
