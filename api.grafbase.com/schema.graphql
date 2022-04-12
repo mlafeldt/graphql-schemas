@@ -495,6 +495,18 @@ type QueryRoot {
   ): Account
   metricsByBranch(accountId: ID!, projectSlug: ID!, branch: ID!, startDate: DateTime!, endDate: DateTime!): BranchMetrics!
 
+  """Get branch by account slug, project slug and the name of the branch."""
+  branch(
+    """slug of the account"""
+    accountSlug: ID!
+
+    """slug of the project"""
+    projectSlug: ID!
+
+    """name of the branch"""
+    branch: String!
+  ): Branch
+
   """Return a list of git accounts accessible by the current user."""
   gitAccounts(provider: GitProvider!): [GitAccount!]!
 
@@ -511,10 +523,10 @@ type QueryRoot {
   """Get project by account slug and slug of the project itself."""
   projectByAccountSlug(
     """slug of the account"""
-    accountSlug: String!
+    accountSlug: ID!
 
     """slug of the project"""
-    projectSlug: String!
+    projectSlug: ID!
   ): Project
 
   """Give the actual connected user."""
