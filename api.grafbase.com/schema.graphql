@@ -103,52 +103,6 @@ type DistributionValue {
   value: Int!
 }
 
-type EnvironmentVariable {
-  id: ID!
-  key: String!
-  value: String!
-  createdAt: DateTime!
-}
-
-input EnvironmentVariableCreateInput {
-  environmentId: ID!
-
-  """Must not be already assigned."""
-  key: String!
-
-  """Must not start with `GRAFBASE_`."""
-  value: String!
-}
-
-type EnvironmentVariableCreatePayload {
-  environmentVariable: EnvironmentVariable!
-  query: QueryRoot!
-}
-
-input EnvironmentVariableDeleteInput {
-  id: ID!
-}
-
-type EnvironmentVariableDeletePayload {
-  deletedId: ID!
-  query: QueryRoot!
-}
-
-input EnvironmentVariableUpdateInput {
-  id: ID!
-
-  """Must not be already assigned."""
-  key: String!
-
-  """Must not start with `GRAFBASE_`."""
-  value: String!
-}
-
-type EnvironmentVariableUpdatePayload {
-  environmentVariable: EnvironmentVariable!
-  query: QueryRoot!
-}
-
 type GitAccount {
   provider: GitProvider!
   id: ID!
@@ -317,21 +271,6 @@ type MutationRoot {
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
-
-  """Create new environment variable for the targeted Environment"""
-  environmentVariableCreate(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
-
-  """
-  Update an environment variable.
-  Mocked up.
-  """
-  environmentVariableUpdate(input: EnvironmentVariableUpdateInput!): EnvironmentVariableUpdatePayload!
-
-  """
-  Delete an environment variable.
-  Mocked up.
-  """
-  environmentVariableDelete(input: EnvironmentVariableDeleteInput!): EnvironmentVariableDeletePayload!
 
   """Update role of an organization member"""
   memberUpdate(input: MemberUpdateInput!): MemberUpdatePayload!
