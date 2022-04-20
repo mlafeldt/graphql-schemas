@@ -273,9 +273,15 @@ type MutationRoot {
   memberDelete(input: MemberDeleteInput!): MemberDeletePayload!
 
   """
+  Deprecated, please use projectCreateFromRepository.
   Create new project owned by the current user. Slug must be unique for given account.
   """
   projectCreateFromRepo(input: ProjectCreateFromRepoInput!): ProjectCreateFromRepoPayload!
+
+  """
+  Create new project owned by the current user. Slug must be unique for given account.
+  """
+  projectCreateFromRepository(input: ProjectCreateFromRepositoryInput!): ProjectCreateFromRepositoryPayload!
   projectUpdate(input: ProjectUpdateInput!): ProjectUpdatePayload!
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
   login(input: LoginInput): LoginPayload!
@@ -396,6 +402,21 @@ type ProjectCreateFromRepoPayload {
   query: QueryRoot!
 }
 
+input ProjectCreateFromRepositoryInput {
+  accountId: ID!
+  projectSlug: String!
+  gitRepoUrl: Url!
+  gitAccountId: String!
+  productionBranch: String!
+}
+
+union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError
+
+type ProjectCreateFromRepositorySuccess {
+  project: Project!
+  query: QueryRoot!
+}
+
 input ProjectDeleteInput {
   id: ID!
 }
@@ -478,6 +499,10 @@ type QueryRoot {
 
 type ReservedSlugsCheckError {
   message: String!
+}
+
+type SlugAlreadyExistsError {
+  query: QueryRoot!
 }
 
 type SlugError {
