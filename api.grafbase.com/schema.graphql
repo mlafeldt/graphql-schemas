@@ -1,8 +1,3 @@
-schema {
-  query: QueryRoot
-  mutation: MutationRoot
-}
-
 interface Account {
   id: ID!
   slug: String!
@@ -145,7 +140,7 @@ input InviteAcceptInput {
 
 type InviteAcceptPayload {
   member: Member!
-  query: QueryRoot!
+  query: Query!
 }
 
 input InviteCancelInput {
@@ -154,7 +149,7 @@ input InviteCancelInput {
 
 type InviteCancelPayload {
   id: ID!
-  query: QueryRoot!
+  query: Query!
 }
 
 type InviteConnection {
@@ -171,7 +166,7 @@ input InviteDeclineInput {
 
 type InviteDeclinePayload {
   id: ID!
-  query: QueryRoot!
+  query: Query!
 }
 
 """An edge in a connection."""
@@ -191,7 +186,7 @@ input InviteSendInput {
 
 type InviteSendPayload {
   invite: Invite!
-  query: QueryRoot!
+  query: Query!
 }
 
 enum InviteStatus {
@@ -206,7 +201,7 @@ input LoginInput {
 type LoginPayload {
   user: User!
   isFirstLogin: Boolean!
-  query: QueryRoot!
+  query: Query!
 }
 
 type Member {
@@ -231,7 +226,7 @@ input MemberDeleteInput {
 
 type MemberDeletePayload {
   deletedMemberId: ID!
-  query: QueryRoot!
+  query: Query!
 }
 
 """An edge in a connection."""
@@ -255,16 +250,20 @@ input MemberUpdateInput {
 
 type MemberUpdatePayload {
   member: Member!
-  query: QueryRoot!
+  query: Query!
 }
 
-type MutationRoot {
+type Mutation {
   """
   Create new organization account owned by the current user. Slug must be unique.
   """
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
+  inviteSend(input: InviteSendInput!): InviteSendPayload!
+  inviteCancel(input: InviteCancelInput!): InviteCancelPayload!
+  inviteAccept(input: InviteAcceptInput!): InviteAcceptPayload!
+  inviteDecline(input: InviteDeclineInput!): InviteDeclinePayload!
 
   """Update role of an organization member"""
   memberUpdate(input: MemberUpdateInput!): MemberUpdatePayload!
@@ -285,10 +284,6 @@ type MutationRoot {
   projectUpdate(input: ProjectUpdateInput!): ProjectUpdatePayload!
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
   login(input: LoginInput): LoginPayload!
-  inviteSend(input: InviteSendInput!): InviteSendPayload!
-  inviteCancel(input: InviteCancelInput!): InviteCancelPayload!
-  inviteAccept(input: InviteAcceptInput!): InviteAcceptPayload!
-  inviteDecline(input: InviteDeclineInput!): InviteDeclinePayload!
 }
 
 type NameSizeCheckError {
@@ -324,7 +319,7 @@ union OrganizationCreatePayload = OrganizationCreateSuccess | SlugError | SlugSi
 type OrganizationCreateSuccess {
   organization: Organization!
   member: Member!
-  query: QueryRoot!
+  query: Query!
 }
 
 input OrganizationDeleteInput {
@@ -333,7 +328,7 @@ input OrganizationDeleteInput {
 
 type OrganizationDeletePayload {
   deletedId: ID!
-  query: QueryRoot!
+  query: Query!
 }
 
 """An edge in a connection."""
@@ -399,7 +394,7 @@ input ProjectCreateFromRepoInput {
 
 type ProjectCreateFromRepoPayload {
   project: Project!
-  query: QueryRoot!
+  query: Query!
 }
 
 input ProjectCreateFromRepositoryInput {
@@ -414,7 +409,7 @@ union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | 
 
 type ProjectCreateFromRepositorySuccess {
   project: Project!
-  query: QueryRoot!
+  query: Query!
 }
 
 input ProjectDeleteInput {
@@ -422,7 +417,7 @@ input ProjectDeleteInput {
 }
 
 type ProjectDeletePayload {
-  query: QueryRoot!
+  query: Query!
 }
 
 """An edge in a connection."""
@@ -442,10 +437,10 @@ input ProjectUpdateInput {
 
 type ProjectUpdatePayload {
   project: Project!
-  query: QueryRoot!
+  query: Query!
 }
 
-type QueryRoot {
+type Query {
   accountBySlug(
     """slug of the account"""
     slug: String!
@@ -487,6 +482,7 @@ type QueryRoot {
   Returns the contents of the `schema.graphql` file located in a particular branch of a repository idenitifed by its URL.
   """
   schema(url: Url!, branch: String!): String
+  invite(id: ID!): Invite
 
   """Get project by account slug and slug of the project itself."""
   projectByAccountSlug(
@@ -499,7 +495,6 @@ type QueryRoot {
 
   """Give the actual connected user."""
   viewer: User
-  invite(id: ID!): Invite
 }
 
 type ReservedSlugsCheckError {
@@ -507,7 +502,7 @@ type ReservedSlugsCheckError {
 }
 
 type SlugAlreadyExistsError {
-  query: QueryRoot!
+  query: Query!
 }
 
 type SlugError {
