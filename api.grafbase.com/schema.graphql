@@ -96,6 +96,9 @@ type GitAccount {
   provider: GitProvider!
   id: ID!
   slug: String!
+
+  """Date when the app was authorized to access this account"""
+  connectedAt: DateTime!
 }
 
 type GitCommit {
@@ -466,7 +469,9 @@ type Query {
     id: ID!
   ): Deployment
 
-  """Return a list of git accounts accessible by the current user."""
+  """
+  Return a list of git accounts accessible by the current user sorted by the creation date.
+  """
   gitAccounts(provider: GitProvider!): [GitAccount!]!
 
   """
