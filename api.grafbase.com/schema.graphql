@@ -409,7 +409,7 @@ input ProjectCreateFromRepositoryInput {
   productionBranch: String!
 }
 
-union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError
+union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | RepositoryContainsNoBranchesError
 
 type ProjectCreateFromRepositorySuccess {
   project: Project!
@@ -501,6 +501,10 @@ type Query {
 
   """Give the actual connected user."""
   viewer: User
+}
+
+type RepositoryContainsNoBranchesError {
+  query: Query!
 }
 
 type ReservedSlugsCheckError {
