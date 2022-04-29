@@ -274,12 +274,6 @@ type Mutation {
   memberDelete(input: MemberDeleteInput!): MemberDeletePayload!
 
   """
-  Deprecated, please use projectCreateFromRepository.
-  Create new project owned by the current user. Slug must be unique for given account.
-  """
-  projectCreateFromRepo(input: ProjectCreateFromRepoInput!): ProjectCreateFromRepoPayload!
-
-  """
   Create new project owned by the current user. Slug must be unique for given account.
   """
   projectCreateFromRepository(input: ProjectCreateFromRepositoryInput!): ProjectCreateFromRepositoryPayload!
@@ -342,6 +336,10 @@ type OrganizationEdge {
   cursor: String!
 }
 
+type OrganizationOwnershipNotTransferredError {
+  query: Query!
+}
+
 """Information about pagination in a connection"""
 type PageInfo {
   """When paginating backwards, are there more items?"""
@@ -365,8 +363,11 @@ type PersonalAccount implements Account {
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
 }
 
-type PersonalAccountDeletePayload {
+union PersonalAccountDeletePayload = PersonalAccountDeleteSuccess | OrganizationOwnershipNotTransferredError
+
+type PersonalAccountDeleteSuccess {
   deletedId: ID!
+  query: Query!
 }
 
 type Project {
@@ -384,19 +385,6 @@ type ProjectConnection {
 
   """A list of edges."""
   edges: [ProjectEdge]
-}
-
-input ProjectCreateFromRepoInput {
-  accountId: ID!
-  projectSlug: String!
-  gitRepoUrl: Url!
-  gitAccountId: String!
-  productionBranch: String!
-}
-
-type ProjectCreateFromRepoPayload {
-  project: Project!
-  query: Query!
 }
 
 input ProjectCreateFromRepositoryInput {
