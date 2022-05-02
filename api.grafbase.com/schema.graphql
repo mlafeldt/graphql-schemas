@@ -101,11 +101,22 @@ type GitAccount {
   connectedAt: DateTime!
 }
 
+union GitAccountsPayload = GitAccountsSuccess | GitHubAuthorizationError
+
+type GitAccountsSuccess {
+  accounts: [GitAccount!]!
+  query: Query!
+}
+
 type GitCommit {
   sha: String!
   message: String!
   author: String
   authorAvatarUrl: String
+}
+
+type GitHubAuthorizationError {
+  query: Query!
 }
 
 enum GitProvider {
@@ -458,7 +469,7 @@ type Query {
   """
   Return a list of git accounts accessible by the current user sorted by the creation date.
   """
-  gitAccounts(provider: GitProvider!): [GitAccount!]!
+  gitAccounts(provider: GitProvider!): GitAccountsPayload!
 
   """
   Return a list of git repositories accessible by the current user, sorted by updatedAt.
