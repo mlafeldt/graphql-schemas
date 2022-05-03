@@ -132,7 +132,6 @@ type GitRepository {
   defaultBranch: String
   private: Boolean!
   updatedAt: DateTime!
-  schemaContents: String
   branches: [String!]!
 }
 
@@ -284,10 +283,13 @@ type Mutation {
   """Remove member from an organization"""
   memberDelete(input: MemberDeleteInput!): MemberDeletePayload!
 
-  """
-  Create new project owned by the current user. Slug must be unique for given account.
-  """
+  """Create a new project from a GitHub repository."""
   projectCreateFromRepository(input: ProjectCreateFromRepositoryInput!): ProjectCreateFromRepositoryPayload!
+
+  """
+  Create a new project from a template in a newly created GitHub repository.
+  """
+  projectCreateFromTemplate(input: ProjectCreateFromTemplateInput!): ProjectCreateFromTemplatePayload!
   projectUpdate(input: ProjectUpdateInput!): ProjectUpdatePayload!
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
   login(input: LoginInput): LoginPayload!
@@ -413,6 +415,23 @@ type ProjectCreateFromRepositorySuccess {
   query: Query!
 }
 
+input ProjectCreateFromTemplateInput {
+  accountId: ID!
+  projectSlug: String!
+  templateGitRepoUrl: Url!
+  gitAccountId: String!
+  templatePath: String!
+  repoSlug: String!
+  private: Boolean!
+}
+
+union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | RepositorySlugInUseError | TemplateDoesNotExistError
+
+type ProjectCreateFromTemplateSuccess {
+  project: Project!
+  query: Query!
+}
+
 input ProjectDeleteInput {
   id: ID!
 }
@@ -504,6 +523,10 @@ type RepositoryContainsNoBranchesError {
   query: Query!
 }
 
+type RepositorySlugInUseError {
+  query: Query!
+}
+
 type ReservedSlugsCheckError {
   message: String!
 }
@@ -521,6 +544,10 @@ type SlugError {
 type SlugSizeCheckError {
   maxLength: Int!
   message: String!
+}
+
+type TemplateDoesNotExistError {
+  query: Query!
 }
 
 enum UnitType {
