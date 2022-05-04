@@ -408,7 +408,7 @@ input ProjectCreateFromRepositoryInput {
   productionBranch: String!
 }
 
-union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | RepositoryContainsNoBranchesError
+union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | SlugInvalidError | RepositoryContainsNoBranchesError
 
 type ProjectCreateFromRepositorySuccess {
   project: Project!
@@ -424,7 +424,7 @@ input ProjectCreateFromTemplateInput {
   repoPrivate: Boolean!
 }
 
-union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | RepositorySlugInUseError | TemplateDoesNotExistError
+union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | SlugInvalidError | RepositorySlugInUseError | TemplateDoesNotExistError
 
 type ProjectCreateFromTemplateSuccess {
   project: Project!
@@ -454,7 +454,9 @@ input ProjectUpdateInput {
   productionBranch: String
 }
 
-type ProjectUpdatePayload {
+union ProjectUpdatePayload = ProjectUpdateSuccess | SlugAlreadyExistsError | SlugInvalidError
+
+type ProjectUpdateSuccess {
   project: Project!
   query: Query!
 }
@@ -538,6 +540,10 @@ type SlugError {
   message: String!
   actual: String!
   expected: String!
+}
+
+type SlugInvalidError {
+  query: Query!
 }
 
 type SlugSizeCheckError {
