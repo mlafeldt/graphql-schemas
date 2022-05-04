@@ -270,6 +270,8 @@ type Mutation {
   Create new organization account owned by the current user. Slug must be unique.
   """
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
+  personalAccountSlugUpdate(input: PersonalAccountSlugUpdateInput!): PersonalAccountSlugUpdatePayload!
+  personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
   inviteSend(input: InviteSendInput!): InviteSendPayload!
@@ -380,6 +382,26 @@ union PersonalAccountDeletePayload = PersonalAccountDeleteSuccess | Organization
 
 type PersonalAccountDeleteSuccess {
   deletedId: ID!
+  query: Query!
+}
+
+input PersonalAccountSlugUpdateInput {
+  slug: String!
+}
+
+union PersonalAccountSlugUpdatePayload = PersonalAccountSlugUpdateSuccess | SlugError | SlugSizeCheckError | ReservedSlugsCheckError
+
+type PersonalAccountSlugUpdateSuccess {
+  query: Query!
+}
+
+input PersonalAccountUpdateInput {
+  name: String!
+}
+
+union PersonalAccountUpdatePayload = PersonalAccountUpdateSuccess | NameSizeCheckError
+
+type PersonalAccountUpdateSuccess {
   query: Query!
 }
 
