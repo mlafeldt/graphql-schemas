@@ -1466,6 +1466,26 @@ type EmojiPayload {
   success: Boolean!
 }
 
+"""A basic entity."""
+interface Entity {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was updated. This is the same as the creation time if the
+      entity hasn't been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+}
+
 input EventCreateInput {
   """The category of the event to create."""
   category: String!
@@ -3031,6 +3051,60 @@ input IssueLabelUpdateInput {
 
   """The color of the label."""
   color: String
+}
+
+"""An issue related notification"""
+type IssueNotification implements Notification & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was updated. This is the same as the creation time if the
+      entity hasn't been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """Notification type"""
+  type: String!
+
+  """The user that received the notification."""
+  user: User!
+
+  """
+  The time at when the user marked the notification as read. Null, if the the user hasn't read the notification
+  """
+  readAt: DateTime
+
+  """
+  The time at when an email reminder for this notification was sent to the user. Null, if no email
+      reminder has been sent.
+  """
+  emailedAt: DateTime
+
+  """
+  The time until a notification will be snoozed. After that it will appear in the inbox again.
+  """
+  snoozedUntilAt: DateTime
+
+  """The issue related to the notification."""
+  issue: Issue!
+
+  """The team related to the notification."""
+  team: Team!
+
+  """The comment related to the notification."""
+  comment: Comment
+
+  """Name of the reaction emoji related to the notification."""
+  reactionEmoji: String
 }
 
 type IssuePayload {
@@ -4819,7 +4893,7 @@ interface Node {
 }
 
 """A notification sent to a user."""
-type Notification implements Node {
+interface Notification {
   """The unique identifier of the entity."""
   id: ID!
 
@@ -4840,8 +4914,8 @@ type Notification implements Node {
   """Notification type"""
   type: String!
 
-  """Name of the reaction emoji associated with the notification."""
-  reactionEmoji: String
+  """The user that received the notification."""
+  user: User!
 
   """
   The time at when the user marked the notification as read. Null, if the the user hasn't read the notification
@@ -4858,18 +4932,6 @@ type Notification implements Node {
   The time until a notification will be snoozed. After that it will appear in the inbox again.
   """
   snoozedUntilAt: DateTime
-
-  """The recipient of the notification."""
-  user: User!
-
-  """The issue that the notification is associated with."""
-  issue: Issue!
-
-  """The team which the notification is associated with."""
-  team: Team!
-
-  """The comment which the notification is associated with."""
-  comment: Comment
 }
 
 type NotificationConnection {
