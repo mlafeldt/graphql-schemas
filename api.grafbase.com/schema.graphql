@@ -33,6 +33,11 @@ type BranchEdge {
   cursor: String!
 }
 
+enum BranchEnvironment {
+  PREVIEW
+  PRODUCTION
+}
+
 type BranchMetrics {
   latency: Distribution!
   request: Distribution!
@@ -206,6 +211,14 @@ enum InviteStatus {
   EXPIRED
 }
 
+type KeyDoesNotExistError {
+  query: Query!
+}
+
+type KeyLimitExceededError {
+  query: Query!
+}
+
 input LoginInput {
   inviteId: ID
 }
@@ -294,6 +307,12 @@ type Mutation {
   projectCreateFromTemplate(input: ProjectCreateFromTemplateInput!): ProjectCreateFromTemplatePayload!
   projectUpdate(input: ProjectUpdateInput!): ProjectUpdatePayload!
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
+
+  """Create a new project API key."""
+  projectApiKeyCreate(input: ProjectApiKeyCreateInput!): ProjectApiKeyCreatePayload!
+
+  """Delete a given API key."""
+  projectApiKeyDelete(input: ProjectApiKeyDeleteInput!): ProjectApiKeyDeletePayload!
   login(input: LoginInput): LoginPayload!
 }
 
@@ -411,7 +430,55 @@ type Project {
   createdAt: DateTime!
   repository: GitRepository!
   branches(after: String, before: String, first: Int, last: Int): BranchConnection!
+  apiKeys(after: String, before: String, first: Int, last: Int): ProjectApiKeyConnection!
   productionBranch: Branch!
+}
+
+type ProjectApiKey {
+  id: ID!
+  key: String!
+  env: BranchEnvironment!
+  createdAt: DateTime!
+}
+
+type ProjectApiKeyConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ProjectApiKeyEdge]
+}
+
+input ProjectApiKeyCreateInput {
+  projectId: ID!
+  environment: BranchEnvironment!
+}
+
+union ProjectApiKeyCreatePayload = ProjectApiKeyCreateSuccess | KeyLimitExceededError
+
+type ProjectApiKeyCreateSuccess {
+  apiKey: ProjectApiKey!
+  query: Query!
+}
+
+input ProjectApiKeyDeleteInput {
+  id: ID!
+}
+
+union ProjectApiKeyDeletePayload = ProjectApiKeyDeleteSuccess | KeyDoesNotExistError
+
+type ProjectApiKeyDeleteSuccess {
+  deletedId: ID!
+  query: Query!
+}
+
+"""An edge in a connection."""
+type ProjectApiKeyEdge {
+  """The item at the end of the edge"""
+  node: ProjectApiKey!
+
+  """A cursor for use in pagination"""
+  cursor: String!
 }
 
 type ProjectConnection {
