@@ -278,6 +278,10 @@ type MemberUpdatePayload {
   query: Query!
 }
 
+type MustLeaveAtLeastOneKeyForEnvironmentError {
+  query: Query!
+}
+
 type Mutation {
   """
   Create new organization account owned by the current user. Slug must be unique.
@@ -322,6 +326,7 @@ type Mutation {
 type NameSizeCheckError {
   maxLength: Int!
   message: String!
+  query: Query!
 }
 
 type Organization implements Account {
@@ -347,7 +352,7 @@ input OrganizationCreateInput {
   name: String!
 }
 
-union OrganizationCreatePayload = OrganizationCreateSuccess | SlugError | SlugSizeCheckError | NameSizeCheckError | ReservedSlugsCheckError
+union OrganizationCreatePayload = OrganizationCreateSuccess | SlugError | SlugSizeCheckError | NameSizeCheckError | ReservedSlugsCheckError | SlugAlreadyExistsError
 
 type OrganizationCreateSuccess {
   organization: Organization!
@@ -411,7 +416,7 @@ input PersonalAccountSlugUpdateInput {
   slug: String!
 }
 
-union PersonalAccountSlugUpdatePayload = PersonalAccountSlugUpdateSuccess | SlugError | SlugSizeCheckError | ReservedSlugsCheckError
+union PersonalAccountSlugUpdatePayload = PersonalAccountSlugUpdateSuccess | SlugError | SlugSizeCheckError | ReservedSlugsCheckError | SlugAlreadyExistsError
 
 type PersonalAccountSlugUpdateSuccess {
   query: Query!
@@ -440,7 +445,7 @@ type Project {
 type ProjectApiKey {
   id: ID!
   key: String!
-  env: BranchEnvironment!
+  environment: BranchEnvironment!
   createdAt: DateTime!
   name: String!
 }
@@ -470,7 +475,7 @@ input ProjectApiKeyDeleteInput {
   id: ID!
 }
 
-union ProjectApiKeyDeletePayload = ProjectApiKeyDeleteSuccess | KeyDoesNotExistError
+union ProjectApiKeyDeletePayload = ProjectApiKeyDeleteSuccess | KeyDoesNotExistError | MustLeaveAtLeastOneKeyForEnvironmentError
 
 type ProjectApiKeyDeleteSuccess {
   deletedId: ID!
@@ -635,6 +640,7 @@ type RepositorySlugInUseError {
 
 type ReservedSlugsCheckError {
   message: String!
+  query: Query!
 }
 
 type SlugAlreadyExistsError {
@@ -645,6 +651,7 @@ type SlugError {
   message: String!
   actual: String!
   expected: String!
+  query: Query!
 }
 
 type SlugInvalidError {
@@ -654,6 +661,7 @@ type SlugInvalidError {
 type SlugSizeCheckError {
   maxLength: Int!
   message: String!
+  query: Query!
 }
 
 type TemplateDoesNotExistError {
