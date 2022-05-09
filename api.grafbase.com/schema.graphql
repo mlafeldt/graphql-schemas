@@ -311,6 +311,9 @@ type Mutation {
   """Create a new project API key."""
   projectApiKeyCreate(input: ProjectApiKeyCreateInput!): ProjectApiKeyCreatePayload!
 
+  """Update a given API key with a new name."""
+  projectApiKeyUpdate(input: ProjectApiKeyUpdateInput!): ProjectApiKeyUpdatePayload!
+
   """Delete a given API key."""
   projectApiKeyDelete(input: ProjectApiKeyDeleteInput!): ProjectApiKeyDeletePayload!
   login(input: LoginInput): LoginPayload!
@@ -439,6 +442,7 @@ type ProjectApiKey {
   key: String!
   env: BranchEnvironment!
   createdAt: DateTime!
+  name: String!
 }
 
 type ProjectApiKeyConnection {
@@ -452,6 +456,7 @@ type ProjectApiKeyConnection {
 input ProjectApiKeyCreateInput {
   projectId: ID!
   environment: BranchEnvironment!
+  name: String!
 }
 
 union ProjectApiKeyCreatePayload = ProjectApiKeyCreateSuccess | KeyLimitExceededError
@@ -479,6 +484,17 @@ type ProjectApiKeyEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+input ProjectApiKeyUpdateInput {
+  id: ID!
+  name: String!
+}
+
+union ProjectApiKeyUpdatePayload = ProjectApiKeyUpdateSuccess | KeyDoesNotExistError
+
+type ProjectApiKeyUpdateSuccess {
+  query: Query!
 }
 
 type ProjectConnection {
