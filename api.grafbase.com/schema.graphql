@@ -6,6 +6,10 @@ interface Account {
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
 }
 
+type AccountDoesNotExistError {
+  query: Query!
+}
+
 type Branch {
   id: ID!
   name: String!
@@ -42,6 +46,8 @@ type BranchMetrics {
   latency: Distribution!
   request: Distribution!
 }
+
+union BranchMetricsPayload = BranchMetrics | ProjectDoesNotExistError
 
 """RFC3339 formatted date in the UTC time zone denoted by letter 'Z'"""
 scalar DateTime
@@ -161,7 +167,9 @@ input InviteAcceptInput {
   id: ID!
 }
 
-type InviteAcceptPayload {
+union InviteAcceptPayload = InviteAcceptSuccess | InviteDoesNotExistError
+
+type InviteAcceptSuccess {
   member: Member!
   query: Query!
 }
@@ -170,7 +178,9 @@ input InviteCancelInput {
   id: ID!
 }
 
-type InviteCancelPayload {
+union InviteCancelPayload = InviteCancelSuccess | InviteDoesNotExistError | NotAllowedToCancelInvitesError
+
+type InviteCancelSuccess {
   id: ID!
   query: Query!
 }
@@ -187,8 +197,14 @@ input InviteDeclineInput {
   id: ID!
 }
 
-type InviteDeclinePayload {
+union InviteDeclinePayload = InviteDeclineSuccess | InviteDoesNotExistError
+
+type InviteDeclineSuccess {
   id: ID!
+  query: Query!
+}
+
+type InviteDoesNotExistError {
   query: Query!
 }
 
@@ -201,13 +217,19 @@ type InviteEdge {
   cursor: String!
 }
 
+type InviteRequiredError {
+  query: Query!
+}
+
 input InviteSendInput {
   organizationId: ID!
   email: String!
   role: MemberRole!
 }
 
-type InviteSendPayload {
+union InviteSendPayload = InviteSendSuccess | OrganizationDoesNotExistError | NotAllowedToSendInvitesError
+
+type InviteSendSuccess {
   invite: Invite!
   query: Query!
 }
@@ -229,7 +251,9 @@ input LoginInput {
   inviteId: ID
 }
 
-type LoginPayload {
+union LoginPayload = LoginSuccess | MissingTokenError | InviteRequiredError | InviteDoesNotExistError
+
+type LoginSuccess {
   user: User!
   isFirstLogin: Boolean!
   query: Query!
@@ -284,6 +308,10 @@ type MemberUpdatePayload {
   query: Query!
 }
 
+type MissingTokenError {
+  query: Query!
+}
+
 type MustLeaveAtLeastOneKeyForEnvironmentError {
   query: Query!
 }
@@ -335,6 +363,18 @@ type NameSizeCheckError {
   query: Query!
 }
 
+type NotAllowedToCancelInvitesError {
+  query: Query!
+}
+
+type NotAllowedToDeleteOrganizationError {
+  query: Query!
+}
+
+type NotAllowedToSendInvitesError {
+  query: Query!
+}
+
 type Organization implements Account {
   id: ID!
   slug: String!
@@ -370,8 +410,14 @@ input OrganizationDeleteInput {
   id: ID!
 }
 
-type OrganizationDeletePayload {
+union OrganizationDeletePayload = OrganizationDeleteSuccess | OrganizationDoesNotExistError | NotAllowedToDeleteOrganizationError
+
+type OrganizationDeleteSuccess {
   deletedId: ID!
+  query: Query!
+}
+
+type OrganizationDoesNotExistError {
   query: Query!
 }
 
@@ -470,7 +516,7 @@ input ProjectApiKeyCreateInput {
   name: String!
 }
 
-union ProjectApiKeyCreatePayload = ProjectApiKeyCreateSuccess | KeyLimitExceededError
+union ProjectApiKeyCreatePayload = ProjectApiKeyCreateSuccess | KeyLimitExceededError | ProjectDoesNotExistError
 
 type ProjectApiKeyCreateSuccess {
   apiKey: ProjectApiKey!
@@ -524,7 +570,7 @@ input ProjectCreateFromRepositoryInput {
   productionBranch: String!
 }
 
-union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | SlugInvalidError | RepositoryContainsNoBranchesError
+union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | SlugInvalidError | RepositoryContainsNoBranchesError | AccountDoesNotExistError
 
 type ProjectCreateFromRepositorySuccess {
   project: Project!
@@ -540,7 +586,7 @@ input ProjectCreateFromTemplateInput {
   repoPrivate: Boolean!
 }
 
-union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | SlugInvalidError | RepositorySlugInUseError | TemplateDoesNotExistError
+union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | SlugInvalidError | RepositorySlugInUseError | TemplateDoesNotExistError | AccountDoesNotExistError
 
 type ProjectCreateFromTemplateSuccess {
   project: Project!
@@ -551,7 +597,13 @@ input ProjectDeleteInput {
   id: ID!
 }
 
-type ProjectDeletePayload {
+union ProjectDeletePayload = ProjectDeleteSuccess | ProjectDoesNotExistError
+
+type ProjectDeleteSuccess {
+  query: Query!
+}
+
+type ProjectDoesNotExistError {
   query: Query!
 }
 
@@ -570,7 +622,7 @@ input ProjectUpdateInput {
   productionBranch: String
 }
 
-union ProjectUpdatePayload = ProjectUpdateSuccess | SlugAlreadyExistsError | SlugInvalidError
+union ProjectUpdatePayload = ProjectUpdateSuccess | ProjectDoesNotExistError | SlugAlreadyExistsError | SlugInvalidError
 
 type ProjectUpdateSuccess {
   project: Project!
@@ -582,7 +634,7 @@ type Query {
     """slug of the account"""
     slug: String!
   ): Account
-  metricsByBranch(accountSlug: String!, projectSlug: String!, branch: String!, startDate: DateTime!, endDate: DateTime!): BranchMetrics!
+  metricsByBranch(accountSlug: String!, projectSlug: String!, branch: String!, startDate: DateTime!, endDate: DateTime!): BranchMetricsPayload!
 
   """Get branch by account slug, project slug and the name of the branch."""
   branch(
