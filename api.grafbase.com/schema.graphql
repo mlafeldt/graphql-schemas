@@ -42,12 +42,12 @@ enum BranchEnvironment {
   PRODUCTION
 }
 
-type BranchMetrics {
+union BranchMetricsPayload = BranchMetricsSuccess | ProjectDoesNotExistError
+
+type BranchMetricsSuccess {
   latency: Distribution!
   request: Distribution!
 }
-
-union BranchMetricsPayload = BranchMetrics | ProjectDoesNotExistError
 
 """RFC3339 formatted date in the UTC time zone denoted by letter 'Z'"""
 scalar DateTime
