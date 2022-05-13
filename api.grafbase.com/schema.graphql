@@ -321,7 +321,9 @@ type Mutation {
   Create new organization account owned by the current user. Slug must be unique.
   """
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
+  organizationSlugUpdate(input: OrganizationSlugUpdateInput!): OrganizationSlugUpdatePayload!
   personalAccountSlugUpdate(input: PersonalAccountSlugUpdateInput!): PersonalAccountSlugUpdatePayload!
+  organizationUpdate(input: OrganizationUpdateInput!): OrganizationUpdatePayload!
   personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
@@ -372,6 +374,14 @@ type NotAllowedToDeleteOrganizationError {
 }
 
 type NotAllowedToSendInvitesError {
+  query: Query!
+}
+
+type NotAllowedToSlugUpdateError {
+  query: Query!
+}
+
+type NotAllowedToUpdateOrganizationError {
   query: Query!
 }
 
@@ -431,6 +441,30 @@ type OrganizationEdge {
 }
 
 type OrganizationOwnershipNotTransferredError {
+  query: Query!
+}
+
+input OrganizationSlugUpdateInput {
+  id: ID!
+  slug: String!
+}
+
+union OrganizationSlugUpdatePayload = OrganizationSlugUpdateSuccess | SlugError | SlugSizeCheckError | ReservedSlugsCheckError | SlugAlreadyExistsError | OrganizationDoesNotExistError | NotAllowedToSlugUpdateError
+
+type OrganizationSlugUpdateSuccess {
+  organization: Organization!
+  query: Query!
+}
+
+input OrganizationUpdateInput {
+  id: ID!
+  name: String!
+}
+
+union OrganizationUpdatePayload = OrganizationUpdateSuccess | OrganizationDoesNotExistError | NameSizeCheckError | NotAllowedToUpdateOrganizationError
+
+type OrganizationUpdateSuccess {
+  organization: Organization!
   query: Query!
 }
 
