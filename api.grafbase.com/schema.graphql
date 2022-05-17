@@ -116,6 +116,7 @@ type GitAccount {
   provider: GitProvider!
   id: ID!
   slug: String!
+  type: GitAccountType!
 
   """Date when the app was authorized to access this account"""
   connectedAt: DateTime!
@@ -126,6 +127,11 @@ union GitAccountsPayload = GitAccountsSuccess | GitHubAuthorizationError
 type GitAccountsSuccess {
   accounts: [GitAccount!]!
   query: Query!
+}
+
+enum GitAccountType {
+  ORGANIZATION
+  PERSONAL
 }
 
 type GitCommit {
