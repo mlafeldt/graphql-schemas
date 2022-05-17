@@ -6220,6 +6220,33 @@ type Project implements Node {
     orderBy: PaginationOrderBy
   ): UserConnection!
 
+  """Project updates associated with the project."""
+  projectUpdates(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectUpdateConnection!
+
   """Documents associated with the project."""
   documents(
     """A cursor to be used with last for backward pagination."""
@@ -6548,6 +6575,51 @@ type ProjectPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""A update associated with an project."""
+type ProjectUpdate implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was updated. This is the same as the creation time if the
+      entity hasn't been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The update content in markdown format."""
+  body: String!
+
+  """The project that the update is associated with."""
+  project: Project!
+
+  """The user who wrote the update."""
+  user: User!
+
+  """The time the project update was edited."""
+  editedAt: DateTime
+}
+
+type ProjectUpdateConnection {
+  edges: [ProjectUpdateEdge!]!
+  nodes: [ProjectUpdate!]!
+  pageInfo: PageInfo!
+}
+
+type ProjectUpdateEdge {
+  node: ProjectUpdate!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
 }
 
 input ProjectUpdateInput {
