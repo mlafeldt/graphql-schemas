@@ -5938,11 +5938,13 @@ type OrganizationInvite implements Node {
   """The invitees email address."""
   email: String!
 
-  """The permission that the invitee will receive upon accepting invite."""
+  """The user role that the invitee will receive upon accepting the invite."""
   role: UserRoleType!
 
-  """The permission that the invitee will receive upon accepting invite."""
-  permission: String
+  """
+  [DEPRECATED] The permission that the invitee will receive upon accepting invite.
+  """
+  permission: String @deprecated(reason: "This field is deprecated and will be removed soon, please use `role` instead")
 
   """The invite was sent to external address."""
   external: Boolean!
@@ -5982,8 +5984,11 @@ input OrganizationInviteCreateInput {
   """The email of the invitee."""
   email: String!
 
-  """Whether the invite should grant admin permissions."""
+  """[DEPRECATED] Whether the invite should grant admin permissions."""
   permission: String
+
+  """What user role the invite should grant."""
+  role: UserRoleType = user
 
   """The message to send to the invitee."""
   message: String
@@ -5999,8 +6004,11 @@ type OrganizationInviteDetailsPayload {
   """The email of the invitee"""
   email: String!
 
-  """Whether the invite should grant admin permissions"""
-  permission: String
+  """[DEPRECATED] Whether the invite should grant admin permissions"""
+  permission: String @deprecated(reason: "This field is deprecated and will be removed soon, please use `role` instead")
+
+  """What user role the invite should grant."""
+  role: UserRoleType!
 
   """When the invite was created."""
   createdAt: DateTime!
