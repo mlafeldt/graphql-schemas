@@ -1884,6 +1884,19 @@ type IntegrationPayload {
   success: Boolean!
 }
 
+input IntegrationRequestInput {
+  """Email associated with the request."""
+  email: String
+
+  """Name of the requested integration."""
+  name: String!
+}
+
+type IntegrationRequestPayload {
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
 """An integration resource created by an external service."""
 type IntegrationResource implements Node {
   """The unique identifier of the entity."""
@@ -3855,6 +3868,12 @@ type Mutation {
     """URL of the file to be uploaded to Linear."""
     url: String!
   ): ImageUploadFromUrlPayload!
+
+  """Requests a currently unavailable integration."""
+  integrationRequest(
+    """Integration request details."""
+    input: IntegrationRequestInput!
+  ): IntegrationRequestPayload!
 
   """[INTERNAL] Updates the integration."""
   integrationSettingsUpdate(
