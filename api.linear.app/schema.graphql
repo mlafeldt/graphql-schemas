@@ -7745,39 +7745,6 @@ type Query {
   """The status of the rate limiter."""
   rateLimitStatus: RateLimitPayload!
 
-  """All comment emoji reactions."""
-  reactions(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): ReactionConnection!
-
-  """A specific reaction."""
-  reaction(
-    """The identifier to retrieve."""
-    id: String!
-  ): Reaction!
-
   """The organization's subscription."""
   subscription: Subscription
 
@@ -8038,7 +8005,7 @@ type RateLimitResultPayload {
   reset: Float!
 }
 
-"""A reaction associated with a comment."""
+"""A reaction associated with a comment or a project update."""
 type Reaction implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -8062,9 +8029,6 @@ type Reaction implements Node {
 
   """The user who reacted."""
   user: User!
-
-  """The comment that the reaction is associated with."""
-  comment: Comment!
 }
 
 type ReactionConnection {
@@ -8081,7 +8045,10 @@ input ReactionCreateInput {
   emoji: String
 
   """The comment to associate the reaction with."""
-  commentId: String!
+  commentId: String
+
+  """The project update to associate the reaction with."""
+  projectUpdateId: String
 }
 
 type ReactionEdge {
