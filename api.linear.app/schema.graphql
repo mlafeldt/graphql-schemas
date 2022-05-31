@@ -426,33 +426,6 @@ input BatchRequest {
   keyValue: String!
 }
 
-type BillingDetailsPayload {
-  """Whether the operation was successful."""
-  success: Boolean!
-
-  """The customer's email address the invoices are sent to."""
-  email: String
-
-  """List of invoices, if any."""
-  invoices: [Invoice!]!
-
-  """The payment method."""
-  paymentMethod: Card
-}
-
-type BillingEmailPayload {
-  """Whether the operation was successful."""
-  success: Boolean!
-
-  """The customer's email address the invoices are sent to."""
-  email: String
-}
-
-input BillingEmailUpdateInput {
-  """The email address to which to send invoices."""
-  email: String!
-}
-
 """Comparator for booleans."""
 input BooleanComparator {
   """Equals constraint."""
@@ -460,14 +433,6 @@ input BooleanComparator {
 
   """Not equals constraint."""
   neq: Boolean
-}
-
-type Card {
-  """The brand of the card, e.g. Visa."""
-  brand: String!
-
-  """The last four digits used to identify the card."""
-  last4: String!
 }
 
 input CollaborationDocumentUpdateInput {
@@ -2011,23 +1976,6 @@ input IntercomSettingsInput {
   Whether an internal message should be added when someone comments on an issue.
   """
   sendNoteOnComment: Boolean
-}
-
-type Invoice {
-  """The URL at which the invoice can be viewed or paid."""
-  url: String
-
-  """The creation date of the invoice."""
-  created: DateTime!
-
-  """The due date of the invoice."""
-  dueDate: TimelessDate
-
-  """The status of the invoice."""
-  status: String!
-
-  """The invoice total, in cents."""
-  total: Float!
 }
 
 """An issue."""
@@ -3674,12 +3622,6 @@ type Mutation {
     organizationId: String!
   ): CreateOrJoinOrganizationResponse!
 
-  """Updates the billing email address for the customer."""
-  billingEmailUpdate(
-    """The properties of the billing details."""
-    input: BillingEmailUpdateInput!
-  ): BillingEmailPayload!
-
   """Update collaborative document with client steps."""
   collaborativeDocumentUpdate(input: CollaborationDocumentUpdateInput!): CollaborationDocumentUpdatePayload!
 
@@ -4607,46 +4549,6 @@ type Mutation {
 
   """Create CSV export report for the organization."""
   createCsvExportReport(includePrivateTeamIds: [String!]): CreateCsvExportReportPayload!
-
-  """
-  [Internal] Creates a subscription session. Used internally to integrate with Stripe.
-  """
-  subscriptionSessionCreate(
-    """The id of an optional coupon to apply."""
-    coupon: String
-
-    """The name of the plan."""
-    plan: String!
-  ): SubscriptionSessionPayload!
-
-  """
-  [Internal] Creates a subscription update session. Used internally to integrate with Stripe.
-  """
-  subscriptionUpdateSessionCreate: SubscriptionSessionPayload!
-
-  """[Internal] Updates a subscription."""
-  subscriptionUpdate(
-    """The properties of the subscription."""
-    input: SubscriptionUpdateInput!
-
-    """The identifier of the subscription."""
-    id: String!
-  ): SubscriptionPayload!
-
-  """[Internal] Upgrades a subscription plan."""
-  subscriptionUpgrade(
-    """The subscription type to upgrade to."""
-    type: String!
-
-    """The identifier of the subscription."""
-    id: String!
-  ): SubscriptionPayload!
-
-  """[Internal] Archives a subscription."""
-  subscriptionArchive(
-    """The identifier of the subscription to archive."""
-    id: String!
-  ): ArchivePayload!
 
   """Deletes a previously used team key."""
   teamKeyDelete(
@@ -7126,9 +7028,6 @@ type Query {
     email: String!
   ): SsoUrlFromEmailResponse!
 
-  """Billing details for the customer."""
-  billingDetails: BillingDetailsPayload!
-
   """Join collaborative document and get missing steps."""
   collaborativeDocumentJoin(
     """The identifier of the client."""
@@ -7755,9 +7654,6 @@ type Query {
   """The status of the rate limiter."""
   rateLimitStatus: RateLimitPayload!
 
-  """The organization's subscription."""
-  subscription: Subscription
-
   """All team memberships."""
   teamMemberships(
     """A cursor to be used with last for backward pagination."""
@@ -8336,35 +8232,6 @@ type Subscription implements Node {
 
   """The date the subscription will be billed next."""
   nextBillingAt: DateTime
-}
-
-type SubscriptionPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The subscription entity being mutated."""
-  subscription: Subscription!
-
-  """
-  The date the subscription was set to cancel at the end of the billing period, if any.
-  """
-  canceledAt: DateTime
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-type SubscriptionSessionPayload {
-  """The subscription session that was created or updated."""
-  session: String
-}
-
-input SubscriptionUpdateInput {
-  """The date the subscription was set to cancel, if any."""
-  canceledAt: DateTime
-
-  """The subscription type of a pending change. Null if no change pending."""
-  pendingChangeType: String
 }
 
 """Contains the requested relations."""
