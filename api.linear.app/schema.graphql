@@ -1451,6 +1451,15 @@ interface Entity {
   archivedAt: DateTime
 }
 
+"""
+Contains either the full serialized state of the application or delta packets that the requester can 
+  apply to the local data set in order to be up-to-date.
+"""
+type EntityCountResponse {
+  """Entity counts keyed by the entity name."""
+  counts: JSON!
+}
+
 input EventCreateInput {
   """The category of the event to create."""
   category: String!
@@ -6783,6 +6792,9 @@ type Query {
     """If defined, only models for the given sync groups will be loaded."""
     syncGroups: [String!]
   ): SyncResponse!
+
+  """[Internal] Retrieves how many entities the user has access to."""
+  syncEntityCount: EntityCountResponse!
 
   """[Internal] Fetches delta sync packets."""
   syncDelta(
