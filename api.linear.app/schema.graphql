@@ -4894,7 +4894,7 @@ type NotificationPayload {
 }
 
 """Notification subscriptions for models."""
-type NotificationSubscription implements Node {
+interface NotificationSubscription {
   """The unique identifier of the entity."""
   id: ID!
 
@@ -4940,6 +4940,9 @@ input NotificationSubscriptionCreateInput {
 
   """The identifier of the project to subscribe to."""
   projectId: String
+
+  """[ALPHA] The type of the project subscription."""
+  projectNotificationSubscriptionType: ProjectNotificationSubscriptionType
 }
 
 type NotificationSubscriptionEdge {
@@ -6558,6 +6561,48 @@ type ProjectNotification implements Notification & Entity & Node {
 
   """The project update related to the notification."""
   projectUpdate: ProjectUpdate
+}
+
+"""A project notification subscription."""
+type ProjectNotificationSubscription implements NotificationSubscription & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was updated. This is the same as the creation time if the
+      entity hasn't been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The type of the subscription."""
+  type: String!
+
+  """The user associated with notification subscriptions."""
+  user: User!
+
+  """Subscribed team."""
+  team: Team
+
+  """The project subscribed to."""
+  project: Project!
+
+  """[ALPHA] The type of the project subscription."""
+  projectNotificationSubscriptionType: ProjectNotificationSubscriptionType!
+}
+
+"""The type of a project notification subscription."""
+enum ProjectNotificationSubscriptionType {
+  importantOnly
+  custom
+  all
 }
 
 type ProjectPayload {
@@ -8937,6 +8982,38 @@ type TeamMembershipPayload {
 input TeamMembershipUpdateInput {
   """Internal. Whether the user is the owner of the team."""
   owner: Boolean!
+}
+
+"""A team notification subscription."""
+type TeamNotificationSubscription implements NotificationSubscription & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was updated. This is the same as the creation time if the
+      entity hasn't been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The type of the subscription."""
+  type: String!
+
+  """The user associated with notification subscriptions."""
+  user: User!
+
+  """The team subscribed to."""
+  team: Team!
+
+  """Subscribed project."""
+  project: Project
 }
 
 type TeamPayload {
