@@ -1938,6 +1938,7 @@ type IntegrationResourceEdge {
 type IntegrationSettings {
   slackPost: SlackPostSettings
   slackProjectPost: SlackPostSettings
+  slackOrgProjectUpdatesPost: SlackPostSettings
   googleSheets: GoogleSheetsSettings
   sentry: SentrySettings
   zendesk: ZendeskSettings
@@ -1948,6 +1949,7 @@ type IntegrationSettings {
 input IntegrationSettingsInput {
   slackPost: SlackPostSettingsInput
   slackProjectPost: SlackPostSettingsInput
+  slackOrgProjectUpdatesPost: SlackPostSettingsInput
   googleSheets: GoogleSheetsSettingsInput
   sentry: SentrySettingsInput
   zendesk: ZendeskSettingsInput
@@ -3915,6 +3917,15 @@ type Mutation {
 
     """Integration's associated project."""
     projectId: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """Slack integration for organization level project update notifications."""
+  integrationSlackOrgProjectUpdatesPost(
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
 
     """The Slack OAuth code."""
     code: String!
