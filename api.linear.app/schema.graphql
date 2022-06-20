@@ -4,6 +4,11 @@ directive @specifiedBy(
   url: String!
 ) on SCALAR
 
+input AirbyteConfigurationInput {
+  """Linear export API key."""
+  apiKey: String!
+}
+
 """An API key. Grants access to the user's resources."""
 type ApiKey implements Node {
   """The unique identifier of the entity."""
@@ -3834,6 +3839,12 @@ type Mutation {
 
     """The GitLab Access Token to connect with."""
     accessToken: String!
+  ): IntegrationPayload!
+
+  """Creates an integration api key for Airbyte to connect with Linear"""
+  airbyteIntegrationConnect(
+    """Airbyte integration settings."""
+    input: AirbyteConfigurationInput!
   ): IntegrationPayload!
 
   """
