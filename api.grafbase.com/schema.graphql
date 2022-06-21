@@ -89,6 +89,11 @@ type DeploymentEdge {
   node: Deployment!
 }
 
+input DeploymentFilter {
+  branch: String
+  statuses: [DeploymentStatus!]! = []
+}
+
 type DeploymentLogEntry {
   createdAt: DateTime!
   message: String!
@@ -541,6 +546,7 @@ type Project {
   branches(after: String, before: String, first: Int, last: Int): BranchConnection!
   apiKeys(after: String, before: String, first: Int, last: Int): ProjectApiKeyConnection!
   productionBranch: Branch!
+  deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
 }
 
 type ProjectApiKey {
