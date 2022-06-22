@@ -5623,6 +5623,9 @@ type Organization implements Node {
   """Whether the organization is using project updates."""
   projectUpdatesEnabled: Boolean!
 
+  """The frequency at which to prompt for project updates."""
+  projectUpdatesReminderFrequency: ProjectUpdateReminderFrequency!
+
   """Whether SAML authentication is enabled for organization."""
   samlEnabled: Boolean!
 
@@ -6772,6 +6775,13 @@ input ProjectUpdateInput {
 
   """The sort order for the project within its milestone."""
   sortOrder: Float
+}
+
+"""The frequency at which to send project update reminders."""
+enum ProjectUpdateReminderFrequency {
+  week
+  twoWeeks
+  never
 }
 
 """Pull request data"""
@@ -9412,6 +9422,9 @@ input UpdateOrganizationInput {
 
   """Whether the organization is using project updates."""
   projectUpdatesEnabled: Boolean
+
+  """The frequency at which project updates are sent."""
+  projectUpdatesReminderFrequency: ProjectUpdateReminderFrequency
 
   """
   Whether the organization has opted for reduced customer support attachment information.
