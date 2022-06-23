@@ -1962,6 +1962,54 @@ input IntegrationSettingsInput {
   jira: JiraSettingsInput
 }
 
+"""The configuration of all integrations for a project or a team."""
+type IntegrationsSettings {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was updated. This is the same as the creation time if the
+      entity hasn't been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """
+  Whether to send a Slack message when a new issue is created for the project or the team.
+  """
+  slackIssueCreated: Boolean
+
+  """
+  Whether to send a Slack message when a comment is created on any of the project or team's issues.
+  """
+  slackIssueNewComment: Boolean
+
+  """
+  Whether to send a Slack message when any of the project or team's issues change to completed or cancelled.
+  """
+  slackIssueStatusChangedDone: Boolean
+
+  """
+  Whether to send a Slack message when any of the project or team's issues has a change in status.
+  """
+  slackIssueStatusChangedAll: Boolean
+
+  """Whether to send a Slack message when a project update is created."""
+  slackProjectUpdateCreated: Boolean
+
+  """
+  Whether a new project update should also be send to the workspace Slack channel.
+  """
+  slackSendProjectUpdateToWorkspace: SendProjectUpdateToWorkspace
+}
+
 """Intercom specific settings."""
 type IntercomSettings {
   """
@@ -8137,6 +8185,16 @@ type SamlConfigurationPayload {
 
   """The issuer's custom entity ID."""
   issuerEntityId: String
+}
+
+"""
+Defines when a project should send a Slack message to both its own channel and
+the workspace channel when a new project update is created.
+"""
+enum SendProjectUpdateToWorkspace {
+  always
+  onlyPublic
+  never
 }
 
 """Sentry issue data"""
