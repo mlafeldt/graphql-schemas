@@ -440,30 +440,6 @@ input BooleanComparator {
   neq: Boolean
 }
 
-input CollaborationDocumentUpdateInput {
-  """Document identifier."""
-  issueId: String!
-
-  """Client's document version number."""
-  version: Int!
-
-  """New document steps from the client."""
-  steps: [JSON!]!
-
-  """Client identifier."""
-  clientId: String!
-}
-
-type CollaborationDocumentUpdatePayload {
-  """
-  Document steps the client has not seen yet and need to rebase it's local steps on.
-  """
-  steps: StepsResponse
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
 """A comment associated with an issue."""
 type Comment implements Node {
   """The unique identifier of the entity."""
@@ -1212,35 +1188,6 @@ type DocumentPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
-}
-
-"""Collaborative editing steps for documents."""
-type DocumentStep implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was updated. This is the same as the creation time if the
-      entity hasn't been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """Step data."""
-  step: JSON!
-
-  """Step version."""
-  version: Float!
-
-  """Connected client ID."""
-  clientId: String!
 }
 
 input DocumentUpdateInput {
@@ -3691,9 +3638,6 @@ type Mutation {
 
   """Logout of all clients."""
   logout: LogoutResponse!
-
-  """Update collaborative document with client steps."""
-  collaborativeDocumentUpdate(input: CollaborationDocumentUpdateInput!): CollaborationDocumentUpdatePayload!
 
   """Creates a new comment."""
   commentCreate(
@@ -7174,18 +7118,6 @@ type Query {
     email: String!
   ): SsoUrlFromEmailResponse!
 
-  """Join collaborative document and get missing steps."""
-  collaborativeDocumentJoin(
-    """The identifier of the client."""
-    clientId: String!
-
-    """The identifier of the Issue to join."""
-    issueId: String!
-
-    """Document version."""
-    version: Int!
-  ): CollaborationDocumentUpdatePayload!
-
   """All comments."""
   comments(
     """Filter returned comments."""
@@ -8273,17 +8205,6 @@ type SsoUrlFromEmailResponse {
 
   """SAML SSO sign-in URL."""
   samlSsoUrl: String!
-}
-
-type StepsResponse {
-  """Client's document version."""
-  version: Int!
-
-  """New document steps from the client."""
-  steps: [JSON!]
-
-  """List of client IDs for the document steps."""
-  clientIds: [String!]!
 }
 
 """Comparator for strings."""
