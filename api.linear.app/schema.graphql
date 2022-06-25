@@ -364,6 +364,15 @@ type AuditEntryType {
   description: String!
 }
 
+"""[INTERNAL] An OAuth userId/createdDate tuple"""
+type AuthMembership {
+  """The authorizing userId"""
+  userId: String!
+
+  """The date of the authorization"""
+  createdAt: DateTime!
+}
+
 """
 Public information of the OAuth application, plus the authorized scopes for a given user.
 """
@@ -6991,6 +7000,11 @@ type Query {
   authorizedApplications: [AuthorizedApplication!]!
 
   """
+  [INTERNAL] Get all authorized applications (with limited fields) for a workspace
+  """
+  workspaceAuthorizedApplications: [WorkspaceAuthorizedApplication!]!
+
+  """
   All issue attachments.
   
   To get attachments for a given URL, use `attachmentsForURL` query.
@@ -10355,6 +10369,31 @@ input WorkflowStateUpdateInput {
 
   """The position of the state."""
   position: Float
+}
+
+"""
+[INTERNAL] Public information of the OAuth application, plus the userIds and scopes for those users.
+"""
+type WorkspaceAuthorizedApplication {
+  """Application name."""
+  name: String!
+
+  """Image of the application."""
+  imageUrl: String
+
+  """Scopes that are authorized for this application for a given user."""
+  scope: [String!]!
+
+  """OAuth application's ID."""
+  appId: String!
+
+  """Whether or not webhooks are enabled for the application."""
+  webhooksEnabled: Boolean!
+
+  """
+  UserIds and membership dates of everyone who has authorized the application with the set of scopes
+  """
+  memberships: [AuthMembership!]!
 }
 
 """Zendesk specific settings."""
