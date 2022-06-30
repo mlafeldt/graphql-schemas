@@ -4414,6 +4414,17 @@ type Mutation {
     appId: String!
   ): OauthTokenRevokePayload!
 
+  """
+  [INTERNAL] Revokes all OAuth tokens in a workspace for a given app and scope set.
+  """
+  oauthTokensWorkspaceRevoke(
+    """The group of scopes for the tokens to be revoked."""
+    scope: [String!]!
+
+    """The identifier of the OAuth client for the tokens to be revoked."""
+    appId: String!
+  ): OauthTokensRevokePayload!
+
   """Verifies a domain to be added to an organization."""
   organizationDomainVerify(
     """The organization domain to verify."""
@@ -5562,6 +5573,11 @@ input OauthClientUpdateInput {
 }
 
 type OauthTokenRevokePayload {
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+type OauthTokensRevokePayload {
   """Whether the operation was successful."""
   success: Boolean!
 }
@@ -10384,6 +10400,9 @@ type WorkspaceAuthorizedApplication {
 
   """Whether or not webhooks are enabled for the application."""
   webhooksEnabled: Boolean!
+
+  """Total number of members that authorized the application"""
+  totalMembers: Float!
 
   """
   UserIds and membership dates of everyone who has authorized the application with the set of scopes
