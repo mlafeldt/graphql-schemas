@@ -1763,6 +1763,135 @@ type ImageUploadFromUrlPayload {
   success: Boolean!
 }
 
+"""A initiative that contains projects."""
+type Initiative implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was updated. This is the same as the creation time if the
+      entity hasn't been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The name of the initiative."""
+  name: String!
+
+  """The organization that the initiative belongs to."""
+  organization: Organization!
+
+  """The sort order for the initiative."""
+  sortOrder: Float!
+
+  """Projects associated with the initiative."""
+  projects(
+    """Filter returned projects."""
+    filter: ProjectFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectConnection!
+}
+
+type InitiativeConnection {
+  edges: [InitiativeEdge!]!
+  nodes: [Initiative!]!
+  pageInfo: PageInfo!
+}
+
+input InitiativeCreateInput {
+  """The identifier. If none is provided, the backend will generate one."""
+  id: String
+
+  """The name of the initiative."""
+  name: String!
+
+  """The sort order of the initiative."""
+  sortOrder: Float
+}
+
+type InitiativeEdge {
+  node: Initiative!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""Initiative filtering options."""
+input InitiativeFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the initiative name."""
+  name: StringComparator
+
+  """Comparator for the initiative sort order."""
+  sortOrder: NumberComparator
+
+  """Filters that the initiatives projects must satisfy."""
+  projects: ProjectCollectionFilter
+
+  """Compound filters, all of which need to be matched by the initiative."""
+  and: [InitiativeFilter!]
+
+  """Compound filters, one of which need to be matched by the initiative."""
+  or: [InitiativeFilter!]
+}
+
+type InitiativePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The milesteone that was created or updated."""
+  initiative: Initiative
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input InitiativeUpdateInput {
+  """The name of the initiative."""
+  name: String
+
+  """The sort order of the initiative."""
+  sortOrder: Float
+}
+
 """An integration with an external service."""
 type Integration implements Node {
   """The unique identifier of the entity."""
@@ -3827,6 +3956,27 @@ type Mutation {
     url: String!
   ): ImageUploadFromUrlPayload!
 
+  """Creates a new initiative."""
+  initiativeCreate(
+    """The issue object to create."""
+    input: InitiativeCreateInput!
+  ): InitiativePayload!
+
+  """Updates a initiative."""
+  initiativeUpdate(
+    """A partial initiative object to update the initiative with."""
+    input: InitiativeUpdateInput!
+
+    """The identifier of the initiative to update."""
+    id: String!
+  ): InitiativePayload!
+
+  """Deletes a initiative."""
+  initiativeDelete(
+    """The identifier of the initiative to delete."""
+    id: String!
+  ): ArchivePayload!
+
   """Requests a currently unavailable integration."""
   integrationRequest(
     """Integration request details."""
@@ -5018,7 +5168,7 @@ input NotificationSubscriptionCreateInput {
   """The identifier of the project to subscribe to."""
   projectId: String
 
-  """[ALPHA] The type of the project subscription."""
+  """The type of the project subscription."""
   projectNotificationSubscriptionType: ProjectNotificationSubscriptionType
 }
 
@@ -5041,7 +5191,7 @@ type NotificationSubscriptionPayload {
 }
 
 input NotificationSubscriptionUpdateInput {
-  """[ALPHA] The type of the project subscription."""
+  """The type of the project subscription."""
   projectNotificationSubscriptionType: ProjectNotificationSubscriptionType!
 }
 
@@ -5138,6 +5288,36 @@ input NullableDateComparator {
   Greater-than-or-equal constraint. Matches any values that are greater than or equal to the given value.
   """
   gte: DateTime
+}
+
+"""User filtering options."""
+input NullableInitiativeFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the initiative name."""
+  name: StringComparator
+
+  """Comparator for the initiative sort order."""
+  sortOrder: NumberComparator
+
+  """Filters that the initiatives projects must satisfy."""
+  projects: ProjectCollectionFilter
+
+  """Compound filters, all of which need to be matched by the initiative."""
+  and: [InitiativeFilter!]
+
+  """Compound filters, one of which need to be matched by the initiative."""
+  or: [InitiativeFilter!]
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
 }
 
 """User filtering options."""
@@ -6156,6 +6336,9 @@ type Project implements Node {
   """The milestone that this project is associated with."""
   milestone: Milestone
 
+  """The initiative that this project is associated with."""
+  initiative: Initiative
+
   """[Internal] The estimated start date of the project."""
   startDate: TimelessDate
 
@@ -6176,7 +6359,7 @@ type Project implements Node {
   """
   autoArchivedAt: DateTime
 
-  """The sort order for the project within its milestone."""
+  """The sort order for the project within its milestone/initiative."""
   sortOrder: Float!
 
   """The total number of issues in the project after each week."""
@@ -6694,7 +6877,7 @@ type ProjectNotificationSubscription implements NotificationSubscription & Entit
   """The project subscribed to."""
   project: Project!
 
-  """[ALPHA] The type of the project subscription."""
+  """The type of the project subscription."""
   projectNotificationSubscriptionType: ProjectNotificationSubscriptionType!
 }
 
@@ -7372,6 +7555,39 @@ type Query {
     """Figma file identifier."""
     fileId: String!
   ): FigmaEmbedPayload!
+
+  """[ALPHA] All initiatives."""
+  initiatives(
+    """Filter returned projects."""
+    filter: InitiativeFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): InitiativeConnection!
+
+  """[ALPHA] One specific initiative."""
+  initiative(id: String!): Initiative!
 
   """All integrations."""
   integrations(
