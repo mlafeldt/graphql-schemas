@@ -4582,6 +4582,21 @@ type Mutation {
     appId: String!
   ): OauthAuthStringCheckPayload!
 
+  """[Internal] Creates a new OAuth client approval request."""
+  oauthClientApprovalCreate(
+    """The OAuth client approval request object to create."""
+    input: OauthClientApprovalCreateInput!
+  ): OauthClientApprovalPayload!
+
+  """[Internal] Updates an OAuth client approval request."""
+  oauthClientApprovalUpdate(
+    """A partial client approval request object to update the request with."""
+    input: OauthClientApprovalUpdateInput!
+
+    """The identifier of the OAuth client approval request to update."""
+    id: String!
+  ): OauthClientApprovalPayload!
+
   """Creates a new OAuth client."""
   oauthClientCreate(
     """The OAuth client application object to create."""
@@ -5768,8 +5783,33 @@ type OauthClientApproval implements Node {
   """The status for the OAuth client approval request."""
   status: OAuthClientApprovalStatus!
 
+  """The reason the person wants to install this OAuth client."""
+  requestReason: String
+
   """The reason the request for the OAuth client approval was denied."""
   denyReason: String
+}
+
+input OauthClientApprovalCreateInput {
+  """The identifier. If none is provided, the backend will generate one."""
+  id: String
+
+  """The identifier of OAuth client being requested for approval."""
+  oauthClientId: String!
+
+  """The reason the person wants to install this OAuth client."""
+  requestReason: String
+}
+
+type OauthClientApprovalPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The OAuth client approval request that was created or updated."""
+  oauthClientApproval: OauthClientApproval!
+
+  """Whether the operation was successful."""
+  success: Boolean!
 }
 
 """
@@ -5779,6 +5819,16 @@ enum OAuthClientApprovalStatus {
   requested
   approved
   denied
+}
+
+input OauthClientApprovalUpdateInput {
+  """
+  The status for the OAuth client approval request. Must be approved or denied.
+  """
+  status: OAuthClientApprovalStatus!
+
+  """The reason the request for the OAuth client approval was denied."""
+  denyReason: String
 }
 
 input OauthClientCreateInput {
