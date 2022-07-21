@@ -1591,6 +1591,13 @@ input FavoriteUpdateInput {
   folderName: String
 }
 
+type FeaturesResponse {
+  userId: String!
+
+  """User feature flags"""
+  flags: JSON!
+}
+
 input FeedbackCreateInput {
   """The feedback the user sent."""
   feedback: String!
@@ -7678,6 +7685,9 @@ type Query {
 
   """One specific favorite."""
   favorite(id: String!): Favorite!
+
+  """[INTERNAL] Return pre-evaluated feature flags for users"""
+  features: [FeaturesResponse!]!
 
   """
   Fetch Figma screenshot and other information with file and node identifiers.
