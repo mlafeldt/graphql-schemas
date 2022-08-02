@@ -4658,6 +4658,12 @@ type Mutation {
   ): OauthTokensRevokePayload!
 
   """Verifies a domain to be added to an organization."""
+  organizationDomainClaim(
+    """The ID of the organization domain to claim."""
+    id: String!
+  ): OrganizationDomainPayload!
+
+  """Verifies a domain to be added to an organization."""
   organizationDomainVerify(
     """The organization domain to verify."""
     input: OrganizationDomainVerificationInput!
@@ -6218,17 +6224,22 @@ type OrganizationDomain implements Node {
   """Is this domain verified"""
   verified: Boolean!
 
-  """The user who added the domain."""
-  creator: User
-
   """E-mail used to verify this domain"""
   verificationEmail: String
 
+  """The user who added the domain."""
+  creator: User
+
   """What type of auth is the domain used for"""
   authType: OrganizationDomainAuthType!
+
+  """
+  Whether the domains was claimed by the organization through DNS verification.
+  """
+  claimed: Boolean
 }
 
-"""What type of auth is the domain used for.."""
+"""What type of auth is the domain used for."""
 enum OrganizationDomainAuthType {
   saml
   general
