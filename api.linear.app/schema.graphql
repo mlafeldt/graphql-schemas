@@ -69,6 +69,9 @@ type ApiKeyPayload {
 
 """Public information of the OAuth application."""
 type Application {
+  """OAuth application's ID."""
+  id: String!
+
   """OAuth application's client ID."""
   clientId: String!
 
@@ -7507,6 +7510,12 @@ type Query {
     clientId: String!
   ): Application!
 
+  """[INTERNAL] Get basic information for a list of applications"""
+  applicationInfoByIds(
+    """The IDs of the applications."""
+    ids: [String!]!
+  ): [Application!]!
+
   """
   Get information for an application and whether a user has approved it for the given scopes.
   """
@@ -10329,6 +10338,9 @@ type UserAdminPayload {
 Public information of the OAuth application, plus whether the application has been authorized for the given scopes.
 """
 type UserAuthorizedApplication {
+  """OAuth application's ID."""
+  id: String!
+
   """OAuth application's client ID."""
   clientId: String!
 
