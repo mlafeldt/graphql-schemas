@@ -4677,19 +4677,19 @@ type Mutation {
     appId: String!
   ): OauthTokensRevokePayload!
 
-  """Verifies a domain to be added to an organization."""
+  """[INTERNAL] Verifies a domain claim."""
   organizationDomainClaim(
     """The ID of the organization domain to claim."""
     id: String!
-  ): OrganizationDomainPayload!
+  ): OrganizationDomainSimplePayload!
 
-  """Verifies a domain to be added to an organization."""
+  """[INTERNAL] Verifies a domain to be added to an organization."""
   organizationDomainVerify(
     """The organization domain to verify."""
     input: OrganizationDomainVerificationInput!
   ): OrganizationDomainPayload!
 
-  """Adds a domain to be allowed for an organization."""
+  """[INTERNAL] Adds a domain to be allowed for an organization."""
   organizationDomainCreate(
     """The organization domain entry to create."""
     input: OrganizationDomainCreateInput!
@@ -6337,6 +6337,12 @@ enum OrganizationDomainAuthType {
   general
 }
 
+"""[INTERNAL] Domain claim request response."""
+type OrganizationDomainClaimPayload {
+  """String to put into DNS for verification."""
+  verificationString: String!
+}
+
 input OrganizationDomainCreateInput {
   """The identifier. If none is provided, the backend will generate one."""
   id: String
@@ -6351,6 +6357,7 @@ input OrganizationDomainCreateInput {
   authType: String = "general"
 }
 
+"""[INTERNAL] Organization domain operation response."""
 type OrganizationDomainPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -6362,6 +6369,7 @@ type OrganizationDomainPayload {
   success: Boolean!
 }
 
+"""[INTERNAL] Organization domain operation response."""
 type OrganizationDomainSimplePayload {
   """Whether the operation was successful."""
   success: Boolean!
@@ -8193,6 +8201,12 @@ type Query {
 
   """One specific notification subscription."""
   notificationSubscription(id: String!): NotificationSubscription!
+
+  """[INTERNAL] Checks whether the domain can be claimed."""
+  organizationDomainClaimRequest(
+    """The ID of the organization domain to claim."""
+    id: String!
+  ): OrganizationDomainClaimPayload!
 
   """All invites for the organization."""
   organizationInvites(
