@@ -2165,6 +2165,125 @@ type IntegrationsSettings implements Node {
 
   """Whether to send a new project update to workspace Slack channel."""
   slackProjectUpdateCreatedToWorkspace: Boolean
+
+  """Team which those settings apply to."""
+  team: Team
+
+  """Project which those settings apply to."""
+  project: Project
+}
+
+type IntegrationsSettingsConnection {
+  edges: [IntegrationsSettingsEdge!]!
+  nodes: [IntegrationsSettings!]!
+  pageInfo: PageInfo!
+}
+
+input IntegrationsSettingsCreateInput {
+  """
+  Whether to send a Slack message when a new issue is created for the project or the team.
+  """
+  slackIssueCreated: Boolean
+
+  """
+  Whether to send a Slack message when a comment is created on any of the project or team's issues.
+  """
+  slackIssueNewComment: Boolean
+
+  """
+  Whether to send a Slack message when any of the project or team's issues change to completed or cancelled.
+  """
+  slackIssueStatusChangedDone: Boolean
+
+  """
+  Whether to send a Slack message when any of the project or team's issues has a change in status.
+  """
+  slackIssueStatusChangedAll: Boolean
+
+  """Whether to send a Slack message when a project update is created."""
+  slackProjectUpdateCreated: Boolean
+
+  """
+  Whether to send a Slack message when a project update is created to team channels.
+  """
+  slackProjectUpdateCreatedToTeam: Boolean
+
+  """
+  Whether to send a Slack message when a project update is created to milestone channels.
+  """
+  slackProjectUpdateCreatedToMilestone: Boolean
+
+  """
+  Whether to send a Slack message when a project update is created to workspace channel.
+  """
+  slackProjectUpdateCreatedToWorkspace: Boolean
+
+  """The identifier. If none is provided, the backend will generate one."""
+  id: String
+
+  """The identifier of the team to create settings for."""
+  teamId: String
+
+  """The identifier of the project to create settings for."""
+  projectId: String
+}
+
+type IntegrationsSettingsEdge {
+  node: IntegrationsSettings!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type IntegrationsSettingsPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The settings that were created or updated."""
+  integrationsSettings: IntegrationsSettings!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input IntegrationsSettingsUpdateInput {
+  """
+  Whether to send a Slack message when a new issue is created for the project or the team.
+  """
+  slackIssueCreated: Boolean
+
+  """
+  Whether to send a Slack message when a comment is created on any of the project or team's issues.
+  """
+  slackIssueNewComment: Boolean
+
+  """
+  Whether to send a Slack message when any of the project or team's issues change to completed or cancelled.
+  """
+  slackIssueStatusChangedDone: Boolean
+
+  """
+  Whether to send a Slack message when any of the project or team's issues has a change in status.
+  """
+  slackIssueStatusChangedAll: Boolean
+
+  """Whether to send a Slack message when a project update is created."""
+  slackProjectUpdateCreated: Boolean
+
+  """
+  Whether to send a Slack message when a project update is created to team channels.
+  """
+  slackProjectUpdateCreatedToTeam: Boolean
+
+  """
+  Whether to send a Slack message when a project update is created to milestone channels.
+  """
+  slackProjectUpdateCreatedToMilestone: Boolean
+
+  """
+  Whether to send a Slack message when a project update is created to workspace channel.
+  """
+  slackProjectUpdateCreatedToWorkspace: Boolean
 }
 
 """Intercom specific settings."""
@@ -4306,6 +4425,21 @@ type Mutation {
     id: String!
   ): ArchivePayload!
 
+  """Creates new settings for one or more integrations."""
+  integrationsSettingsCreate(
+    """The settings to create."""
+    input: IntegrationsSettingsCreateInput!
+  ): IntegrationsSettingsPayload!
+
+  """Updates settings related to integrations for a project or a team."""
+  integrationsSettingsUpdate(
+    """A settings object to update the settings with."""
+    input: IntegrationsSettingsUpdateInput!
+
+    """The identifier of the settings to update."""
+    id: String!
+  ): IntegrationsSettingsPayload!
+
   """Kicks off a GitHub import job."""
   issueImportCreateGithub(
     """ID of issue import. If not provided it will be generated."""
@@ -4854,6 +4988,39 @@ type Mutation {
     """
     id: String!
   ): ArchivePayload!
+
+  """Creates a new interaction on a project update."""
+  projectUpdateInteractionCreate(
+    """Data for the project update interaction to create."""
+    input: ProjectUpdateInteractionCreateInput!
+  ): ProjectUpdateInteractionPayload!
+
+  """Creates a new project update."""
+  projectUpdateCreate(
+    """Data for the project update to create."""
+    input: ProjectUpdateCreateInput!
+  ): ProjectUpdatePayload!
+
+  """Updates a project update."""
+  projectUpdateUpdate(
+    """A data to update the project update with."""
+    input: ProjectUpdateUpdateInput!
+
+    """The identifier of the project update to update."""
+    id: String!
+  ): ProjectUpdatePayload!
+
+  """Deletes a project update."""
+  projectUpdateDelete(
+    """The identifier of the project update to delete."""
+    id: String!
+  ): ArchivePayload!
+
+  """Mark a project update as read."""
+  projectUpdateMarkAsRead(
+    """The identifier of the project update."""
+    id: String!
+  ): ProjectUpdateWithInteractionPayload!
 
   """Creates a push subscription."""
   pushSubscriptionCreate(
@@ -6875,6 +7042,9 @@ type Project implements Node {
   0.25 * in progress estimate points) / total estimate points.
   """
   progress: Float!
+
+  """Settings for all integrations associated with that project."""
+  integrationsSettings: IntegrationsSettings
 }
 
 """Project filtering options."""
@@ -7242,12 +7412,32 @@ type ProjectUpdate implements Node {
 
   """The time the project update was edited."""
   editedAt: DateTime
+
+  """The URL to the project update."""
+  url: String!
 }
 
 type ProjectUpdateConnection {
   edges: [ProjectUpdateEdge!]!
   nodes: [ProjectUpdate!]!
   pageInfo: PageInfo!
+}
+
+input ProjectUpdateCreateInput {
+  """The identifier. If none is provided, the backend will generate one."""
+  id: String
+
+  """The content of the project update in markdown format."""
+  body: String
+
+  """The content of the project update as a Prosemirror document."""
+  bodyData: JSON
+
+  """The project to associate the project update with."""
+  projectId: String!
+
+  """The health of the project at the time of the update."""
+  health: ProjectUpdateHealthType
 }
 
 type ProjectUpdateEdge {
@@ -7357,6 +7547,17 @@ type ProjectUpdateInteractionConnection {
   pageInfo: PageInfo!
 }
 
+input ProjectUpdateInteractionCreateInput {
+  """The identifier. If none is provided, the backend will generate one."""
+  id: String
+
+  """The id of the project update that has been interacted with."""
+  projectUpdateId: String!
+
+  """The time at which the user read the project update."""
+  readAt: DateTime!
+}
+
 type ProjectUpdateInteractionEdge {
   node: ProjectUpdateInteraction!
 
@@ -7364,11 +7565,58 @@ type ProjectUpdateInteractionEdge {
   cursor: String!
 }
 
+type ProjectUpdateInteractionPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The project update interaction that was created or updated."""
+  projectUpdateInteraction: ProjectUpdateInteraction!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+type ProjectUpdatePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The project update that was created or updated."""
+  projectUpdate: ProjectUpdate!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
 """The frequency at which to send project update reminders."""
 enum ProjectUpdateReminderFrequency {
   week
   twoWeeks
   never
+}
+
+input ProjectUpdateUpdateInput {
+  """The content of the project update in markdown format."""
+  body: String
+
+  """The content of the project update as a Prosemirror document."""
+  bodyData: JSON
+
+  """The health of the project at the time of the update."""
+  health: ProjectUpdateHealthType
+}
+
+type ProjectUpdateWithInteractionPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The project update that was created or updated."""
+  projectUpdate: ProjectUpdate!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The project update that was created or updated."""
+  interaction: ProjectUpdateInteraction!
 }
 
 """Pull request data"""
@@ -8019,6 +8267,36 @@ type Query {
   """
   integrationResource(id: String!): IntegrationResource!
 
+  """All project updates."""
+  projectUpdates(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectUpdateConnection!
+
+  """One specific set of settings."""
+  integrationsSettings(id: String!): IntegrationsSettings!
+
   """Fetches the GitHub token, completing the OAuth flow."""
   issueImportFinishGithubOAuth(
     """OAuth code."""
@@ -8365,6 +8643,45 @@ type Query {
 
   """One specific project."""
   project(id: String!): Project!
+
+  """All interactions on project updates."""
+  projectUpdateInteractions(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectUpdateInteractionConnection!
+
+  """A specific interaction on a project update."""
+  projectUpdateInteraction(
+    """The identifier of the project update interaction to retrieve."""
+    id: String!
+  ): ProjectUpdateInteraction!
+
+  """A specific project update."""
+  projectUpdate(
+    """The identifier of the project update to retrieve."""
+    id: String!
+  ): ProjectUpdate!
 
   """Sends a test push message."""
   pushSubscriptionTest: PushSubscriptionTestPayload!
@@ -9446,6 +9763,9 @@ type Team implements Node {
     """
     orderBy: PaginationOrderBy
   ): WebhookConnection!
+
+  """Settings for all integrations associated with that team."""
+  integrationsSettings: IntegrationsSettings
 }
 
 type TeamConnection {
