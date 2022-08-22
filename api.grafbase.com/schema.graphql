@@ -128,6 +128,81 @@ type DistributionValue {
   value: Int!
 }
 
+type EnvironmentVariable {
+  id: ID!
+  name: String!
+  value: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  environments: [BranchEnvironment!]!
+  branches: [String!]
+}
+
+type EnvironmentVariableConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [EnvironmentVariableEdge!]!
+
+  """A list of nodes."""
+  nodes: [EnvironmentVariable!]!
+}
+
+input EnvironmentVariableCreateInput {
+  projectId: ID!
+
+  """Must not be already assigned."""
+  name: String!
+  value: String!
+  environments: [BranchEnvironment!]!
+}
+
+union EnvironmentVariableCreatePayload = EnvironmentVariableCreateSuccess | NameAlreadyExistsError | NameTooLongError | ValueTooLongError | ReservedPrefixError | ProjectDoesNotExistError
+
+type EnvironmentVariableCreateSuccess {
+  environmentVariable: EnvironmentVariable!
+  query: Query!
+}
+
+input EnvironmentVariableDeleteInput {
+  id: ID!
+}
+
+union EnvironmentVariableDeletePayload = EnvironmentVariableDeleteSuccess | EnvironmentVariableDoesNotExistError
+
+type EnvironmentVariableDeleteSuccess {
+  deletedId: ID!
+  query: Query!
+}
+
+type EnvironmentVariableDoesNotExistError {
+  query: Query!
+}
+
+"""An edge in a connection."""
+type EnvironmentVariableEdge {
+  """A cursor for use in pagination"""
+  cursor: String!
+
+  """The item at the end of the edge"""
+  node: EnvironmentVariable!
+}
+
+input EnvironmentVariableUpdateInput {
+  id: ID!
+  name: String
+  value: String
+  environments: [BranchEnvironment!]
+}
+
+union EnvironmentVariableUpdatePayload = EnvironmentVariableUpdateSuccess | EnvironmentVariableDoesNotExistError | NameAlreadyExistsError | NameTooLongError | ValueTooLongError | ReservedPrefixError
+
+type EnvironmentVariableUpdateSuccess {
+  environmentVariable: EnvironmentVariable!
+  query: Query!
+}
+
 type GitAccount {
   provider: GitProvider!
   id: ID!
@@ -358,6 +433,15 @@ type Mutation {
   personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
+
+  """Create a new environment variable."""
+  environmentVariableCreate(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
+
+  """Update an environment variable."""
+  environmentVariableUpdate(input: EnvironmentVariableUpdateInput!): EnvironmentVariableUpdatePayload!
+
+  """Delete an environment variable."""
+  environmentVariableDelete(input: EnvironmentVariableDeleteInput!): EnvironmentVariableDeletePayload!
   inviteSend(input: InviteSendInput!): InviteSendPayload!
   inviteCancel(input: InviteCancelInput!): InviteCancelPayload!
   inviteAccept(input: InviteAcceptInput!): InviteAcceptPayload!
@@ -390,9 +474,17 @@ type Mutation {
   login(input: LoginInput): LoginPayload!
 }
 
+type NameAlreadyExistsError {
+  query: Query!
+}
+
 type NameSizeCheckError {
   maxLength: Int!
   message: String!
+  query: Query!
+}
+
+type NameTooLongError {
   query: Query!
 }
 
@@ -560,6 +652,7 @@ type Project {
   branches(after: String, before: String, first: Int, last: Int): BranchConnection!
   apiKeys(after: String, before: String, first: Int, last: Int): ProjectApiKeyConnection!
   productionBranch: Branch!
+  environmentVariables(after: String, before: String, first: Int, last: Int): EnvironmentVariableConnection!
   deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
   databaseRegions: [String!]!
 }
@@ -772,6 +865,10 @@ type RepositorySlugInUseError {
   query: Query!
 }
 
+type ReservedPrefixError {
+  query: Query!
+}
+
 type ReservedSlugsCheckError {
   message: String!
   query: Query!
@@ -821,5 +918,9 @@ type User {
   organizations(after: String, before: String, first: Int, last: Int): OrganizationConnection!
   organizationMemberships: [Member!]!
   personalAccount: PersonalAccount!
+}
+
+type ValueTooLongError {
+  query: Query!
 }
 
