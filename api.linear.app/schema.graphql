@@ -5049,6 +5049,48 @@ type Mutation {
   """Create CSV export report for the organization."""
   createCsvExportReport(includePrivateTeamIds: [String!]): CreateCsvExportReportPayload!
 
+  """Creates a new roadmap."""
+  roadmapCreate(
+    """The properties of the roadmap to create."""
+    input: RoadmapCreateInput!
+  ): RoadmapPayload!
+
+  """Updates a roadmap."""
+  roadmapUpdate(
+    """The properties of the roadmap to update."""
+    input: RoadmapUpdateInput!
+
+    """The identifier of the roadmap to update."""
+    id: String!
+  ): RoadmapPayload!
+
+  """Deletes a roadmap."""
+  roadmapDelete(
+    """The identifier of the roadmap to delete."""
+    id: String!
+  ): ArchivePayload!
+
+  """Creates a new roadmapToProject join."""
+  roadmapToProjectCreate(
+    """The properties of the roadmapToProject to create."""
+    input: RoadmapToProjectCreateInput!
+  ): RoadmapToProjectPayload!
+
+  """Updates a roadmapToProject."""
+  roadmapToProjectUpdate(
+    """The properties of the roadmapToProject to update."""
+    input: RoadmapToProjectUpdateInput!
+
+    """The identifier of the roadmapToProject to update."""
+    id: String!
+  ): RoadmapToProjectPayload!
+
+  """Deletes a roadmapToProject."""
+  roadmapToProjectDelete(
+    """The identifier of the roadmapToProject to delete."""
+    id: String!
+  ): ArchivePayload!
+
   """Deletes a previously used team key."""
   teamKeyDelete(
     """The identifier of the team key to delete."""
@@ -8689,6 +8731,66 @@ type Query {
   """The status of the rate limiter."""
   rateLimitStatus: RateLimitPayload!
 
+  """Custom views for the user."""
+  roadmaps(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): RoadmapConnection!
+
+  """One specific roadmap."""
+  roadmap(id: String!): Roadmap!
+
+  """Custom views for the user."""
+  roadmapToProjects(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): RoadmapToProjectConnection!
+
+  """One specific roadmapToProject."""
+  roadmapToProject(id: String!): RoadmapToProject!
+
   """All team memberships."""
   teamMemberships(
     """A cursor to be used with last for backward pagination."""
@@ -9004,6 +9106,147 @@ type ReactionPayload {
   lastSyncId: Float!
   reaction: Reaction!
   success: Boolean!
+}
+
+"""A roadmap for projects."""
+type Roadmap implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was updated. This is the same as the creation time if the
+      entity hasn't been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The name of the roadmap."""
+  name: String!
+
+  """The description of the roadmap."""
+  description: String
+
+  """The organization of the roadmap."""
+  organization: Organization!
+
+  """The user who created the roadmap."""
+  creator: User!
+}
+
+type RoadmapConnection {
+  edges: [RoadmapEdge!]!
+  nodes: [Roadmap!]!
+  pageInfo: PageInfo!
+}
+
+input RoadmapCreateInput {
+  """The identifier. If none is provided, the backend will generate one."""
+  id: String
+
+  """The name of the roadmap."""
+  name: String!
+}
+
+type RoadmapEdge {
+  node: Roadmap!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type RoadmapPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The roadmap that was created or updated."""
+  roadmap: Roadmap!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+"""Join table between projects and roadmaps"""
+type RoadmapToProject implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was updated. This is the same as the creation time if the
+      entity hasn't been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The project that the roadmap is associated with."""
+  project: Project!
+
+  """The roadmap that the project is associated with."""
+  roadmap: Roadmap!
+
+  """The sort order of the project within the roadmap."""
+  sortOrder: String!
+}
+
+type RoadmapToProjectConnection {
+  edges: [RoadmapToProjectEdge!]!
+  nodes: [RoadmapToProject!]!
+  pageInfo: PageInfo!
+}
+
+input RoadmapToProjectCreateInput {
+  """The identifier. If none is provided, the backend will generate one."""
+  id: String
+
+  """The identifier of the project."""
+  projectId: String!
+
+  """The identifier of the roadmap."""
+  roadmapId: String!
+
+  """The sort order for the project within its milestone."""
+  sortOrder: Float
+}
+
+type RoadmapToProjectEdge {
+  node: RoadmapToProject!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type RoadmapToProjectPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The roadmapToProject that was created or updated."""
+  roadmapToProject: RoadmapToProject!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input RoadmapToProjectUpdateInput {
+  """The sort order for the project within its milestone."""
+  sortOrder: Float
+}
+
+input RoadmapUpdateInput {
+  """The name of the roadmap."""
+  name: String
 }
 
 type RotateSecretPayload {
