@@ -1255,54 +1255,6 @@ input DocumentUpdateInput {
   projectId: String
 }
 
-"""A version of a document."""
-type DocumentVersion implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was updated. This is the same as the creation time if the
-      entity hasn't been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The document's title."""
-  title: String!
-
-  """The version revision number."""
-  revision: Float!
-
-  """The document's content in markdown format."""
-  content: String
-
-  """The user who created the version."""
-  creator: User!
-
-  """The project that the document is associated with."""
-  project: Project!
-}
-
-type DocumentVersionConnection {
-  edges: [DocumentVersionEdge!]!
-  nodes: [DocumentVersion!]!
-  pageInfo: PageInfo!
-}
-
-type DocumentVersionEdge {
-  node: DocumentVersion!
-
-  """Used in `before` and `after` args"""
-  cursor: String!
-}
-
 input EmailSubscribeInput {
   """Email to subscribe."""
   email: String!
@@ -3586,9 +3538,6 @@ input IssueUpdateInput {
 
   """The position of the issue in parent's sub-issue list."""
   subIssueSortOrder: Float
-
-  """[DEPRECATED] Document version for backwards compatibility."""
-  documentVersion: Int
 
   """The date at which the issue is due."""
   dueDate: TimelessDate
