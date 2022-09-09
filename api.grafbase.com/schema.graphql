@@ -158,7 +158,7 @@ input EnvironmentVariableCreateInput {
   environments: [BranchEnvironment!]!
 }
 
-union EnvironmentVariableCreatePayload = EnvironmentVariableCreateSuccess | NameAlreadyExistsError | NameTooLongError | ValueTooLongError | ReservedPrefixError | ProjectDoesNotExistError
+union EnvironmentVariableCreatePayload = EnvironmentVariableCreateSuccess | NameAlreadyExistsError | NameTooLongError | NameContainsInvalidCharactersError | ValueTooLongError | ReservedPrefixError | ProjectDoesNotExistError
 
 type EnvironmentVariableCreateSuccess {
   environmentVariable: EnvironmentVariable!
@@ -196,7 +196,7 @@ input EnvironmentVariableUpdateInput {
   environments: [BranchEnvironment!]
 }
 
-union EnvironmentVariableUpdatePayload = EnvironmentVariableUpdateSuccess | EnvironmentVariableDoesNotExistError | NameAlreadyExistsError | NameTooLongError | ValueTooLongError | ReservedPrefixError
+union EnvironmentVariableUpdatePayload = EnvironmentVariableUpdateSuccess | EnvironmentVariableDoesNotExistError | NameAlreadyExistsError | NameTooLongError | NameContainsInvalidCharactersError | ValueTooLongError | ReservedPrefixError
 
 type EnvironmentVariableUpdateSuccess {
   environmentVariable: EnvironmentVariable!
@@ -475,6 +475,10 @@ type Mutation {
 }
 
 type NameAlreadyExistsError {
+  query: Query!
+}
+
+type NameContainsInvalidCharactersError {
   query: Query!
 }
 
