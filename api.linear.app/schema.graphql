@@ -1642,6 +1642,13 @@ type FigmaEmbedPayload {
   success: Boolean!
 }
 
+type FlagsResponse {
+  userId: String!
+
+  """User flags"""
+  flags: JSON!
+}
+
 type FrontAttachmentPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -8157,9 +8164,6 @@ type Query {
   """One specific favorite."""
   favorite(id: String!): Favorite!
 
-  """[INTERNAL] Return pre-evaluated feature flags for users"""
-  features: [FeaturesResponse!]!
-
   """
   Fetch Figma screenshot and other information with file and node identifiers.
   """
@@ -8170,6 +8174,12 @@ type Query {
     """Figma file identifier."""
     fileId: String!
   ): FigmaEmbedPayload!
+
+  """[INTERNAL] Return pre-evaluated flags for users"""
+  flags: [FlagsResponse!]!
+
+  """[INTERNAL] Return pre-evaluated feature flags for users"""
+  features: [FeaturesResponse!]! @deprecated(reason: "Use flags instead")
 
   """[ALPHA] All initiatives."""
   initiatives(
