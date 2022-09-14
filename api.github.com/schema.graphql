@@ -21351,6 +21351,9 @@ type PullRequestThread implements Node {
     """Skips the first _n_ elements in the list."""
     skip: Int
   ): PullRequestReviewCommentConnection!
+
+  """The side of the diff on which this thread was placed."""
+  diffSide: DiffSide!
   id: ID!
 
   """Whether or not the thread has been collapsed (resolved)"""
@@ -21362,6 +21365,9 @@ type PullRequestThread implements Node {
   """Whether this thread has been resolved"""
   isResolved: Boolean!
 
+  """The line in the file to which this thread refers"""
+  line: Int
+
   """Identifies the pull request associated with this thread."""
   pullRequest: PullRequest!
 
@@ -21370,6 +21376,14 @@ type PullRequestThread implements Node {
 
   """The user who resolved this thread"""
   resolvedBy: User
+
+  """
+  The side of the diff that the first line of the thread starts on (multi-line only)
+  """
+  startDiffSide: DiffSide
+
+  """The line of the first file diff in the thread."""
+  startLine: Int
 
   """Indicates whether the current viewer can reply to this thread."""
   viewerCanReply: Boolean!
