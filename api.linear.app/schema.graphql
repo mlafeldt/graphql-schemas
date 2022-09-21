@@ -3174,6 +3174,9 @@ type IssueLabel implements Node {
   """The user who created the label."""
   creator: User
 
+  """The parent label."""
+  parent: IssueLabel
+
   """Issues associated with the label."""
   issues(
     """Filter returned issues."""
@@ -3203,6 +3206,36 @@ type IssueLabel implements Node {
     """
     orderBy: PaginationOrderBy
   ): IssueConnection!
+
+  """Children of the label."""
+  children(
+    """Filter returned issue labels."""
+    filter: IssueLabelFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueLabelConnection!
 }
 
 """Issue label filtering options."""
@@ -3256,6 +3289,9 @@ input IssueLabelCreateInput {
 
   """The color of the label."""
   color: String
+
+  """The identifier of the parent label."""
+  parentId: String
 
   """
   The team associated with the label. If not given, the label will be associated with the entire workspace.
@@ -3314,6 +3350,9 @@ input IssueLabelUpdateInput {
 
   """The description of the label."""
   description: String
+
+  """The identifier of the parent label."""
+  parentId: String
 
   """The color of the label."""
   color: String
