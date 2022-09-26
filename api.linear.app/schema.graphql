@@ -675,6 +675,21 @@ type ContactPayload {
   success: Boolean!
 }
 
+"""[INTERNAL] Input for sending a message to the Linear Sales team"""
+input ContactSalesCreateInput {
+  """Name of the person requesting information."""
+  name: String!
+
+  """Work email of the person requesting information."""
+  email: String!
+
+  """Name of the person requesting information."""
+  topics: [String!]
+
+  """The message the user sent."""
+  message: String
+}
+
 type CreateCsvExportReportPayload {
   """Whether the operation was successful."""
   success: Boolean!
@@ -4024,6 +4039,12 @@ type Mutation {
   contactCreate(
     """The contact entry to create."""
     input: ContactCreateInput!
+  ): ContactPayload!
+
+  """[INTERNAL] Saves sales pricing inquiry to Front."""
+  contactSalesCreate(
+    """The contact entry to create."""
+    input: ContactSalesCreateInput!
   ): ContactPayload!
 
   """Creates a new custom view."""
