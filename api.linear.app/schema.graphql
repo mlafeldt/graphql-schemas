@@ -3819,6 +3819,14 @@ input MilestoneFilter {
   or: [MilestoneFilter!]
 }
 
+type MilestoneMigrationPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
 type MilestonePayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -3828,6 +3836,14 @@ type MilestonePayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+input MilestonesMigrateInput {
+  """IDs of the milestones to migrate."""
+  milestonesToMigrate: [String!]
+
+  """IDs of the milestones to delete."""
+  milestonesToDelete: [String!]
 }
 
 input MilestoneUpdateInput {
@@ -4724,6 +4740,12 @@ type Mutation {
     """The identifier of the milestone to delete."""
     id: String!
   ): ArchivePayload!
+
+  """Migrates milestones to roadmaps"""
+  migrateMilestonesToRoadmaps(
+    """Ids for milestones to migrate and milestones to delete"""
+    input: MilestonesMigrateInput!
+  ): MilestoneMigrationPayload!
 
   """Updates a notification."""
   notificationUpdate(
