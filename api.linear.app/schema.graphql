@@ -2252,6 +2252,67 @@ input IntegrationsSettingsUpdateInput {
   slackProjectUpdateCreatedToWorkspace: Boolean
 }
 
+"""Join table between templates and integrations"""
+type IntegrationTemplate implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was updated. This is the same as the creation time if the
+      entity hasn't been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The template that the integration is associated with."""
+  template: Template!
+
+  """The integration that the template is associated with."""
+  integration: Integration!
+}
+
+type IntegrationTemplateConnection {
+  edges: [IntegrationTemplateEdge!]!
+  nodes: [IntegrationTemplate!]!
+  pageInfo: PageInfo!
+}
+
+input IntegrationTemplateCreateInput {
+  """The identifier. If none is provided, the backend will generate one."""
+  id: String
+
+  """The identifier of the integration."""
+  integrationId: String!
+
+  """The identifier of the template."""
+  templateId: String!
+}
+
+type IntegrationTemplateEdge {
+  node: IntegrationTemplate!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type IntegrationTemplatePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The IntegrationTemplate that was created or updated."""
+  integrationTemplate: IntegrationTemplate!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
 """Intercom specific settings."""
 type IntercomSettings {
   """
@@ -4463,6 +4524,18 @@ type Mutation {
     """The identifier of the settings to update."""
     id: String!
   ): IntegrationsSettingsPayload!
+
+  """Creates a new integrationTemplate join."""
+  integrationTemplateCreate(
+    """The properties of the integrationTemplate to create."""
+    input: IntegrationTemplateCreateInput!
+  ): IntegrationTemplatePayload!
+
+  """Deletes a integrationTemplate."""
+  integrationTemplateDelete(
+    """The identifier of the integrationTemplate to delete."""
+    id: String!
+  ): ArchivePayload!
 
   """Kicks off a GitHub import job."""
   issueImportCreateGithub(
@@ -8396,6 +8469,36 @@ type Query {
 
   """One specific set of settings."""
   integrationsSettings(id: String!): IntegrationsSettings!
+
+  """Template and integration connections."""
+  integrationTemplates(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IntegrationTemplateConnection!
+
+  """One specific integrationTemplate."""
+  integrationTemplate(id: String!): IntegrationTemplate!
 
   """Fetches the GitHub token, completing the OAuth flow."""
   issueImportFinishGithubOAuth(
