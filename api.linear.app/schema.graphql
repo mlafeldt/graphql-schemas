@@ -419,6 +419,168 @@ type AuthResolverResponse {
   lastUsedOrganizationId: String
 }
 
+"""Cycle filtering options."""
+input BaseCycleFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the cycle number."""
+  number: NumberComparator
+
+  """Comparator for the cycle name."""
+  name: StringComparator
+
+  """Comparator for the cycle start date."""
+  startsAt: DateComparator
+
+  """Comparator for the cycle ends at date."""
+  endsAt: DateComparator
+
+  """Comparator for the cycle completed at date."""
+  completedAt: DateComparator
+
+  """Comparator for the filtering active cycle."""
+  isActive: BooleanComparator
+
+  """Comparator for the filtering next cycle."""
+  isNext: BooleanComparator
+
+  """Comparator for the filtering previous cycle."""
+  isPrevious: BooleanComparator
+
+  """Filters that the cycles team must satisfy."""
+  team: TeamFilter
+
+  """Filters that the cycles issues must satisfy."""
+  issues: IssueCollectionFilter
+}
+
+"""Initiative filtering options."""
+input BaseInitiativeFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the initiative name."""
+  name: StringComparator
+
+  """Comparator for the initiative sort order."""
+  sortOrder: NumberComparator
+
+  """Filters that the initiatives projects must satisfy."""
+  projects: ProjectCollectionFilter
+}
+
+"""Milestone filtering options."""
+input BaseMilestoneFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the milestone name."""
+  name: StringComparator
+
+  """Comparator for the milestone sort order."""
+  sortOrder: NumberComparator
+
+  """Filters that the milestones projects must satisfy."""
+  projects: ProjectCollectionFilter
+}
+
+"""Project filtering options."""
+input BaseProjectFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the project name."""
+  name: StringComparator
+
+  """Comparator for the project slug ID."""
+  slugId: StringComparator
+
+  """Comparator for the project state."""
+  state: StringComparator
+
+  """Comparator for the project start date."""
+  startDate: NullableDateComparator
+
+  """Comparator for the project target date."""
+  targetDate: NullableDateComparator
+
+  """Filters that the projects creator must satisfy."""
+  creator: UserFilter
+
+  """Filters that the projects lead must satisfy."""
+  lead: NullableUserFilter
+
+  """Filters that the projects members must satisfy."""
+  members: UserFilter
+
+  """Filters that the projects milestones must satisfy."""
+  milestone: NullableMilestoneFilter
+
+  """Filters that the projects issues must satisfy."""
+  issues: IssueCollectionFilter
+}
+
+"""User filtering options."""
+input BaseUserFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the user's name."""
+  name: StringComparator
+
+  """Comparator for the user's display name."""
+  displayName: StringComparator
+
+  """Comparator for the user's email."""
+  email: StringComparator
+
+  """Comparator for the user's activity status."""
+  active: BooleanComparator
+
+  """Filters that the users assigned issues must satisfy."""
+  assignedIssues: IssueCollectionFilter
+
+  """Comparator for the user's admin status."""
+  admin: BooleanComparator
+
+  """
+  Filter based on the currently authenticated user. Set to true to filter for
+  the authenticated user, false for any other user.
+  """
+  isMe: BooleanComparator
+}
+
 """Relation load request."""
 input BatchRequest {
   """The class name of the model to load."""
@@ -5701,14 +5863,14 @@ input NullableCycleFilter {
   """Filters that the cycles issues must satisfy."""
   issues: IssueCollectionFilter
 
-  """Compound filters, all of which need to be matched by the cycle."""
-  and: [CycleFilter!]
-
-  """Compound filters, one of which need to be matched by the cycle."""
-  or: [CycleFilter!]
-
   """Filter based on the existence of the relation."""
   null: Boolean
+
+  """Compound filters, one of which need to be matched by the cycle."""
+  and: [NullableCycleFilter!]
+
+  """Compound filters, one of which need to be matched by the cycle."""
+  or: [NullableCycleFilter!]
 }
 
 """Comparator for optional dates."""
@@ -5771,14 +5933,14 @@ input NullableInitiativeFilter {
   """Filters that the initiatives projects must satisfy."""
   projects: ProjectCollectionFilter
 
-  """Compound filters, all of which need to be matched by the initiative."""
-  and: [InitiativeFilter!]
-
-  """Compound filters, one of which need to be matched by the initiative."""
-  or: [InitiativeFilter!]
-
   """Filter based on the existence of the relation."""
   null: Boolean
+
+  """Compound filters, all of which need to be matched by the initiative."""
+  and: [NullableInitiativeFilter!]
+
+  """Compound filters, one of which need to be matched by the initiative."""
+  or: [NullableInitiativeFilter!]
 }
 
 """User filtering options."""
@@ -5801,14 +5963,14 @@ input NullableMilestoneFilter {
   """Filters that the milestones projects must satisfy."""
   projects: ProjectCollectionFilter
 
-  """Compound filters, all of which need to be matched by the milestone."""
-  and: [MilestoneFilter!]
-
-  """Compound filters, one of which need to be matched by the milestone."""
-  or: [MilestoneFilter!]
-
   """Filter based on the existence of the relation."""
   null: Boolean
+
+  """Compound filters, all of which need to be matched by the milestone."""
+  and: [NullableMilestoneFilter!]
+
+  """Compound filters, one of which need to be matched by the milestone."""
+  or: [NullableMilestoneFilter!]
 }
 
 """Comparator for optional numbers."""
@@ -5892,14 +6054,14 @@ input NullableProjectFilter {
   """Filters that the projects issues must satisfy."""
   issues: IssueCollectionFilter
 
-  """Compound filters, all of which need to be matched by the project."""
-  and: [ProjectFilter!]
-
-  """Compound filters, one of which need to be matched by the project."""
-  or: [ProjectFilter!]
-
   """Filter based on the existence of the relation."""
   null: Boolean
+
+  """Compound filters, all of which need to be matched by the project."""
+  and: [NullableProjectFilter!]
+
+  """Compound filters, one of which need to be matched by the project."""
+  or: [NullableProjectFilter!]
 }
 
 """Comparator for optional strings."""
@@ -6035,12 +6197,6 @@ input NullableUserFilter {
   """Filters that the users assigned issues must satisfy."""
   assignedIssues: IssueCollectionFilter
 
-  """Compound filters, all of which need to be matched by the user."""
-  and: [UserFilter!]
-
-  """Compound filters, one of which need to be matched by the user."""
-  or: [UserFilter!]
-
   """Comparator for the user's admin status."""
   admin: BooleanComparator
 
@@ -6052,6 +6208,12 @@ input NullableUserFilter {
 
   """Filter based on the existence of the relation."""
   null: Boolean
+
+  """Compound filters, all of which need to be matched by the user."""
+  and: [NullableUserFilter!]
+
+  """Compound filters, one of which need to be matched by the user."""
+  or: [NullableUserFilter!]
 }
 
 """Comparator for numbers."""
@@ -11214,12 +11376,6 @@ input UserFilter {
   """Filters that the users assigned issues must satisfy."""
   assignedIssues: IssueCollectionFilter
 
-  """Compound filters, all of which need to be matched by the user."""
-  and: [UserFilter!]
-
-  """Compound filters, one of which need to be matched by the user."""
-  or: [UserFilter!]
-
   """Comparator for the user's admin status."""
   admin: BooleanComparator
 
@@ -11228,6 +11384,12 @@ input UserFilter {
   the authenticated user, false for any other user.
   """
   isMe: BooleanComparator
+
+  """Compound filters, all of which need to be matched by the user."""
+  and: [UserFilter!]
+
+  """Compound filters, one of which need to be matched by the user."""
+  or: [UserFilter!]
 }
 
 """The types of flags that the user can have."""
