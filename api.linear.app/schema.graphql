@@ -543,6 +543,30 @@ input BaseProjectFilter {
 
   """Filters that the projects issues must satisfy."""
   issues: IssueCollectionFilter
+
+  """Filters that the projects roadmaps must satisfy."""
+  roadmaps: RoadmapCollectionFilter
+}
+
+"""Roadmap filtering options."""
+input BaseRoadmapFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the roadmap name."""
+  name: StringComparator
+
+  """Comparator for the roadmap slug ID."""
+  slugId: StringComparator
+
+  """Filters that the roadmap creator must satisfy."""
+  creator: UserFilter
 }
 
 """User filtering options."""
@@ -6126,6 +6150,9 @@ input NullableProjectFilter {
   """Filters that the projects issues must satisfy."""
   issues: IssueCollectionFilter
 
+  """Filters that the projects roadmaps must satisfy."""
+  roadmaps: RoadmapCollectionFilter
+
   """Filter based on the existence of the relation."""
   null: Boolean
 
@@ -7477,6 +7504,9 @@ input ProjectCollectionFilter {
   """Filters that the projects issues must satisfy."""
   issues: IssueCollectionFilter
 
+  """Filters that the projects roadmaps must satisfy."""
+  roadmaps: RoadmapCollectionFilter
+
   """Compound filters, all of which need to be matched by the project."""
   and: [ProjectFilter!]
 
@@ -7584,6 +7614,9 @@ input ProjectFilter {
 
   """Filters that the projects issues must satisfy."""
   issues: IssueCollectionFilter
+
+  """Filters that the projects roadmaps must satisfy."""
+  roadmaps: RoadmapCollectionFilter
 
   """Compound filters, all of which need to be matched by the project."""
   and: [ProjectFilter!]
@@ -9550,6 +9583,39 @@ type Roadmap implements Node {
   slugId: String!
 }
 
+"""Roadmap collection filtering options."""
+input RoadmapCollectionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the roadmap name."""
+  name: StringComparator
+
+  """Comparator for the roadmap slug ID."""
+  slugId: StringComparator
+
+  """Filters that the roadmap creator must satisfy."""
+  creator: UserFilter
+
+  """Compound filters, all of which need to be matched by the roadmap."""
+  and: [RoadmapFilter!]
+
+  """Compound filters, one of which need to be matched by the roadmap."""
+  or: [RoadmapFilter!]
+
+  """Filters that needs to be matched by some roadmaps."""
+  some: RoadmapFilter
+
+  """Filters that needs to be matched by all roadmaps."""
+  every: RoadmapFilter
+}
+
 type RoadmapConnection {
   edges: [RoadmapEdge!]!
   nodes: [Roadmap!]!
@@ -9572,6 +9638,33 @@ type RoadmapEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Roadmap filtering options."""
+input RoadmapFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the roadmap name."""
+  name: StringComparator
+
+  """Comparator for the roadmap slug ID."""
+  slugId: StringComparator
+
+  """Filters that the roadmap creator must satisfy."""
+  creator: UserFilter
+
+  """Compound filters, all of which need to be matched by the roadmap."""
+  and: [RoadmapFilter!]
+
+  """Compound filters, one of which need to be matched by the roadmap."""
+  or: [RoadmapFilter!]
 }
 
 type RoadmapPayload {

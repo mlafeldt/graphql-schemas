@@ -57,6 +57,11 @@ type BranchMetricsSuccess {
   request: Distribution!
 }
 
+type CurrentPlanLimitReachedError {
+  max: Int!
+  query: Query!
+}
+
 """RFC3339 formatted date in the UTC time zone denoted by letter 'Z'"""
 scalar DateTime
 
@@ -747,7 +752,7 @@ input ProjectCreateFromRepositoryInput {
   productionBranch: String!
 }
 
-union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | SlugInvalidError | RepositoryContainsNoBranchesError | AccountDoesNotExistError
+union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | SlugInvalidError | SlugReservedError | SlugTooLongError | RepositoryContainsNoBranchesError | AccountDoesNotExistError | CurrentPlanLimitReachedError
 
 type ProjectCreateFromRepositorySuccess {
   project: Project!
@@ -763,7 +768,7 @@ input ProjectCreateFromTemplateInput {
   repoPrivate: Boolean!
 }
 
-union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | SlugInvalidError | RepositorySlugInUseError | TemplateDoesNotExistError | AccountDoesNotExistError
+union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | SlugInvalidError | SlugReservedError | SlugTooLongError | RepositorySlugInUseError | TemplateDoesNotExistError | AccountDoesNotExistError | CurrentPlanLimitReachedError
 
 type ProjectCreateFromTemplateSuccess {
   project: Project!
@@ -799,7 +804,7 @@ input ProjectUpdateInput {
   productionBranch: String
 }
 
-union ProjectUpdatePayload = ProjectUpdateSuccess | ProjectDoesNotExistError | SlugAlreadyExistsError | SlugInvalidError
+union ProjectUpdatePayload = ProjectUpdateSuccess | ProjectDoesNotExistError | SlugAlreadyExistsError | SlugInvalidError | SlugReservedError | SlugTooLongError
 
 type ProjectUpdateSuccess {
   project: Project!
@@ -897,9 +902,18 @@ type SlugInvalidError {
   query: Query!
 }
 
+type SlugReservedError {
+  query: Query!
+}
+
 type SlugSizeCheckError {
   maxLength: Int!
   message: String!
+  query: Query!
+}
+
+type SlugTooLongError {
+  maxLength: Int!
   query: Query!
 }
 
