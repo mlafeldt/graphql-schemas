@@ -419,192 +419,6 @@ type AuthResolverResponse {
   lastUsedOrganizationId: String
 }
 
-"""Cycle filtering options."""
-input BaseCycleFilter {
-  """Comparator for the identifier."""
-  id: IDComparator
-
-  """Comparator for the created at date."""
-  createdAt: DateComparator
-
-  """Comparator for the updated at date."""
-  updatedAt: DateComparator
-
-  """Comparator for the cycle number."""
-  number: NumberComparator
-
-  """Comparator for the cycle name."""
-  name: StringComparator
-
-  """Comparator for the cycle start date."""
-  startsAt: DateComparator
-
-  """Comparator for the cycle ends at date."""
-  endsAt: DateComparator
-
-  """Comparator for the cycle completed at date."""
-  completedAt: DateComparator
-
-  """Comparator for the filtering active cycle."""
-  isActive: BooleanComparator
-
-  """Comparator for the filtering next cycle."""
-  isNext: BooleanComparator
-
-  """Comparator for the filtering previous cycle."""
-  isPrevious: BooleanComparator
-
-  """Filters that the cycles team must satisfy."""
-  team: TeamFilter
-
-  """Filters that the cycles issues must satisfy."""
-  issues: IssueCollectionFilter
-}
-
-"""Initiative filtering options."""
-input BaseInitiativeFilter {
-  """Comparator for the identifier."""
-  id: IDComparator
-
-  """Comparator for the created at date."""
-  createdAt: DateComparator
-
-  """Comparator for the updated at date."""
-  updatedAt: DateComparator
-
-  """Comparator for the initiative name."""
-  name: StringComparator
-
-  """Comparator for the initiative sort order."""
-  sortOrder: NumberComparator
-
-  """Filters that the initiatives projects must satisfy."""
-  projects: ProjectCollectionFilter
-}
-
-"""Milestone filtering options."""
-input BaseMilestoneFilter {
-  """Comparator for the identifier."""
-  id: IDComparator
-
-  """Comparator for the created at date."""
-  createdAt: DateComparator
-
-  """Comparator for the updated at date."""
-  updatedAt: DateComparator
-
-  """Comparator for the milestone name."""
-  name: StringComparator
-
-  """Comparator for the milestone sort order."""
-  sortOrder: NumberComparator
-
-  """Filters that the milestones projects must satisfy."""
-  projects: ProjectCollectionFilter
-}
-
-"""Project filtering options."""
-input BaseProjectFilter {
-  """Comparator for the identifier."""
-  id: IDComparator
-
-  """Comparator for the created at date."""
-  createdAt: DateComparator
-
-  """Comparator for the updated at date."""
-  updatedAt: DateComparator
-
-  """Comparator for the project name."""
-  name: StringComparator
-
-  """Comparator for the project slug ID."""
-  slugId: StringComparator
-
-  """Comparator for the project state."""
-  state: StringComparator
-
-  """Comparator for the project start date."""
-  startDate: NullableDateComparator
-
-  """Comparator for the project target date."""
-  targetDate: NullableDateComparator
-
-  """Filters that the projects creator must satisfy."""
-  creator: UserFilter
-
-  """Filters that the projects lead must satisfy."""
-  lead: NullableUserFilter
-
-  """Filters that the projects members must satisfy."""
-  members: UserFilter
-
-  """Filters that the projects milestones must satisfy."""
-  milestone: NullableMilestoneFilter
-
-  """Filters that the projects issues must satisfy."""
-  issues: IssueCollectionFilter
-
-  """Filters that the projects roadmaps must satisfy."""
-  roadmaps: RoadmapCollectionFilter
-}
-
-"""Roadmap filtering options."""
-input BaseRoadmapFilter {
-  """Comparator for the identifier."""
-  id: IDComparator
-
-  """Comparator for the created at date."""
-  createdAt: DateComparator
-
-  """Comparator for the updated at date."""
-  updatedAt: DateComparator
-
-  """Comparator for the roadmap name."""
-  name: StringComparator
-
-  """Comparator for the roadmap slug ID."""
-  slugId: StringComparator
-
-  """Filters that the roadmap creator must satisfy."""
-  creator: UserFilter
-}
-
-"""User filtering options."""
-input BaseUserFilter {
-  """Comparator for the identifier."""
-  id: IDComparator
-
-  """Comparator for the created at date."""
-  createdAt: DateComparator
-
-  """Comparator for the updated at date."""
-  updatedAt: DateComparator
-
-  """Comparator for the user's name."""
-  name: StringComparator
-
-  """Comparator for the user's display name."""
-  displayName: StringComparator
-
-  """Comparator for the user's email."""
-  email: StringComparator
-
-  """Comparator for the user's activity status."""
-  active: BooleanComparator
-
-  """Filters that the users assigned issues must satisfy."""
-  assignedIssues: IssueCollectionFilter
-
-  """Comparator for the user's admin status."""
-  admin: BooleanComparator
-
-  """
-  Filter based on the currently authenticated user. Set to true to filter for
-  the authenticated user, false for any other user.
-  """
-  isMe: BooleanComparator
-}
-
 """Relation load request."""
 input BatchRequest {
   """The class name of the model to load."""
@@ -715,10 +529,10 @@ input CommentCollectionFilter {
   issue: IssueFilter
 
   """Compound filters, all of which need to be matched by the comment."""
-  and: [CommentFilter!]
+  and: [CommentCollectionFilter!]
 
   """Compound filters, one of which need to be matched by the comment."""
-  or: [CommentFilter!]
+  or: [CommentCollectionFilter!]
 
   """Filters that needs to be matched by some comments."""
   some: CommentFilter
@@ -3069,10 +2883,10 @@ input IssueCollectionFilter {
   attachments: AttachmentFilter
 
   """Compound filters, all of which need to be matched by the issue."""
-  and: [IssueFilter!]
+  and: [IssueCollectionFilter!]
 
   """Compound filters, one of which need to be matched by the issue."""
-  or: [IssueFilter!]
+  or: [IssueCollectionFilter!]
 
   """Filters that needs to be matched by some issues."""
   some: IssueFilter
@@ -3593,10 +3407,10 @@ input IssueLabelCollectionFilter {
   team: TeamFilter
 
   """Compound filters, all of which need to be matched by the label."""
-  and: [IssueLabelFilter!]
+  and: [IssueLabelCollectionFilter!]
 
   """Compound filters, one of which need to be matched by the label."""
-  or: [IssueLabelFilter!]
+  or: [IssueLabelCollectionFilter!]
 
   """Filters that needs to be matched by some issue labels."""
   some: IssueLabelFilter
@@ -7508,10 +7322,10 @@ input ProjectCollectionFilter {
   roadmaps: RoadmapCollectionFilter
 
   """Compound filters, all of which need to be matched by the project."""
-  and: [ProjectFilter!]
+  and: [ProjectCollectionFilter!]
 
   """Compound filters, one of which need to be matched by the project."""
-  or: [ProjectFilter!]
+  or: [ProjectCollectionFilter!]
 
   """Filters that needs to be matched by some projects."""
   some: ProjectFilter
@@ -9592,10 +9406,10 @@ input RoadmapCollectionFilter {
   creator: UserFilter
 
   """Compound filters, all of which need to be matched by the roadmap."""
-  and: [RoadmapFilter!]
+  and: [RoadmapCollectionFilter!]
 
   """Compound filters, one of which need to be matched by the roadmap."""
-  or: [RoadmapFilter!]
+  or: [RoadmapCollectionFilter!]
 
   """Filters that needs to be matched by some roadmaps."""
   some: RoadmapFilter
