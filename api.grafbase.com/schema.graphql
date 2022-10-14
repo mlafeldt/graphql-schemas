@@ -23,6 +23,7 @@ type Branch {
   deployments(after: String, before: String, first: Int, last: Int): DeploymentConnection!
   project: Project!
   environment: BranchEnvironment!
+  status: BranchStatus!
 }
 
 type BranchConnection {
@@ -55,6 +56,11 @@ union BranchMetricsPayload = BranchMetricsSuccess | ProjectDoesNotExistError
 type BranchMetricsSuccess {
   latency: Distribution!
   request: Distribution!
+}
+
+enum BranchStatus {
+  ACTIVE
+  DISABLED
 }
 
 type CurrentPlanLimitReachedError {
