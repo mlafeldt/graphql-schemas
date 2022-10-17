@@ -169,6 +169,48 @@ type Attachment implements Node {
   issue: Issue!
 }
 
+"""Attachment collection filtering options."""
+input AttachmentCollectionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the title."""
+  title: StringComparator
+
+  """Comparator for the subtitle."""
+  subtitle: NullableStringComparator
+
+  """Comparator for the url."""
+  url: StringComparator
+
+  """Filters that the attachments creator must satisfy."""
+  creator: NullableUserFilter
+
+  """Comparator for the source type."""
+  sourceType: NestedStringComparator
+
+  """Compound filters, all of which need to be matched by the attachment."""
+  and: [AttachmentCollectionFilter!]
+
+  """Compound filters, one of which need to be matched by the attachment."""
+  or: [AttachmentCollectionFilter!]
+
+  """Filters that needs to be matched by some attachments."""
+  some: AttachmentFilter
+
+  """Filters that needs to be matched by all attachments."""
+  every: AttachmentFilter
+
+  """Comparator for the collection length."""
+  length: NumberComparator
+}
+
 type AttachmentConnection {
   edges: [AttachmentEdge!]!
   nodes: [Attachment!]!
@@ -256,6 +298,12 @@ input AttachmentFilter {
 
   """Comparator for the source type."""
   sourceType: NestedStringComparator
+
+  """Compound filters, all of which need to be matched by the attachment."""
+  and: [AttachmentFilter!]
+
+  """Compound filters, one of which need to be matched by the attachment."""
+  or: [AttachmentFilter!]
 }
 
 type AttachmentPayload {
@@ -1432,6 +1480,52 @@ Contains either the full serialized state of the application or delta packets th
 type EntityCountResponse {
   """Entity counts keyed by the entity name."""
   counts: JSON!
+}
+
+"""Comparator for estimates."""
+input EstimateComparator {
+  """Equals constraint."""
+  eq: Float
+
+  """Not-equals constraint."""
+  neq: Float
+
+  """In-array constraint."""
+  in: [Float!]
+
+  """Not-in-array constraint."""
+  nin: [Float!]
+
+  """
+  Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.
+  """
+  null: Boolean
+
+  """
+  Less-than constraint. Matches any values that are less than the given value.
+  """
+  lt: Float
+
+  """
+  Less-than-or-equal constraint. Matches any values that are less than or equal to the given value.
+  """
+  lte: Float
+
+  """
+  Greater-than constraint. Matches any values that are greater than the given value.
+  """
+  gt: Float
+
+  """
+  Greater-than-or-equal constraint. Matches any values that are greater than or equal to the given value.
+  """
+  gte: Float
+
+  """Compound filters, all of which need to be matched by the estimate."""
+  or: [NullableNumberComparator!]
+
+  """Compound filters, one of which need to be matched by the estimate."""
+  and: [NullableNumberComparator!]
 }
 
 input EventCreateInput {
@@ -2861,7 +2955,7 @@ input IssueCollectionFilter {
   priority: NullableNumberComparator
 
   """Comparator for the issues estimate."""
-  estimate: NumberComparator
+  estimate: EstimateComparator
 
   """Comparator for the issues started at date."""
   startedAt: NullableDateComparator
@@ -2915,7 +3009,7 @@ input IssueCollectionFilter {
   children: IssueCollectionFilter
 
   """Filters that the issues attachments must satisfy."""
-  attachments: AttachmentFilter
+  attachments: AttachmentCollectionFilter
 
   """[Internal] Comparator for the issues content."""
   searchableContent: ContentComparator
@@ -3051,7 +3145,7 @@ input IssueFilter {
   priority: NullableNumberComparator
 
   """Comparator for the issues estimate."""
-  estimate: NumberComparator
+  estimate: EstimateComparator
 
   """Comparator for the issues started at date."""
   startedAt: NullableDateComparator
@@ -3105,7 +3199,7 @@ input IssueFilter {
   children: IssueCollectionFilter
 
   """Filters that the issues attachments must satisfy."""
-  attachments: AttachmentFilter
+  attachments: AttachmentCollectionFilter
 
   """[Internal] Comparator for the issues content."""
   searchableContent: ContentComparator
