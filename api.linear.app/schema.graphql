@@ -2981,11 +2981,17 @@ input IssueCollectionFilter {
   """Filters that the issues creator must satisfy."""
   creator: NullableUserFilter
 
+  """Filters that the issue parent must satisfy."""
+  parent: NullableIssueFilter
+
   """Filters that the issues snoozer must satisfy."""
   snoozedBy: NullableUserFilter
 
   """Filters that issue labels must satisfy."""
   labels: IssueLabelCollectionFilter
+
+  """Filters that issue subscribers must satisfy."""
+  subscribers: UserCollectionFilter
 
   """Filters that the issues team must satisfy."""
   team: TeamFilter
@@ -3171,11 +3177,17 @@ input IssueFilter {
   """Filters that the issues creator must satisfy."""
   creator: NullableUserFilter
 
+  """Filters that the issue parent must satisfy."""
+  parent: NullableIssueFilter
+
   """Filters that the issues snoozer must satisfy."""
   snoozedBy: NullableUserFilter
 
   """Filters that issue labels must satisfy."""
   labels: IssueLabelCollectionFilter
+
+  """Filters that issue subscribers must satisfy."""
+  subscribers: UserCollectionFilter
 
   """Filters that the issues team must satisfy."""
   team: TeamFilter
@@ -5989,6 +6001,105 @@ input NullableInitiativeFilter {
 
   """Compound filters, one of which need to be matched by the initiative."""
   or: [NullableInitiativeFilter!]
+}
+
+"""Issue filtering options."""
+input NullableIssueFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the issues number."""
+  number: NumberComparator
+
+  """Comparator for the issues title."""
+  title: StringComparator
+
+  """Comparator for the issues description."""
+  description: NullableStringComparator
+
+  """Comparator for the issues priority."""
+  priority: NullableNumberComparator
+
+  """Comparator for the issues estimate."""
+  estimate: EstimateComparator
+
+  """Comparator for the issues started at date."""
+  startedAt: NullableDateComparator
+
+  """Comparator for the issues completed at date."""
+  completedAt: NullableDateComparator
+
+  """Comparator for the issues canceled at date."""
+  canceledAt: NullableDateComparator
+
+  """Comparator for the issues auto closed at date."""
+  autoClosedAt: NullableDateComparator
+
+  """Comparator for the issues auto archived at date."""
+  autoArchivedAt: NullableDateComparator
+
+  """Comparator for the issues due date."""
+  dueDate: NullableTimelessDateComparator
+
+  """Comparator for the issues snoozed until date."""
+  snoozedUntilAt: NullableDateComparator
+
+  """Filters that the issues assignee must satisfy."""
+  assignee: NullableUserFilter
+
+  """Filters that the issues creator must satisfy."""
+  creator: NullableUserFilter
+
+  """Filters that the issue parent must satisfy."""
+  parent: NullableIssueFilter
+
+  """Filters that the issues snoozer must satisfy."""
+  snoozedBy: NullableUserFilter
+
+  """Filters that issue labels must satisfy."""
+  labels: IssueLabelCollectionFilter
+
+  """Filters that issue subscribers must satisfy."""
+  subscribers: UserCollectionFilter
+
+  """Filters that the issues team must satisfy."""
+  team: TeamFilter
+
+  """Filters that the issues comments must satisfy."""
+  comments: CommentCollectionFilter
+
+  """Filters that the issues cycle must satisfy."""
+  cycle: NullableCycleFilter
+
+  """Filters that the issues project must satisfy."""
+  project: NullableProjectFilter
+
+  """Filters that the issues state must satisfy."""
+  state: WorkflowStateFilter
+
+  """Filters that the child issues must satisfy."""
+  children: IssueCollectionFilter
+
+  """Filters that the issues attachments must satisfy."""
+  attachments: AttachmentCollectionFilter
+
+  """[Internal] Comparator for the issues content."""
+  searchableContent: ContentComparator
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
+
+  """Compound filters, all of which need to be matched by the issue."""
+  and: [NullableIssueFilter!]
+
+  """Compound filters, one of which need to be matched by the issue."""
+  or: [NullableIssueFilter!]
 }
 
 """User filtering options."""
@@ -11454,6 +11565,57 @@ type UserAuthorizedApplication {
   Error associated with the application needing to be requested for approval in the workspace
   """
   approvalErrorCode: String
+}
+
+"""User filtering options."""
+input UserCollectionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the user's name."""
+  name: StringComparator
+
+  """Comparator for the user's display name."""
+  displayName: StringComparator
+
+  """Comparator for the user's email."""
+  email: StringComparator
+
+  """Comparator for the user's activity status."""
+  active: BooleanComparator
+
+  """Filters that the users assigned issues must satisfy."""
+  assignedIssues: IssueCollectionFilter
+
+  """Comparator for the user's admin status."""
+  admin: BooleanComparator
+
+  """
+  Filter based on the currently authenticated user. Set to true to filter for
+  the authenticated user, false for any other user.
+  """
+  isMe: BooleanComparator
+
+  """Compound filters, all of which need to be matched by the user."""
+  and: [UserCollectionFilter!]
+
+  """Compound filters, one of which need to be matched by the user."""
+  or: [UserCollectionFilter!]
+
+  """Filters that needs to be matched by some users."""
+  some: UserFilter
+
+  """Filters that needs to be matched by all users."""
+  every: UserFilter
+
+  """Comparator for the collection length."""
+  length: NumberComparator
 }
 
 type UserConnection {
