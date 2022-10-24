@@ -1259,6 +1259,17 @@ type BranchProtectionRule implements Node {
   """Can admins overwrite branch protection."""
   isAdminEnforced: Boolean!
 
+  """
+  Whether users can pull changes from upstream when the branch is locked. Set to
+  `true` to allow fork syncing. Set to `false` to prevent fork syncing.
+  """
+  lockAllowsFetchAndMerge: Boolean!
+
+  """
+  Whether to set the branch as read-only. If this is true, users will not be able to push to the branch.
+  """
+  lockBranch: Boolean!
+
   """Repository refs that are protected by this rule"""
   matchingRefs(
     """Filters refs with query on name"""
@@ -3953,6 +3964,17 @@ input CreateBranchProtectionRuleInput {
 
   """Are conversations required to be resolved before merging."""
   requiresConversationResolution: Boolean
+
+  """
+  Whether to set the branch as read-only. If this is true, users will not be able to push to the branch.
+  """
+  lockBranch: Boolean
+
+  """
+  Whether users can pull changes from upstream when the branch is locked. Set to
+  `true` to allow fork syncing. Set to `false` to prevent fork syncing.
+  """
+  lockAllowsFetchAndMerge: Boolean
 
   """A unique identifier for the client performing the mutation."""
   clientMutationId: String
@@ -31470,6 +31492,17 @@ input UpdateBranchProtectionRuleInput {
 
   """Are conversations required to be resolved before merging."""
   requiresConversationResolution: Boolean
+
+  """
+  Whether to set the branch as read-only. If this is true, users will not be able to push to the branch.
+  """
+  lockBranch: Boolean
+
+  """
+  Whether users can pull changes from upstream when the branch is locked. Set to
+  `true` to allow fork syncing. Set to `false` to prevent fork syncing.
+  """
+  lockAllowsFetchAndMerge: Boolean
 
   """A unique identifier for the client performing the mutation."""
   clientMutationId: String
