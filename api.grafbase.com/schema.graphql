@@ -335,10 +335,6 @@ type InviteEdge {
   node: Invite!
 }
 
-type InviteRequiredError {
-  query: Query!
-}
-
 input InviteSendInput {
   organizationId: ID!
   email: String!
@@ -365,11 +361,7 @@ type KeyLimitExceededError {
   query: Query!
 }
 
-input LoginInput {
-  inviteId: ID
-}
-
-union LoginPayload = LoginSuccess | MissingTokenError | InviteRequiredError | InviteDoesNotExistError
+union LoginPayload = LoginSuccess | MissingTokenError
 
 type LoginSuccess {
   user: User!
@@ -486,7 +478,7 @@ type Mutation {
 
   """Delete a given API key."""
   projectApiKeyDelete(input: ProjectApiKeyDeleteInput!): ProjectApiKeyDeletePayload!
-  login(input: LoginInput): LoginPayload!
+  login: LoginPayload!
 }
 
 type NameAlreadyExistsError {
