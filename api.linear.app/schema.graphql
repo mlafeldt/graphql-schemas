@@ -7187,7 +7187,7 @@ type Organization implements Node {
   ): IntegrationConnection!
 
   """The organization's subscription to a paid plan."""
-  subscription: Subscription
+  subscription: PaidSubscription
 
   """Number of active users in the organization."""
   userCount: Int!
@@ -7521,6 +7521,53 @@ type PageInfo {
 enum PaginationOrderBy {
   createdAt
   updatedAt
+}
+
+"""The paid subscription of an organization."""
+type PaidSubscription implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was updated. This is the same as the creation time if the
+      entity hasn't been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The subscription type."""
+  type: String!
+
+  """The number of seats in the subscription."""
+  seats: Float!
+
+  """The minimum number of seats that will be billed in the subscription."""
+  seatsMinimum: Float
+
+  """The maximum number of seats that can be added to the subscription."""
+  seatsMaximum: Float
+
+  """The creator of the subscription."""
+  creator: User
+
+  """The organization that the subscription is associated with."""
+  organization: Organization!
+
+  """The date the subscription was canceled, if any."""
+  canceledAt: DateTime
+
+  """The subscription type of a pending change. Null if no change pending."""
+  pendingChangeType: String
+
+  """The date the subscription will be billed next."""
+  nextBillingAt: DateTime
 }
 
 """A project."""
@@ -10381,53 +10428,6 @@ input StringComparator {
   Doesn't contain case insensitive constraint. Matches any values that don't contain the given string case insensitive.
   """
   notContainsIgnoreCase: String
-}
-
-"""The subscription of an organization."""
-type Subscription implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was updated. This is the same as the creation time if the
-      entity hasn't been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The subscription type."""
-  type: String!
-
-  """The number of seats in the subscription."""
-  seats: Float!
-
-  """The minimum number of seats that will be billed in the subscription."""
-  seatsMinimum: Float
-
-  """The maximum number of seats that can be added to the subscription."""
-  seatsMaximum: Float
-
-  """The creator of the subscription."""
-  creator: User
-
-  """The organization that the subscription is associated with."""
-  organization: Organization!
-
-  """The date the subscription was canceled, if any."""
-  canceledAt: DateTime
-
-  """The subscription type of a pending change. Null if no change pending."""
-  pendingChangeType: String
-
-  """The date the subscription will be billed next."""
-  nextBillingAt: DateTime
 }
 
 """Contains the requested relations."""
