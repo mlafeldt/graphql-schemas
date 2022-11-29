@@ -5333,101 +5333,6 @@ type Mutation {
     id: String!
   ): ArchivePayload!
 
-  """
-  [Internal] Creates a temporary authentication code that can be exchanged for an OAuth token.
-  """
-  oauthAuthStringChallenge(
-    """The group of scopes that are being requested."""
-    scope: [String!]!
-
-    """The identifier of the OAuth client that's trying to authenticate."""
-    appId: String!
-  ): OauthAuthStringChallengePayload!
-
-  """[Internal] Authenticates an auth string by the user."""
-  oauthAuthStringAuthorize(
-    """The auth string to authenticate."""
-    authString: String!
-
-    """The identifier of the OAuth client that's trying to authenticate."""
-    appId: String!
-  ): OauthAuthStringAuthorizePayload!
-
-  """
-  [Internal] Returns an access token once the auth string has been authenticated.
-  """
-  oauthAuthStringCheck(
-    """The auth string to authenticate."""
-    authString: String!
-
-    """The identifier of the OAuth client that's trying to authenticate."""
-    appId: String!
-  ): OauthAuthStringCheckPayload!
-
-  """[Internal] Creates a new OAuth client approval request."""
-  oauthClientApprovalCreate(
-    """The OAuth client approval request object to create."""
-    input: OauthClientApprovalCreateInput!
-  ): OauthClientApprovalPayload!
-
-  """[Internal] Updates an OAuth client approval request."""
-  oauthClientApprovalUpdate(
-    """A partial client approval request object to update the request with."""
-    input: OauthClientApprovalUpdateInput!
-
-    """The identifier of the OAuth client approval request to update."""
-    id: String!
-  ): OauthClientApprovalPayload!
-
-  """Creates a new OAuth client."""
-  oauthClientCreate(
-    """The OAuth client application object to create."""
-    input: OauthClientCreateInput!
-  ): OauthClientPayload!
-
-  """Updates an OAuth client."""
-  oauthClientUpdate(
-    """A partial client object to update the OAuth client with."""
-    input: OauthClientUpdateInput!
-
-    """The identifier of the OAuth client to update."""
-    id: String!
-  ): OauthClientPayload!
-
-  """Archives an OAuth client."""
-  oauthClientArchive(
-    """The identifier of the OAuth client to archive."""
-    id: String!
-  ): ArchivePayload!
-
-  """Updates an OAuth client."""
-  oauthClientRotateSecret(
-    """
-    The identifier of the OAuth client for which we want to rotate the secret.
-    """
-    id: String!
-  ): RotateSecretPayload!
-
-  """Revokes an OAuth token."""
-  oauthTokenRevoke(
-    """The group of scopes for the tokens to be revoked."""
-    scope: [String!]!
-
-    """The identifier of the OAuth client for the tokens to be revoked."""
-    appId: String!
-  ): OauthTokenRevokePayload!
-
-  """
-  [INTERNAL] Revokes all OAuth tokens in a workspace for a given app and scope set.
-  """
-  oauthTokenWorkspaceRevoke(
-    """The group of scopes for the tokens to be revoked."""
-    scope: [String!]
-
-    """The identifier of the OAuth client for the tokens to be revoked."""
-    appId: String!
-  ): OauthTokensRevokePayload!
-
   """[INTERNAL] Verifies a domain claim."""
   organizationDomainClaim(
     """The ID of the organization domain to claim."""
@@ -6683,27 +6588,6 @@ input NumberComparator {
   gte: Float
 }
 
-type OauthAuthStringAuthorizePayload {
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-type OauthAuthStringChallengePayload {
-  """Whether the operation was successful."""
-  success: Boolean!
-
-  """The created authentication string."""
-  authString: String!
-}
-
-type OauthAuthStringCheckPayload {
-  """Whether the operation was successful."""
-  success: Boolean!
-
-  """Access token for use."""
-  token: String
-}
-
 """OAuth2 client application"""
 type OauthClient implements Node {
   """The unique identifier of the entity."""
@@ -6802,22 +6686,6 @@ type OauthClientApproval implements Node {
   denyReason: String
 }
 
-input OauthClientApprovalCreateInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
-  """The client id of OAuth client being requested for approval."""
-  clientId: String!
-
-  """The scopes being requested for approval."""
-  scopes: [String!]!
-
-  """The reason the person wants to install this OAuth client."""
-  requestReason: String
-}
-
 """An oauth client approval related notification"""
 type OauthClientApprovalNotification implements Notification & Entity & Node {
   """The unique identifier of the entity."""
@@ -6869,17 +6737,6 @@ type OauthClientApprovalNotification implements Notification & Entity & Node {
   oauthClientApproval: OauthClientApproval!
 }
 
-type OauthClientApprovalPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The OAuth client approval request that was created or updated."""
-  oauthClientApproval: OauthClientApproval!
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
 """
 The different requests statuses possible for an OAuth client approval request
 """
@@ -6887,104 +6744,6 @@ enum OAuthClientApprovalStatus {
   requested
   approved
   denied
-}
-
-input OauthClientApprovalUpdateInput {
-  """
-  The status for the OAuth client approval request. Must be approved or denied.
-  """
-  status: OAuthClientApprovalStatus!
-
-  """The reason the request for the OAuth client approval was denied."""
-  denyReason: String
-}
-
-input OauthClientCreateInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
-  """The application's name."""
-  name: String!
-
-  """User facing description of the application."""
-  description: String
-
-  """Name of the developer of the application."""
-  developer: String!
-
-  """Url of the developer (homepage or docs)."""
-  developerUrl: String!
-
-  """List of allowed redirect URIs for the application."""
-  redirectUris: [String!]!
-
-  """URL for the app icon."""
-  imageUrl: String
-
-  """
-  Whether the OAuth application should be publicly visible, or only visible to the creating workspace.
-  """
-  publicEnabled: Boolean
-
-  """The URL that will be called on data changes."""
-  webhookUrl: String
-
-  """List of resources the webhooks should subscribe to."""
-  webhookResourceTypes: [String!]!
-}
-
-type OauthClientPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The OAuth client application that was created or updated."""
-  oauthClient: OauthClient!
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-input OauthClientUpdateInput {
-  """The application's name."""
-  name: String
-
-  """User facing description of the application."""
-  description: String
-
-  """Name of the developer of the application."""
-  developer: String
-
-  """URL of the developer (homepage or docs)."""
-  developerUrl: String
-
-  """List of allowed redirect URIs for the application."""
-  redirectUris: [String!]
-
-  """URL for the app icon."""
-  imageUrl: String
-
-  """
-  Whether the OAuth application should be publicly visible, or only visible to the creating workspace.
-  """
-  publicEnabled: Boolean
-
-  """The URL that will be called on data changes."""
-  webhookUrl: String
-
-  """List of resources the webhooks should subscribe to."""
-  webhookResourceTypes: [String!]
-}
-
-type OauthTokenRevokePayload {
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-type OauthTokensRevokePayload {
-  """Whether the operation was successful."""
-  success: Boolean!
 }
 
 input OnboardingCustomerSurvey {
@@ -10217,14 +9976,6 @@ input RoadmapUpdateInput {
 
   """The owner of the roadmap"""
   ownerId: String
-}
-
-type RotateSecretPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """Whether the operation was successful."""
-  success: Boolean!
 }
 
 type SamlConfiguration {
