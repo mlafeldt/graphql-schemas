@@ -12155,6 +12155,90 @@ input WebhookUpdateInput {
   resourceTypes: [String!]
 }
 
+"""
+The conditions to match different events, which need to be true for workflow to be started.
+"""
+input WorkflowConditions {
+  """
+  The conditions to match triggers based on issue (creation, update, deletion).
+  """
+  issue: WorkflowEntityPropertyMatcher!
+}
+
+type WorkflowDefinition implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was updated. This is the same as the creation time if the
+      entity hasn't been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The name of the workflow."""
+  name: String!
+
+  """The workflow description."""
+  description: String
+
+  """The type of the workflow"""
+  type: WorkflowType!
+
+  """The type of the trigger that kicks off the workflow."""
+  trigger: WorkflowTriggerType!
+  enabled: Boolean!
+
+  """The organization where workflow was created."""
+  organization: Organization!
+
+  """The team associated with the workflow."""
+  team: Team!
+
+  """The user who created the workflow."""
+  creator: User!
+
+  """
+  One or more conditions that need to be true for workflow to be triggered.
+  """
+  conditions: JSONObject!
+
+  """
+  Cron schedule which is used to execute the workflow. Only applicable for cron based workflows.
+  """
+  schedule: JSONObject!
+
+  """An array of activities that will be executed as part of the workflow."""
+  activities: JSONObject!
+}
+
+"""Object to provide conditions to match an entity change."""
+input WorkflowEntityPropertyMatcher {
+  """The property to check for matching."""
+  property: String!
+
+  """The initial value of the property to match."""
+  fromValue: String
+
+  """The new value of the property to match."""
+  toValue: String
+
+  """The optional list of property matchers that all have to match."""
+  and: [WorkflowEntityPropertyMatcher!]
+
+  """
+  The optional list of property matchers where at least one have to match.
+  """
+  or: [WorkflowEntityPropertyMatcher!]
+}
+
 """A state in a team workflow."""
 type WorkflowState implements Node {
   """The unique identifier of the entity."""
@@ -12324,6 +12408,18 @@ input WorkflowStateUpdateInput {
 
   """The position of the state."""
   position: Float
+}
+
+enum WorkflowTriggerType {
+  cron
+  issueCreated
+  issueUpdated
+  issueDeleted
+}
+
+enum WorkflowType {
+  recurringIssue
+  custom
 }
 
 """
