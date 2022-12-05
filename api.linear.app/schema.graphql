@@ -3528,6 +3528,12 @@ type IssueHistory implements Node {
   """The id of new cycle of the issue."""
   toCycleId: String
 
+  """The new project created from the issue."""
+  toConvertedProject: Project
+
+  """The id of new project created from the issue."""
+  toConvertedProjectId: String
+
   """The previous project of the issue."""
   fromProject: Project
 
@@ -7468,6 +7474,9 @@ type Project implements Node {
   """The sort order for the project within its milestone/initiative."""
   sortOrder: Float!
 
+  """The project was created based on this issue."""
+  convertedFromIssue: Issue
+
   """The total number of issues in the project after each week."""
   issueCountHistory: [Float!]!
 
@@ -7771,6 +7780,9 @@ input ProjectCreateInput {
 
   """The identifiers of the teams this project is associated with."""
   teamIds: [String!]!
+
+  """The ID of the issue from which that project is created."""
+  convertedFromIssueId: String
 
   """The identifier of the project lead."""
   leadId: String
@@ -8128,6 +8140,9 @@ input ProjectUpdateInput {
 
   """The identifier of the milestone to associate the project with."""
   milestoneId: String
+
+  """The ID of the issue from which that project is created."""
+  convertedFromIssueId: String
 
   """The icon of the project."""
   icon: String
