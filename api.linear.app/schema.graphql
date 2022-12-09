@@ -11741,6 +11741,46 @@ type UserAccount {
   users: [User!]!
 }
 
+"""An email change verification challenge."""
+type UserAccountEmailChange implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The user account's current email."""
+  oldEmail: String!
+
+  """The timestamp the old email was verified at."""
+  oldEmailVerifiedAt: DateTime
+
+  """The new email the user account wants to change to."""
+  newEmail: String!
+
+  """The timestamp the new email was verified at."""
+  newEmailVerifiedAt: DateTime
+
+  """The timestamp the verification codes expire at."""
+  expiresAt: DateTime!
+
+  """The timestamp this verification challenge was canceled at."""
+  canceledAt: DateTime
+}
+
 type UserAdminPayload {
   """Whether the operation was successful."""
   success: Boolean!
