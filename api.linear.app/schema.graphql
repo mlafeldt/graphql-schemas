@@ -5711,6 +5711,17 @@ type Mutation {
   ): ArchivePayload!
 
   """
+  [INTERNAL] Verifies the email address and code for a user account that wants to change email.
+  """
+  userAccountEmailChangeVerifyCode(
+    """[INTERNAL] The code to verify."""
+    code: String!
+
+    """[INTERNAL] The email to verify."""
+    email: String!
+  ): UserAccountEmailChangeVerifyCodePayload!
+
+  """
   Updates a user. Only available to organization admins and the user themselves.
   """
   userUpdate(
@@ -11791,6 +11802,15 @@ type UserAccountEmailChange {
 
   """The timestamp this verification challenge was canceled at."""
   canceledAt: DateTime
+}
+
+"""[INTERNAL] Result of verifying an email and code."""
+type UserAccountEmailChangeVerifyCodePayload {
+  """[INTERNAL] Whether the operation was successful."""
+  success: Boolean!
+
+  """[INTERNAL] Reason why the operation was not successful."""
+  failureReason: Float!
 }
 
 type UserAdminPayload {
