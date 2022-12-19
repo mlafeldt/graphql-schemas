@@ -68,6 +68,23 @@ type CurrentPlanLimitReachedError {
   query: Query!
 }
 
+type DailyUsage {
+  periodStart: DateTime!
+  periodEnd: DateTime!
+  reads: UsageValue!
+  writes: UsageValue!
+  apiRequests: UsageValue!
+}
+
+type DatabaseUsage {
+  databaseSize: UsageValue!
+  currentDayUsage: DailyUsage!
+}
+
+input DatabaseUsageFilter {
+  environment: BranchEnvironment
+}
+
 """RFC3339 formatted date in the UTC time zone denoted by letter 'Z'"""
 scalar DateTime
 
@@ -800,7 +817,10 @@ type ProjectEdge {
 type ProjectLimits {
   remainingBranches: Int
   totalBranches: Int
+  currentUsage(filter: DatabaseUsageFilter): DatabaseUsage!
 }
+
+union ProjectLimitsPayload = ProjectLimits | ProjectDoesNotExistError
 
 input ProjectUpdateInput {
   id: ID!
@@ -870,6 +890,15 @@ type Query {
     projectSlug: String!
   ): Project
 
+  """Get project limits by account slug and slug of the project itself."""
+  projectLimits(
+    """slug of the account"""
+    accountSlug: String!
+
+    """slug of the project"""
+    projectSlug: String!
+  ): ProjectLimitsPayload!
+
   """Give the actual connected user."""
   viewer: User
 }
@@ -930,6 +959,11 @@ enum UnitType {
 URL is a String implementing the [URL Standard](http://url.spec.whatwg.org/)
 """
 scalar Url
+
+type UsageValue {
+  currentValue: Int!
+  currentPlanLimit: Int
+}
 
 type User {
   id: ID!
