@@ -137,25 +137,6 @@ type ArchivePayload {
   success: Boolean!
 }
 
-"""Contains requested archived model objects."""
-type ArchiveResponse {
-  """A JSON serialized collection of model objects loaded from the archive"""
-  archive: String!
-
-  """The total number of entities in the archive."""
-  totalCount: Float!
-
-  """
-  The version of the remote database. Incremented by 1 for each migration run on the database.
-  """
-  databaseVersion: Float!
-
-  """
-  Whether the dependencies for the model objects are included in the archive.
-  """
-  includesDependencies: Boolean!
-}
-
 """Issue attachment (e.g. support ticket, pull request)."""
 type Attachment implements Node {
   """The unique identifier of the entity."""
@@ -512,18 +493,6 @@ type AuthResolverResponse {
 
   """ID of the organization last accessed by the user."""
   lastUsedOrganizationId: String
-}
-
-"""Relation load request."""
-input BatchRequest {
-  """The class name of the model to load."""
-  modelClass: String!
-
-  """The indexed key to load models for."""
-  indexedKey: String!
-
-  """The value of the indexed key to load models for."""
-  keyValue: String!
 }
 
 """Comparator for booleans."""
@@ -1293,12 +1262,6 @@ input DeleteOrganizationInput {
   deletionCode: String!
 }
 
-"""Contains the requested dependencies."""
-type DependencyResponse {
-  """A JSON serialized collection of dependencies."""
-  dependencies: String!
-}
-
 """Object describing a dimension in analytical query, value to group by."""
 input Dimension {
   """name of the dimension column"""
@@ -1324,6 +1287,7 @@ enum DimensionName {
   createdAt
   project
   team
+  roadmap
 }
 
 """A document for a project."""
@@ -1588,15 +1552,6 @@ interface Entity {
   The time at which the entity was archived. Null if the entity has not been archived.
   """
   archivedAt: DateTime
-}
-
-"""
-Contains either the full serialized state of the application or delta packets that the requester can
-  apply to the local data set in order to be up-to-date.
-"""
-type EntityCountResponse {
-  """Entity counts keyed by the entity name."""
-  counts: JSONObject!
 }
 
 """Comparator for estimates."""
@@ -8443,74 +8398,6 @@ enum PushSubscriptionType {
 }
 
 type Query {
-  """Fetch data to catch up the client to the state of the world."""
-  syncBootstrap(
-    """If defined, only models of the given type will be loaded."""
-    onlyModels: [String!]
-
-    """If defined, only models for the given sync groups will be loaded."""
-    syncGroups: [String!]
-  ): SyncResponse!
-
-  """Retrieves how many entities the user has access to."""
-  syncEntityCount: EntityCountResponse!
-
-  """Syncs a batch of models."""
-  syncBatch(
-    """The requests to load."""
-    requests: [BatchRequest!]!
-  ): SyncBatchResponse!
-
-  """Fetches the dependencies of a model."""
-  dependentModelSync(
-    """
-    Whether to also include the dependent model referenced by the given identifier in the response.
-    """
-    includeDependent: Boolean
-
-    """The identifier of the model whose dependencies to load."""
-    identifier: String!
-
-    """The class name of the model to load."""
-    modelClass: String!
-  ): DependencyResponse!
-
-  """Fetches an archived model."""
-  archivedModelSync(
-    """
-    The identifier of the model to load. What an identifier is specific to the model class.
-    """
-    identifier: String!
-
-    """The class name of the model to load."""
-    modelClass: String!
-  ): ArchiveResponse!
-
-  """Fetches archived models."""
-  archivedModelsSync(
-    """The class name of the models to load."""
-    modelClass: String!
-
-    """The teamId for which to load archived models."""
-    teamId: String!
-
-    """
-    How trashed issues should be loaded. Defaults to TrashOptionType.excludeTrash
-    """
-    trashOption: TrashOptionType
-
-    """Retrieve issues that have been archived before this date."""
-    before: DateTime
-
-    """
-    To proper page through entities with same "archivedAt" date we also need last id
-    """
-    beforeId: String
-
-    """The number of issues to load."""
-    last: Int
-  ): ArchiveResponse!
-
   """All API keys for the user."""
   apiKeys(
     """A cursor to be used with last for backward pagination."""
@@ -10299,26 +10186,6 @@ input StringComparator {
   notContainsIgnoreCase: String
 }
 
-"""Contains the requested relations."""
-type SyncBatchResponse {
-  """A JSON serialized collection of relations model object."""
-  models: String!
-}
-
-"""Contains a delta sync."""
-type SyncDeltaResponse {
-  """A JSON serialized collection of delta packets."""
-  updates: String
-
-  """Whether the client should try loading more."""
-  loadMore: Boolean!
-
-  """
-  Whether loading the delta was successful. In case it wasn't, the client is instructed to do a full bootstrap.
-  """
-  success: Boolean!
-}
-
 type SynchronizedPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -11387,13 +11254,6 @@ input TokenUserAccountAuthInput {
 
   """The identifiers of the teams to auto-join."""
   teamIdsToJoin: [String!]
-}
-
-"""How trashed models should be loaded."""
-enum TrashOptionType {
-  includeTrash
-  excludeTrash
-  trashOnly
 }
 
 input UpdateOrganizationInput {
