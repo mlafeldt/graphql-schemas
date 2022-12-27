@@ -2055,36 +2055,6 @@ type Initiative implements Node {
 
   """The estimated completion date of the initiative."""
   targetDate: TimelessDate
-
-  """Projects associated with the initiative."""
-  projects(
-    """Filter returned projects."""
-    filter: ProjectFilter
-
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): ProjectConnection!
 }
 
 type InitiativeConnection {
@@ -2093,70 +2063,11 @@ type InitiativeConnection {
   pageInfo: PageInfo!
 }
 
-input InitiativeCreateInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
-  """The name of the initiative."""
-  name: String!
-
-  """The sort order of the initiative."""
-  sortOrder: Float
-}
-
 type InitiativeEdge {
   node: Initiative!
 
   """Used in `before` and `after` args"""
   cursor: String!
-}
-
-"""Initiative filtering options."""
-input InitiativeFilter {
-  """Comparator for the identifier."""
-  id: IDComparator
-
-  """Comparator for the created at date."""
-  createdAt: DateComparator
-
-  """Comparator for the updated at date."""
-  updatedAt: DateComparator
-
-  """Comparator for the initiative name."""
-  name: StringComparator
-
-  """Comparator for the initiative sort order."""
-  sortOrder: NumberComparator
-
-  """Filters that the initiatives projects must satisfy."""
-  projects: ProjectCollectionFilter
-
-  """Compound filters, all of which need to be matched by the initiative."""
-  and: [InitiativeFilter!]
-
-  """Compound filters, one of which need to be matched by the initiative."""
-  or: [InitiativeFilter!]
-}
-
-type InitiativePayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The milesteone that was created or updated."""
-  initiative: Initiative
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-input InitiativeUpdateInput {
-  """The name of the initiative."""
-  name: String
-
-  """The sort order of the initiative."""
-  sortOrder: Float
 }
 
 input InsightPayload {
@@ -4312,33 +4223,6 @@ type MilestoneEdge {
   cursor: String!
 }
 
-"""Milestone filtering options."""
-input MilestoneFilter {
-  """Comparator for the identifier."""
-  id: IDComparator
-
-  """Comparator for the created at date."""
-  createdAt: DateComparator
-
-  """Comparator for the updated at date."""
-  updatedAt: DateComparator
-
-  """Comparator for the milestone name."""
-  name: StringComparator
-
-  """Comparator for the milestone sort order."""
-  sortOrder: NumberComparator
-
-  """Filters that the milestones projects must satisfy."""
-  projects: ProjectCollectionFilter
-
-  """Compound filters, all of which need to be matched by the milestone."""
-  and: [MilestoneFilter!]
-
-  """Compound filters, one of which need to be matched by the milestone."""
-  or: [MilestoneFilter!]
-}
-
 type MilestoneMigrationPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -4718,27 +4602,6 @@ type Mutation {
     """URL of the file to be uploaded to Linear."""
     url: String!
   ): ImageUploadFromUrlPayload!
-
-  """Creates a new initiative."""
-  initiativeCreate(
-    """The issue object to create."""
-    input: InitiativeCreateInput!
-  ): InitiativePayload!
-
-  """Updates a initiative."""
-  initiativeUpdate(
-    """A partial initiative object to update the initiative with."""
-    input: InitiativeUpdateInput!
-
-    """The identifier of the initiative to update."""
-    id: String!
-  ): InitiativePayload!
-
-  """Deletes a initiative."""
-  initiativeDelete(
-    """The identifier of the initiative to delete."""
-    id: String!
-  ): ArchivePayload!
 
   """Requests a currently unavailable integration."""
   integrationRequest(
@@ -6169,36 +6032,6 @@ input NullableDateComparator {
   gte: DateTime
 }
 
-"""User filtering options."""
-input NullableInitiativeFilter {
-  """Comparator for the identifier."""
-  id: IDComparator
-
-  """Comparator for the created at date."""
-  createdAt: DateComparator
-
-  """Comparator for the updated at date."""
-  updatedAt: DateComparator
-
-  """Comparator for the initiative name."""
-  name: StringComparator
-
-  """Comparator for the initiative sort order."""
-  sortOrder: NumberComparator
-
-  """Filters that the initiatives projects must satisfy."""
-  projects: ProjectCollectionFilter
-
-  """Filter based on the existence of the relation."""
-  null: Boolean
-
-  """Compound filters, all of which need to be matched by the initiative."""
-  and: [NullableInitiativeFilter!]
-
-  """Compound filters, one of which need to be matched by the initiative."""
-  or: [NullableInitiativeFilter!]
-}
-
 """Issue filtering options."""
 input NullableIssueFilter {
   """Comparator for the identifier."""
@@ -6310,36 +6143,6 @@ input NullableIssueFilter {
   or: [NullableIssueFilter!]
 }
 
-"""User filtering options."""
-input NullableMilestoneFilter {
-  """Comparator for the identifier."""
-  id: IDComparator
-
-  """Comparator for the created at date."""
-  createdAt: DateComparator
-
-  """Comparator for the updated at date."""
-  updatedAt: DateComparator
-
-  """Comparator for the milestone name."""
-  name: StringComparator
-
-  """Comparator for the milestone sort order."""
-  sortOrder: NumberComparator
-
-  """Filters that the milestones projects must satisfy."""
-  projects: ProjectCollectionFilter
-
-  """Filter based on the existence of the relation."""
-  null: Boolean
-
-  """Compound filters, all of which need to be matched by the milestone."""
-  and: [NullableMilestoneFilter!]
-
-  """Compound filters, one of which need to be matched by the milestone."""
-  or: [NullableMilestoneFilter!]
-}
-
 """Comparator for optional numbers."""
 input NullableNumberComparator {
   """Equals constraint."""
@@ -6414,9 +6217,6 @@ input NullableProjectFilter {
 
   """Filters that the projects members must satisfy."""
   members: UserFilter
-
-  """Filters that the projects milestones must satisfy."""
-  milestone: NullableMilestoneFilter
 
   """Filters that the projects issues must satisfy."""
   issues: IssueCollectionFilter
@@ -6934,36 +6734,6 @@ type Organization implements Node {
     """
     orderBy: PaginationOrderBy
   ): TeamConnection!
-
-  """Milestones associated with the organization."""
-  milestones(
-    """Filter returned projects."""
-    filter: MilestoneFilter
-
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): MilestoneConnection! @deprecated(reason: "Milestones will be removed. Use roadmaps instead.")
 
   """Integrations associated with the organization."""
   integrations(
@@ -7708,9 +7478,6 @@ input ProjectCollectionFilter {
   """Filters that the projects members must satisfy."""
   members: UserFilter
 
-  """Filters that the projects milestones must satisfy."""
-  milestone: NullableMilestoneFilter
-
   """Filters that the projects issues must satisfy."""
   issues: IssueCollectionFilter
 
@@ -7826,9 +7593,6 @@ input ProjectFilter {
 
   """Filters that the projects members must satisfy."""
   members: UserFilter
-
-  """Filters that the projects milestones must satisfy."""
-  milestone: NullableMilestoneFilter
 
   """Filters that the projects issues must satisfy."""
   issues: IssueCollectionFilter
@@ -8793,39 +8557,6 @@ type Query {
     fileId: String!
   ): FigmaEmbedPayload!
 
-  """[ALPHA] All initiatives."""
-  initiatives(
-    """Filter returned projects."""
-    filter: InitiativeFilter
-
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): InitiativeConnection!
-
-  """[ALPHA] One specific initiative."""
-  initiative(id: String!): Initiative!
-
   """All integrations."""
   integrations(
     """A cursor to be used with last for backward pagination."""
@@ -9098,9 +8829,6 @@ type Query {
 
   """All milestones."""
   milestones(
-    """Filter returned projects."""
-    filter: MilestoneFilter
-
     """A cursor to be used with last for backward pagination."""
     before: String
 
