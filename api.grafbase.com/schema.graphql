@@ -62,17 +62,11 @@ type CurrentPlanLimitReachedError {
   query: Query!
 }
 
-type DailyUsage {
-  periodStart: DateTime!
-  periodEnd: DateTime!
-  reads: UsageValue!
-  writes: UsageValue!
-  apiRequests: UsageValue!
-}
-
 type DatabaseUsage {
-  databaseSize: UsageValue!
-  currentDayUsage: DailyUsage!
+  reads: Distribution!
+  writes: Distribution!
+  apiRequests: Distribution!
+  size: Distribution!
 }
 
 input DatabaseUsageFilter {
@@ -436,6 +430,13 @@ type MissingTokenError {
   query: Query!
 }
 
+type MonthlyLimits {
+  reads: Int
+  writes: Int
+  apiRequests: Int
+  size: Int
+}
+
 type MustLeaveAtLeastOneKeyForEnvironmentError {
   query: Query!
 }
@@ -677,7 +678,8 @@ type Project {
   environmentVariables(after: String, before: String, first: Int, last: Int): EnvironmentVariableConnection!
   deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
   databaseRegions: [String!]!
-  limits: ProjectLimits!
+  usage(startDate: DateTime!, endDate: DateTime!, filter: DatabaseUsageFilter!): DatabaseUsage!
+  plan: ProjectPlan!
   status: ProjectStatus!
 }
 
@@ -809,11 +811,10 @@ type ProjectEdge {
   node: Project!
 }
 
-type ProjectLimits {
-  currentUsage(filter: DatabaseUsageFilter): DatabaseUsage!
+type ProjectPlan {
+  name: String!
+  monthlyLimits: MonthlyLimits!
 }
-
-union ProjectLimitsPayload = ProjectLimits | ProjectDoesNotExistError
 
 enum ProjectStatus {
   ACTIVE
@@ -888,15 +889,6 @@ type Query {
     projectSlug: String!
   ): Project
 
-  """Get project limits by account slug and slug of the project itself."""
-  projectLimits(
-    """slug of the account"""
-    accountSlug: String!
-
-    """slug of the project"""
-    projectSlug: String!
-  ): ProjectLimitsPayload!
-
   """Give the actual connected user."""
   viewer: User
 }
@@ -951,17 +943,13 @@ type TemplateDoesNotExistError {
 enum UnitType {
   NO_UNIT
   MILLI_SECONDS
+  BYTES
 }
 
 """
 URL is a String implementing the [URL Standard](http://url.spec.whatwg.org/)
 """
 scalar Url
-
-type UsageValue {
-  currentValue: Int!
-  currentPlanLimit: Int
-}
 
 type User {
   id: ID!

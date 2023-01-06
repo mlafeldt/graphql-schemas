@@ -645,41 +645,9 @@
       },
       {
         "kind": "OBJECT",
-        "name": "DailyUsage",
+        "name": "DatabaseUsage",
         "description": null,
         "fields": [
-          {
-            "name": "periodStart",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "DateTime",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "periodEnd",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "DateTime",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "reads",
             "description": null,
@@ -689,7 +657,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "UsageValue",
+                "name": "Distribution",
                 "ofType": null
               }
             },
@@ -705,7 +673,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "UsageValue",
+                "name": "Distribution",
                 "ofType": null
               }
             },
@@ -721,34 +689,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "UsageValue",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "DatabaseUsage",
-        "description": null,
-        "fields": [
-          {
-            "name": "databaseSize",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "UsageValue",
+                "name": "Distribution",
                 "ofType": null
               }
             },
@@ -756,7 +697,7 @@
             "deprecationReason": null
           },
           {
-            "name": "currentDayUsage",
+            "name": "size",
             "description": null,
             "args": [],
             "type": {
@@ -764,7 +705,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "DailyUsage",
+                "name": "Distribution",
                 "ofType": null
               }
             },
@@ -3797,6 +3738,65 @@
       },
       {
         "kind": "OBJECT",
+        "name": "MonthlyLimits",
+        "description": null,
+        "fields": [
+          {
+            "name": "reads",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "writes",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "apiRequests",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "size",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "MustLeaveAtLeastOneKeyForEnvironmentError",
         "description": null,
         "fields": [
@@ -6494,7 +6494,66 @@
             "deprecationReason": null
           },
           {
-            "name": "limits",
+            "name": "usage",
+            "description": null,
+            "args": [
+              {
+                "name": "startDate",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "DateTime",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "endDate",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "DateTime",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "filter",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DatabaseUsageFilter",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DatabaseUsage",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "plan",
             "description": null,
             "args": [],
             "type": {
@@ -6502,7 +6561,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ProjectLimits",
+                "name": "ProjectPlan",
                 "ofType": null
               }
             },
@@ -7622,30 +7681,35 @@
       },
       {
         "kind": "OBJECT",
-        "name": "ProjectLimits",
+        "name": "ProjectPlan",
         "description": null,
         "fields": [
           {
-            "name": "currentUsage",
+            "name": "name",
             "description": null,
-            "args": [
-              {
-                "name": "filter",
-                "description": null,
-                "type": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "DatabaseUsageFilter",
-                  "ofType": null
-                },
-                "defaultValue": null
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               }
-            ],
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "monthlyLimits",
+            "description": null,
+            "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "DatabaseUsage",
+                "name": "MonthlyLimits",
                 "ofType": null
               }
             },
@@ -7657,27 +7721,6 @@
         "interfaces": [],
         "enumValues": null,
         "possibleTypes": null
-      },
-      {
-        "kind": "UNION",
-        "name": "ProjectLimitsPayload",
-        "description": null,
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": [
-          {
-            "kind": "OBJECT",
-            "name": "ProjectLimits",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "ProjectDoesNotExistError",
-            "ofType": null
-          }
-        ]
       },
       {
         "kind": "ENUM",
@@ -8262,51 +8305,6 @@
             "deprecationReason": null
           },
           {
-            "name": "projectLimits",
-            "description": "Get project limits by account slug and slug of the project itself.",
-            "args": [
-              {
-                "name": "accountSlug",
-                "description": "slug of the account",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "projectSlug",
-                "description": "slug of the project",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "UNION",
-                "name": "ProjectLimitsPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "viewer",
             "description": "Give the actual connected user.",
             "args": [],
@@ -8735,6 +8733,12 @@
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "BYTES",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "possibleTypes": null
@@ -8746,45 +8750,6 @@
         "fields": null,
         "inputFields": null,
         "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "UsageValue",
-        "description": null,
-        "fields": [
-          {
-            "name": "currentValue",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "currentPlanLimit",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
         "enumValues": null,
         "possibleTypes": null
       },
