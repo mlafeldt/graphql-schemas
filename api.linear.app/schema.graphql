@@ -5530,6 +5530,30 @@ type Mutation {
   ): UserAccountEmailChangeVerifyCodePayload!
 
   """
+  [INTERNAL] Creates an email verification challenge from the app for a user account that wants to change email.
+  """
+  userAccountEmailChangeCreate(
+    """
+    [INTERNAL] Whether an existing account exists for the new email address.
+    """
+    hasExistingAccount: Boolean!
+
+    """[INTERNAL] The new email address the user wants to use."""
+    newEmail: String!
+
+    """
+    [INTERNAL] The identifier of the user account that wants to change email.
+    """
+    id: String!
+  ): UserAccountEmailVerificationPayload!
+
+  """Cancels an ongoing email change for the user account"""
+  userAccountEmailChangeCancel(
+    """The id of the user account to cancel the change for."""
+    id: String!
+  ): UserAccountEmailVerificationPayload!
+
+  """
   Updates a user. Only available to organization admins and the user themselves.
   """
   userUpdate(
@@ -9248,6 +9272,20 @@ type Query {
     id: String!
   ): Template!
 
+  """
+  [INTERNAL] Checks if there's a currently active email verification challenge for a user account.
+  """
+  userAccountEmailChangeFind(
+    """[INTERNAL] The email of the user account."""
+    email: String!
+  ): UserAccountEmailChangeFindPayload!
+
+  """Finds a user account by email."""
+  userAccountExists(
+    """The email to find the user account by."""
+    email: String!
+  ): UserAccountExistsPayload
+
   """All users for the organization."""
   users(
     """Filter returned users."""
@@ -11382,6 +11420,17 @@ type UserAccountEmailChange {
   canceledAt: DateTime
 }
 
+"""
+[INTERNAL] Result of searching for a verification challenge for a user account.
+"""
+type UserAccountEmailChangeFindPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """[INTERNAL] Whether there is a currently active change."""
+  hasChangeActive: Boolean!
+}
+
 """[INTERNAL] Result of verifying an email and code."""
 type UserAccountEmailChangeVerifyCodePayload {
   """[INTERNAL] Whether the operation was successful."""
@@ -11389,6 +11438,23 @@ type UserAccountEmailChangeVerifyCodePayload {
 
   """[INTERNAL] Reason why the operation was not successful."""
   failureReason: Float
+}
+
+"""
+[INTERNAL] Result of creating or cancelling a verification challenge for email change.
+"""
+type UserAccountEmailVerificationPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """[INTERNAL] Whether the operation was successful."""
+  success: Boolean!
+}
+
+"""[INTERNAL] Result of looking up a user account by email."""
+type UserAccountExistsPayload {
+  """[INTERNAL] Whether the operation was successful."""
+  success: Boolean!
 }
 
 type UserAdminPayload {
