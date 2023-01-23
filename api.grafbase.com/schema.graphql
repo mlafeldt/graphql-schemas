@@ -75,14 +75,16 @@ enum DatabaseRegionChangeStatus {
 }
 
 type DatabaseUsage {
-  reads: Distribution!
-  writes: Distribution!
-  apiRequests: Distribution!
-  size: Distribution!
+  requestCount: Distribution!
+  dbReads: Distribution!
+  dbWrites: Distribution!
+  dbSize: Distribution!
 }
 
 input DatabaseUsageFilter {
   environment: BranchEnvironment
+  startDate: DateTime
+  endDate: DateTime
 }
 
 """RFC3339 formatted date in the UTC time zone denoted by letter 'Z'"""
@@ -690,7 +692,7 @@ type Project {
   environmentVariables(after: String, before: String, first: Int, last: Int): EnvironmentVariableConnection!
   deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
   databaseRegions: [String!]!
-  usage(startDate: DateTime!, endDate: DateTime!, filter: DatabaseUsageFilter!): DatabaseUsage!
+  usage(filter: DatabaseUsageFilter): DatabaseUsage!
   plan: ProjectPlan!
   status: ProjectStatus!
   databaseRegionChangeStatus: DatabaseRegionChangeStatus!
