@@ -1,3 +1,52 @@
+type AccessToken {
+  id: ID!
+  name: String!
+  createdAt: DateTime!
+}
+
+type AccessTokenConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [AccessTokenEdge!]!
+
+  """A list of nodes."""
+  nodes: [AccessToken!]!
+}
+
+input AccessTokenCreateInput {
+  name: String!
+}
+
+union AccessTokenCreatePayload = AccessTokenCreateSuccess | TokenLimitExceededError
+
+type AccessTokenCreateSuccess {
+  token: AccessToken!
+  payload: String!
+  query: Query!
+}
+
+input AccessTokenDeleteInput {
+  id: ID!
+}
+
+union AccessTokenDeletePayload = AccessTokenDeleteSuccess | TokenDoesNotExistError
+
+type AccessTokenDeleteSuccess {
+  deletedId: ID!
+  query: Query!
+}
+
+"""An edge in a connection."""
+type AccessTokenEdge {
+  """A cursor for use in pagination"""
+  cursor: String!
+
+  """The item at the end of the edge"""
+  node: AccessToken!
+}
+
 interface Account {
   id: ID!
   slug: String!
@@ -456,6 +505,12 @@ type MustLeaveAtLeastOneKeyForEnvironmentError {
 }
 
 type Mutation {
+  """Create a new access token."""
+  accessTokenCreate(input: AccessTokenCreateInput!): AccessTokenCreatePayload!
+
+  """Delete a given access token."""
+  accessTokenDelete(input: AccessTokenDeleteInput!): AccessTokenDeletePayload!
+
   """
   Create new organization account owned by the current user. Slug must be unique.
   """
@@ -851,6 +906,7 @@ type ProjectUpdateSuccess {
 }
 
 type Query {
+  accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
   accountBySlug(
     """slug of the account"""
     slug: String!
@@ -957,6 +1013,14 @@ type SlugTooLongError {
 }
 
 type TemplateDoesNotExistError {
+  query: Query!
+}
+
+type TokenDoesNotExistError {
+  query: Query!
+}
+
+type TokenLimitExceededError {
   query: Query!
 }
 
