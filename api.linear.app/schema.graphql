@@ -25,21 +25,6 @@ type AdminJobStatusPayload {
   availableJobs: [String!]!
 }
 
-"""Different aggregation functions for analytical queries."""
-enum Aggregation {
-  count
-  avg
-  max
-  min
-  sum
-  median
-  p25
-  p75
-  p90
-  p95
-  p99
-}
-
 input AirbyteConfigurationInput {
   """Linear export API key."""
   apiKey: String!
@@ -509,12 +494,6 @@ input BooleanComparator {
 
   """Not equals constraint."""
   neq: Boolean
-}
-
-"""All possible chart types."""
-enum ChartType {
-  nivoBar
-  nivoScatterPlot
 }
 
 """A comment associated with an issue."""
@@ -1201,15 +1180,6 @@ input CycleUpdateInput {
   completedAt: DateTime
 }
 
-"""Different date aggregation functions for date dimension."""
-enum DateAggregation {
-  day
-  week
-  month
-  year
-  thirtyMinutes
-}
-
 """Comparator for dates."""
 input DateComparator {
   """Equals constraint."""
@@ -1267,34 +1237,6 @@ enum Day {
 input DeleteOrganizationInput {
   """The deletion code to confirm operation."""
   deletionCode: String!
-}
-
-"""Object describing a dimension in analytical query, value to group by."""
-input Dimension {
-  """name of the dimension column"""
-  name: DimensionName!
-
-  """aggregation function to be applied on date dimensions"""
-  dateAggregation: DateAggregation
-}
-
-"""All possible dimensions that can be applied to analytical queries."""
-enum DimensionName {
-  stateName
-  priority
-  estimate
-  cycle
-  label
-  stateType
-  creator
-  assignee
-  snapshotAt
-  completedAt
-  dueDate
-  createdAt
-  project
-  team
-  roadmap
 }
 
 """A document for a project."""
@@ -1627,12 +1569,6 @@ input EventCreateInput {
 type EventPayload {
   """Whether the operation was successful."""
   success: Boolean!
-}
-
-"""Different facts tables to run analytical queries against."""
-enum FactsTable {
-  issueSnapshot
-  issue
 }
 
 """User favorites presented in the sidebar."""
@@ -2075,25 +2011,6 @@ type InitiativeEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
-}
-
-input InsightPayload {
-  """Insight id where to send data to."""
-  insightId: String!
-
-  """Table to run analytical query against."""
-  table: FactsTable!
-
-  """Chart type of the visualization."""
-  chartType: ChartType!
-
-  """Filters that needs to be matched by some issues."""
-  issueFilter: IssueFilter!
-  measures: [Measure!]!
-  dimensions: [Dimension!]!
-
-  """If set to true, analytics data will include archived data"""
-  includeArchived: Boolean
 }
 
 """An integration with an external service."""
@@ -4106,24 +4023,6 @@ scalar JSONObject
 type LogoutResponse {
   """Whether the operation was successful."""
   success: Boolean!
-}
-
-"""Object describing a measure in analytical query."""
-input Measure {
-  """name of the measure"""
-  name: MeasureName!
-
-  """aggregation function to be applied on the measure column"""
-  aggregation: Aggregation!
-}
-
-"""All possible measures that can be applied to analytical queries."""
-enum MeasureName {
-  id
-  effort
-  cycleTime
-  timeToTriage
-  timeToStart
 }
 
 """A milestone that contains projects."""
