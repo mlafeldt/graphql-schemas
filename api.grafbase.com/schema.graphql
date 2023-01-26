@@ -211,6 +211,15 @@ type DistributionValue {
   value: Int!
 }
 
+type DuplicateDatabaseRegionsError {
+  duplicates: [String!]!
+  query: Query!
+}
+
+type EmptyDatabaseRegionsError {
+  query: Query!
+}
+
 type EnvironmentVariable {
   id: ID!
   name: String!
@@ -333,6 +342,11 @@ type GitRepository {
   private: Boolean!
   updatedAt: DateTime!
   branches: [String!]!
+}
+
+type InvalidDatabaseRegionsError {
+  invalid: [String!]!
+  query: Query!
 }
 
 type Invite {
@@ -834,9 +848,10 @@ input ProjectCreateFromRepositoryInput {
   gitRepoUrl: Url!
   gitAccountId: String!
   productionBranch: String!
+  databaseRegions: [String!]! = ["eu-north-1"]
 }
 
-union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | RepositoryContainsNoBranchesError | AccountDoesNotExistError | CurrentPlanLimitReachedError
+union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | RepositoryContainsNoBranchesError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError
 
 type ProjectCreateFromRepositorySuccess {
   project: Project!
@@ -850,9 +865,10 @@ input ProjectCreateFromTemplateInput {
   gitAccountId: String!
   repoSlug: String!
   repoPrivate: Boolean!
+  databaseRegions: [String!]! = ["eu-north-1"]
 }
 
-union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | RepositorySlugInUseError | TemplateDoesNotExistError | AccountDoesNotExistError | CurrentPlanLimitReachedError
+union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | RepositorySlugInUseError | TemplateDoesNotExistError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError
 
 type ProjectCreateFromTemplateSuccess {
   project: Project!
