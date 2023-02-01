@@ -3166,6 +3166,116 @@ type IssueDraft implements Node {
   descriptionData: JSON
 }
 
+input IssueDraftCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The title of the draft."""
+  title: String!
+
+  """The draft description in markdown format."""
+  description: String
+
+  """The draft description as a Prosemirror document."""
+  descriptionData: JSON
+
+  """The identifier of the user to assign the draft to."""
+  assigneeId: String
+
+  """The identifier of the parent draft."""
+  parentId: String
+
+  """The identifier of the parent issue."""
+  parentIssueId: String
+
+  """The priority of the draft."""
+  priority: Int
+
+  """The estimated complexity of the draft."""
+  estimate: Int
+
+  """The identifiers of the issue labels associated with this draft."""
+  labelIds: [String!]
+
+  """The identifier or key of the team associated with the draft."""
+  teamId: String!
+
+  """The cycle associated with the draft."""
+  cycleId: String
+
+  """The project associated with the draft."""
+  projectId: String
+
+  """The team state of the draft."""
+  stateId: String
+
+  """The position of the draft in parent draft's sub-draft list."""
+  subIssueSortOrder: Float
+
+  """The date at which the draft is due."""
+  dueDate: TimelessDate
+}
+
+type IssueDraftPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The draft that was created or updated."""
+  issueDraft: IssueDraft!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input IssueDraftUpdateInput {
+  """The title of the draft."""
+  title: String
+
+  """The draft description in markdown format."""
+  description: String
+
+  """The draft description as a Prosemirror document."""
+  descriptionData: JSON
+
+  """The identifier of the user to assign the draft to."""
+  assigneeId: String
+
+  """The identifier of the parent draft."""
+  parentId: String
+
+  """The identifier of the parent issue."""
+  parentIssueId: String
+
+  """The priority of the draft."""
+  priority: Int
+
+  """The estimated complexity of the draft."""
+  estimate: Int
+
+  """The identifiers of the issue labels associated with this draft."""
+  labelIds: [String!]
+
+  """The identifier or key of the team associated with the draft."""
+  teamId: String
+
+  """The cycle associated with the draft."""
+  cycleId: String
+
+  """The project associated with the draft."""
+  projectId: String
+
+  """The team state of the draft."""
+  stateId: String
+
+  """The position of the draft in parent draft's sub-draft list."""
+  subIssueSortOrder: Float
+
+  """The date at which the draft is due."""
+  dueDate: TimelessDate
+}
+
 type IssueEdge {
   node: Issue!
 
@@ -4850,6 +4960,21 @@ type Mutation {
     """The identifier of the integrationTemplate to delete."""
     id: String!
   ): ArchivePayload!
+
+  """Creates a new draft."""
+  issueDraftCreate(
+    """The issue draft to create."""
+    input: IssueDraftCreateInput!
+  ): IssueDraftPayload!
+
+  """Updates a draft."""
+  issueDraftUpdate(
+    """The fields to update."""
+    input: IssueDraftUpdateInput!
+
+    """The ID of the issue draft to update."""
+    id: String!
+  ): IssueDraftPayload!
 
   """Kicks off a GitHub import job."""
   issueImportCreateGithub(
