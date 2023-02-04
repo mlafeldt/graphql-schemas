@@ -3169,6 +3169,9 @@ type IssueDraft implements Node {
 
   """[Internal] The draft's description as a Prosemirror document."""
   descriptionData: JSON
+
+  """Serialized array of JSONs representing attachments."""
+  attachments: JSONObject!
 }
 
 input IssueDraftCreateInput {
@@ -4983,6 +4986,12 @@ type Mutation {
     """The ID of the issue draft to update."""
     id: String!
   ): IssueDraftPayload!
+
+  """Deletes a draft."""
+  issueDraftDelete(
+    """The identifier of the draft to delete."""
+    id: String!
+  ): ArchivePayload!
 
   """Archives a draft."""
   issueDraftArchive(
