@@ -11452,8 +11452,8 @@ input UpdateOrganizationInput {
   """List of services that are allowed to be used for login."""
   allowedAuthServices: [String!]
 
-  """Internal. The SLA configuration of the organization."""
-  slaConfiguration: JSONObject
+  """Internal. Whether SLA's have been enabled for the organization."""
+  slaEnabled: Boolean
 }
 
 input UpdateUserInput {
@@ -12398,6 +12398,9 @@ type WorkflowDefinition implements Node {
   """The name of the workflow."""
   name: String!
 
+  """The name of the group that the workflow belongs to."""
+  groupName: String
+
   """The workflow description."""
   description: String
 
@@ -12408,11 +12411,10 @@ type WorkflowDefinition implements Node {
   trigger: WorkflowTriggerType!
   enabled: Boolean!
 
-  """The organization where workflow was created."""
-  organization: Organization!
-
-  """The team associated with the workflow."""
-  team: Team!
+  """
+  The team associated with the workflow. If not set, the workflow is associated with the entire organization.
+  """
+  team: Team
 
   """The user who created the workflow."""
   creator: User!
@@ -12628,11 +12630,13 @@ enum WorkflowTriggerType {
   cron
   issueCreated
   issueUpdated
+  issueCreatedOrUpdated
   issueDeleted
 }
 
 enum WorkflowType {
   recurringIssue
+  sla
   custom
 }
 
