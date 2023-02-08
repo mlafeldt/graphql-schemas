@@ -2586,6 +2586,9 @@ type Issue implements Node {
   """The project that the issue is associated with."""
   project: Project
 
+  """[ALPHA] The projectMilestone that the issue is associated with."""
+  projectMilestone: ProjectMilestone
+
   """Previous identifiers of the issue if it has been moved between teams."""
   previousIdentifiers: [String!]!
 
@@ -3066,6 +3069,9 @@ input IssueCreateInput {
 
   """The project associated with the issue."""
   projectId: String
+
+  """[ALPHA] The project milestone associated with the issue."""
+  projectMilestoneId: String
 
   """The team state of the issue."""
   stateId: String
@@ -4125,6 +4131,9 @@ input IssueUpdateInput {
 
   """The project associated with the issue."""
   projectId: String
+
+  """[ALPHA] The project milestone associated with the issue."""
+  projectMilestoneId: String
 
   """The team state of the issue."""
   stateId: String
@@ -5448,6 +5457,29 @@ type Mutation {
   """Deletes a project link."""
   projectLinkDelete(
     """The identifier of the project link to delete."""
+    id: String!
+  ): ArchivePayload!
+
+  """Creates a new project milestone."""
+  projectMilestoneCreate(
+    """The project milestone to create."""
+    input: ProjectMilestoneCreateInput!
+  ): ProjectMilestonePayload!
+
+  """Updates a project milestone."""
+  projectMilestoneUpdate(
+    """A partial object to update the project milestone with."""
+    input: ProjectMilestoneUpdateInput!
+
+    """
+    The identifier of the project milestone to update. Also the identifier from the URL is accepted.
+    """
+    id: String!
+  ): ProjectMilestonePayload!
+
+  """Deletes a project milestone."""
+  projectMilestoneDelete(
+    """The identifier of the project milestone to delete."""
     id: String!
   ): ArchivePayload!
 
@@ -7531,6 +7563,33 @@ type Project implements Node {
     orderBy: PaginationOrderBy
   ): DocumentConnection!
 
+  """[ALPHA] Milestones associated with the project."""
+  projectMilestones(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectMilestoneConnection!
+
   """Issues associated with the project."""
   issues(
     """Filter returned issues."""
@@ -7845,6 +7904,97 @@ input ProjectLinkUpdateInput {
 
   """The label for the link."""
   label: String
+}
+
+"""A milestone for a project."""
+type ProjectMilestone implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The name of the project milestone."""
+  name: String!
+
+  """The description of the project milestone."""
+  description: String
+
+  """The planned completion date of the milestone."""
+  targetDate: TimelessDate
+
+  """The project of the milestone."""
+  project: Project!
+}
+
+type ProjectMilestoneConnection {
+  edges: [ProjectMilestoneEdge!]!
+  nodes: [ProjectMilestone!]!
+  pageInfo: PageInfo!
+}
+
+input ProjectMilestoneCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The name of the project milestone."""
+  name: String!
+
+  """The description of the project milestone."""
+  description: String
+
+  """The planned target date of the project milestone."""
+  targetDate: TimelessDate
+
+  """Related project for the project milestone."""
+  projectId: String!
+}
+
+type ProjectMilestoneEdge {
+  node: ProjectMilestone!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type ProjectMilestonePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The project milestone that was created or updated."""
+  projectMilestone: ProjectMilestone!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input ProjectMilestoneUpdateInput {
+  """The name of the project milestone."""
+  name: String
+
+  """The description of the project milestone."""
+  description: String
+
+  """The planned target date of the project milestone."""
+  targetDate: TimelessDate
+
+  """Related project for the project milestone."""
+  projectId: String
 }
 
 """A project related notification"""
@@ -9149,6 +9299,36 @@ type Query {
 
   """One specific project link."""
   projectLink(id: String!): ProjectLink!
+
+  """All milestones for the project."""
+  ProjectMilestones(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectMilestoneConnection!
+
+  """One specific project milestone."""
+  ProjectMilestone(id: String!): ProjectMilestone!
 
   """All projects."""
   projects(
