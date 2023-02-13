@@ -526,7 +526,7 @@ type Comment implements Node {
   """The issue that the comment is associated with."""
   issue: Issue!
 
-  """The parent of the comment."""
+  """The parent comment under which the current comment is nested."""
   parent: Comment
 
   """The user who wrote the comment."""
@@ -632,7 +632,7 @@ input CommentCreateInput {
   """The issue to associate the comment with."""
   issueId: String!
 
-  """[Internal] The parent under which to nest the comment."""
+  """The parent comment under which to nest a current comment."""
   parentId: String
 
   """
@@ -3024,6 +3024,9 @@ input IssueCollectionFilter {
   """Comparator for filtering issues which are blocking."""
   hasBlockingRelations: RelationExistsComparator
 
+  """Comparator for the issues sla status."""
+  slaStatus: SlaStatusComparator
+
   """Compound filters, all of which need to be matched by the issue."""
   and: [IssueCollectionFilter!]
 
@@ -3427,6 +3430,9 @@ input IssueFilter {
 
   """Comparator for filtering issues which are blocking."""
   hasBlockingRelations: RelationExistsComparator
+
+  """Comparator for the issues sla status."""
+  slaStatus: SlaStatusComparator
 
   """Compound filters, all of which need to be matched by the issue."""
   and: [IssueFilter!]
@@ -6314,6 +6320,9 @@ input NullableIssueFilter {
 
   """Comparator for filtering issues which are blocking."""
   hasBlockingRelations: RelationExistsComparator
+
+  """Comparator for the issues sla status."""
+  slaStatus: SlaStatusComparator
 
   """Filter based on the existence of the relation."""
   null: Boolean
@@ -10216,6 +10225,34 @@ input SlackPostSettingsInput {
   channel: String!
   channelId: String!
   configurationUrl: String!
+}
+
+enum SlaStatus {
+  Breached
+  HighRisk
+  MediumRisk
+  LowRisk
+  Completed
+}
+
+"""Comparator for sla status."""
+input SlaStatusComparator {
+  """Equals constraint."""
+  eq: SlaStatus
+
+  """Not-equals constraint."""
+  neq: SlaStatus
+
+  """In-array constraint."""
+  in: [SlaStatus!]
+
+  """Not-in-array constraint."""
+  nin: [SlaStatus!]
+
+  """
+  Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.
+  """
+  null: Boolean
 }
 
 """Comparator for `sourceType` field."""
