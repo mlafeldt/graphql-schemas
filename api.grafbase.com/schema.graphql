@@ -565,6 +565,9 @@ type Mutation {
   projectApiKeyDelete(input: ProjectApiKeyDeleteInput!): ProjectApiKeyDeletePayload!
 
   """Create a new project from a GitHub repository."""
+  projectCreateFromSchema(input: ProjectCreateFromSchemaInput!): ProjectCreateFromSchemaPayload!
+
+  """Create a new project from a GitHub repository."""
   projectCreateFromRepository(input: ProjectCreateFromRepositoryInput!): ProjectCreateFromRepositoryPayload!
 
   """
@@ -853,6 +856,20 @@ input ProjectCreateFromRepositoryInput {
 union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | RepositoryContainsNoBranchesError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError
 
 type ProjectCreateFromRepositorySuccess {
+  project: Project!
+  query: Query!
+}
+
+input ProjectCreateFromSchemaInput {
+  accountId: ID!
+  projectSlug: String!
+  schema: String!
+  databaseRegions: [String!]! = ["eu-north-1"]
+}
+
+union ProjectCreateFromSchemaPayload = ProjectCreateFromSchemaSuccess | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError
+
+type ProjectCreateFromSchemaSuccess {
   project: Project!
   query: Query!
 }
