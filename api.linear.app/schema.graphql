@@ -1971,56 +1971,6 @@ type ImageUploadFromUrlPayload {
   success: Boolean!
 }
 
-"""A initiative that contains projects."""
-type Initiative implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
-      for which updates should not produce an update to updatedAt (see
-  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The name of the initiative."""
-  name: String!
-
-  """The organization that the initiative belongs to."""
-  organization: Organization!
-
-  """The sort order for the initiative."""
-  sortOrder: Float!
-
-  """The initiative's description."""
-  description: String
-
-  """The estimated completion date of the initiative."""
-  targetDate: TimelessDate
-}
-
-type InitiativeConnection {
-  edges: [InitiativeEdge!]!
-  nodes: [Initiative!]!
-  pageInfo: PageInfo!
-}
-
-type InitiativeEdge {
-  node: Initiative!
-
-  """Used in `before` and `after` args"""
-  cursor: String!
-}
-
 """An integration with an external service."""
 type Integration implements Node {
   """The unique identifier of the entity."""
@@ -2238,9 +2188,6 @@ type IntegrationsSettings implements Node {
   """Whether to send a new project update to team Slack channels."""
   slackProjectUpdateCreatedToTeam: Boolean
 
-  """Whether to send a new project update to milestone Slack channels."""
-  slackProjectUpdateCreatedToMilestone: Boolean
-
   """Whether to send a new project update to workspace Slack channel."""
   slackProjectUpdateCreatedToWorkspace: Boolean
 
@@ -2294,11 +2241,6 @@ input IntegrationsSettingsCreateInput {
   Whether to send a Slack message when a project update is created to team channels.
   """
   slackProjectUpdateCreatedToTeam: Boolean
-
-  """
-  Whether to send a Slack message when a project update is created to milestone channels.
-  """
-  slackProjectUpdateCreatedToMilestone: Boolean
 
   """
   Whether to send a Slack message when a project update is created to workspace channel.
@@ -2372,11 +2314,6 @@ input IntegrationsSettingsUpdateInput {
   Whether to send a Slack message when a project update is created to team channels.
   """
   slackProjectUpdateCreatedToTeam: Boolean
-
-  """
-  Whether to send a Slack message when a project update is created to milestone channels.
-  """
-  slackProjectUpdateCreatedToMilestone: Boolean
 
   """
   Whether to send a Slack message when a project update is created to workspace channel.
@@ -4287,156 +4224,6 @@ type LogoutResponse {
   success: Boolean!
 }
 
-"""A milestone that contains projects."""
-type Milestone implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
-      for which updates should not produce an update to updatedAt (see
-  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The name of the milestone."""
-  name: String!
-
-  """The organization that the milestone belongs to."""
-  organization: Organization!
-
-  """The sort order for the milestone."""
-  sortOrder: Float!
-
-  """[ALPHA] The milestone's description."""
-  description: String
-
-  """[ALPHA] The estimated completion date of the initiative."""
-  targetDate: TimelessDate
-
-  """Projects associated with the milestone."""
-  projects(
-    """Filter returned projects."""
-    filter: ProjectFilter
-
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): ProjectConnection! @deprecated(reason: "Milestones will be removed. Use roadmaps instead.")
-}
-
-type MilestoneConnection {
-  edges: [MilestoneEdge!]!
-  nodes: [Milestone!]!
-  pageInfo: PageInfo!
-}
-
-input MilestoneCreateInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
-  """The name of the milestone."""
-  name: String!
-
-  """The sort order of the milestone."""
-  sortOrder: Float
-
-  """[ALPHA] The description for the milestone."""
-  description: String
-
-  """[ALPHA] The planned target date of the milestone."""
-  targetDate: TimelessDate
-
-  """
-  [ALPHA] The identifiers of the teams this milestone is associated with.
-  """
-  teamIds: [String!]
-}
-
-type MilestoneEdge {
-  node: Milestone!
-
-  """Used in `before` and `after` args"""
-  cursor: String!
-}
-
-type MilestoneMigrationPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-type MilestonePayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The milesteone that was created or updated."""
-  milestone: Milestone
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-input MilestonesMigrateInput {
-  """IDs of the milestones to migrate."""
-  milestonesToMigrate: [String!]
-
-  """IDs of the milestones to delete."""
-  milestonesToDelete: [String!]
-}
-
-input MilestoneUpdateInput {
-  """The name of the milestone."""
-  name: String
-
-  """The sort order of the milestone."""
-  sortOrder: Float
-
-  """[ALPHA] The description for the milestone."""
-  description: String
-
-  """[ALPHA] The planned target date of the milestone."""
-  targetDate: TimelessDate
-
-  """
-  [ALPHA] The identifiers of the teams this milestone is associated with.
-  """
-  teamIds: [String!]
-}
-
 type Mutation {
   """[Deprecated] Creates a new event."""
   eventCreate(
@@ -5322,33 +5109,6 @@ type Mutation {
     """The identifier of the issue to add a reminder for."""
     id: String!
   ): IssuePayload!
-
-  """Creates a new milestone."""
-  milestoneCreate(
-    """The issue object to create."""
-    input: MilestoneCreateInput!
-  ): MilestonePayload! @deprecated(reason: "Milestones will be removed. Use roadmaps instead.")
-
-  """Updates a milestone."""
-  milestoneUpdate(
-    """A partial milestone object to update the milestone with."""
-    input: MilestoneUpdateInput!
-
-    """The identifier of the milestone to update."""
-    id: String!
-  ): MilestonePayload! @deprecated(reason: "Milestones will be removed. Use roadmaps instead.")
-
-  """Deletes a milestone."""
-  milestoneDelete(
-    """The identifier of the milestone to delete."""
-    id: String!
-  ): ArchivePayload! @deprecated(reason: "Milestones will be removed. Use roadmaps instead.")
-
-  """Migrates milestones to roadmaps"""
-  migrateMilestonesToRoadmaps(
-    """Ids for milestones to migrate and milestones to delete"""
-    input: MilestonesMigrateInput!
-  ): MilestoneMigrationPayload!
 
   """Updates a notification."""
   notificationUpdate(
@@ -7435,12 +7195,6 @@ type Project implements Node {
   """The project lead."""
   lead: User
 
-  """The milestone that this project is associated with."""
-  milestone: Milestone @deprecated(reason: "Milestones will be removed. Use roadmaps instead.")
-
-  """The initiative that this project is associated with."""
-  initiative: Initiative
-
   """The time until which project update reminders are paused."""
   projectUpdateRemindersPausedUntilAt: DateTime
 
@@ -7464,7 +7218,7 @@ type Project implements Node {
   """
   autoArchivedAt: DateTime
 
-  """The sort order for the project within its milestone/initiative."""
+  """The sort order for the project within the organizion."""
   sortOrder: Float!
 
   """The project was created based on this issue."""
@@ -7794,9 +7548,6 @@ input ProjectCreateInput {
 
   """The description for the project."""
   description: String
-
-  """The identifier of the milestone to associate the project with."""
-  milestoneId: String
 
   """The identifiers of the teams this project is associated with."""
   teamIds: [String!]!
@@ -8245,9 +7996,6 @@ input ProjectUpdateInput {
 
   """The description for the project."""
   description: String
-
-  """The identifier of the milestone to associate the project with."""
-  milestoneId: String
 
   """The ID of the issue from which that project is created."""
   convertedFromIssueId: String
@@ -9186,36 +8934,6 @@ type Query {
   """Issue priority values and corresponding labels."""
   issuePriorityValues: [IssuePriorityValue!]!
 
-  """All milestones."""
-  milestones(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): MilestoneConnection! @deprecated(reason: "Milestones will be removed. Use roadmaps instead.")
-
-  """One specific milestone."""
-  milestone(id: String!): Milestone! @deprecated(reason: "Milestones will be removed. Use roadmaps instead.")
-
   """All notifications."""
   notifications(
     """A cursor to be used with last for backward pagination."""
@@ -10085,7 +9803,7 @@ input RoadmapToProjectCreateInput {
   """The identifier of the roadmap."""
   roadmapId: String!
 
-  """The sort order for the project within its milestone."""
+  """The sort order for the project within its organization."""
   sortOrder: Float
 }
 
@@ -10108,7 +9826,7 @@ type RoadmapToProjectPayload {
 }
 
 input RoadmapToProjectUpdateInput {
-  """The sort order for the project within its milestone."""
+  """The sort order for the project within its organization."""
   sortOrder: Float
 }
 
