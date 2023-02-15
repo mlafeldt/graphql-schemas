@@ -1,6 +1,7 @@
 type AccessToken {
   id: ID!
   name: String!
+  accountId: ID
   createdAt: DateTime!
 }
 
@@ -17,9 +18,10 @@ type AccessTokenConnection {
 
 input AccessTokenCreateInput {
   name: String!
+  accountId: ID
 }
 
-union AccessTokenCreatePayload = AccessTokenCreateSuccess | TokenLimitExceededError
+union AccessTokenCreatePayload = AccessTokenCreateSuccess | InvalidAccountError | TokenLimitExceededError
 
 type AccessTokenCreateSuccess {
   token: AccessToken!
@@ -342,6 +344,10 @@ type GitRepository {
   private: Boolean!
   updatedAt: DateTime!
   branches: [String!]!
+}
+
+type InvalidAccountError {
+  query: Query!
 }
 
 type InvalidDatabaseRegionsError {
