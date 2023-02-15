@@ -3146,122 +3146,6 @@ type IssueDraft implements Node {
   attachments: JSONObject!
 }
 
-input IssueDraftCreateInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
-  """The title of the draft."""
-  title: String!
-
-  """The draft description in markdown format."""
-  description: String
-
-  """The draft description as a Prosemirror document."""
-  descriptionData: JSON
-
-  """The identifier of the user to assign the draft to."""
-  assigneeId: String
-
-  """The identifier of the parent draft."""
-  parentId: String
-
-  """The identifier of the parent issue."""
-  parentIssueId: String
-
-  """The priority of the draft."""
-  priority: Int
-
-  """The estimated complexity of the draft."""
-  estimate: Int
-
-  """The identifiers of the issue labels associated with this draft."""
-  labelIds: [String!]
-
-  """The identifier or key of the team associated with the draft."""
-  teamId: String!
-
-  """The cycle associated with the draft."""
-  cycleId: String
-
-  """The project associated with the draft."""
-  projectId: String
-
-  """The team state of the draft."""
-  stateId: String
-
-  """The position of the draft in parent draft's sub-draft list."""
-  subIssueSortOrder: Float
-
-  """The date at which the draft is due."""
-  dueDate: TimelessDate
-
-  """The attachments associated with this draft."""
-  attachments: JSONObject
-}
-
-type IssueDraftPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The draft that was created or updated."""
-  issueDraft: IssueDraft!
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-input IssueDraftUpdateInput {
-  """The title of the draft."""
-  title: String
-
-  """The draft description in markdown format."""
-  description: String
-
-  """The draft description as a Prosemirror document."""
-  descriptionData: JSON
-
-  """The identifier of the user to assign the draft to."""
-  assigneeId: String
-
-  """The identifier of the parent draft."""
-  parentId: String
-
-  """The identifier of the parent issue."""
-  parentIssueId: String
-
-  """The priority of the draft."""
-  priority: Int
-
-  """The estimated complexity of the draft."""
-  estimate: Int
-
-  """The identifiers of the issue labels associated with this draft."""
-  labelIds: [String!]
-
-  """The identifier or key of the team associated with the draft."""
-  teamId: String
-
-  """The cycle associated with the draft."""
-  cycleId: String
-
-  """The project associated with the draft."""
-  projectId: String
-
-  """The team state of the draft."""
-  stateId: String
-
-  """The position of the draft in parent draft's sub-draft list."""
-  subIssueSortOrder: Float
-
-  """The date at which the draft is due."""
-  dueDate: TimelessDate
-
-  """The attachments associated with this draft."""
-  attachments: JSONObject
-}
-
 type IssueEdge {
   node: Issue!
 
@@ -4816,33 +4700,6 @@ type Mutation {
     id: String!
   ): ArchivePayload!
 
-  """Creates a new draft."""
-  issueDraftCreate(
-    """The issue draft to create."""
-    input: IssueDraftCreateInput!
-  ): IssueDraftPayload!
-
-  """Updates a draft."""
-  issueDraftUpdate(
-    """The fields to update."""
-    input: IssueDraftUpdateInput!
-
-    """The ID of the issue draft to update."""
-    id: String!
-  ): IssueDraftPayload!
-
-  """Deletes a draft."""
-  issueDraftDelete(
-    """The identifier of the draft to delete."""
-    id: String!
-  ): ArchivePayload!
-
-  """Archives a draft."""
-  issueDraftArchive(
-    """The identifier of the draft to archive."""
-    id: String!
-  ): ArchivePayload!
-
   """Kicks off a GitHub import job."""
   issueImportCreateGithub(
     """ID of issue import. If not provided it will be generated."""
@@ -5107,6 +4964,17 @@ type Mutation {
     reminderAt: DateTime!
 
     """The identifier of the issue to add a reminder for."""
+    id: String!
+  ): IssuePayload!
+
+  """
+  [INTERNAL] Updates an issue description from the Front app to handle Front attachments correctly.
+  """
+  issueDescriptionUpdateFromFront(
+    """Description to update the issue with. """
+    description: String!
+
+    """The identifier of the issue to update."""
     id: String!
   ): IssuePayload!
 
@@ -5498,41 +5366,6 @@ type Mutation {
     """The identifier of the template to delete."""
     id: String!
   ): ArchivePayload!
-
-  """
-  [INTERNAL] Verifies the email address and code for a user account that wants to change email.
-  """
-  userAccountEmailChangeVerifyCode(
-    """[INTERNAL] The code to verify."""
-    code: String!
-
-    """[INTERNAL] The email to verify."""
-    email: String!
-  ): UserAccountEmailChangeVerifyCodePayload!
-
-  """
-  [INTERNAL] Creates an email verification challenge from the app for a user account that wants to change email.
-  """
-  userAccountEmailChangeCreate(
-    """
-    [INTERNAL] Whether an existing account exists for the new email address.
-    """
-    hasExistingAccount: Boolean!
-
-    """[INTERNAL] The new email address the user wants to use."""
-    newEmail: String!
-
-    """
-    [INTERNAL] The identifier of the user account that wants to change email.
-    """
-    id: String!
-  ): UserAccountEmailVerificationPayload!
-
-  """[INTERNAL] Cancels an ongoing email change for the user account"""
-  userAccountEmailChangeCancel(
-    """The id of the user account to cancel the change for."""
-    id: String!
-  ): UserAccountEmailVerificationPayload!
 
   """
   Updates a user. Only available to organization admins and the user themselves.
@@ -9347,14 +9180,6 @@ type Query {
     id: String!
   ): Template!
 
-  """
-  [INTERNAL] Checks if there's a currently active email verification challenge for a user account.
-  """
-  userAccountEmailChangeFind(
-    """[INTERNAL] The email of the user account."""
-    email: String!
-  ): UserAccountEmailChangeFindPayload!
-
   """Finds a user account by email."""
   userAccountExists(
     """The email to find the user account by."""
@@ -11590,40 +11415,6 @@ type UserAccountEmailChange {
 
   """The timestamp this verification challenge was canceled at."""
   canceledAt: DateTime
-}
-
-"""
-[INTERNAL] Result of searching for a verification challenge for a user account.
-"""
-type UserAccountEmailChangeFindPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """[INTERNAL] Whether there is a currently active change."""
-  hasChangeActive: Boolean!
-}
-
-"""[INTERNAL] Result of verifying an email and code."""
-type UserAccountEmailChangeVerifyCodePayload {
-  """[INTERNAL] Whether the operation was successful."""
-  success: Boolean!
-
-  """[INTERNAL] Reason why the operation was not successful."""
-  failureReason: Float
-}
-
-"""
-[INTERNAL] Result of creating or cancelling a verification challenge for email change.
-"""
-type UserAccountEmailVerificationPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """[INTERNAL] Whether the operation was successful."""
-  success: Boolean!
-
-  """[INTERNAL] Reason why the operation was not successful."""
-  failureReason: Float
 }
 
 """[INTERNAL] Result of looking up a user account by email."""
