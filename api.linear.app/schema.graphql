@@ -713,17 +713,6 @@ input CommentUpdateInput {
   bodyData: JSON
 }
 
-"""GitHub's commit data"""
-type CommitPayload {
-  id: String!
-  message: String!
-  timestamp: String!
-  url: String!
-  added: [String!]!
-  removed: [String!]!
-  modified: [String!]!
-}
-
 input ContactCreateInput {
   """The type of support contact."""
   type: String!
@@ -2042,76 +2031,6 @@ type IntegrationRequestPayload {
   success: Boolean!
 }
 
-"""An integration resource created by an external service."""
-type IntegrationResource implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
-      for which updates should not produce an update to updatedAt (see
-  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The integration's type."""
-  resourceType: String!
-
-  """The external service resource ID."""
-  resourceId: String!
-
-  """Detailed information about the external resource."""
-  data: IntegrationResourceData!
-
-  """The integration that the resource is associated with."""
-  integration: Integration
-
-  """The issue that the resource is associated with."""
-  issue: Issue!
-
-  """
-  Pull request information for GitHub pull requests and GitLab merge requests.
-  """
-  pullRequest: PullRequestPayload!
-}
-
-type IntegrationResourceConnection {
-  edges: [IntegrationResourceEdge!]!
-  nodes: [IntegrationResource!]!
-  pageInfo: PageInfo!
-}
-
-"""Integration resource's payload"""
-type IntegrationResourceData {
-  """The payload for an IntegrationResource of type 'githubPullRequest'"""
-  githubPullRequest: PullRequestPayload
-
-  """The payload for an IntegrationResource of type 'gitlabMergeRequest'"""
-  gitlabMergeRequest: PullRequestPayload
-
-  """The payload for an IntegrationResource of type 'githubCommit'"""
-  githubCommit: CommitPayload
-
-  """The payload for an IntegrationResource of type 'sentryIssue'"""
-  sentryIssue: SentryIssuePayload
-}
-
-type IntegrationResourceEdge {
-  node: IntegrationResource!
-
-  """Used in `before` and `after` args"""
-  cursor: String!
-}
-
 """The integration resource's settings"""
 type IntegrationSettings {
   slackPost: SlackPostSettings
@@ -2738,33 +2657,6 @@ type Issue implements Node {
     """
     orderBy: PaginationOrderBy
   ): IssueLabelConnection!
-
-  """[DEPRECATED] Integration resources for this issue."""
-  integrationResources(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): IntegrationResourceConnection! @deprecated(reason: "This field will soon be deprecated, please use `attachments` instead")
 
   """Relations associated with this issue."""
   relations(
@@ -4666,12 +4558,6 @@ type Mutation {
     """The identifier of the integration to delete."""
     id: String!
   ): ArchivePayload!
-
-  """Archives an integration resource."""
-  integrationResourceArchive(
-    """The identifier of the integration resource to archive."""
-    id: String!
-  ): ArchivePayload! @deprecated(reason: "This query will soon be deprecated, please use `attachmentArchive` instead")
 
   """Creates new settings for one or more integrations."""
   integrationsSettingsCreate(
@@ -7987,48 +7873,6 @@ type ProjectUpdateWithInteractionPayload {
   interaction: ProjectUpdateInteraction!
 }
 
-"""Pull request data"""
-type PullRequestPayload {
-  status: String!
-  number: Float!
-  url: String!
-  draft: Boolean!
-  id: String!
-  title: String!
-  branch: String!
-  userId: String!
-  userLogin: String!
-  repoLogin: String!
-  repoName: String!
-  createdAt: String!
-  updatedAt: String!
-  closedAt: String!
-  mergedAt: String!
-  reviewers: [String!]
-  reviews: [PullRequestReview!]
-}
-
-"""Pull request review data"""
-type PullRequestReview {
-  """The ID of the review."""
-  id: Float!
-
-  """The state of the review."""
-  state: String!
-
-  """The login of the reviewer."""
-  reviewerLogin: String!
-
-  """The user ID of the reviewer."""
-  reviewerId: Float!
-
-  """The timestamp of review submission."""
-  submittedAt: String!
-
-  """[Internal] The reviewer's avatar URL."""
-  reviewerAvatarUrl: String
-}
-
 """A user's web browser push notification subscription."""
 type PushSubscription implements Node {
   """The unique identifier of the entity."""
@@ -8526,40 +8370,6 @@ type Query {
 
   """One specific integration."""
   integration(id: String!): Integration!
-
-  """
-  All integrations resources (e.g. linked GitHub pull requests for issues).
-  """
-  integrationResources(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): IntegrationResourceConnection! @deprecated(reason: "This query will soon be deprecated, please use `attachments` instead")
-
-  """
-  One specific integration resource. (e.g. linked GitHub pull requests for an issue)
-  """
-  integrationResource(id: String!): IntegrationResource! @deprecated(reason: "This query will soon be deprecated, please use `attachment` instead")
 
   """All project updates."""
   projectUpdates(
@@ -9725,44 +9535,6 @@ type SamlConfigurationPayload {
 
   """The issuer's custom entity ID."""
   issuerEntityId: String
-}
-
-"""Sentry issue data"""
-type SentryIssuePayload {
-  """The Sentry identifier for the issue."""
-  issueId: String!
-
-  """The description of the issue."""
-  webUrl: String!
-
-  """The type of the actor who created the issue."""
-  actorType: String!
-
-  """The Sentry identifier of the actor who created the issue."""
-  actorId: Float!
-
-  """The name of the Sentry actor who created this issue."""
-  actorName: String!
-
-  """The Sentry identifier of the project this issue belongs to."""
-  projectId: Float!
-
-  """The slug of the project this issue belongs to."""
-  projectSlug: String!
-
-  """The title of the issue."""
-  issueTitle: String!
-
-  """The shortId of the issue."""
-  shortId: String!
-
-  """The date this issue was first seen."""
-  firstSeen: String!
-
-  """
-  The name of the first release version this issue appeared on, if available.
-  """
-  firstVersion: String
 }
 
 """Sentry specific settings."""
