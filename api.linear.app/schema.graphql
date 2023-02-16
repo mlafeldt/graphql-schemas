@@ -11781,6 +11781,66 @@ input WorkflowCondition {
   projectFilter: ProjectFilter
 }
 
+type WorkflowCronJobDefinition implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The name of the workflow cron job."""
+  name: String!
+
+  """The description of the workflow cron job."""
+  description: String
+  enabled: Boolean!
+
+  """The team associated with the workflow cron job."""
+  team: Team!
+
+  """The user who created the workflow cron job."""
+  creator: User!
+
+  """Cron schedule which is used to execute the workflow cron job."""
+  schedule: JSONObject!
+
+  """
+  An array of activities that will be executed as part of the workflow cron job.
+  """
+  activities: JSONObject!
+
+  """
+  The sort order of the workflow cron job definition within its siblings.
+  """
+  sortOrder: String!
+}
+
+type WorkflowCronJobDefinitionConnection {
+  edges: [WorkflowCronJobDefinitionEdge!]!
+  nodes: [WorkflowCronJobDefinition!]!
+  pageInfo: PageInfo!
+}
+
+type WorkflowCronJobDefinitionEdge {
+  node: WorkflowCronJobDefinition!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
 type WorkflowDefinition implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -11830,11 +11890,6 @@ type WorkflowDefinition implements Node {
 
   """The user who created the workflow."""
   creator: User!
-
-  """
-  Cron schedule which is used to execute the workflow. Only applicable for cron based workflows.
-  """
-  schedule: JSONObject!
 
   """An array of activities that will be executed as part of the workflow."""
   activities: JSONObject!
@@ -12030,7 +12085,6 @@ input WorkflowStateUpdateInput {
 }
 
 enum WorkflowTrigger {
-  cron
   entityCreated
   entityUpdated
   entityCreatedOrUpdated
@@ -12044,7 +12098,6 @@ enum WorkflowTriggerType {
 }
 
 enum WorkflowType {
-  recurringIssue
   sla
   custom
 }
