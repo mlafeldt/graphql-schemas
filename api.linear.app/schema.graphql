@@ -6205,6 +6205,9 @@ type OauthClient implements Node {
 
   """Webhook URL"""
   webhookUrl: String
+
+  """Webhook secret token for verifying the origin on the recipient side."""
+  webhookSecret: String
 }
 
 """
@@ -6312,6 +6315,19 @@ enum OAuthClientApprovalStatus {
   requested
   approved
   denied
+}
+
+type OauthClientConnection {
+  edges: [OauthClientEdge!]!
+  nodes: [OauthClient!]!
+  pageInfo: PageInfo!
+}
+
+type OauthClientEdge {
+  node: OauthClient!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
 }
 
 input OnboardingCustomerSurvey {
@@ -7526,6 +7542,9 @@ input ProjectMilestoneCreateInput {
 
   """Related project for the project milestone."""
   projectId: String!
+
+  """The sort order for the project milestone within a project."""
+  sortOrder: Float
 }
 
 type ProjectMilestoneEdge {
@@ -7558,6 +7577,9 @@ input ProjectMilestoneUpdateInput {
 
   """Related project for the project milestone."""
   projectId: String
+
+  """The sort order for the project milestone within a project."""
+  sortOrder: Float
 }
 
 """A project related notification"""
@@ -11732,7 +11754,7 @@ input WebhookCreateInput {
   """Whether this webhook is enabled."""
   enabled: Boolean = true
 
-  """An optional secret token used to sign the webhook payload."""
+  """A secret token used to sign the webhook payload."""
   secret: String
 
   """The URL that will be called on data changes."""
@@ -11770,7 +11792,7 @@ input WebhookUpdateInput {
   """Label for the webhook."""
   label: String
 
-  """An optional secret token used to sign the Webhook payload."""
+  """A secret token used to sign the webhook payload."""
   secret: String
 
   """Whether this webhook is enabled."""
