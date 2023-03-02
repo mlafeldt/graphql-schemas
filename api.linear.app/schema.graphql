@@ -4,27 +4,6 @@ directive @specifiedBy(
   url: String!
 ) on SCALAR
 
-input AdminJobConfiguration {
-  enabled: Boolean!
-  delay: Float
-  currentJob: String
-  param: String
-}
-
-type AdminJobConfigurationPayload {
-  enabled: Boolean!
-  delay: Float!
-  currentJob: String
-  param: String
-}
-
-type AdminJobStatusPayload {
-  configuration: AdminJobConfigurationPayload!
-  cursor: String
-  startedAt: DateTime
-  availableJobs: [String!]!
-}
-
 input AirbyteConfigurationInput {
   """Linear export API key."""
   apiKey: String!
@@ -4436,6 +4415,15 @@ type Mutation {
     """
     shouldUseV2Auth: Boolean
 
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """Integrates the organization with Slack for issue intake."""
+  integrationSlackIntake(
     """The Slack OAuth redirect URI."""
     redirectUri: String!
 
