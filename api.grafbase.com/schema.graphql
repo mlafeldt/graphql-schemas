@@ -457,14 +457,6 @@ type KeyLimitExceededError {
   query: Query!
 }
 
-union LoginPayload = LoginSuccess | MissingTokenError
-
-type LoginSuccess {
-  user: User!
-  isFirstLogin: Boolean!
-  query: Query!
-}
-
 type Member {
   id: ID!
   role: MemberRole!
@@ -514,10 +506,6 @@ input MemberUpdateInput {
 
 type MemberUpdatePayload {
   member: Member!
-  query: Query!
-}
-
-type MissingTokenError {
   query: Query!
 }
 
@@ -578,6 +566,9 @@ type Mutation {
   """Delete a given API key."""
   projectApiKeyDelete(input: ProjectApiKeyDeleteInput!): ProjectApiKeyDeletePayload!
 
+  """Create a new project without any source for an initial deployment."""
+  projectCreate(input: ProjectCreateInput!): ProjectCreatePayload!
+
   """Create a new project from a GitHub repository."""
   projectCreateFromSchema(input: ProjectCreateFromSchemaInput!): ProjectCreateFromSchemaPayload!
 
@@ -590,7 +581,6 @@ type Mutation {
   projectCreateFromTemplate(input: ProjectCreateFromTemplateInput!): ProjectCreateFromTemplatePayload!
   projectUpdate(input: ProjectUpdateInput!): ProjectUpdatePayload!
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
-  login: LoginPayload!
 }
 
 type NameAlreadyExistsError {
@@ -864,7 +854,7 @@ input ProjectCreateFromRepositoryInput {
   gitRepoUrl: Url!
   gitAccountId: String!
   productionBranch: String!
-  databaseRegions: [String!]! = ["eu-north-1"]
+  databaseRegions: [String!]!
 }
 
 union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | RepositoryContainsNoBranchesError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError
@@ -878,7 +868,7 @@ input ProjectCreateFromSchemaInput {
   accountId: ID!
   projectSlug: String!
   schema: String!
-  databaseRegions: [String!]! = ["eu-north-1"]
+  databaseRegions: [String!]!
 }
 
 union ProjectCreateFromSchemaPayload = ProjectCreateFromSchemaSuccess | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError
@@ -895,12 +885,25 @@ input ProjectCreateFromTemplateInput {
   gitAccountId: String!
   repoSlug: String!
   repoPrivate: Boolean!
-  databaseRegions: [String!]! = ["eu-north-1"]
+  databaseRegions: [String!]!
 }
 
 union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | RepositorySlugInUseError | TemplateDoesNotExistError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError
 
 type ProjectCreateFromTemplateSuccess {
+  project: Project!
+  query: Query!
+}
+
+input ProjectCreateInput {
+  accountId: ID!
+  projectSlug: String!
+  databaseRegions: [String!]!
+}
+
+union ProjectCreatePayload = ProjectCreateSuccess | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError
+
+type ProjectCreateSuccess {
   project: Project!
   query: Query!
 }
