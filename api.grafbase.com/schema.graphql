@@ -65,6 +65,10 @@ type AlreadyMemberError {
   query: Query!
 }
 
+type ArchiveFileSizeLimitExceededError {
+  query: Query!
+}
+
 type Branch {
   id: ID!
   name: String!
@@ -110,6 +114,10 @@ type BranchMetricsSuccess {
 
 type CurrentPlanLimitReachedError {
   max: Int!
+  query: Query!
+}
+
+type DailyDeploymentCountLimitExceededError {
   query: Query!
 }
 
@@ -177,6 +185,20 @@ type DeploymentConnection {
 
   """A list of nodes."""
   nodes: [Deployment!]!
+}
+
+input DeploymentCreateInput {
+  projectId: ID!
+  archiveFileSize: Int!
+  branch: String!
+}
+
+union DeploymentCreatePayload = DeploymentCreateSuccess | ProjectDoesNotExistError | ArchiveFileSizeLimitExceededError | DailyDeploymentCountLimitExceededError
+
+type DeploymentCreateSuccess {
+  deployment: Deployment!
+  presignedUrl: String!
+  query: Query!
 }
 
 """An edge in a connection."""
@@ -537,6 +559,9 @@ type Mutation {
   personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
+
+  """Create a new deployment for an existing project."""
+  deploymentCreate(input: DeploymentCreateInput!): DeploymentCreatePayload!
 
   """Create a new environment variable."""
   environmentVariableCreate(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
