@@ -1270,67 +1270,11 @@ type DocumentConnection {
   pageInfo: PageInfo!
 }
 
-input DocumentCreateInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
-  """The title of the document."""
-  title: String!
-
-  """The icon of the document."""
-  icon: String
-
-  """The color of the icon."""
-  color: String
-
-  """The document content as a Prosemirror document."""
-  contentData: JSONObject
-
-  """The document content as markdown."""
-  content: String
-
-  """Related project for the document."""
-  projectId: String!
-}
-
 type DocumentEdge {
   node: Document!
 
   """Used in `before` and `after` args"""
   cursor: String!
-}
-
-type DocumentPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The document that was created or updated."""
-  document: Document!
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-input DocumentUpdateInput {
-  """The title of the document."""
-  title: String
-
-  """The icon of the document."""
-  icon: String
-
-  """The color of the icon."""
-  color: String
-
-  """The document content as a Prosemirror document."""
-  contentData: JSONObject
-
-  """The document content as markdown."""
-  content: String
-
-  """Related project for the document."""
-  projectId: String
 }
 
 input EmailSubscribeInput {
@@ -1545,6 +1489,65 @@ input EventCreateInput {
 type EventPayload {
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""
+[ALPHA] An external authenticated (e.g., through Slack) user which doesn't have
+a Linear account, but can create and update entities in Linear from the external
+system that authenticated them.
+"""
+type ExternalUser implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The external user's full name."""
+  name: String!
+
+  """
+  The external user's display name. Unique within each organization. Can match the display name of an actual user.
+  """
+  displayName: String!
+
+  """The external user's email address."""
+  email: String!
+
+  """An URL to the external user's avatar image."""
+  avatarUrl: String
+
+  """Organization the external user belongs to."""
+  organization: Organization!
+
+  """The last time the external user was seen interacting with Linear."""
+  lastSeen: DateTime
+}
+
+type ExternalUserConnection {
+  edges: [ExternalUserEdge!]!
+  nodes: [ExternalUser!]!
+  pageInfo: PageInfo!
+}
+
+type ExternalUserEdge {
+  node: ExternalUser!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
 }
 
 """User favorites presented in the sidebar."""
@@ -2377,9 +2380,6 @@ type Issue implements Node {
   """The issue's title."""
   title: String!
 
-  """The issue's description in markdown format."""
-  description: String
-
   """The priority of the issue."""
   priority: Float!
 
@@ -2469,9 +2469,6 @@ type Issue implements Node {
 
   """Label for the priority."""
   priorityLabel: String!
-
-  """[Internal] The issue's description as a Prosemirror document."""
-  descriptionData: JSON
 
   """Issue's human readable identifier (e.g. ENG-123)."""
   identifier: String!
@@ -2720,6 +2717,12 @@ type Issue implements Node {
     """
     orderBy: PaginationOrderBy
   ): AttachmentConnection!
+
+  """The issue's description in markdown format."""
+  description: String
+
+  """[Internal] The issue's description as a Prosemirror document."""
+  descriptionData: JSON
 }
 
 type IssueBatchPayload {
@@ -4236,29 +4239,6 @@ type Mutation {
   """Archives a cycle."""
   cycleArchive(
     """The identifier of the cycle to archive."""
-    id: String!
-  ): ArchivePayload!
-
-  """Creates a new document."""
-  documentCreate(
-    """The document to create."""
-    input: DocumentCreateInput!
-  ): DocumentPayload!
-
-  """Updates a document."""
-  documentUpdate(
-    """A partial document object to update the document with."""
-    input: DocumentUpdateInput!
-
-    """
-    The identifier of the document to update. Also the identifier from the URL is accepted.
-    """
-    id: String!
-  ): DocumentPayload!
-
-  """Deletes a document."""
-  documentDelete(
-    """The identifier of the document to delete."""
     id: String!
   ): ArchivePayload!
 
@@ -8328,36 +8308,6 @@ type Query {
   """One specific cycle."""
   cycle(id: String!): Cycle!
 
-  """All documents for the project."""
-  documents(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): DocumentConnection!
-
-  """One specific document."""
-  document(id: String!): Document!
-
   """All custom emojis."""
   emojis(
     """A cursor to be used with last for backward pagination."""
@@ -8390,6 +8340,39 @@ type Query {
     """The identifier of the emoji to retrieve."""
     id: String!
   ): Emoji!
+
+  """All external users for the organization."""
+  externalUsers(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ExternalUserConnection!
+
+  """One specific external user."""
+  externalUser(
+    """The identifier of the external user to retrieve."""
+    id: String!
+  ): ExternalUser!
 
   """The user's favorites."""
   favorites(
