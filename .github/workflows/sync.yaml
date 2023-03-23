@@ -22,16 +22,11 @@ jobs:
         run: bun install
 
       - name: Sync schemas
-        run: bun run sync
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Commit and push any changes
         run: |
           git config --global user.name "${GIT_USER}"
           git config --global user.email "${GIT_USER}@users.noreply.github.com"
-          if git commit -a -m "Sync schema changes"; then
-              git push origin main
-          fi
+          bun run sync
+          git push origin main
         env:
           GIT_USER: graphql-schemas-bot
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

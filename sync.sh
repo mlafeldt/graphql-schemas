@@ -10,6 +10,7 @@ sync_schema() {
     mkdir -p "$domain"
     get-graphql-schema https://$domain/graphql "$@" > "$domain/schema.graphql"
     get-graphql-schema https://$domain/graphql "$@" --json > "$domain/schema.json"
+    git commit -m "Sync schema: $domain" "$domain" || true
 }
 
 # Sorted alphabetically
