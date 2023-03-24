@@ -880,6 +880,14 @@ type CustomViewPayload {
   success: Boolean!
 }
 
+type CustomViewSuggestionPayload {
+  """The suggested view name."""
+  suggestedName: String
+
+  """The suggested view description."""
+  suggestedDescription: String
+}
+
 input CustomViewUpdateInput {
   """The name of the custom view."""
   name: String
@@ -8280,6 +8288,9 @@ type Query {
 
   """One specific custom view."""
   customView(id: String!): CustomView!
+
+  """[INTERNAL] Suggests metadata for a view based on it's filters."""
+  customViewSuggestion(filter: JSONObject!): CustomViewSuggestionPayload!
 
   """All cycles."""
   cycles(
