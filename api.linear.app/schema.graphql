@@ -821,6 +821,9 @@ type CustomView implements Node {
   """The filter applied to issues in the custom view."""
   filterData: JSONObject!
 
+  """[ALPHA] The filter applied to projects in the custom view."""
+  projectFilterData: JSONObject
+
   """Whether the custom view is shared with everyone in the organization."""
   shared: Boolean!
 }
@@ -857,6 +860,9 @@ input CustomViewCreateInput {
 
   """The filter applied to issues in the custom view."""
   filterData: JSONObject
+
+  """[ALPHA] The project filter applied to issues in the custom view."""
+  projectFilterData: JSONObject
 
   """Whether the custom view is shared with everyone in the organization."""
   shared: Boolean
@@ -909,6 +915,9 @@ input CustomViewUpdateInput {
 
   """The filter applied to issues in the custom view."""
   filterData: JSONObject
+
+  """[ALPHA] The project filter applied to issues in the custom view."""
+  projectFilterData: JSONObject
 
   """Whether the custom view is shared with everyone in the organization."""
   shared: Boolean
@@ -2452,7 +2461,7 @@ type Issue implements Node {
   """The project that the issue is associated with."""
   project: Project
 
-  """[ALPHA] The projectMilestone that the issue is associated with."""
+  """The projectMilestone that the issue is associated with."""
   projectMilestone: ProjectMilestone
 
   """Previous identifiers of the issue if it has been moved between teams."""
@@ -2821,7 +2830,7 @@ input IssueCollectionFilter {
   """Filters that the issues team must satisfy."""
   team: TeamFilter
 
-  """[ALPHA] Filters that the issues project milestone must satisfy."""
+  """Filters that the issues project milestone must satisfy."""
   projectMilestone: NullableProjectMilestoneFilter
 
   """Filters that the issues comments must satisfy."""
@@ -2924,7 +2933,7 @@ input IssueCreateInput {
   """The project associated with the issue."""
   projectId: String
 
-  """[ALPHA] The project milestone associated with the issue."""
+  """The project milestone associated with the issue."""
   projectMilestoneId: String
 
   """The team state of the issue."""
@@ -3123,7 +3132,7 @@ input IssueFilter {
   """Filters that the issues team must satisfy."""
   team: TeamFilter
 
-  """[ALPHA] Filters that the issues project milestone must satisfy."""
+  """Filters that the issues project milestone must satisfy."""
   projectMilestone: NullableProjectMilestoneFilter
 
   """Filters that the issues comments must satisfy."""
@@ -3889,7 +3898,7 @@ input IssueUpdateInput {
   """The project associated with the issue."""
   projectId: String
 
-  """[ALPHA] The project milestone associated with the issue."""
+  """The project milestone associated with the issue."""
   projectMilestoneId: String
 
   """The team state of the issue."""
@@ -5805,7 +5814,7 @@ input NullableIssueFilter {
   """Filters that the issues team must satisfy."""
   team: TeamFilter
 
-  """[ALPHA] Filters that the issues project milestone must satisfy."""
+  """Filters that the issues project milestone must satisfy."""
   projectMilestone: NullableProjectMilestoneFilter
 
   """Filters that the issues comments must satisfy."""
@@ -5945,7 +5954,7 @@ input NullableProjectFilter {
   or: [NullableProjectFilter!]
 }
 
-"""[ALPHA] Project milestone filtering options."""
+"""Project milestone filtering options."""
 input NullableProjectMilestoneFilter {
   """Comparator for the identifier."""
   id: IDComparator
@@ -7161,7 +7170,7 @@ type Project implements Node {
     orderBy: PaginationOrderBy
   ): DocumentConnection!
 
-  """[ALPHA] Milestones associated with the project."""
+  """Milestones associated with the project."""
   projectMilestones(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -9356,6 +9365,9 @@ type Roadmap implements Node {
 
   """The sort order of the roadmap within the organization."""
   sortOrder: Float!
+
+  """The roadmap's color."""
+  color: String
 
   """Projects associated with the roadmap."""
   projects(
