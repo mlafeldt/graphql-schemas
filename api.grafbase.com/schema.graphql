@@ -55,10 +55,15 @@ interface Account {
   name: String!
   createdAt: DateTime!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
+  resources: AccountResources!
 }
 
 type AccountDoesNotExistError {
   query: Query!
+}
+
+type AccountResources {
+  projects: ResourceStatus!
 }
 
 type AlreadyMemberError {
@@ -682,6 +687,7 @@ type Organization implements Account {
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
+  resources: AccountResources!
 }
 
 type OrganizationConnection {
@@ -781,6 +787,7 @@ type PersonalAccount implements Account {
   name: String!
   createdAt: DateTime!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
+  resources: AccountResources!
 }
 
 union PersonalAccountDeletePayload = PersonalAccountDeleteSuccess | OrganizationOwnershipNotTransferredError
@@ -1092,6 +1099,12 @@ type ReservedSlugsCheckError {
   query: Query!
 }
 
+type ResourceStatus {
+  current: Int!
+  limit: Int
+  remaining: Int
+}
+
 type SlugAlreadyExistsError {
   query: Query!
 }
@@ -1150,7 +1163,7 @@ type User {
   organizations(after: String, before: String, first: Int, last: Int): OrganizationConnection!
   organizationMemberships: [Member!]!
   personalAccount: PersonalAccount
-  limits: ViewerLimits!
+  limits: ViewerLimits! @deprecated(reason: "Moved to account level")
 }
 
 type ValueTooLongError {
