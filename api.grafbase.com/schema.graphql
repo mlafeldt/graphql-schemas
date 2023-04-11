@@ -588,6 +588,7 @@ type Mutation {
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
   organizationSlugUpdate(input: OrganizationSlugUpdateInput!): OrganizationSlugUpdatePayload!
   personalAccountSlugUpdate(input: PersonalAccountSlugUpdateInput!): PersonalAccountSlugUpdatePayload!
+  organizationCreateStripeSetupIntent(input: OrganizationCreateStripeSetupIntentInput!): OrganizationCreateStripeSetupIntentPayload!
   organizationUpdate(input: OrganizationUpdateInput!): OrganizationUpdatePayload!
   personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
@@ -707,6 +708,17 @@ input OrganizationCreateInput {
 }
 
 union OrganizationCreatePayload = OrganizationCreateSuccess | SlugError | SlugSizeCheckError | NameSizeCheckError | ReservedSlugsCheckError | SlugAlreadyExistsError
+
+input OrganizationCreateStripeSetupIntentInput {
+  id: ID!
+}
+
+union OrganizationCreateStripeSetupIntentPayload = OrganizationCreateStripeSetupIntentSuccess | OrganizationDoesNotExistError | NotAllowedToUpdateOrganizationError
+
+type OrganizationCreateStripeSetupIntentSuccess {
+  clientSecret: String!
+  query: Query!
+}
 
 type OrganizationCreateSuccess {
   organization: Organization!
