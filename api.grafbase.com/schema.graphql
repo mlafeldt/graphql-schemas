@@ -56,6 +56,8 @@ interface Account {
   createdAt: DateTime!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
   resources: AccountResources!
+  stripeCustomer: StripeCustomer
+  orbCustomer: OrbCustomer
 }
 
 type AccountDoesNotExistError {
@@ -588,7 +590,6 @@ type Mutation {
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
   organizationSlugUpdate(input: OrganizationSlugUpdateInput!): OrganizationSlugUpdatePayload!
   personalAccountSlugUpdate(input: PersonalAccountSlugUpdateInput!): PersonalAccountSlugUpdatePayload!
-  organizationCreateStripeSetupIntent(input: OrganizationCreateStripeSetupIntentInput!): OrganizationCreateStripeSetupIntentPayload!
   organizationUpdate(input: OrganizationUpdateInput!): OrganizationUpdatePayload!
   personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
@@ -640,6 +641,7 @@ type Mutation {
   projectCreateFromTemplate(input: ProjectCreateFromTemplateInput!): ProjectCreateFromTemplatePayload!
   projectUpdate(input: ProjectUpdateInput!): ProjectUpdatePayload!
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
+  stripeSetupIntentCreate: StripeSetupIntentCreatePayload!
 }
 
 type NameAlreadyExistsError {
@@ -680,11 +682,17 @@ type NotAllowedToUpdateOrganizationError {
   query: Query!
 }
 
+type OrbCustomer {
+  id: String!
+}
+
 type Organization implements Account {
   id: ID!
   slug: String!
   name: String!
   createdAt: DateTime!
+  stripeCustomer: StripeCustomer
+  orbCustomer: OrbCustomer
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
@@ -705,20 +713,11 @@ type OrganizationConnection {
 input OrganizationCreateInput {
   slug: String!
   name: String!
+  email: String
+  stripePaymentMethodId: String!
 }
 
 union OrganizationCreatePayload = OrganizationCreateSuccess | SlugError | SlugSizeCheckError | NameSizeCheckError | ReservedSlugsCheckError | SlugAlreadyExistsError
-
-input OrganizationCreateStripeSetupIntentInput {
-  id: ID!
-}
-
-union OrganizationCreateStripeSetupIntentPayload = OrganizationCreateStripeSetupIntentSuccess | OrganizationDoesNotExistError | NotAllowedToUpdateOrganizationError
-
-type OrganizationCreateStripeSetupIntentSuccess {
-  clientSecret: String!
-  query: Query!
-}
 
 type OrganizationCreateSuccess {
   organization: Organization!
@@ -798,6 +797,8 @@ type PersonalAccount implements Account {
   slug: String!
   name: String!
   createdAt: DateTime!
+  stripeCustomer: StripeCustomer
+  orbCustomer: OrbCustomer
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
   resources: AccountResources!
 }
@@ -1140,6 +1141,22 @@ type SlugSizeCheckError {
 
 type SlugTooLongError {
   maxLength: Int!
+  query: Query!
+}
+
+type StripeCustomer {
+  id: String!
+}
+
+type StripeSetupIntent {
+  id: String!
+  clientSecret: String!
+}
+
+union StripeSetupIntentCreatePayload = StripeSetupIntentCreateSuccess
+
+type StripeSetupIntentCreateSuccess {
+  setupIntent: StripeSetupIntent!
   query: Query!
 }
 
