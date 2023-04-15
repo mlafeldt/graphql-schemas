@@ -56,8 +56,15 @@ interface Account {
   createdAt: DateTime!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
   resources: AccountResources!
-  stripeCustomer: StripeCustomer
-  orbCustomer: OrbCustomer
+  usage(filter: AccountResourceUsageFilter): DatabaseUsage!
+}
+
+input AccountCreationValidateInput {
+  slug: String!
+}
+
+type AccountCreationValidatePayload {
+  slugAvailable: Boolean!
 }
 
 type AccountDoesNotExistError {
@@ -66,6 +73,12 @@ type AccountDoesNotExistError {
 
 type AccountResources {
   projects: ResourceStatus!
+}
+
+input AccountResourceUsageFilter {
+  projectIds: [ID!]
+  startDate: DateTime
+  endDate: DateTime
 }
 
 type AlreadyMemberError {
@@ -147,6 +160,8 @@ type DatabaseUsage {
   dbReads: Distribution!
   dbWrites: Distribution!
   dbSize: Distribution!
+  buildDuration: Distribution!
+  execUnits: Distribution!
   granularity: DatabaseUsageGranularity!
 }
 
@@ -394,6 +409,10 @@ type GitRepository {
   branches: [String!]!
 }
 
+type HasAlreadyPaymentMethodError {
+  query: Query!
+}
+
 type InvalidAccountError {
   query: Query!
 }
@@ -590,6 +609,7 @@ type Mutation {
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
   organizationSlugUpdate(input: OrganizationSlugUpdateInput!): OrganizationSlugUpdatePayload!
   personalAccountSlugUpdate(input: PersonalAccountSlugUpdateInput!): PersonalAccountSlugUpdatePayload!
+  organizationSetupPaymentMethod(accountId: ID!, stripePaymentMethodId: String!): OrganizationSetupPaymentMethod!
   organizationUpdate(input: OrganizationUpdateInput!): OrganizationUpdatePayload!
   personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
@@ -682,6 +702,10 @@ type NotAllowedToUpdateOrganizationError {
   query: Query!
 }
 
+type OnlyOwnerCanUpgradeToProError {
+  query: Query!
+}
+
 type OrbCustomer {
   id: String!
 }
@@ -692,10 +716,11 @@ type Organization implements Account {
   name: String!
   createdAt: DateTime!
   stripeCustomer: StripeCustomer
-  orbCustomer: OrbCustomer
+  orbCustomer: OrbCustomer!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
+  usage(filter: AccountResourceUsageFilter): DatabaseUsage!
   resources: AccountResources!
 }
 
@@ -753,6 +778,8 @@ type OrganizationOwnershipNotTransferredError {
   query: Query!
 }
 
+union OrganizationSetupPaymentMethod = OrganizationUpgradeToProSuccess | HasAlreadyPaymentMethodError | OrganizationDoesNotExistError | OnlyOwnerCanUpgradeToProError
+
 input OrganizationSlugUpdateInput {
   id: ID!
   slug: String!
@@ -777,6 +804,11 @@ type OrganizationUpdateSuccess {
   query: Query!
 }
 
+type OrganizationUpgradeToProSuccess {
+  organization: Organization!
+  query: Query!
+}
+
 """Information about pagination in a connection"""
 type PageInfo {
   """When paginating backwards, are there more items?"""
@@ -797,9 +829,8 @@ type PersonalAccount implements Account {
   slug: String!
   name: String!
   createdAt: DateTime!
-  stripeCustomer: StripeCustomer
-  orbCustomer: OrbCustomer
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
+  usage(filter: AccountResourceUsageFilter): DatabaseUsage!
   resources: AccountResources!
 }
 
@@ -1037,6 +1068,7 @@ type Query {
     """slug of the account"""
     slug: String!
   ): Account
+  accountCreationValidate(input: AccountCreationValidateInput!): AccountCreationValidatePayload!
   metricsByBranch(accountSlug: String!, projectSlug: String!, branch: String!, startDate: DateTime!, endDate: DateTime!): BranchMetricsPayload!
 
   """Get branch by account slug, project slug and the name of the branch."""

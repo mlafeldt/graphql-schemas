@@ -549,25 +549,28 @@
             "deprecationReason": null
           },
           {
-            "name": "stripeCustomer",
+            "name": "usage",
             "description": null,
-            "args": [],
+            "args": [
+              {
+                "name": "filter",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "AccountResourceUsageFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
             "type": {
-              "kind": "OBJECT",
-              "name": "StripeCustomer",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "orbCustomer",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "OrbCustomer",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DatabaseUsage",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -588,6 +591,58 @@
             "ofType": null
           }
         ]
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AccountCreationValidateInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "slug",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AccountCreationValidatePayload",
+        "description": null,
+        "fields": [
+          {
+            "name": "slugAvailable",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
       },
       {
         "kind": "OBJECT",
@@ -613,6 +668,55 @@
         ],
         "inputFields": null,
         "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AccountResourceUsageFilter",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "projectIds",
+            "description": null,
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "startDate",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "endDate",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },
@@ -1347,6 +1451,38 @@
           },
           {
             "name": "dbSize",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Distribution",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "buildDuration",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Distribution",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "execUnits",
             "description": null,
             "args": [],
             "type": {
@@ -3475,6 +3611,33 @@
         "possibleTypes": null
       },
       {
+        "kind": "OBJECT",
+        "name": "HasAlreadyPaymentMethodError",
+        "description": null,
+        "fields": [
+          {
+            "name": "query",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Query",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "SCALAR",
         "name": "ID",
         "description": null,
@@ -5076,6 +5239,51 @@
             "deprecationReason": null
           },
           {
+            "name": "organizationSetupPaymentMethod",
+            "description": null,
+            "args": [
+              {
+                "name": "accountId",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "stripePaymentMethodId",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "UNION",
+                "name": "OrganizationSetupPaymentMethod",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "organizationUpdate",
             "description": null,
             "args": [
@@ -6072,6 +6280,33 @@
       },
       {
         "kind": "OBJECT",
+        "name": "OnlyOwnerCanUpgradeToProError",
+        "description": null,
+        "fields": [
+          {
+            "name": "query",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Query",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "OrbCustomer",
         "description": null,
         "fields": [
@@ -6183,9 +6418,13 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "OBJECT",
-              "name": "OrbCustomer",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrbCustomer",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -6355,6 +6594,33 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "MemberConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "usage",
+            "description": null,
+            "args": [
+              {
+                "name": "filter",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "AccountResourceUsageFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DatabaseUsage",
                 "ofType": null
               }
             },
@@ -6819,6 +7085,37 @@
         "possibleTypes": null
       },
       {
+        "kind": "UNION",
+        "name": "OrganizationSetupPaymentMethod",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "OrganizationUpgradeToProSuccess",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "HasAlreadyPaymentMethodError",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "OrganizationDoesNotExistError",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "OnlyOwnerCanUpgradeToProError",
+            "ofType": null
+          }
+        ]
+      },
+      {
         "kind": "INPUT_OBJECT",
         "name": "OrganizationSlugUpdateInput",
         "description": null,
@@ -7061,6 +7358,49 @@
       },
       {
         "kind": "OBJECT",
+        "name": "OrganizationUpgradeToProSuccess",
+        "description": null,
+        "fields": [
+          {
+            "name": "organization",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Organization",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "query",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Query",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "PageInfo",
         "description": "Information about pagination in a connection",
         "fields": [
@@ -7196,30 +7536,6 @@
             "deprecationReason": null
           },
           {
-            "name": "stripeCustomer",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "StripeCustomer",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "orbCustomer",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "OrbCustomer",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "projects",
             "description": null,
             "args": [
@@ -7270,6 +7586,33 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "ProjectConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "usage",
+            "description": null,
+            "args": [
+              {
+                "name": "filter",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "AccountResourceUsageFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DatabaseUsage",
                 "ofType": null
               }
             },
@@ -9853,6 +10196,37 @@
               "kind": "INTERFACE",
               "name": "Account",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "accountCreationValidate",
+            "description": null,
+            "args": [
+              {
+                "name": "input",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AccountCreationValidateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AccountCreationValidatePayload",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
