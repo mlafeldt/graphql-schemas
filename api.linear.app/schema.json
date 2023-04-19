@@ -22356,6 +22356,33 @@
       },
       {
         "kind": "OBJECT",
+        "name": "IssueImportCheckPayload",
+        "description": null,
+        "fields": [
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "GithubRepo",
         "description": "Relevant information for the GitHub repository.",
         "fields": [
@@ -41701,6 +41728,51 @@
             "deprecationReason": null
           },
           {
+            "name": "issueImportCheckCSV",
+            "description": "Checks a CSV file validity against a specific import service.",
+            "args": [
+              {
+                "name": "csvUrl",
+                "description": "CSV storage url",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "service",
+                "description": "The service the CSV containing data from",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueImportCheckPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "issueLabels",
             "description": "All issue labels.",
             "args": [
@@ -45731,6 +45803,75 @@
             "deprecationReason": null
           },
           {
+            "name": "importFileUpload",
+            "description": "XHR request payload to upload a file for import, directly to Linear's cloud storage.",
+            "args": [
+              {
+                "name": "metaData",
+                "description": "Optional metadata.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "JSON",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "size",
+                "description": "File size of the uploaded file.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "contentType",
+                "description": "MIME type of the uploaded file.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "filename",
+                "description": "Filename of the uploaded file.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "UploadPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "imageUploadFromUrl",
             "description": "Upload an image from an URL to Linear.",
             "args": [
@@ -47226,6 +47367,97 @@
               {
                 "name": "organizationId",
                 "description": "ID of the organization into which to import data.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueImportPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueImportCreateCSVJira",
+            "description": "Kicks off a Jira import job from a CSV.",
+            "args": [
+              {
+                "name": "organizationId",
+                "description": "ID of the organization into which to import data.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "teamId",
+                "description": "ID of the team into which to import data. Empty to create new team.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "teamName",
+                "description": "Name of new team. When teamId is not set.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "csvUrl",
+                "description": "URL for the CSV.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "jiraHostname",
+                "description": "Jira installation or cloud hostname.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "jiraToken",
+                "description": "Jira personal access token to access Jira REST API.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "jiraEmail",
+                "description": "Jira user account email.",
                 "type": {
                   "kind": "SCALAR",
                   "name": "String",

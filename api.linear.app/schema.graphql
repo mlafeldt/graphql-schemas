@@ -3478,6 +3478,11 @@ type IssueImport implements Node {
   csvFileUrl: String
 }
 
+type IssueImportCheckPayload {
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
 type IssueImportDeletePayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -4424,6 +4429,23 @@ type Mutation {
     filename: String!
   ): UploadPayload!
 
+  """
+  XHR request payload to upload a file for import, directly to Linear's cloud storage.
+  """
+  importFileUpload(
+    """Optional metadata."""
+    metaData: JSON
+
+    """File size of the uploaded file."""
+    size: Int!
+
+    """MIME type of the uploaded file."""
+    contentType: String!
+
+    """Filename of the uploaded file."""
+    filename: String!
+  ): UploadPayload!
+
   """Upload an image from an URL to Linear."""
   imageUploadFromUrl(
     """URL of the file to be uploaded to Linear."""
@@ -4758,6 +4780,30 @@ type Mutation {
 
     """ID of the organization into which to import data."""
     organizationId: String
+  ): IssueImportPayload!
+
+  """Kicks off a Jira import job from a CSV."""
+  issueImportCreateCSVJira(
+    """ID of the organization into which to import data."""
+    organizationId: String
+
+    """ID of the team into which to import data. Empty to create new team."""
+    teamId: String
+
+    """Name of new team. When teamId is not set."""
+    teamName: String
+
+    """URL for the CSV."""
+    csvUrl: String!
+
+    """Jira installation or cloud hostname."""
+    jiraHostname: String
+
+    """Jira personal access token to access Jira REST API."""
+    jiraToken: String
+
+    """Jira user account email."""
+    jiraEmail: String
   ): IssueImportPayload!
 
   """Kicks off a Shortcut (formerly Clubhouse) import job."""
@@ -8660,6 +8706,15 @@ type Query {
     """OAuth code."""
     code: String!
   ): GithubOAuthTokenPayload!
+
+  """Checks a CSV file validity against a specific import service."""
+  issueImportCheckCSV(
+    """CSV storage url"""
+    csvUrl: String!
+
+    """The service the CSV containing data from"""
+    service: String!
+  ): IssueImportCheckPayload!
 
   """All issue labels."""
   issueLabels(
