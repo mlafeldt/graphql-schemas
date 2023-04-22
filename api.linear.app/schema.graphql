@@ -888,13 +888,13 @@ type CustomViewPayload {
 
 type CustomViewSuggestionPayload {
   """The suggested view name."""
-  suggestedName: String
+  name: String
 
   """The suggested view description."""
-  suggestedDescription: String
+  description: String
 
   """The suggested view icon."""
-  suggestedIcon: String
+  icon: String
 }
 
 input CustomViewUpdateInput {
@@ -3780,8 +3780,11 @@ type IssueNotification implements Notification & Entity & Node {
   """Notification type"""
   type: String!
 
-  """The user that caused the notification. If empty it's Linear itself."""
+  """The user that caused the notification."""
   actor: User
+
+  """The external user that caused the notification."""
+  externalUserActor: ExternalUser
 
   """The user that received the notification."""
   user: User!
@@ -4820,9 +4823,9 @@ type Mutation {
     instantProcess: Boolean
 
     """
-    Shortcut (formerly Clubhouse) team name to choose which issues we should import.
+    Shortcut (formerly Clubhouse) group name to choose which issues we should import.
     """
-    clubhouseTeamName: String!
+    clubhouseGroupName: String!
 
     """
     Shortcut (formerly Clubhouse) token to fetch information from the Clubhouse API.
@@ -5621,8 +5624,11 @@ interface Notification {
   """Notification type"""
   type: String!
 
-  """The user that caused the notification. If empty it's Linear itself."""
+  """The user that caused the notification."""
   actor: User
+
+  """The external user that caused the notification."""
+  externalUserActor: ExternalUser
 
   """The user that received the notification."""
   user: User!
@@ -6441,8 +6447,11 @@ type OauthClientApprovalNotification implements Notification & Entity & Node {
   """Notification type"""
   type: String!
 
-  """The user that caused the notification. If empty it's Linear itself."""
+  """The user that caused the notification."""
   actor: User
+
+  """The external user that caused the notification."""
+  externalUserActor: ExternalUser
 
   """The user that received the notification."""
   user: User!
@@ -7776,8 +7785,11 @@ type ProjectNotification implements Notification & Entity & Node {
   """Notification type"""
   type: String!
 
-  """The user that caused the notification. If empty it's Linear itself."""
+  """The user that caused the notification."""
   actor: User
+
+  """The external user that caused the notification."""
+  externalUserActor: ExternalUser
 
   """The user that received the notification."""
   user: User!
@@ -8439,7 +8451,7 @@ type Query {
   customView(id: String!): CustomView!
 
   """[INTERNAL] Suggests metadata for a view based on it's filters."""
-  customViewSuggestion(filter: JSONObject!): CustomViewSuggestionPayload!
+  customViewDetailsSuggestion(filter: JSONObject!): CustomViewSuggestionPayload!
 
   """All cycles."""
   cycles(
