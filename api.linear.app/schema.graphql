@@ -3476,6 +3476,9 @@ type IssueImport implements Node {
 
   """File URL for the uploaded CSV for the import, if there is one."""
   csvFileUrl: String
+
+  """Error code and metadata, if one has occurred during the import"""
+  errorMetadata: JSONObject
 }
 
 type IssueImportCheckPayload {
@@ -7071,34 +7074,6 @@ type PaidSubscription implements Node {
 
   """The date the subscription will be billed next."""
   nextBillingAt: DateTime
-}
-
-"""A personal note for a user"""
-type PersonalNote implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
-      for which updates should not produce an update to updatedAt (see
-  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The user that owns the note."""
-  user: User!
-
-  """The note content as JSON."""
-  contentData: JSONObject
 }
 
 """A project."""
@@ -11942,6 +11917,7 @@ enum ViewType {
   search
   teams
   archive
+  quickView
 }
 
 """A webhook used to send HTTP notifications over data updates"""
