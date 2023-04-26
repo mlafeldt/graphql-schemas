@@ -3244,6 +3244,11 @@ input IssueFilter {
   or: [IssueFilter!]
 }
 
+type IssueFilterSuggestionPayload {
+  """The json filter that is suggested."""
+  filter: JSONObject
+}
+
 """A record of changes to an issue."""
 type IssueHistory implements Node {
   """The unique identifier of the entity."""
@@ -7552,6 +7557,11 @@ input ProjectFilter {
   or: [ProjectFilter!]
 }
 
+type ProjectFilterSuggestionPayload {
+  """The json filter that is suggested."""
+  filter: JSONObject
+}
+
 """An external link for a project."""
 type ProjectLink implements Node {
   """The unique identifier of the entity."""
@@ -8843,6 +8853,9 @@ type Query {
   """Issue priority values and corresponding labels."""
   issuePriorityValues: [IssuePriorityValue!]!
 
+  """Suggests filters for an issue view based on a text prompt."""
+  issueFilterSuggestion(prompt: String!): IssueFilterSuggestionPayload!
+
   """All notifications."""
   notifications(
     """A cursor to be used with last for backward pagination."""
@@ -9040,6 +9053,9 @@ type Query {
 
   """One specific project."""
   project(id: String!): Project!
+
+  """Suggests filters for a project view based on a text prompt."""
+  projectFilterSuggestion(prompt: String!): ProjectFilterSuggestionPayload!
 
   """All interactions on project updates."""
   projectUpdateInteractions(
