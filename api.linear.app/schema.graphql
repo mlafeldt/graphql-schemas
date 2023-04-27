@@ -815,6 +815,9 @@ type CustomView implements Node {
   """The user who created the custom view."""
   creator: User!
 
+  """The user who owns the custom view."""
+  owner: User!
+
   """The filters applied to issues in the custom view."""
   filters: JSONObject! @deprecated(reason: "Will be replaced by `filterData` in a future update")
 
@@ -854,6 +857,9 @@ input CustomViewCreateInput {
 
   """The id of the team associated with the custom view."""
   teamId: String
+
+  """The owner of the custom view"""
+  ownerId: String
 
   """The filters applied to issues in the custom view."""
   filters: JSONObject
@@ -912,6 +918,9 @@ input CustomViewUpdateInput {
 
   """The id of the team associated with the custom view."""
   teamId: String
+
+  """The owner of the custom view"""
+  ownerId: String
 
   """The filters applied to issues in the custom view."""
   filters: JSONObject
@@ -8849,6 +8858,36 @@ type Query {
     """The VCS branch name to search for."""
     branchName: String!
   ): Issue
+
+  """Find issues that are related to a given Figma file key."""
+  issueFigmaFileKeySearch(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+
+    """The Figma file key."""
+    fileKey: String!
+  ): IssueConnection!
 
   """Issue priority values and corresponding labels."""
   issuePriorityValues: [IssuePriorityValue!]!
