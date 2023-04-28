@@ -1302,6 +1302,37 @@ type DocumentConnection {
   pageInfo: PageInfo!
 }
 
+"""A document content for a project."""
+type DocumentContent implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The document content in markdown format."""
+  content: String
+
+  """The document content as JSON."""
+  contentData: JSONObject
+
+  """The issue that the document is associated with."""
+  issue: Issue
+}
+
 input DocumentCreateInput {
   """
   The identifier in UUID v4 format. If none is provided, the backend will generate one.
@@ -2562,6 +2593,9 @@ type Issue implements Node {
 
   """Label for the priority."""
   priorityLabel: String!
+
+  """The users favorite associated with this issue."""
+  favorite: Favorite
 
   """Issue's human readable identifier (e.g. ENG-123)."""
   identifier: String!
