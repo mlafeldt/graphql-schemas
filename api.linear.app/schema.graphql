@@ -103,6 +103,25 @@ type ArchivePayload {
   success: Boolean!
 }
 
+"""Contains requested archived model objects."""
+type ArchiveResponse {
+  """A JSON serialized collection of model objects loaded from the archive"""
+  archive: String!
+
+  """The total number of entities in the archive."""
+  totalCount: Float!
+
+  """
+  The version of the remote database. Incremented by 1 for each migration run on the database.
+  """
+  databaseVersion: Float!
+
+  """
+  Whether the dependencies for the model objects are included in the archive.
+  """
+  includesDependencies: Boolean!
+}
+
 """Issue attachment (e.g. support ticket, pull request)."""
 type Attachment implements Node {
   """The unique identifier of the entity."""
@@ -1374,6 +1393,84 @@ type DocumentPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+type DocumentSearchPayload {
+  edges: [DocumentSearchResultEdge!]!
+  nodes: [DocumentSearchResult!]!
+  pageInfo: PageInfo!
+
+  """
+  Archived entities matching the search term along with all their dependencies.
+  """
+  archivePayload: ArchiveResponse!
+
+  """Total number of results for query without filters applied."""
+  totalCount: Float!
+}
+
+type DocumentSearchResult implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The document title."""
+  title: String!
+
+  """The document content in markdown format."""
+  content: String
+
+  """The document content as JSON."""
+  contentData: JSONObject
+
+  """The icon of the document."""
+  icon: String
+
+  """The color of the icon."""
+  color: String
+
+  """The user who created the document."""
+  creator: User!
+
+  """The user who last updated the document."""
+  updatedBy: User!
+
+  """The project that the document is associated with."""
+  project: Project!
+
+  """The document's unique URL slug."""
+  slugId: String!
+
+  """Metadata related to search result"""
+  metadata: JSONObject!
+}
+
+type DocumentSearchResultConnection {
+  edges: [DocumentSearchResultEdge!]!
+  nodes: [DocumentSearchResult!]!
+  pageInfo: PageInfo!
+}
+
+type DocumentSearchResultEdge {
+  node: DocumentSearchResult!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
 }
 
 input DocumentUpdateInput {
@@ -3987,6 +4084,415 @@ input IssueRelationUpdateInput {
 
   """The identifier of the related issue."""
   relatedIssueId: String
+}
+
+type IssueSearchPayload {
+  edges: [IssueSearchResultEdge!]!
+  nodes: [IssueSearchResult!]!
+  pageInfo: PageInfo!
+
+  """
+  Archived entities matching the search term along with all their dependencies.
+  """
+  archivePayload: ArchiveResponse!
+
+  """Total number of results for query without filters applied."""
+  totalCount: Float!
+}
+
+type IssueSearchResult implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The issue's unique number."""
+  number: Float!
+
+  """The issue's title."""
+  title: String!
+
+  """
+  The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  """
+  priority: Float!
+
+  """The estimate of the complexity of the issue.."""
+  estimate: Float
+
+  """The order of the item in its column on the board."""
+  boardOrder: Float! @deprecated(reason: "Will be removed in near future, please use `sortOrder` instead")
+
+  """The order of the item in relation to other items in the organization."""
+  sortOrder: Float!
+
+  """The time at which the issue was moved into started state."""
+  startedAt: DateTime
+
+  """The time at which the issue was moved into completed state."""
+  completedAt: DateTime
+
+  """The time at which the issue entered triage."""
+  startedTriageAt: DateTime
+
+  """The time at which the issue left triage."""
+  triagedAt: DateTime
+
+  """The time at which the issue was moved into canceled state."""
+  canceledAt: DateTime
+
+  """
+  The time at which the issue was automatically closed by the auto pruning process.
+  """
+  autoClosedAt: DateTime
+
+  """
+  The time at which the issue was automatically archived by the auto pruning process.
+  """
+  autoArchivedAt: DateTime
+
+  """The date at which the issue is due."""
+  dueDate: TimelessDate
+
+  """[Internal] The time at which the issue's SLA began."""
+  slaStartedAt: DateTime
+
+  """[Internal] The time at which the issue's SLA will breach."""
+  slaBreachesAt: DateTime
+
+  """A flag that indicates whether the issue is in the trash bin."""
+  trashed: Boolean
+
+  """The time until an issue will be snoozed in Triage view."""
+  snoozedUntilAt: DateTime
+
+  """The team that the issue is associated with."""
+  team: Team!
+
+  """The cycle that the issue is associated with."""
+  cycle: Cycle
+
+  """The project that the issue is associated with."""
+  project: Project
+
+  """The projectMilestone that the issue is associated with."""
+  projectMilestone: ProjectMilestone
+
+  """Previous identifiers of the issue if it has been moved between teams."""
+  previousIdentifiers: [String!]!
+
+  """The user who created the issue."""
+  creator: User
+
+  """[ALPHA] The external user who created the issue."""
+  externalUserCreator: ExternalUser
+
+  """The user to whom the issue is assigned to."""
+  assignee: User
+
+  """The user who snoozed the issue."""
+  snoozedBy: User
+
+  """The workflow state that the issue is associated with."""
+  state: WorkflowState!
+
+  """
+  The order of the item in the sub-issue list. Only set if the issue has a parent.
+  """
+  subIssueSortOrder: Float
+
+  """Label for the priority."""
+  priorityLabel: String!
+
+  """The users favorite associated with this issue."""
+  favorite: Favorite
+
+  """Issue's human readable identifier (e.g. ENG-123)."""
+  identifier: String!
+
+  """Issue URL."""
+  url: String!
+
+  """Suggested branch name for the issue."""
+  branchName: String!
+
+  """
+  Returns the number of Attachment resources which are created by customer support ticketing systems (e.g. Zendesk).
+  """
+  customerTicketCount: Int!
+
+  """Users who are subscribed to the issue."""
+  subscribers(
+    """Filter returned subscribers."""
+    filter: UserFilter
+
+    """Should query return disabled/suspended users (default: false)."""
+    includeDisabled: Boolean
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): UserConnection!
+
+  """The parent of the issue."""
+  parent: Issue
+
+  """Children of the issue."""
+  children(
+    """Filter returned issues."""
+    filter: IssueFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueConnection!
+
+  """Comments associated with the issue."""
+  comments(
+    """Filter returned comments."""
+    filter: CommentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CommentConnection!
+
+  """History entries associated with the issue."""
+  history(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueHistoryConnection!
+
+  """Labels associated with this issue."""
+  labels(
+    """Filter returned issue labels."""
+    filter: IssueLabelFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueLabelConnection!
+
+  """Relations associated with this issue."""
+  relations(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueRelationConnection!
+
+  """Inverse relations associated with this issue."""
+  inverseRelations(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueRelationConnection!
+
+  """Attachments associated with the issue."""
+  attachments(
+    """Filter returned attachments."""
+    filter: AttachmentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AttachmentConnection!
+
+  """The issue's description in markdown format."""
+  description: String
+
+  """[Internal] The issue's description as a Prosemirror document."""
+  descriptionData: JSON
+
+  """Metadata related to search result"""
+  metadata: JSONObject!
+}
+
+type IssueSearchResultConnection {
+  edges: [IssueSearchResultEdge!]!
+  nodes: [IssueSearchResult!]!
+  pageInfo: PageInfo!
+}
+
+type IssueSearchResultEdge {
+  node: IssueSearchResult!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
 }
 
 input IssueUpdateInput {
@@ -7926,6 +8432,350 @@ type ProjectPayload {
   success: Boolean!
 }
 
+type ProjectSearchPayload {
+  edges: [ProjectSearchResultEdge!]!
+  nodes: [ProjectSearchResult!]!
+  pageInfo: PageInfo!
+
+  """
+  Archived entities matching the search term along with all their dependencies.
+  """
+  archivePayload: ArchiveResponse!
+
+  """Total number of results for query without filters applied."""
+  totalCount: Float!
+}
+
+type ProjectSearchResult implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The project's name."""
+  name: String!
+
+  """The project's description."""
+  description: String!
+
+  """The project's unique URL slug."""
+  slugId: String!
+
+  """The icon of the project."""
+  icon: String
+
+  """The project's color."""
+  color: String!
+
+  """The type of the state."""
+  state: String!
+
+  """The user who created the project."""
+  creator: User!
+
+  """The project lead."""
+  lead: User
+
+  """The time until which project update reminders are paused."""
+  projectUpdateRemindersPausedUntilAt: DateTime
+
+  """[Internal] The estimated start date of the project."""
+  startDate: TimelessDate
+
+  """The estimated completion date of the project."""
+  targetDate: TimelessDate
+
+  """The time at which the project was moved into started state."""
+  startedAt: DateTime
+
+  """The time at which the project was moved into completed state."""
+  completedAt: DateTime
+
+  """The time at which the project was moved into canceled state."""
+  canceledAt: DateTime
+
+  """
+  The time at which the project was automatically archived by the auto pruning process.
+  """
+  autoArchivedAt: DateTime
+
+  """The sort order for the project within the organization."""
+  sortOrder: Float!
+
+  """The project was created based on this issue."""
+  convertedFromIssue: Issue
+
+  """The total number of issues in the project after each week."""
+  issueCountHistory: [Float!]!
+
+  """The number of completed issues in the project after each week."""
+  completedIssueCountHistory: [Float!]!
+
+  """The total number of estimation points after each week."""
+  scopeHistory: [Float!]!
+
+  """The number of completed estimation points after each week."""
+  completedScopeHistory: [Float!]!
+
+  """The number of in progress estimation points after each week."""
+  inProgressScopeHistory: [Float!]!
+
+  """Whether to send new issue notifications to Slack."""
+  slackNewIssue: Boolean!
+
+  """Whether to send new issue comment notifications to Slack."""
+  slackIssueComments: Boolean!
+
+  """Whether to send new issue status updates to Slack."""
+  slackIssueStatuses: Boolean!
+
+  """Project URL."""
+  url: String!
+
+  """Teams associated with this project."""
+  teams(
+    """Filter returned teams."""
+    filter: TeamFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): TeamConnection!
+
+  """Users that are members of the project."""
+  members(
+    """Filter returned users."""
+    filter: UserFilter
+
+    """Should query return disabled/suspended users (default: false)."""
+    includeDisabled: Boolean
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): UserConnection!
+
+  """Project updates associated with the project."""
+  projectUpdates(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectUpdateConnection!
+
+  """Documents associated with the project."""
+  documents(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): DocumentConnection!
+
+  """Milestones associated with the project."""
+  projectMilestones(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectMilestoneConnection!
+
+  """Issues associated with the project."""
+  issues(
+    """Filter returned issues."""
+    filter: IssueFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueConnection!
+
+  """Links associated with the project."""
+  links(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectLinkConnection!
+
+  """
+  The overall progress of the project. This is the (completed estimate points +
+  0.25 * in progress estimate points) / total estimate points.
+  """
+  progress: Float!
+
+  """The overall scope (total estimate points) of the project."""
+  scope: Float!
+
+  """Settings for all integrations associated with that project."""
+  integrationsSettings: IntegrationsSettings
+
+  """Metadata related to search result"""
+  metadata: JSONObject!
+}
+
+type ProjectSearchResultConnection {
+  edges: [ProjectSearchResultEdge!]!
+  nodes: [ProjectSearchResult!]!
+  pageInfo: PageInfo!
+}
+
+type ProjectSearchResultEdge {
+  node: ProjectSearchResult!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
 """A update associated with an project."""
 type ProjectUpdate implements Node {
   """The unique identifier of the entity."""
@@ -9257,6 +10107,99 @@ type Query {
 
   """One specific roadmapToProject."""
   roadmapToProject(id: String!): RoadmapToProject!
+
+  """Search documents."""
+  searchDocuments(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+
+    """Search string to look for."""
+    term: String!
+  ): DocumentSearchPayload!
+
+  """Search projects."""
+  searchProjects(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+
+    """Search string to look for."""
+    term: String!
+  ): ProjectSearchPayload!
+
+  """Search issues."""
+  searchIssues(
+    """Filter returned issues."""
+    filter: IssueFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+
+    """Search string to look for."""
+    term: String!
+  ): IssueSearchPayload!
 
   """All team memberships."""
   teamMemberships(
