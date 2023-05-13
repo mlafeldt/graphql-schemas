@@ -56,7 +56,8 @@ interface Account {
   createdAt: DateTime!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
   resources: AccountResources!
-  usage(filter: AccountResourceUsageFilter): DatabaseUsage!
+  usage(filter: AccountResourcesUsageDashboardFilter): DatabaseUsage!
+  resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
 }
 
 input AccountCreationValidateInput {
@@ -75,10 +76,48 @@ type AccountResources {
   projects: ResourceStatus!
 }
 
-input AccountResourceUsageFilter {
+type AccountResourcesStatus {
+  requestCount: ResourceStatus!
+  dbReads: ResourceStatus!
+  dbWrites: ResourceStatus!
+  dbSize: ResourceStatus!
+  buildDuration: ResourceStatus!
+  execUnits: ResourceStatus!
+}
+
+type AccountResourcesUsage {
+  requestCount: TimeSeries!
+  dbReads: TimeSeries!
+  dbWrites: TimeSeries!
+  dbSize: TimeSeries!
+  buildDuration: TimeSeries!
+  execUnits: TimeSeries!
+  granularity: TimeAggregationGranularity!
+}
+
+"""
+'limit_cycle_choice' is exclusive with all other options. It's the only case
+where we'll show account limit status (used/limit)
+"""
+input AccountResourcesUsageDashboardFilter {
   projectIds: [ID!]
+  limitCycleChoice: LimitCycleChoice
   startDate: DateTime
   endDate: DateTime
+}
+
+type AccountResourcesUsageDashboardInvalidFilterCombinationError {
+  message: String!
+  query: Query!
+}
+
+union AccountResourcesUsageDashboardPayload = AccountResourcesUsageDashboardSuccess | AccountResourcesUsageDashboardInvalidFilterCombinationError
+
+type AccountResourcesUsageDashboardSuccess {
+  periodStart: DateTime!
+  periodEnd: DateTime!
+  usage: AccountResourcesUsage!
+  status: AccountResourcesStatus
 }
 
 type AlreadyMemberError {
@@ -533,6 +572,16 @@ type KeyLimitExceededError {
   query: Query!
 }
 
+"""
+Users can select the previous/current "limit cycle" which defines the cycle on which limits
+applies. For hobby it's monthly starting the first of each month and for pro it matches the
+billing cycle.
+"""
+enum LimitCycleChoice {
+  CURRENT
+  PREVIOUS
+}
+
 type Member {
   id: ID!
   role: MemberRole!
@@ -706,8 +755,195 @@ type OnlyOwnerCanUpgradeToProError {
   query: Query!
 }
 
+type OrbBillingAddress {
+  city: String
+  country: String
+  line1: String
+  line2: String
+  postalCode: String
+  state: String
+}
+
+input OrbBillingAddressInput {
+  city: String
+  country: String
+  line1: String
+  line2: String
+  postalCode: String
+  state: String
+}
+
 type OrbCustomer {
   id: String!
+  name: String!
+  email: String!
+  taxId: OrbTaxId
+  billingAddress: OrbBillingAddress
+  subscriptions(cursor: String): OrbPaginatedSubscriptions!
+}
+
+input OrbCustomerUpdateInput {
+  name: String
+  email: String
+  billingAddress: OrbBillingAddressInput
+  taxId: OrbTaxIdInput
+}
+
+type OrbInvoice {
+  id: String!
+  invoiceDate: DateTime!
+  status: OrbInvoiceStatus!
+  total: String!
+  currency: String!
+  lineItems: [OrbInvoiceLineItem!]!
+  invoicePdf: Url!
+  invoiceNumber: String!
+}
+
+type OrbInvoiceLineItem {
+  id: String!
+  name: String!
+  quantity: Float!
+  amount: String!
+  price: OrbPrice!
+  startDate: DateTime!
+  endDate: DateTime!
+}
+
+enum OrbInvoiceStatus {
+  ISSUED
+  PAID
+  SYNCED
+  VOID
+  DRAFT
+}
+
+type OrbPaginatedInvoices {
+  data: [OrbInvoice!]!
+  paginationMetadata: OrbPaginationMetadata!
+}
+
+type OrbPaginatedSubscriptions {
+  data: [OrbSubscription!]!
+  paginationMetadata: OrbPaginationMetadata!
+}
+
+type OrbPaginationMetadata {
+  nextCursor: String
+}
+
+type OrbPlan {
+  externalPlanId: String!
+}
+
+type OrbPrice {
+  currency: String!
+  config: OrbPriceConfig!
+}
+
+union OrbPriceConfig = OrbPriceUnitConfig | OrbPricePackageConfig
+
+type OrbPricePackageConfig {
+  packageAmount: String!
+  packageSize: Float!
+}
+
+type OrbPriceUnitConfig {
+  unitAmount: String!
+}
+
+type OrbSubscription {
+  id: String!
+  status: OrbSubscriptionStatus!
+  plan: OrbPlan!
+  currentBillingPeriodStartDate: DateTime
+  currentBillingPeriodEndDate: DateTime
+  invoices(cursor: String): OrbPaginatedInvoices!
+  upcomingInvoice: OrbUpcomingInvoice!
+}
+
+enum OrbSubscriptionStatus {
+  ACTIVE
+  ENDED
+  UPCOMING
+}
+
+type OrbTaxId {
+  type: OrbTaxIdType!
+  value: String!
+  country: String!
+}
+
+input OrbTaxIdInput {
+  type: OrbTaxIdType!
+  value: String!
+  country: String!
+}
+
+enum OrbTaxIdType {
+  AE_TRN
+  AU_ABN
+  AU_ARN
+  BG_UIC
+  BR_CNPJ
+  BR_CPF
+  CA_BN
+  CA_GST_HST
+  CA_PST_BC
+  CA_PST_MB
+  CA_PST_SK
+  CA_QST
+  CH_VAT
+  CL_TIN
+  EG_TIN
+  ES_CIF
+  EU_OSS_VAT
+  EU_VAT
+  GB_VAT
+  GE_VAT
+  HK_BR
+  HU_TIN
+  ID_NPWP
+  IL_VAT
+  IN_GST
+  IS_VAT
+  JP_CN
+  JP_RN
+  JP_TRN
+  KE_PIN
+  KR_BRN
+  LI_UID
+  MX_RFC
+  MY_FRP
+  MY_ITN
+  MY_SST
+  NO_VAT
+  NZ_GST
+  PH_TIN
+  RU_INN
+  RU_KPP
+  SA_VAT
+  SG_GST
+  SG_UEN
+  SI_TIN
+  TH_VAT
+  TR_TIN
+  TW_VAT
+  UA_VAT
+  US_EIN
+  ZA_VAT
+}
+
+type OrbUpcomingInvoice {
+  targetDate: DateTime!
+  subtotal: String!
+  currency: String!
+  lineItems: [OrbInvoiceLineItem!]!
+}
+
+type OrbValidationError {
+  errors: [String!]!
+  query: Query!
 }
 
 type Organization implements Account {
@@ -716,12 +952,14 @@ type Organization implements Account {
   name: String!
   createdAt: DateTime!
   stripeCustomer: StripeCustomer
-  orbCustomer: OrbCustomer!
+  orbCustomer: OrbCustomer
+  orbActiveSubscription: OrbSubscription
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
-  usage(filter: AccountResourceUsageFilter): DatabaseUsage!
-  resources: AccountResources!
+  usage(filter: AccountResourcesUsageDashboardFilter): DatabaseUsage! @deprecated(reason: "Use resources_usage_dashboard")
+  resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
+  resources: AccountResources! @deprecated(reason: "Not relevant for organizations")
 }
 
 type OrganizationConnection {
@@ -794,10 +1032,11 @@ type OrganizationSlugUpdateSuccess {
 
 input OrganizationUpdateInput {
   id: ID!
-  name: String!
+  name: String
+  orbCustomer: OrbCustomerUpdateInput
 }
 
-union OrganizationUpdatePayload = OrganizationUpdateSuccess | OrganizationDoesNotExistError | NameSizeCheckError | NotAllowedToUpdateOrganizationError
+union OrganizationUpdatePayload = OrganizationUpdateSuccess | OrganizationDoesNotExistError | NameSizeCheckError | NotAllowedToUpdateOrganizationError | OrbValidationError
 
 type OrganizationUpdateSuccess {
   organization: Organization!
@@ -830,8 +1069,10 @@ type PersonalAccount implements Account {
   name: String!
   createdAt: DateTime!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
-  usage(filter: AccountResourceUsageFilter): DatabaseUsage!
-  resources: AccountResources!
+  projectsCountStatus: ResourceStatus!
+  usage(filter: AccountResourcesUsageDashboardFilter): DatabaseUsage! @deprecated(reason: "Use resources_usage_dashboard")
+  resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
+  resources: AccountResources! @deprecated(reason: "use projects_count_status")
 }
 
 union PersonalAccountDeletePayload = PersonalAccountDeleteSuccess | OrganizationOwnershipNotTransferredError
@@ -1146,7 +1387,7 @@ type ReservedSlugsCheckError {
 
 type ResourceStatus {
   unit: UnitType!
-  current: Int!
+  used: Int!
   limit: Int
   remaining: Int
   percentage: Float
@@ -1178,8 +1419,61 @@ type SlugTooLongError {
   query: Query!
 }
 
+type StripeCard {
+  brand: String!
+  funding: String!
+  expMonth: Int!
+  expYear: Int!
+  last4: String!
+}
+
 type StripeCustomer {
   id: String!
+  paymentMethods(type: StripePaymentMethodType, endingBefore: String, startingAfter: String, limit: Int): StripePaginatedPaymentMethods!
+}
+
+type StripePaginatedPaymentMethods {
+  data: [StripePaymentMethod!]!
+  hasMore: Boolean!
+}
+
+type StripePaymentMethod {
+  id: String!
+  created: DateTime!
+  card: StripeCard
+  type: StripePaymentMethodType!
+}
+
+enum StripePaymentMethodType {
+  ACSS_DEBIT
+  AFFIRM
+  AFTERPAY_CLEARPAY
+  ALIPAY
+  AU_BECS_DEBIT
+  BACS_DEBIT
+  BANCONTACT
+  BLIK
+  BOLETO
+  CARD
+  CASHAPP
+  CUSTOMER_BALANCE
+  EPS
+  FPX
+  GIROPAY
+  GRABPAY
+  IDEAL
+  KLARNA
+  KONBINI
+  LINK
+  OXXO
+  P24
+  PAYNOW
+  PIX
+  PROMPTPAY
+  SEPA_DEBIT
+  SOFORT
+  US_BANK_ACCOUNT
+  WECHAT_PAY
 }
 
 type StripeSetupIntent {
@@ -1196,6 +1490,28 @@ type StripeSetupIntentCreateSuccess {
 
 type TemplateDoesNotExistError {
   query: Query!
+}
+
+enum TimeAggregationGranularity {
+  HOURLY
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+type TimeSeries {
+  unit: UnitType!
+  data: [TimeSeriesDataPoint!]!
+  statistics: TimeSeriesStatistics!
+}
+
+type TimeSeriesDataPoint {
+  datetime: DateTime!
+  value: Int!
+}
+
+type TimeSeriesStatistics {
+  sum: Int!
 }
 
 type TokenDoesNotExistError {
