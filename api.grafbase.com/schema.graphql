@@ -833,15 +833,26 @@ type OrbPaginationMetadata {
 }
 
 type OrbPlan {
-  externalPlanId: String!
+  externalPlanId: String
 }
 
 type OrbPrice {
   currency: String!
-  config: OrbPriceConfig!
+  modelType: OrbPriceModelType!
+  unitConfig: OrbPriceUnitConfig
+  packageConfig: OrbPricePackageConfig
 }
 
-union OrbPriceConfig = OrbPriceUnitConfig | OrbPricePackageConfig
+enum OrbPriceModelType {
+  UNIT
+  TIERED
+  BULK
+  PACKAGE
+  BPS
+  TIERED_BPS
+  BULK_BPS
+  MATRIX
+}
 
 type OrbPricePackageConfig {
   packageAmount: String!
@@ -938,7 +949,16 @@ type OrbUpcomingInvoice {
   targetDate: DateTime!
   subtotal: String!
   currency: String!
-  lineItems: [OrbInvoiceLineItem!]!
+  lineItems: [OrbUpcomingInvoiceLineItem!]!
+}
+
+type OrbUpcomingInvoiceLineItem {
+  name: String!
+  quantity: Float!
+  amount: String!
+  startDate: DateTime!
+  endDate: DateTime!
+  price: OrbPrice!
 }
 
 type OrbValidationError {
