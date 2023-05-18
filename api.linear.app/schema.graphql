@@ -6014,6 +6014,12 @@ type Mutation {
     code: String!
   ): UserPayload!
 
+  """Connects the Jira user to this Linear account via OAuth2."""
+  userJiraConnect(
+    """The Jira OAuth code."""
+    code: String!
+  ): UserPayload!
+
   """Disconnects the external user from this Linear account."""
   userExternalUserDisconnect(
     """The external service to disconnect"""
@@ -6653,6 +6659,15 @@ input NullableProjectFilter {
   """Filters that the projects roadmaps must satisfy."""
   roadmaps: RoadmapCollectionFilter
 
+  """Filters that the project's milestones must satisfy."""
+  projectMilestones: ProjectMilestoneCollectionFilter
+
+  """Filters that the project's completed milestones must satisfy."""
+  completedProjectMilestones: ProjectMilestoneCollectionFilter
+
+  """Filters that the project's next milestone must satisfy."""
+  nextProjectMilestone: ProjectMilestoneFilter
+
   """Filter based on the existence of the relation."""
   null: Boolean
 
@@ -6673,6 +6688,12 @@ input NullableProjectMilestoneFilter {
 
   """Comparator for the updated at date."""
   updatedAt: DateComparator
+
+  """Comparator for the project milestone name."""
+  name: StringComparator
+
+  """Comparator for the project milestone target date."""
+  targetDate: NullableDateComparator
 
   """Filter based on the existence of the relation."""
   null: Boolean
@@ -8003,6 +8024,15 @@ input ProjectCollectionFilter {
   """Filters that the projects roadmaps must satisfy."""
   roadmaps: RoadmapCollectionFilter
 
+  """Filters that the project's milestones must satisfy."""
+  projectMilestones: ProjectMilestoneCollectionFilter
+
+  """Filters that the project's completed milestones must satisfy."""
+  completedProjectMilestones: ProjectMilestoneCollectionFilter
+
+  """Filters that the project's next milestone must satisfy."""
+  nextProjectMilestone: ProjectMilestoneFilter
+
   """Compound filters, all of which need to be matched by the project."""
   and: [ProjectCollectionFilter!]
 
@@ -8121,6 +8151,15 @@ input ProjectFilter {
 
   """Filters that the projects roadmaps must satisfy."""
   roadmaps: RoadmapCollectionFilter
+
+  """Filters that the project's milestones must satisfy."""
+  projectMilestones: ProjectMilestoneCollectionFilter
+
+  """Filters that the project's completed milestones must satisfy."""
+  completedProjectMilestones: ProjectMilestoneCollectionFilter
+
+  """Filters that the project's next milestone must satisfy."""
+  nextProjectMilestone: ProjectMilestoneFilter
 
   """Compound filters, all of which need to be matched by the project."""
   and: [ProjectFilter!]
@@ -8255,6 +8294,39 @@ type ProjectMilestone implements Node {
   sortOrder: Float!
 }
 
+"""Milestone collection filtering options."""
+input ProjectMilestoneCollectionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the project milestone name."""
+  name: StringComparator
+
+  """Comparator for the project milestone target date."""
+  targetDate: NullableDateComparator
+
+  """Compound filters, all of which need to be matched by the milestone."""
+  and: [ProjectMilestoneCollectionFilter!]
+
+  """Compound filters, one of which need to be matched by the milestone."""
+  or: [ProjectMilestoneCollectionFilter!]
+
+  """Filters that needs to be matched by some milestones."""
+  some: ProjectMilestoneFilter
+
+  """Filters that needs to be matched by all milestones."""
+  every: ProjectMilestoneFilter
+
+  """Comparator for the collection length."""
+  length: NumberComparator
+}
+
 type ProjectMilestoneConnection {
   edges: [ProjectMilestoneEdge!]!
   nodes: [ProjectMilestone!]!
@@ -8288,6 +8360,34 @@ type ProjectMilestoneEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Project milestone filtering options."""
+input ProjectMilestoneFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the project milestone name."""
+  name: StringComparator
+
+  """Comparator for the project milestone target date."""
+  targetDate: NullableDateComparator
+
+  """
+  Compound filters, all of which need to be matched by the project milestone.
+  """
+  and: [ProjectMilestoneFilter!]
+
+  """
+  Compound filters, one of which need to be matched by the project milestone.
+  """
+  or: [ProjectMilestoneFilter!]
 }
 
 type ProjectMilestonePayload {
@@ -9939,6 +10039,9 @@ type Query {
 
   """All milestones for the project."""
   ProjectMilestones(
+    """Filter returned project milestones."""
+    filter: ProjectMilestoneFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
