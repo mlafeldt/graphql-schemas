@@ -54,7 +54,9 @@ interface Account {
   slug: String!
   name: String!
   createdAt: DateTime!
+  status: AccountStatus!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
+  projectsCountStatus: ResourceStatus!
   resources: AccountResources!
   usage(filter: AccountResourcesUsageDashboardFilter): DatabaseUsage!
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
@@ -118,6 +120,12 @@ type AccountResourcesUsageDashboardSuccess {
   periodEnd: DateTime!
   usage: AccountResourcesUsage!
   status: AccountResourcesStatus
+}
+
+enum AccountStatus {
+  ACTIVE
+  DISABLED_BECAUSE_EXCEEDED_LIMITS
+  DISABLED_BECAUSE_IN_ARREARS
 }
 
 type AlreadyMemberError {
@@ -294,6 +302,10 @@ enum DeploymentStatus {
   IN_PROGRESS
   SUCCEEDED
   FAILED
+}
+
+type DisabledAccountError {
+  query: Query!
 }
 
 type Distribution {
@@ -971,12 +983,14 @@ type Organization implements Account {
   slug: String!
   name: String!
   createdAt: DateTime!
+  status: AccountStatus!
   stripeCustomer: StripeCustomer
   orbCustomer: OrbCustomer
   orbActiveSubscription: OrbSubscription
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
+  projectsCountStatus: ResourceStatus!
   usage(filter: AccountResourcesUsageDashboardFilter): DatabaseUsage! @deprecated(reason: "Use resources_usage_dashboard")
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
   resources: AccountResources! @deprecated(reason: "Not relevant for organizations")
@@ -1088,6 +1102,7 @@ type PersonalAccount implements Account {
   slug: String!
   name: String!
   createdAt: DateTime!
+  status: AccountStatus!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
   projectsCountStatus: ResourceStatus!
   usage(filter: AccountResourcesUsageDashboardFilter): DatabaseUsage! @deprecated(reason: "Use resources_usage_dashboard")
@@ -1223,7 +1238,7 @@ input ProjectCreateFromRepositoryInput {
   environmentVariables: [EnvironmentVariableSpecification!]! = []
 }
 
-union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | RepositoryContainsNoBranchesError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError
+union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | RepositoryContainsNoBranchesError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError
 
 type ProjectCreateFromRepositorySuccess {
   project: Project!
@@ -1238,7 +1253,7 @@ input ProjectCreateFromSchemaInput {
   environmentVariables: [EnvironmentVariableSpecification!]! = []
 }
 
-union ProjectCreateFromSchemaPayload = ProjectCreateFromSchemaSuccess | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError
+union ProjectCreateFromSchemaPayload = ProjectCreateFromSchemaSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError
 
 type ProjectCreateFromSchemaSuccess {
   project: Project!
@@ -1256,7 +1271,7 @@ input ProjectCreateFromTemplateInput {
   environmentVariables: [EnvironmentVariableSpecification!]! = []
 }
 
-union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | RepositorySlugInUseError | TemplateDoesNotExistError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError
+union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | RepositorySlugInUseError | TemplateDoesNotExistError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError
 
 type ProjectCreateFromTemplateSuccess {
   project: Project!
@@ -1270,7 +1285,7 @@ input ProjectCreateInput {
   environmentVariables: [EnvironmentVariableSpecification!]! = []
 }
 
-union ProjectCreatePayload = ProjectCreateSuccess | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError
+union ProjectCreatePayload = ProjectCreateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError
 
 type ProjectCreateSuccess {
   project: Project!
