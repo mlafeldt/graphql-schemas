@@ -7334,6 +7334,11 @@ type Organization implements Node {
   ): IssueLabelConnection!
 }
 
+type OrganizationAcceptedOrExpiredInviteDetailsPayload {
+  """The status of the invite"""
+  status: OrganizationInviteStatus!
+}
+
 type OrganizationCancelDeletePayload {
   """Whether the operation was successful."""
   success: Boolean!
@@ -7525,7 +7530,19 @@ input OrganizationInviteCreateInput {
   teamIds: [String!]
 }
 
-type OrganizationInviteDetailsPayload {
+union OrganizationInviteDetailsPayload = OrganizationInviteFullDetailsPayload | OrganizationAcceptedOrExpiredInviteDetailsPayload
+
+type OrganizationInviteEdge {
+  node: OrganizationInvite!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type OrganizationInviteFullDetailsPayload {
+  """The status of the invite"""
+  status: OrganizationInviteStatus!
+
   """The name of the inviter"""
   inviter: String!
 
@@ -7554,13 +7571,6 @@ type OrganizationInviteDetailsPayload {
   expired: Boolean!
 }
 
-type OrganizationInviteEdge {
-  node: OrganizationInvite!
-
-  """Used in `before` and `after` args"""
-  cursor: String!
-}
-
 type OrganizationInvitePayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -7570,6 +7580,13 @@ type OrganizationInvitePayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""The different statuses possible for an organization invite."""
+enum OrganizationInviteStatus {
+  pending
+  accepted
+  expired
 }
 
 input OrganizationInviteUpdateInput {
@@ -12918,6 +12935,9 @@ type UserSettings implements Node {
 
   """Hash for the user to be used in calendar URLs."""
   calendarHash: String
+
+  """Whether to show full user names instead of display names."""
+  showFullUserNames: Boolean!
 }
 
 type UserSettingsFlagPayload {
