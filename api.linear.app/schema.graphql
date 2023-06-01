@@ -714,6 +714,62 @@ input CommentUpdateInput {
   bodyData: JSON
 }
 
+"""A company related to issue's origin."""
+type Company implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """Company name."""
+  name: String!
+
+  """Company ID in an external system."""
+  externalId: String!
+
+  """Company website URL."""
+  websiteUrl: String
+
+  """Company logo URL."""
+  logoUrl: String
+
+  """The user who added the company."""
+  creator: User!
+
+  """The organization of the customer."""
+  organization: Organization!
+
+  """Custom company properties."""
+  companyProperties: JSONObject!
+}
+
+type CompanyConnection {
+  edges: [CompanyEdge!]!
+  nodes: [Company!]!
+  pageInfo: PageInfo!
+}
+
+type CompanyEdge {
+  node: Company!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
 input ContactCreateInput {
   """The type of support contact."""
   type: String!
@@ -4565,6 +4621,9 @@ input IssueUpdateInput {
 
   """The identifier of the user who snoozed the issue."""
   snoozedById: String
+
+  """The identifiers of the companies associated with this ticket."""
+  companyIds: [String!]
 }
 
 input JiraConfigurationInput {
