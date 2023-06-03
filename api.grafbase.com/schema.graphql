@@ -122,10 +122,11 @@ type AccountResourcesUsageDashboardSuccess {
   status: AccountResourcesStatus
 }
 
-enum AccountStatus {
-  ACTIVE
-  DISABLED_BECAUSE_EXCEEDED_LIMITS
-  DISABLED_BECAUSE_IN_ARREARS
+type AccountStatus {
+  isEnabled: Boolean!
+  inArrearsCause: InArrearsCause
+  hasExceededLimits: Boolean!
+  isHobbyPlanEnforced: Boolean!
 }
 
 type AlreadyMemberError {
@@ -462,6 +463,11 @@ type GitRepository {
 
 type HasAlreadyPaymentMethodError {
   query: Query!
+}
+
+enum InArrearsCause {
+  NEVER_PAID
+  UNPAID_INVOICE
 }
 
 type InvalidAccountError {
