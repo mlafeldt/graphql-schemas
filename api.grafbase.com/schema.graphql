@@ -652,6 +652,10 @@ type MemberUpdatePayload {
   query: Query!
 }
 
+type MissingStripeCustomerError {
+  query: Query!
+}
+
 type MonthlyLimits {
   reads: Int
   writes: Int
@@ -676,6 +680,7 @@ type Mutation {
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
   organizationSlugUpdate(input: OrganizationSlugUpdateInput!): OrganizationSlugUpdatePayload!
   personalAccountSlugUpdate(input: PersonalAccountSlugUpdateInput!): PersonalAccountSlugUpdatePayload!
+  organizationPaymentMethodReplace(accountId: ID!, stripePaymentMethodId: String!): OrganizationPaymentMethodReplacePayload!
   organizationSetupPaymentMethod(accountId: ID!, stripePaymentMethodId: String!): OrganizationSetupPaymentMethod!
   organizationUpdate(input: OrganizationUpdateInput!): OrganizationUpdatePayload!
   personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload!
@@ -749,6 +754,10 @@ type NameTooLongError {
   query: Query!
 }
 
+type NotAllowedError {
+  query: Query!
+}
+
 type NotAllowedToCancelInvitesError {
   query: Query!
 }
@@ -766,10 +775,6 @@ type NotAllowedToSlugUpdateError {
 }
 
 type NotAllowedToUpdateOrganizationError {
-  query: Query!
-}
-
-type OnlyOwnerCanUpgradeToProError {
   query: Query!
 }
 
@@ -1057,7 +1062,9 @@ type OrganizationOwnershipNotTransferredError {
   query: Query!
 }
 
-union OrganizationSetupPaymentMethod = OrganizationUpgradeToProSuccess | HasAlreadyPaymentMethodError | OrganizationDoesNotExistError | OnlyOwnerCanUpgradeToProError
+union OrganizationPaymentMethodReplacePayload = OrganizationSuccessfulUpdate | MissingStripeCustomerError | OrganizationDoesNotExistError | NotAllowedError
+
+union OrganizationSetupPaymentMethod = OrganizationUpgradeToProSuccess | HasAlreadyPaymentMethodError | OrganizationDoesNotExistError | NotAllowedError
 
 input OrganizationSlugUpdateInput {
   id: ID!
@@ -1067,6 +1074,11 @@ input OrganizationSlugUpdateInput {
 union OrganizationSlugUpdatePayload = OrganizationSlugUpdateSuccess | SlugError | SlugSizeCheckError | ReservedSlugsCheckError | SlugAlreadyExistsError | OrganizationDoesNotExistError | NotAllowedToSlugUpdateError
 
 type OrganizationSlugUpdateSuccess {
+  organization: Organization!
+  query: Query!
+}
+
+type OrganizationSuccessfulUpdate {
   organization: Organization!
   query: Query!
 }
@@ -1477,6 +1489,7 @@ type StripeCustomer {
 type StripePaginatedPaymentMethods {
   data: [StripePaymentMethod!]!
   hasMore: Boolean!
+  nextPage: String
 }
 
 type StripePaymentMethod {
