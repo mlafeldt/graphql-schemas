@@ -819,6 +819,14 @@ input ContentComparator {
   notContains: String
 }
 
+enum ContextViewType {
+  activeIssues
+  activeCycle
+  upcomingCycle
+  backlog
+  triage
+}
+
 type CreateCsvExportReportPayload {
   """Whether the operation was successful."""
   success: Boolean!
@@ -2342,6 +2350,7 @@ type IntegrationSettings {
   front: FrontSettings
   jira: JiraSettings
   notion: NotionSettings
+  pagerDuty: PagerDutySettings
 }
 
 input IntegrationSettingsInput {
@@ -2356,6 +2365,7 @@ input IntegrationSettingsInput {
   front: FrontSettingsInput
   jira: JiraSettingsInput
   notion: NotionSettingsInput
+  pagerDuty: PagerDutyInput
 }
 
 """The configuration of all integrations for a project or a team."""
@@ -5202,6 +5212,12 @@ type Mutation {
     code: String!
   ): IntegrationPayload!
 
+  """[INTERNAL] Integrates the organization with PagerDuty."""
+  integrationPageDutyConnect(
+    """The PagerDuty API token."""
+    apiToken: String!
+  ): IntegrationPayload!
+
   """Updates the organization's Slack integration."""
   integrationUpdateSlack(
     """The Slack OAuth redirect URI."""
@@ -7743,6 +7759,34 @@ type PageInfo {
 
   """Cursor representing the last result in the paginated results."""
   endCursor: String
+}
+
+input PagerDutyInput {
+  """The mapping of PagerDuty schedule id to names."""
+  scheduleMapping: [PagerDutyScheduleMappingInput!]!
+}
+
+"""Tuple for mapping PagerDuty schedule id to names."""
+type PagerDutyScheduleMapping {
+  """The PagerDuty schedule id."""
+  scheduleId: String!
+
+  """The PagerDuty schedule name."""
+  scheduleName: String!
+}
+
+input PagerDutyScheduleMappingInput {
+  """The PagerDuty schedule id."""
+  scheduleId: String!
+
+  """The PagerDuty schedule name."""
+  scheduleName: String!
+}
+
+"""PagerDuty specific settings."""
+type PagerDutySettings {
+  """The mapping of PagerDuty schedule id to names."""
+  scheduleMapping: [PagerDutyScheduleMapping!]!
 }
 
 """By which field should the pagination order by"""
@@ -12919,6 +12963,10 @@ type UserConnection {
   pageInfo: PageInfo!
 }
 
+enum UserContextViewType {
+  assigned
+}
+
 type UserEdge {
   node: User!
 
@@ -13496,6 +13544,29 @@ type WorkflowDefinition implements Node {
 
   """The sort order of the workflow definition within its siblings."""
   sortOrder: String!
+
+  """The contextual label view associated with the workflow."""
+  label: IssueLabel
+
+  """The contextual cycle view associated with the workflow."""
+  cycle: Cycle
+
+  """The contextual user view associated with the workflow."""
+  user: User
+
+  """The contextual project view associated with the workflow."""
+  project: User
+
+  """The context custom view associated with the workflow."""
+  customView: CustomView
+
+  """The type of view to which this workflow's context is associated with."""
+  contextViewType: ContextViewType
+
+  """
+  The type of user view to which this workflow's context is associated with.
+  """
+  userContextViewType: UserContextViewType
 }
 
 type WorkflowDefinitionConnection {
