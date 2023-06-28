@@ -10613,6 +10613,12 @@ type Query {
     id: String!
   ): Template!
 
+  """Returns all templates that are associated with the integration type."""
+  templatesForIntegration(
+    """The type of integration for which to return associated templates."""
+    integrationType: TemplateEnabledIntegrationService!
+  ): [Template!]!
+
   """Finds a user account by email."""
   userAccountExists(
     """The email to find the user account by."""
@@ -12379,6 +12385,13 @@ type TemplateEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""The types of integration services that support templates."""
+enum TemplateEnabledIntegrationService {
+  intercom
+  slack
+  zendesk
 }
 
 type TemplatePayload {
