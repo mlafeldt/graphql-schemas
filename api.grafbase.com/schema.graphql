@@ -186,6 +186,53 @@ type CurrentPlanLimitReachedError {
   query: Query!
 }
 
+type CustomDomain {
+  hostnameVerificationStatus: CustomDomainStatus!
+  hostnameVerificationTxtName: String
+  hostnameVerificationTxtValue: String
+  name: String!
+  sslVerificationCnameName: String
+  sslVerificationCnameValue: String
+  sslVerificationStatus: CustomDomainStatus!
+}
+
+type CustomDomainAlreadyExists {
+  query: Query!
+}
+
+input CustomDomainCreateInput {
+  projectId: ID!
+  name: String!
+}
+
+union CustomDomainCreatePayload = CustomDomainCreateSuccess | ProjectDoesNotExistError | CustomDomainAlreadyExists
+
+type CustomDomainCreateSuccess {
+  domain: CustomDomain!
+  query: Query!
+}
+
+input CustomDomainDeleteInput {
+  projectId: ID!
+  name: String!
+}
+
+union CustomDomainDeletePayload = CustomDomainDeleteSuccess | CustomDomainDoesNotExistError
+
+type CustomDomainDeleteSuccess {
+  name: String!
+}
+
+type CustomDomainDoesNotExistError {
+  query: Query!
+}
+
+enum CustomDomainStatus {
+  ACTIVE
+  PENDING
+  ERROR
+}
+
 type DailyDeploymentCountLimitExceededError {
   query: Query!
   limit: Int!
@@ -691,6 +738,12 @@ type Mutation {
   personalAccountDelete: PersonalAccountDeletePayload!
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
 
+  """Add a new custom domain."""
+  customDomainCreate(input: CustomDomainCreateInput!): CustomDomainCreatePayload!
+
+  """Delete a custom hostname token."""
+  customDomainDelete(input: CustomDomainDeleteInput!): CustomDomainDeletePayload!
+
   """Create a new deployment for an existing project."""
   deploymentCreate(input: DeploymentCreateInput!): DeploymentCreatePayload!
 
@@ -1175,6 +1228,7 @@ type Project {
   plan: ProjectPlan!
   status: ProjectStatus!
   databaseRegionChangeStatus: DatabaseRegionChangeStatus!
+  customDomains: [String!]!
 }
 
 type ProjectApiKey {
@@ -1381,6 +1435,15 @@ type Query {
     """name of the branch"""
     name: String!
   ): Branch
+
+  """Get custom domain by project id and name."""
+  customDomainByName(
+    """id of the project"""
+    projectId: ID!
+
+    """name of the domain"""
+    name: String!
+  ): CustomDomain
 
   """Get all database regions available for replication."""
   databaseRegions: [DatabaseRegion!]!
