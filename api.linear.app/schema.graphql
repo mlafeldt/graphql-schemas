@@ -3209,7 +3209,7 @@ input IssueCreateInput {
   id: String
 
   """The title of the issue."""
-  title: String!
+  title: String
 
   """The issue description in markdown format."""
   description: String
@@ -3290,6 +3290,12 @@ input IssueCreateInput {
   [Internal] The timestamp at which an issue will be considered in breach of SLA.
   """
   slaBreachesAt: DateTime
+
+  """
+  The identifier of a template the issue should be created from. If other values
+  are provided in the input, they will override template values.
+  """
+  templateId: String
 }
 
 """[Internal] A draft issue."""
@@ -6398,14 +6404,44 @@ interface NotificationSubscription {
   """The type of the subscription."""
   type: String!
 
+  """
+  The contextual custom view associated with the notification subscription.
+  """
+  customView: CustomView
+
+  """
+  The contextual cycle view associated with the notification subscription.
+  """
+  cycle: Cycle
+
+  """
+  The contextual label view associated with the notification subscription.
+  """
+  label: IssueLabel
+
+  """
+  The contextual project view associated with the notification subscription.
+  """
+  project: Project
+
+  """The team associated with the notification subscription."""
+  team: Team
+
+  """
+  The type of view to which the notification subscription context is associated with.
+  """
+  contextViewType: ContextViewType
+
+  """
+  The type of user view to which the notification subscription context is associated with.
+  """
+  userContextViewType: UserContextViewType
+
   """The user associated with notification subscriptions."""
   user: User!
 
-  """Subscribed team."""
-  team: Team
-
-  """Subscribed project."""
-  project: Project
+  """The user that subscribed to receive notifications."""
+  subscriber: User!
 }
 
 type NotificationSubscriptionConnection {
@@ -8695,14 +8731,42 @@ type ProjectNotificationSubscription implements NotificationSubscription & Entit
   """The type of the subscription."""
   type: String!
 
-  """The user associated with notification subscriptions."""
-  user: User!
+  """
+  The contextual custom view associated with the notification subscription.
+  """
+  customView: CustomView
 
-  """Subscribed team."""
-  team: Team
+  """
+  The contextual cycle view associated with the notification subscription.
+  """
+  cycle: Cycle
+
+  """
+  The contextual label view associated with the notification subscription.
+  """
+  label: IssueLabel
 
   """The project subscribed to."""
   project: Project!
+
+  """The team associated with the notification subscription."""
+  team: Team
+
+  """
+  The type of view to which the notification subscription context is associated with.
+  """
+  contextViewType: ContextViewType
+
+  """
+  The type of user view to which the notification subscription context is associated with.
+  """
+  userContextViewType: UserContextViewType
+
+  """The user associated with notification subscriptions."""
+  user: User!
+
+  """The user that subscribed to receive notifications."""
+  subscriber: User!
 
   """The type of the project subscription."""
   projectNotificationSubscriptionType: ProjectNotificationSubscriptionType!
@@ -11640,6 +11704,12 @@ type Team implements Node {
     orderBy: PaginationOrderBy
   ): IssueConnection!
 
+  """Number of issues in the team."""
+  issueCount(
+    """Include archived issues in the count."""
+    includeArchived: Boolean!
+  ): Int!
+
   """Cycles associated with the team."""
   cycles(
     """Filter returned cycles."""
@@ -12143,14 +12213,44 @@ type TeamNotificationSubscription implements NotificationSubscription & Entity &
   """The type of the subscription."""
   type: String!
 
-  """The user associated with notification subscriptions."""
-  user: User!
+  """
+  The contextual custom view associated with the notification subscription.
+  """
+  customView: CustomView
+
+  """
+  The contextual cycle view associated with the notification subscription.
+  """
+  cycle: Cycle
+
+  """
+  The contextual label view associated with the notification subscription.
+  """
+  label: IssueLabel
+
+  """
+  The contextual project view associated with the notification subscription.
+  """
+  project: Project
 
   """The team subscribed to."""
   team: Team!
 
-  """Subscribed project."""
-  project: Project
+  """
+  The type of view to which the notification subscription context is associated with.
+  """
+  contextViewType: ContextViewType
+
+  """
+  The type of user view to which the notification subscription context is associated with.
+  """
+  userContextViewType: UserContextViewType
+
+  """The user associated with notification subscriptions."""
+  user: User!
+
+  """The user that subscribed to receive notifications."""
+  subscriber: User!
 }
 
 type TeamPayload {
@@ -13575,7 +13675,7 @@ type WorkflowDefinition implements Node {
   user: User
 
   """The contextual project view associated with the workflow."""
-  project: User
+  project: Project
 
   """The context custom view associated with the workflow."""
   customView: CustomView
