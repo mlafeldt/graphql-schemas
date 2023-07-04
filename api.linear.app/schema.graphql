@@ -964,6 +964,71 @@ type CustomViewEdge {
   cursor: String!
 }
 
+"""A custom view notification subscription."""
+type CustomViewNotificationSubscription implements NotificationSubscription & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The type of the subscription."""
+  type: String
+
+  """The custom view subscribed to."""
+  customView: CustomView!
+
+  """
+  The contextual cycle view associated with the notification subscription.
+  """
+  cycle: Cycle
+
+  """
+  The contextual label view associated with the notification subscription.
+  """
+  label: IssueLabel
+
+  """
+  The contextual project view associated with the notification subscription.
+  """
+  project: Project
+
+  """The team associated with the notification subscription."""
+  team: Team
+
+  """
+  The type of view to which the notification subscription context is associated with.
+  """
+  contextViewType: ContextViewType
+
+  """
+  The type of user view to which the notification subscription context is associated with.
+  """
+  userContextViewType: UserContextViewType
+
+  """The user associated with notification subscriptions."""
+  user: User!
+
+  """The user that subscribed to receive notifications."""
+  subscriber: User!
+
+  """The type of subscription."""
+  notificationSubscriptionTypes: [NotificationType!]!
+}
+
 type CustomViewPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -1238,6 +1303,71 @@ input CycleFilter {
 
   """Compound filters, one of which need to be matched by the cycle."""
   or: [CycleFilter!]
+}
+
+"""A cycle notification subscription."""
+type CycleNotificationSubscription implements NotificationSubscription & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The type of the subscription."""
+  type: String
+
+  """
+  The contextual custom view associated with the notification subscription.
+  """
+  customView: CustomView
+
+  """The cycle subscribed to."""
+  cycle: Cycle!
+
+  """
+  The contextual label view associated with the notification subscription.
+  """
+  label: IssueLabel
+
+  """
+  The contextual project view associated with the notification subscription.
+  """
+  project: Project
+
+  """The team associated with the notification subscription."""
+  team: Team
+
+  """
+  The type of view to which the notification subscription context is associated with.
+  """
+  contextViewType: ContextViewType
+
+  """
+  The type of user view to which the notification subscription context is associated with.
+  """
+  userContextViewType: UserContextViewType
+
+  """The user associated with notification subscriptions."""
+  user: User!
+
+  """The user that subscribed to receive notifications."""
+  subscriber: User!
+
+  """The type of subscription."""
+  notificationSubscriptionTypes: [NotificationType!]!
 }
 
 type CyclePayload {
@@ -4772,6 +4902,71 @@ The `JSONObject` scalar type represents arbitrary values as *embedded* JSON
 """
 scalar JSONObject
 
+"""A label notification subscription."""
+type LabelNotificationSubscription implements NotificationSubscription & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The type of the subscription."""
+  type: String
+
+  """
+  The contextual custom view associated with the notification subscription.
+  """
+  customView: CustomView
+
+  """
+  The contextual cycle view associated with the notification subscription.
+  """
+  cycle: Cycle
+
+  """The label subscribed to."""
+  label: IssueLabel!
+
+  """
+  The contextual project view associated with the notification subscription.
+  """
+  project: Project
+
+  """The team associated with the notification subscription."""
+  team: Team
+
+  """
+  The type of view to which the notification subscription context is associated with.
+  """
+  contextViewType: ContextViewType
+
+  """
+  The type of user view to which the notification subscription context is associated with.
+  """
+  userContextViewType: UserContextViewType
+
+  """The user associated with notification subscriptions."""
+  user: User!
+
+  """The user that subscribed to receive notifications."""
+  subscriber: User!
+
+  """The type of subscription."""
+  notificationSubscriptionTypes: [NotificationType!]!
+}
+
 type LogoutResponse {
   """Whether the operation was successful."""
   success: Boolean!
@@ -5733,7 +5928,9 @@ type Mutation {
     id: String!
   ): ArchivePayload!
 
-  """Creates a new notification subscription for a team or a project."""
+  """
+  Creates a new notification subscription for a cycle, custom view, label, project or team.
+  """
   notificationSubscriptionCreate(
     """The subscription object to create."""
     input: NotificationSubscriptionCreateInput!
@@ -6456,11 +6653,30 @@ input NotificationSubscriptionCreateInput {
   """
   id: String
 
-  """The identifier of the team to subscribe to."""
-  teamId: String
+  """The identifier of the custom view to subscribe to."""
+  customViewId: String
+
+  """The identifier of the cycle to subscribe to."""
+  cycleId: String
+
+  """The identifier of the label to subscribe to."""
+  labelId: String
 
   """The identifier of the project to subscribe to."""
   projectId: String
+
+  """The identifier of the team to subscribe to."""
+  teamId: String
+
+  """
+  The type of view to which the notification subscription context is associated with.
+  """
+  contextViewType: ContextViewType
+
+  """
+  The type of user view to which the notification subscription context is associated with.
+  """
+  userContextViewType: UserContextViewType
 
   """The type of the project subscription."""
   projectNotificationSubscriptionType: ProjectNotificationSubscriptionType
@@ -6499,6 +6715,35 @@ input NotificationSubscriptionUpdateInput {
 
   """The types of notifications of the team subscription."""
   notificationSubscriptionTypes: [String!]
+}
+
+enum NotificationType {
+  issueCreated
+  issueMention
+  issueAddedToTriage
+  issueAssignedToYou
+  issueUnassignedFromYou
+  issueNewComment
+  issueCommentMention
+  issueCommentReaction
+  issuePriorityUrgent
+  issueSubscribed
+  issueBlocking
+  issueUnblocked
+  issueMovedToProject
+  issueReminder
+  issueStatusChangedDone
+  issueStatusChangedAll
+  issueSlaHighRisk
+  issueSlaBreached
+  issueDue
+  oauthClientApprovalCreated
+  projectAddedAsMember
+  projectAddedAsLead
+  projectUpdateCreated
+  projectUpdatePrompt
+  projectUpdateMention
+  system
 }
 
 input NotificationUpdateInput {
@@ -12251,6 +12496,9 @@ type TeamNotificationSubscription implements NotificationSubscription & Entity &
 
   """The user that subscribed to receive notifications."""
   subscriber: User!
+
+  """The type of subscription."""
+  notificationSubscriptionTypes: [NotificationType!]
 }
 
 type TeamPayload {
