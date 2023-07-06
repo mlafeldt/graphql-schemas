@@ -1734,6 +1734,53 @@ type EmailUserAccountAuthChallengeResponse {
   authType: String!
 }
 
+"""Information for creating embedded content for the provided URL"""
+type Embed {
+  """The type of embed"""
+  type: String!
+
+  """Title for the returned embed view"""
+  title: String
+
+  """The name of the provider"""
+  providerName: String
+
+  """The description of the content"""
+  description: String
+
+  """ The name of the author/owner of the resource"""
+  authorName: String
+
+  """The URL of the thumbnail preview image"""
+  thumbnailUrl: String
+
+  """The height of the thumbnail preview image"""
+  thumbnailHeight: Float
+
+  """The width of the thumbnail preview image"""
+  thumbnailWidth: Float
+
+  """The asset URL (photo)"""
+  url: String
+
+  """The HTML (video, rich)"""
+  html: String
+
+  """The height of embedded content (photo, video, rich)"""
+  height: Float
+
+  """The width of embedded content (photo, video, rich)"""
+  width: Float
+}
+
+type EmbedPayload {
+  """Embed information"""
+  embed: Embed
+
+  """Whether the query was successful"""
+  success: Boolean!
+}
+
 """A custom emoji."""
 type Emoji implements Node {
   """The unique identifier of the entity."""
@@ -7092,6 +7139,9 @@ input NullableProjectFilter {
   """Filters that the project's next milestone must satisfy."""
   nextProjectMilestone: ProjectMilestoneFilter
 
+  """Filters that the project's team must satisfy."""
+  accessibleTeams: TeamCollectionFilter
+
   """Filter based on the existence of the relation."""
   null: Boolean
 
@@ -8505,6 +8555,9 @@ input ProjectCollectionFilter {
   """Filters that the project's next milestone must satisfy."""
   nextProjectMilestone: ProjectMilestoneFilter
 
+  """Filters that the project's team must satisfy."""
+  accessibleTeams: TeamCollectionFilter
+
   """Compound filters, all of which need to be matched by the project."""
   and: [ProjectCollectionFilter!]
 
@@ -8635,6 +8688,9 @@ input ProjectFilter {
 
   """Filters that the project's next milestone must satisfy."""
   nextProjectMilestone: ProjectMilestoneFilter
+
+  """Filters that the project's team must satisfy."""
+  accessibleTeams: TeamCollectionFilter
 
   """Compound filters, all of which need to be matched by the project."""
   and: [ProjectFilter!]
@@ -9014,7 +9070,7 @@ type ProjectNotificationSubscription implements NotificationSubscription & Entit
   subscriber: User!
 
   """The type of the project subscription."""
-  projectNotificationSubscriptionType: ProjectNotificationSubscriptionType!
+  projectNotificationSubscriptionType: ProjectNotificationSubscriptionType
 
   """The type of subscription."""
   notificationSubscriptionTypes: [NotificationType!]
@@ -10028,6 +10084,23 @@ type Query {
   """One specific document."""
   document(id: String!): Document!
 
+  """Returns embed info for any url"""
+  embedInfo(
+    """The URL to lookup embed info for"""
+    url: String!
+  ): EmbedPayload!
+
+  """
+  Fetch Figma screenshot and other information with file and node identifiers.
+  """
+  figmaEmbedInfo(
+    """Figma node identifier."""
+    nodeId: String
+
+    """Figma file identifier."""
+    fileId: String!
+  ): FigmaEmbedPayload!
+
   """All custom emojis."""
   emojis(
     """A cursor to be used with last for backward pagination."""
@@ -10123,17 +10196,6 @@ type Query {
 
   """One specific favorite."""
   favorite(id: String!): Favorite!
-
-  """
-  Fetch Figma screenshot and other information with file and node identifiers.
-  """
-  figmaEmbedInfo(
-    """Figma node identifier."""
-    nodeId: String
-
-    """Figma file identifier."""
-    fileId: String!
-  ): FigmaEmbedPayload!
 
   """All integrations."""
   integrations(
@@ -12199,6 +12261,33 @@ type Team implements Node {
 
   """Settings for all integrations associated with that team."""
   integrationsSettings: IntegrationsSettings
+}
+
+"""Roadmap collection filtering options."""
+input TeamCollectionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Compound filters, all of which need to be matched by the roadmap."""
+  and: [TeamCollectionFilter!]
+
+  """Compound filters, one of which need to be matched by the roadmap."""
+  or: [TeamCollectionFilter!]
+
+  """Filters that needs to be matched by some roadmaps."""
+  some: TeamFilter
+
+  """Filters that needs to be matched by all roadmaps."""
+  every: TeamFilter
+
+  """Comparator for the collection length."""
+  length: NumberComparator
 }
 
 type TeamConnection {
