@@ -95,7 +95,8 @@ type Application {
   imageUrl: String
 }
 
-type ArchivePayload {
+"""A generic payload return from entity archive or deletion mutations."""
+interface ArchivePayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
 
@@ -173,6 +174,18 @@ type Attachment implements Node {
 
   """The issue this attachment belongs to."""
   issue: Issue!
+}
+
+"""A generic payload return from entity archive mutations."""
+type AttachmentArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: Attachment
 }
 
 """Attachment collection filtering options."""
@@ -806,6 +819,9 @@ input ContactSalesCreateInput {
   """Work email of the person requesting information."""
   email: String!
 
+  """Size of the company."""
+  companySize: String
+
   """The message the user sent."""
   message: String
 }
@@ -1211,6 +1227,18 @@ type Cycle implements Node {
   progress: Float!
 }
 
+"""A generic payload return from entity archive mutations."""
+type CycleArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: Cycle
+}
+
 type CycleConnection {
   edges: [CycleEdge!]!
   nodes: [Cycle!]!
@@ -1455,6 +1483,18 @@ enum Day {
 input DeleteOrganizationInput {
   """The deletion code to confirm operation."""
   deletionCode: String!
+}
+
+"""A generic payload return from entity deletion mutations."""
+type DeletePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The identifier of the deleted entity."""
+  entityId: String!
 }
 
 """A document for a project."""
@@ -3234,6 +3274,18 @@ type Issue implements Node {
 
   """[Internal] The issue's description as a Prosemirror document."""
   descriptionData: JSON
+}
+
+"""A generic payload return from entity archive mutations."""
+type IssueArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: Issue
 }
 
 type IssueBatchPayload {
@@ -5036,7 +5088,7 @@ type Mutation {
   apiKeyDelete(
     """The identifier of the API key to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """
   Creates a new attachment, or updates existing if the same `url` and `issueId` is used.
@@ -5131,13 +5183,13 @@ type Mutation {
   attachmentArchive(
     """The identifier of the attachment to archive."""
     id: String!
-  ): ArchivePayload! @deprecated(reason: "This mutation is deprecated, please use `attachmentDelete` instead")
+  ): AttachmentArchivePayload! @deprecated(reason: "This mutation is deprecated, please use `attachmentDelete` instead")
 
   """Deletes an issue attachment."""
   attachmentDelete(
     """The identifier of the attachment to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """
   Finds or creates a new user account by email and sends an email with token.
@@ -5212,7 +5264,7 @@ type Mutation {
   commentDelete(
     """The identifier of the comment to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Saves user message."""
   contactCreate(
@@ -5245,7 +5297,7 @@ type Mutation {
   customViewDelete(
     """The identifier of the custom view to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Creates a new cycle."""
   cycleCreate(
@@ -5266,7 +5318,7 @@ type Mutation {
   cycleArchive(
     """The identifier of the cycle to archive."""
     id: String!
-  ): ArchivePayload!
+  ): CycleArchivePayload!
 
   """Creates a new document."""
   documentCreate(
@@ -5289,7 +5341,7 @@ type Mutation {
   documentDelete(
     """The identifier of the document to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """[INTERNAL] Subscribes the email to the newsletter."""
   emailSubscribe(
@@ -5313,7 +5365,7 @@ type Mutation {
   emojiDelete(
     """The identifier of the emoji to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Creates a new favorite (project, cycle etc)."""
   favoriteCreate(
@@ -5334,7 +5386,7 @@ type Mutation {
   favoriteDelete(
     """The identifier of the favorite reference to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """
   XHR request payload to upload an images, video and other attachments directly to Linear's cloud storage.
@@ -5623,7 +5675,7 @@ type Mutation {
   integrationDelete(
     """The identifier of the integration to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Creates new settings for one or more integrations."""
   integrationsSettingsCreate(
@@ -5650,7 +5702,7 @@ type Mutation {
   integrationTemplateDelete(
     """The identifier of the integrationTemplate to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Kicks off a GitHub import job."""
   issueImportCreateGithub(
@@ -5858,13 +5910,13 @@ type Mutation {
   issueLabelArchive(
     """The identifier of the label to archive."""
     id: String!
-  ): ArchivePayload! @deprecated(reason: "Labels are deleted instead of archived now!")
+  ): DeletePayload! @deprecated(reason: "Labels are deleted instead of archived now! Use issueLabelDelete instead.")
 
   """Deletes an issue label."""
   issueLabelDelete(
     """The identifier of the label to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Creates a new issue relation."""
   issueRelationCreate(
@@ -5885,7 +5937,7 @@ type Mutation {
   issueRelationDelete(
     """The identifier of the issue relation to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Creates a new issue."""
   issueCreate(
@@ -5918,19 +5970,19 @@ type Mutation {
 
     """The identifier of the issue to archive."""
     id: String!
-  ): ArchivePayload!
+  ): IssueArchivePayload!
 
   """Unarchives an issue."""
   issueUnarchive(
     """The identifier of the issue to archive."""
     id: String!
-  ): ArchivePayload!
+  ): IssueArchivePayload!
 
   """Deletes (trashes) an issue."""
   issueDelete(
     """The identifier of the issue to delete."""
     id: String!
-  ): ArchivePayload!
+  ): IssueArchivePayload!
 
   """
   Adds an issue reminder. Will cause a notification to be sent when the issue reminder time is reached.
@@ -5967,13 +6019,13 @@ type Mutation {
   notificationArchive(
     """The id of the notification to archive."""
     id: String!
-  ): ArchivePayload!
+  ): NotificationArchivePayload!
 
   """Unarchives a notification."""
   notificationUnarchive(
     """The id of the notification to archive."""
     id: String!
-  ): ArchivePayload!
+  ): NotificationArchivePayload!
 
   """
   Creates a new notification subscription for a cycle, custom view, label, project or team.
@@ -5998,7 +6050,7 @@ type Mutation {
   notificationSubscriptionDelete(
     """The identifier of the notification subscription reference to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """[INTERNAL] Verifies a domain claim."""
   organizationDomainClaim(
@@ -6025,7 +6077,7 @@ type Mutation {
   organizationDomainDelete(
     """The identifier of the domain to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Creates a new organization invite."""
   organizationInviteCreate(
@@ -6046,13 +6098,13 @@ type Mutation {
   resendOrganizationInvite(
     """The identifier of the organization invite to be re-send."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Deletes an organization invite."""
   organizationInviteDelete(
     """The identifier of the organization invite to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Updates the user's organization."""
   organizationUpdate(
@@ -6100,7 +6152,7 @@ type Mutation {
   projectLinkDelete(
     """The identifier of the project link to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Creates a new project milestone."""
   projectMilestoneCreate(
@@ -6123,7 +6175,7 @@ type Mutation {
   projectMilestoneDelete(
     """The identifier of the project milestone to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Creates a new project."""
   projectCreate(
@@ -6150,7 +6202,7 @@ type Mutation {
     The identifier of the project to delete. Also the identifier from the URL is accepted.
     """
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Archives a project."""
   projectArchive(
@@ -6158,7 +6210,7 @@ type Mutation {
     The identifier of the project to archive. Also the identifier from the URL is accepted.
     """
     id: String!
-  ): ArchivePayload! @deprecated(reason: "Deprecated in favor of projectDelete.")
+  ): ProjectArchivePayload! @deprecated(reason: "Deprecated in favor of projectDelete.")
 
   """Unarchives a project."""
   projectUnarchive(
@@ -6166,7 +6218,7 @@ type Mutation {
     The identifier of the project to restore. Also the identifier from the URL is accepted.
     """
     id: String!
-  ): ArchivePayload!
+  ): ProjectArchivePayload!
 
   """Creates a new interaction on a project update."""
   projectUpdateInteractionCreate(
@@ -6193,7 +6245,7 @@ type Mutation {
   projectUpdateDelete(
     """The identifier of the project update to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Mark a project update as read."""
   projectUpdateMarkAsRead(
@@ -6223,7 +6275,7 @@ type Mutation {
   reactionDelete(
     """The identifier of the reaction to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Create CSV export report for the organization."""
   createCsvExportReport(includePrivateTeamIds: [String!]): CreateCsvExportReportPayload!
@@ -6247,19 +6299,19 @@ type Mutation {
   roadmapArchive(
     """The identifier of the roadmap to archive."""
     id: String!
-  ): ArchivePayload!
+  ): RoadmapArchivePayload!
 
   """Unarchives a roadmap."""
   roadmapUnarchive(
     """The identifier of the roadmap to unarchive."""
     id: String!
-  ): ArchivePayload!
+  ): RoadmapArchivePayload!
 
   """Deletes a roadmap."""
   roadmapDelete(
     """The identifier of the roadmap to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Creates a new roadmapToProject join."""
   roadmapToProjectCreate(
@@ -6280,13 +6332,13 @@ type Mutation {
   roadmapToProjectDelete(
     """The identifier of the roadmapToProject to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Deletes a previously used team key."""
   teamKeyDelete(
     """The identifier of the team key to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Creates a new team membership."""
   teamMembershipCreate(
@@ -6307,7 +6359,7 @@ type Mutation {
   teamMembershipDelete(
     """The identifier of the team membership to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """
   Creates a new team. The user who creates the team will automatically be added as a member to the newly created team.
@@ -6333,7 +6385,7 @@ type Mutation {
   teamDelete(
     """The identifier of the team to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Deletes team's cycles data"""
   teamCyclesDelete(
@@ -6360,7 +6412,7 @@ type Mutation {
   templateDelete(
     """The identifier of the template to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """
   Updates a user. Only available to organization admins and the user themselves.
@@ -6495,7 +6547,7 @@ type Mutation {
   viewPreferencesDelete(
     """The identifier of the ViewPreferences to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Creates a new webhook."""
   webhookCreate(
@@ -6516,7 +6568,7 @@ type Mutation {
   webhookDelete(
     """The identifier of the Webhook to delete."""
     id: String!
-  ): ArchivePayload!
+  ): DeletePayload!
 
   """Creates a new state, adding it to the workflow of a team."""
   workflowStateCreate(
@@ -6539,7 +6591,7 @@ type Mutation {
   workflowStateArchive(
     """The identifier of the state to archive."""
     id: String!
-  ): ArchivePayload!
+  ): WorkflowStateArchivePayload!
 }
 
 interface Node {
@@ -6598,6 +6650,18 @@ interface Notification {
 
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
+}
+
+"""A generic payload return from entity archive mutations."""
+type NotificationArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: Notification
 }
 
 type NotificationConnection {
@@ -6728,9 +6792,6 @@ input NotificationSubscriptionCreateInput {
   """The type of the project subscription."""
   projectNotificationSubscriptionType: ProjectNotificationSubscriptionType
 
-  """The types of notifications of the team subscription."""
-  teamNotificationSubscriptionTypes: [String!]
-
   """The types of notifications of the subscription."""
   notificationSubscriptionTypes: [String!]
 }
@@ -6756,9 +6817,6 @@ type NotificationSubscriptionPayload {
 input NotificationSubscriptionUpdateInput {
   """The type of the project subscription."""
   projectNotificationSubscriptionType: ProjectNotificationSubscriptionType
-
-  """The types of notifications of the team subscription."""
-  teamNotificationSubscriptionTypes: [String!]
 
   """The types of notifications of the subscription."""
   notificationSubscriptionTypes: [String!]
@@ -8494,6 +8552,18 @@ type Project implements Node {
 
   """Settings for all integrations associated with that project."""
   integrationsSettings: IntegrationsSettings
+}
+
+"""A generic payload return from entity archive mutations."""
+type ProjectArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: Project
 }
 
 """Project filtering options."""
@@ -10399,7 +10469,7 @@ type Query {
   issue(id: String!): Issue!
 
   """
-  [ALPHA] Search issues. This query is experimental and is subject to change without notice.
+  [DEPRECATED] Search issues. This endpoint is deprecated and will be removed in the future – use `searchIssues` instead.
   """
   issueSearch(
     """Filter returned issues."""
@@ -11301,6 +11371,18 @@ type Roadmap implements Node {
     """
     orderBy: PaginationOrderBy
   ): ProjectConnection!
+}
+
+"""A generic payload return from entity archive mutations."""
+type RoadmapArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: Roadmap
 }
 
 """Roadmap collection filtering options."""
@@ -13507,8 +13589,8 @@ enum UserFlagType {
   slackCommentReactionTipShown
   issueLabelSuggestionUsed
   threadedCommentsNudgeIsSeen
-  milestoneOnboardingIsSeenAndDismissed
   desktopTabsOnboardingDismissed
+  milestoneOnboardingIsSeenAndDismissed
   figmaPluginBannerDismissed
   all
 }
@@ -14110,6 +14192,18 @@ type WorkflowState implements Node {
     """
     orderBy: PaginationOrderBy
   ): IssueConnection!
+}
+
+"""A generic payload return from entity archive mutations."""
+type WorkflowStateArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: WorkflowState
 }
 
 type WorkflowStateConnection {
