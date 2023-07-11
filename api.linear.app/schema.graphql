@@ -1001,9 +1001,6 @@ type CustomViewNotificationSubscription implements NotificationSubscription & En
   """
   archivedAt: DateTime
 
-  """The type of the subscription."""
-  type: String
-
   """The custom view subscribed to."""
   customView: CustomView!
 
@@ -1353,9 +1350,6 @@ type CycleNotificationSubscription implements NotificationSubscription & Entity 
   The time at which the entity was archived. Null if the entity has not been archived.
   """
   archivedAt: DateTime
-
-  """The type of the subscription."""
-  type: String
 
   """
   The contextual custom view associated with the notification subscription.
@@ -5022,9 +5016,6 @@ type LabelNotificationSubscription implements NotificationSubscription & Entity 
   """
   archivedAt: DateTime
 
-  """The type of the subscription."""
-  type: String
-
   """
   The contextual custom view associated with the notification subscription.
   """
@@ -5907,12 +5898,6 @@ type Mutation {
   ): IssueLabelPayload!
 
   """Deletes an issue label."""
-  issueLabelArchive(
-    """The identifier of the label to archive."""
-    id: String!
-  ): DeletePayload! @deprecated(reason: "Labels are deleted instead of archived now! Use issueLabelDelete instead.")
-
-  """Deletes an issue label."""
   issueLabelDelete(
     """The identifier of the label to delete."""
     id: String!
@@ -6708,9 +6693,6 @@ interface NotificationSubscription {
   The time at which the entity was archived. Null if the entity has not been archived.
   """
   archivedAt: DateTime
-
-  """The type of the subscription."""
-  type: String
 
   """
   The contextual custom view associated with the notification subscription.
@@ -9099,9 +9081,6 @@ type ProjectNotificationSubscription implements NotificationSubscription & Entit
   """
   archivedAt: DateTime
 
-  """The type of the subscription."""
-  type: String
-
   """
   The contextual custom view associated with the notification subscription.
   """
@@ -11059,8 +11038,8 @@ type Query {
 
   """Returns all templates that are associated with the integration type."""
   templatesForIntegration(
-    """The type of integration for which to return associated templates."""
-    integrationType: TemplateEnabledIntegrationService!
+    """The type of integration for which to return associated templates"""
+    integrationType: String!
   ): [Template!]!
 
   """Finds a user account by email."""
@@ -12629,9 +12608,6 @@ type TeamNotificationSubscription implements NotificationSubscription & Entity &
   """
   archivedAt: DateTime
 
-  """The type of the subscription."""
-  type: String
-
   """
   The contextual custom view associated with the notification subscription.
   """
@@ -12907,13 +12883,6 @@ type TemplateEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
-}
-
-"""The types of integration services that support templates."""
-enum TemplateEnabledIntegrationService {
-  intercom
-  slack
-  zendesk
 }
 
 type TemplatePayload {
@@ -13591,6 +13560,7 @@ enum UserFlagType {
   threadedCommentsNudgeIsSeen
   desktopTabsOnboardingDismissed
   milestoneOnboardingIsSeenAndDismissed
+  projectBoardOnboardingIsSeenAndDismissed
   figmaPluginBannerDismissed
   all
 }
