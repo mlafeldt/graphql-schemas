@@ -1039,7 +1039,7 @@ type CustomViewNotificationSubscription implements NotificationSubscription & En
   subscriber: User!
 
   """The type of subscription."""
-  notificationSubscriptionTypes: [NotificationType!]!
+  notificationSubscriptionTypes: [String!]!
 }
 
 type CustomViewPayload {
@@ -1389,7 +1389,7 @@ type CycleNotificationSubscription implements NotificationSubscription & Entity 
   subscriber: User!
 
   """The type of subscription."""
-  notificationSubscriptionTypes: [NotificationType!]!
+  notificationSubscriptionTypes: [String!]!
 }
 
 type CyclePayload {
@@ -2070,9 +2070,10 @@ type Favorite implements Node {
 
   """The type of favorited predefined view."""
   predefinedViewType: String
+  user: User! @deprecated(reason: "Use \"owner\" instead.")
 
   """The owner of the favorite."""
-  user: User!
+  owner: User!
 
   """The order of the item in the favorites list."""
   sortOrder: Float!
@@ -4130,7 +4131,7 @@ input IssueLabelCollectionFilter {
   creator: NullableUserFilter
 
   """Filters that the issue labels team must satisfy."""
-  team: TeamFilter
+  team: NullableTeamFilter
 
   """Filters that the issue label's parent label must satisfy."""
   parent: IssueLabelFilter
@@ -4206,7 +4207,7 @@ input IssueLabelFilter {
   creator: NullableUserFilter
 
   """Filters that the issue labels team must satisfy."""
-  team: TeamFilter
+  team: NullableTeamFilter
 
   """Filters that the issue label's parent label must satisfy."""
   parent: IssueLabelFilter
@@ -5054,7 +5055,7 @@ type LabelNotificationSubscription implements NotificationSubscription & Entity 
   subscriber: User!
 
   """The type of subscription."""
-  notificationSubscriptionTypes: [NotificationType!]!
+  notificationSubscriptionTypes: [String!]!
 }
 
 type LogoutResponse {
@@ -6804,35 +6805,6 @@ input NotificationSubscriptionUpdateInput {
   notificationSubscriptionTypes: [String!]
 }
 
-enum NotificationType {
-  issueCreated
-  issueMention
-  issueAddedToTriage
-  issueAssignedToYou
-  issueUnassignedFromYou
-  issueNewComment
-  issueCommentMention
-  issueCommentReaction
-  issuePriorityUrgent
-  issueSubscribed
-  issueBlocking
-  issueUnblocked
-  issueMovedToProject
-  issueReminder
-  issueStatusChangedDone
-  issueStatusChangedAll
-  issueSlaHighRisk
-  issueSlaBreached
-  issueDue
-  oauthClientApprovalCreated
-  projectAddedAsMember
-  projectAddedAsLead
-  projectUpdateCreated
-  projectUpdatePrompt
-  projectUpdateMention
-  system
-}
-
 input NotificationUpdateInput {
   """The time when notification was marked as read."""
   readAt: DateTime
@@ -7294,6 +7266,39 @@ input NullableStringComparator {
   Doesn't contain case insensitive constraint. Matches any values that don't contain the given string case insensitive.
   """
   notContainsIgnoreCase: String
+}
+
+"""Team filtering options."""
+input NullableTeamFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the team name."""
+  name: StringComparator
+
+  """Comparator for the team key."""
+  key: StringComparator
+
+  """Comparator for the team description."""
+  description: NullableStringComparator
+
+  """Filters that the teams issues must satisfy."""
+  issues: IssueCollectionFilter
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
+
+  """Compound filters, all of which need to be matched by the team."""
+  and: [NullableTeamFilter!]
+
+  """Compound filters, one of which need to be matched by the team."""
+  or: [NullableTeamFilter!]
 }
 
 input NullableTimelessDateComparator {
@@ -9122,7 +9127,7 @@ type ProjectNotificationSubscription implements NotificationSubscription & Entit
   projectNotificationSubscriptionType: ProjectNotificationSubscriptionType
 
   """The type of subscription."""
-  notificationSubscriptionTypes: [NotificationType!]
+  notificationSubscriptionTypes: [String!]
 }
 
 """The type of a project notification subscription."""
@@ -12648,7 +12653,7 @@ type TeamNotificationSubscription implements NotificationSubscription & Entity &
   subscriber: User!
 
   """The type of subscription."""
-  notificationSubscriptionTypes: [NotificationType!]
+  notificationSubscriptionTypes: [String!]
 }
 
 type TeamPayload {
