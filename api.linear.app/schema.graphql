@@ -1957,28 +1957,6 @@ input EstimateComparator {
   and: [NullableNumberComparator!]
 }
 
-input EventCreateInput {
-  """The category of the event to create."""
-  category: String!
-
-  """The subject of the event."""
-  subject: String!
-
-  """The target identifier of the event."""
-  targetId: String
-
-  """The value of the event."""
-  value: Float
-
-  """Additional data of the event, encoded as JSON."""
-  data: JSON
-}
-
-type EventPayload {
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
 """
 [ALPHA] An external authenticated (e.g., through Slack) user which doesn't have
 a Linear account, but can create and update entities in Linear from the external
@@ -2070,7 +2048,6 @@ type Favorite implements Node {
 
   """The type of favorited predefined view."""
   predefinedViewType: String
-  user: User! @deprecated(reason: "Use \"owner\" instead.")
 
   """The owner of the favorite."""
   owner: User!
@@ -2131,6 +2108,9 @@ type Favorite implements Node {
 
   """The favorited label."""
   label: IssueLabel
+
+  """The favorited user."""
+  user: User
 }
 
 type FavoriteConnection {
@@ -2178,6 +2158,9 @@ input FavoriteCreateInput {
 
   """The identifier of the label to favorite."""
   labelId: String
+
+  """The identifier of the user to favorite."""
+  userId: String
 
   """The position of the item in the favorites list."""
   sortOrder: Float
@@ -5064,12 +5047,6 @@ type LogoutResponse {
 }
 
 type Mutation {
-  """[Deprecated] Creates a new event."""
-  eventCreate(
-    """The event to create."""
-    input: EventCreateInput!
-  ): EventPayload!
-
   """Creates a new API key."""
   apiKeyCreate(
     """The api key object to create."""
@@ -12067,7 +12044,7 @@ type Team implements Node {
   """Number of issues in the team."""
   issueCount(
     """Include archived issues in the count."""
-    includeArchived: Boolean!
+    includeArchived: Boolean = false
   ): Int!
 
   """Cycles associated with the team."""
