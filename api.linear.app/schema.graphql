@@ -6004,11 +6004,58 @@ type Mutation {
     id: String!
   ): NotificationPayload!
 
+  """Marks all past notifications for the associated entity as read."""
+  notificationMarkReadAll(
+    """The time when notification was marked as read."""
+    readAt: DateTime!
+
+    """The type and id of the entity to archive notifications for."""
+    input: NotificationEntityInput!
+  ): NotificationBatchActionPayload!
+
+  """Marks all past notifications for the associated entity as unread."""
+  notificationMarkUnreadAll(
+    """The type and id of the entity to archive notifications for."""
+    input: NotificationEntityInput!
+  ): NotificationBatchActionPayload!
+
+  """
+  Snoozes a notification and all past notifications for the associated entity.
+  """
+  notificationSnoozeAll(
+    """
+    The time until a notification will be snoozed. After that it will appear in the inbox again.
+    """
+    snoozedUntilAt: DateTime!
+
+    """The type and id of the entity to archive notifications for."""
+    input: NotificationEntityInput!
+  ): NotificationBatchActionPayload!
+
+  """
+  Unsnoozes a notification and all past notifications for the associated entity.
+  """
+  notificationUnsnoozeAll(
+    """The time when the notification was unsnoozed."""
+    unsnoozedAt: DateTime!
+
+    """The type and id of the entity to archive notifications for."""
+    input: NotificationEntityInput!
+  ): NotificationBatchActionPayload!
+
   """Archives a notification."""
   notificationArchive(
     """The id of the notification to archive."""
     id: String!
   ): NotificationArchivePayload!
+
+  """
+  Archives all of the user's past notifications for the associated entity.
+  """
+  notificationArchiveAll(
+    """The type and id of the entity to archive notifications for."""
+    input: NotificationEntityInput!
+  ): NotificationBatchActionPayload!
 
   """Unarchives a notification."""
   notificationUnarchive(
@@ -6653,6 +6700,17 @@ type NotificationArchivePayload implements ArchivePayload {
   entity: Notification
 }
 
+type NotificationBatchActionPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The notifications that were updated."""
+  notifications: [Notification!]!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
 type NotificationConnection {
   edges: [NotificationEdge!]!
   nodes: [Notification!]!
@@ -6664,6 +6722,21 @@ type NotificationEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Describes the type and id of the entity to target for notifications."""
+input NotificationEntityInput {
+  """The id of the issue related to the notification."""
+  issueId: String
+
+  """The id of the project related to the notification."""
+  projectId: String
+
+  """The id of the project update related to the notification."""
+  projectUpdateId: String
+
+  """The id of the OAuth client approval related to the notification."""
+  oauthClientApprovalId: String
 }
 
 type NotificationPayload {

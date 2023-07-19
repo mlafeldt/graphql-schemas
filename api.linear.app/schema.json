@@ -24210,6 +24210,73 @@
       },
       {
         "kind": "OBJECT",
+        "name": "NotificationBatchActionPayload",
+        "description": null,
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "The identifier of the last sync operation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "notifications",
+            "description": "The notifications that were updated.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INTERFACE",
+                    "name": "Notification",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "NotificationArchivePayload",
         "description": "A generic payload return from entity archive mutations.",
         "fields": [
@@ -30997,47 +31064,6 @@
             "ofType": null
           }
         ]
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "IssueImportMappingInput",
-        "description": "Issue import mapping input",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "users",
-            "description": "The mapping configuration for users",
-            "type": {
-              "kind": "SCALAR",
-              "name": "JSONObject",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "workflowStates",
-            "description": "The mapping configuration for workflow states",
-            "type": {
-              "kind": "SCALAR",
-              "name": "JSONObject",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "epics",
-            "description": "The mapping configuration for epics",
-            "type": {
-              "kind": "SCALAR",
-              "name": "JSONObject",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
       },
       {
         "kind": "INPUT_OBJECT",
@@ -41114,6 +41140,47 @@
       },
       {
         "kind": "INPUT_OBJECT",
+        "name": "IssueImportMappingInput",
+        "description": "Issue import mapping input",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "users",
+            "description": "The mapping configuration for users",
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSONObject",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "workflowStates",
+            "description": "The mapping configuration for workflow states",
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSONObject",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "epics",
+            "description": "The mapping configuration for epics",
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSONObject",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
         "name": "IssueImportUpdateInput",
         "description": null,
         "fields": null,
@@ -41425,6 +41492,57 @@
           {
             "name": "projectUpdateId",
             "description": "The id of the project update related to the notification.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "NotificationEntityInput",
+        "description": "Describes the type and id of the entity to target for notifications.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "issueId",
+            "description": "The id of the issue related to the notification.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectId",
+            "description": "The id of the project related to the notification.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectUpdateId",
+            "description": "The id of the project update related to the notification.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "oauthClientApprovalId",
+            "description": "The id of the OAuth client approval related to the notification.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -56055,6 +56173,172 @@
             "deprecationReason": null
           },
           {
+            "name": "notificationMarkReadAll",
+            "description": "Marks all past notifications for the associated entity as read.",
+            "args": [
+              {
+                "name": "readAt",
+                "description": "The time when notification was marked as read.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "DateTime",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "input",
+                "description": "The type and id of the entity to archive notifications for.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "NotificationEntityInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationBatchActionPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "notificationMarkUnreadAll",
+            "description": "Marks all past notifications for the associated entity as unread.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The type and id of the entity to archive notifications for.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "NotificationEntityInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationBatchActionPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "notificationSnoozeAll",
+            "description": "Snoozes a notification and all past notifications for the associated entity.",
+            "args": [
+              {
+                "name": "snoozedUntilAt",
+                "description": "The time until a notification will be snoozed. After that it will appear in the inbox again.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "DateTime",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "input",
+                "description": "The type and id of the entity to archive notifications for.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "NotificationEntityInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationBatchActionPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "notificationUnsnoozeAll",
+            "description": "Unsnoozes a notification and all past notifications for the associated entity.",
+            "args": [
+              {
+                "name": "unsnoozedAt",
+                "description": "The time when the notification was unsnoozed.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "DateTime",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "input",
+                "description": "The type and id of the entity to archive notifications for.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "NotificationEntityInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationBatchActionPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "notificationArchive",
             "description": "Archives a notification.",
             "args": [
@@ -56079,6 +56363,37 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "NotificationArchivePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "notificationArchiveAll",
+            "description": "Archives all of the user's past notifications for the associated entity.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The type and id of the entity to archive notifications for.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "NotificationEntityInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationBatchActionPayload",
                 "ofType": null
               }
             },
