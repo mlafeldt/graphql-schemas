@@ -338,6 +338,11 @@ type AttachmentPayload {
   success: Boolean!
 }
 
+type AttachmentSourcesPayload {
+  """A unique list of all source types used in this workspace"""
+  sources: JSONObject!
+}
+
 input AttachmentUpdateInput {
   """The attachment title."""
   title: String!
@@ -10029,6 +10034,16 @@ type Query {
     """
     id: String!
   ): Issue! @deprecated(reason: "Will be removed in near future, please use `attachmentsForURL` to get attachments and their issues instead.")
+
+  """
+  [Internal] Get a list of all unique attachment sources in the workspace
+  """
+  attachmentSources(
+    """
+    (optional) if provided will only return attachment sources for the given team
+    """
+    teamId: String
+  ): AttachmentSourcesPayload!
 
   """List of audit entry types."""
   auditEntryTypes: [AuditEntryType!]!
