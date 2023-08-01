@@ -920,7 +920,7 @@ type CustomView implements Node {
   creator: User!
 
   """[ALPHA] The user who owns the custom view."""
-  owner: User
+  owner: User!
 
   """[ALPHA] The user who last updated the custom view."""
   updatedBy: User!
@@ -2789,6 +2789,11 @@ type IntegrationTemplate implements Node {
 
   """The integration that the template is associated with."""
   integration: Integration!
+
+  """
+  ID of the foreign entity in the external integration this template is for, e.g., Slack channel ID.
+  """
+  foreignEntityId: String
 }
 
 type IntegrationTemplateConnection {
@@ -6244,18 +6249,17 @@ type Mutation {
     id: String!
   ): ProjectPayload!
 
-  """
-  Deletes a project. All issues will be disassociated from the deleted project.
-  """
+  """Deletes (trashes) a project."""
   projectDelete(
-    """
-    The identifier of the project to delete. Also the identifier from the URL is accepted.
-    """
+    """The identifier of the project to delete."""
     id: String!
-  ): DeletePayload!
+  ): ProjectArchivePayload!
 
   """Archives a project."""
   projectArchive(
+    """Whether to trash the issue"""
+    trash: Boolean
+
     """
     The identifier of the project to archive. Also the identifier from the URL is accepted.
     """
@@ -8381,6 +8385,9 @@ type Project implements Node {
   """
   autoArchivedAt: DateTime
 
+  """A flag that indicates whether the project is in the trash bin."""
+  trashed: Boolean
+
   """The sort order for the project within the organization."""
   sortOrder: Float!
 
@@ -9305,6 +9312,9 @@ type ProjectSearchResult implements Node {
   The time at which the project was automatically archived by the auto pruning process.
   """
   autoArchivedAt: DateTime
+
+  """A flag that indicates whether the project is in the trash bin."""
+  trashed: Boolean
 
   """The sort order for the project within the organization."""
   sortOrder: Float!
@@ -10953,6 +10963,9 @@ type Query {
 
     """Search string to look for."""
     term: String!
+
+    """UUID of a team to use as a boost"""
+    teamId: String
   ): DocumentSearchPayload!
 
   """Search projects."""
@@ -10983,6 +10996,9 @@ type Query {
 
     """Search string to look for."""
     term: String!
+
+    """UUID of a team to use as a boost"""
+    teamId: String
   ): ProjectSearchPayload!
 
   """Search issues."""
@@ -11016,6 +11032,9 @@ type Query {
 
     """Search string to look for."""
     term: String!
+
+    """UUID of a team to use as a boost"""
+    teamId: String
   ): IssueSearchPayload!
 
   """All team memberships."""

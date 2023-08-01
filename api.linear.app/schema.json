@@ -1663,6 +1663,18 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "foreignEntityId",
+            "description": "ID of the foreign entity in the external integration this template is for, e.g., Slack channel ID.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -5597,6 +5609,18 @@
             "type": {
               "kind": "SCALAR",
               "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "trashed",
+            "description": "A flag that indicates whether the project is in the trash bin.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
               "ofType": null
             },
             "isDeprecated": false,
@@ -12353,9 +12377,13 @@
             "description": "[ALPHA] The user who owns the custom view.",
             "args": [],
             "type": {
-              "kind": "OBJECT",
-              "name": "User",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "User",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -28049,6 +28077,18 @@
             "type": {
               "kind": "SCALAR",
               "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "trashed",
+            "description": "A flag that indicates whether the project is in the trash bin.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
               "ofType": null
             },
             "isDeprecated": false,
@@ -51091,6 +51131,16 @@
                   }
                 },
                 "defaultValue": null
+              },
+              {
+                "name": "teamId",
+                "description": "UUID of a team to use as a boost",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
               }
             ],
             "type": {
@@ -51180,6 +51230,16 @@
                     "name": "String",
                     "ofType": null
                   }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "teamId",
+                "description": "UUID of a team to use as a boost",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
                 },
                 "defaultValue": null
               }
@@ -51281,6 +51341,16 @@
                     "name": "String",
                     "ofType": null
                   }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "teamId",
+                "description": "UUID of a team to use as a boost",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
                 },
                 "defaultValue": null
               }
@@ -57558,11 +57628,11 @@
           },
           {
             "name": "projectDelete",
-            "description": "Deletes a project. All issues will be disassociated from the deleted project.",
+            "description": "Deletes (trashes) a project.",
             "args": [
               {
                 "name": "id",
-                "description": "The identifier of the project to delete. Also the identifier from the URL is accepted.",
+                "description": "The identifier of the project to delete.",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -57580,7 +57650,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "DeletePayload",
+                "name": "ProjectArchivePayload",
                 "ofType": null
               }
             },
@@ -57591,6 +57661,16 @@
             "name": "projectArchive",
             "description": "Archives a project.",
             "args": [
+              {
+                "name": "trash",
+                "description": "Whether to trash the issue",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
               {
                 "name": "id",
                 "description": "The identifier of the project to archive. Also the identifier from the URL is accepted.",
