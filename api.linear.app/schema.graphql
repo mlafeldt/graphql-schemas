@@ -919,7 +919,7 @@ type CustomView implements Node {
   """The user who created the custom view."""
   creator: User!
 
-  """[ALPHA] The user who owns the custom view."""
+  """The user who owns the custom view."""
   owner: User!
 
   """[ALPHA] The user who last updated the custom view."""
@@ -2815,6 +2815,9 @@ input IntegrationTemplateCreateInput {
 
   """The identifier of the template."""
   templateId: String!
+
+  """The foreign identifier in the other service."""
+  foreignEntityId: String
 }
 
 type IntegrationTemplateEdge {
@@ -5575,6 +5578,15 @@ type Mutation {
     code: String!
   ): IntegrationPayload!
 
+  """Connect a Slack channel to Asks."""
+  integrationAsksConnectChannel(
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
   """Slack webhook integration."""
   integrationSlackPost(
     """
@@ -8105,6 +8117,9 @@ type OrganizationInvite implements Node {
   """
   expiresAt: DateTime
 
+  """Extra metadata associated with the organization invite."""
+  metadata: JSONObject!
+
   """The user who created the invitation."""
   inviter: User!
 
@@ -8140,6 +8155,9 @@ input OrganizationInviteCreateInput {
 
   """The teams that the user has been invited to."""
   teamIds: [String!]
+
+  """[INTERNAL] Optional metadata about the invite"""
+  metadata: JSONObject
 }
 
 union OrganizationInviteDetailsPayload = OrganizationInviteFullDetailsPayload | OrganizationAcceptedOrExpiredInviteDetailsPayload
