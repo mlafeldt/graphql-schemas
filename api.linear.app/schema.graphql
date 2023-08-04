@@ -4,6 +4,30 @@ directive @specifiedBy(
   url: String!
 ) on SCALAR
 
+"""
+A bot actor is an actor that is not a user, but an application or integration.
+"""
+type ActorBot {
+  id: ID!
+
+  """The type of bot."""
+  type: String!
+
+  """The sub type of the bot."""
+  subType: String
+
+  """The display name of the bot."""
+  name: String
+
+  """
+  The display name of the external user on behalf of which the bot acted.
+  """
+  userDisplayName: String
+
+  """A url pointing to the avatar representing this bot."""
+  avatarUrl: String
+}
+
 input AirbyteConfigurationInput {
   """Linear export API key."""
   apiKey: String!
@@ -3906,6 +3930,9 @@ type IssueHistory implements Node {
   [Internal] Serialized JSON representing changes for certain non-relational properties.
   """
   changes: JSONObject
+
+  """The bot that performed the action"""
+  botActor: ActorBot
 }
 
 type IssueHistoryConnection {
@@ -4302,6 +4329,9 @@ type IssueNotification implements Notification & Entity & Node {
 
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
+
+  """The bot that caused the notification."""
+  botActor: ActorBot
 
   """Name of the reaction emoji related to the notification."""
   reactionEmoji: String
@@ -6718,6 +6748,9 @@ interface Notification {
 
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
+
+  """The bot that caused the notification."""
+  botActor: ActorBot
 }
 
 """A generic payload return from entity archive mutations."""
@@ -7687,6 +7720,9 @@ type OauthClientApprovalNotification implements Notification & Entity & Node {
 
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
+
+  """The bot that caused the notification."""
+  botActor: ActorBot
 
   """The OAuth client approval request related to the notification."""
   oauthClientApproval: OauthClientApproval!
@@ -9171,6 +9207,9 @@ type ProjectNotification implements Notification & Entity & Node {
 
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
+
+  """The bot that caused the notification."""
+  botActor: ActorBot
 
   """The project related to the notification."""
   project: Project!
