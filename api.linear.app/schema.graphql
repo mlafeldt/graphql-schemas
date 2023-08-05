@@ -1610,6 +1610,9 @@ type DocumentContent implements Node {
 
   """The issue that the document is associated with."""
   issue: Issue
+
+  """The project that the document is associated with."""
+  project: Project
 }
 
 input DocumentCreateInput {
@@ -8689,6 +8692,12 @@ type Project implements Node {
 
   """Settings for all integrations associated with that project."""
   integrationsSettings: IntegrationsSettings
+
+  """The project's content in markdown format."""
+  content: String
+
+  """[Internal] The project's content as a Prosemirror document."""
+  contentData: JSON
 }
 
 """A generic payload return from entity archive mutations."""
@@ -9621,6 +9630,12 @@ type ProjectSearchResult implements Node {
   """Settings for all integrations associated with that project."""
   integrationsSettings: IntegrationsSettings
 
+  """The project's content in markdown format."""
+  content: String
+
+  """[Internal] The project's content as a Prosemirror document."""
+  contentData: JSON
+
   """Metadata related to search result"""
   metadata: JSONObject!
 }
@@ -9957,6 +9972,7 @@ type PushSubscriptionTestPayload {
 enum PushSubscriptionType {
   web
   apple
+  firebase
 }
 
 type Query {
