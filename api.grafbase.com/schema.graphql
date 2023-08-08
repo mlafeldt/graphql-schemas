@@ -371,6 +371,13 @@ type DuplicateDatabaseRegionsError {
   query: Query!
 }
 
+"""
+Implement the Duration scalar
+
+The input/output is a string in ISO8601 format.
+"""
+scalar Duration
+
 type EmptyDatabaseRegionsError {
   query: Query!
 }
@@ -1230,6 +1237,7 @@ type Project {
   status: ProjectStatus!
   databaseRegionChangeStatus: DatabaseRegionChangeStatus!
   customDomains: [String!]!
+  requestAnalytics(filter: ProjectRequestAnalyticsFilter!): RequestAnalytics!
 }
 
 type ProjectApiKey {
@@ -1402,6 +1410,13 @@ type ProjectPlan {
   monthlyLimits: MonthlyLimits!
 }
 
+input ProjectRequestAnalyticsFilter {
+  branch: String = null
+  from: DateTime!
+  to: DateTime!
+  graphqlOperation: String
+}
+
 enum ProjectStatus {
   ACTIVE
   INACTIVE
@@ -1500,6 +1515,77 @@ type RepositoryContainsNoBranchesError {
 
 type RepositorySlugInUseError {
   query: Query!
+}
+
+type RequestAnalytics {
+  timeSeries: RequestMetricsTimeSeries!
+  metrics: RequestMetrics!
+  periodStart: DateTime!
+  periodEnd: DateTime!
+}
+
+type RequestMetrics {
+  requestCount: Int!
+  cacheableRequestCount: Int!
+  cacheHitCount: Int!
+  cacheMissCount: Int!
+  cacheBypassCount: Int!
+  cacheUpdatingCount: Int!
+  cacheStaleCount: Int!
+  error4XxCount: Int!
+  error5XxCount: Int!
+  errorGraphqlCount: Int!
+  latencyMsP95: Int
+  latencyMsP99: Int
+  cacheHitRatio: Float!
+  requestsPerSecond: Float!
+  cacheableRequestsPerSecond: Float!
+  cacheHitsPerSecond: Float!
+  cacheMissesPerSecond: Float!
+  cacheBypassesPerSecond: Float!
+  cacheUpdatingPerSecond: Float!
+  cacheStalesPerSecond: Float!
+  errors4XxPerSecond: Float!
+  errors5XxPerSecond: Float!
+  errorsGraphqlPerSecond: Float!
+  errorsCount: Int!
+  errorsPerSecond: Float!
+  errorsRatio: Float!
+}
+
+type RequestMetricsTimeSeries {
+  data: [RequestMetricsTimeSeriesDataPoint!]!
+  aggregationStep: Duration!
+}
+
+type RequestMetricsTimeSeriesDataPoint {
+  dateTime: DateTime!
+  requestCount: Int!
+  cacheableRequestCount: Int!
+  cacheHitCount: Int!
+  cacheMissCount: Int!
+  cacheBypassCount: Int!
+  cacheUpdatingCount: Int!
+  cacheStaleCount: Int!
+  error4XxCount: Int!
+  error5XxCount: Int!
+  errorGraphqlCount: Int!
+  latencyMsP95: Int
+  latencyMsP99: Int
+  cacheHitRatio: Float!
+  requestsPerSecond: Float!
+  cacheableRequestsPerSecond: Float!
+  cacheHitsPerSecond: Float!
+  cacheMissesPerSecond: Float!
+  cacheBypassesPerSecond: Float!
+  cacheUpdatingPerSecond: Float!
+  cacheStalesPerSecond: Float!
+  errors4XxPerSecond: Float!
+  errors5XxPerSecond: Float!
+  errorsGraphqlPerSecond: Float!
+  errorsCount: Int!
+  errorsPerSecond: Float!
+  errorsRatio: Float!
 }
 
 type ReservedPrefixError {
