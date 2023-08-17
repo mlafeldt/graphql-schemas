@@ -572,6 +572,12 @@ type Comment implements Node {
   """The parent comment under which the current comment is nested."""
   parent: Comment
 
+  """[ALPHA] The user that resolved the thread."""
+  resolvingUser: User
+
+  """[ALPHA] The comment that resolved the thread."""
+  resolvingComment: Comment
+
   """The user who wrote the comment."""
   user: User
 
@@ -5165,6 +5171,13 @@ type Mutation {
     """
     createAsUser: String
 
+    """
+    Provide an external user avatar URL. Can only be used in conjunction with
+    the `createAsUser` options. This option is only available to OAuth
+    applications creating comments in `actor=application` mode.
+    """
+    displayIconUrl: String
+
     """The url to link."""
     url: String!
 
@@ -5186,6 +5199,13 @@ type Mutation {
     """
     createAsUser: String
 
+    """
+    Provide an external user avatar URL. Can only be used in conjunction with
+    the `createAsUser` options. This option is only available to OAuth
+    applications creating comments in `actor=application` mode.
+    """
+    displayIconUrl: String
+
     """The Zendesk ticket ID to link."""
     ticketId: String!
 
@@ -5200,6 +5220,13 @@ type Mutation {
     available to OAuth applications creating attachments in `actor=application` mode.
     """
     createAsUser: String
+
+    """
+    Provide an external user avatar URL. Can only be used in conjunction with
+    the `createAsUser` options. This option is only available to OAuth
+    applications creating comments in `actor=application` mode.
+    """
+    displayIconUrl: String
 
     """The issue for which to link the Discord message."""
     issueId: String!
@@ -5221,6 +5248,13 @@ type Mutation {
     available to OAuth applications creating attachments in `actor=application` mode.
     """
     createAsUser: String
+
+    """
+    Provide an external user avatar URL. Can only be used in conjunction with
+    the `createAsUser` options. This option is only available to OAuth
+    applications creating comments in `actor=application` mode.
+    """
+    displayIconUrl: String
 
     """The Slack channel ID for the message to link."""
     channel: String!
@@ -5254,6 +5288,13 @@ type Mutation {
     """
     createAsUser: String
 
+    """
+    Provide an external user avatar URL. Can only be used in conjunction with
+    the `createAsUser` options. This option is only available to OAuth
+    applications creating comments in `actor=application` mode.
+    """
+    displayIconUrl: String
+
     """The Front conversation ID to link."""
     conversationId: String!
 
@@ -5268,6 +5309,13 @@ type Mutation {
     available to OAuth applications creating attachments in `actor=application` mode.
     """
     createAsUser: String
+
+    """
+    Provide an external user avatar URL. Can only be used in conjunction with
+    the `createAsUser` options. This option is only available to OAuth
+    applications creating comments in `actor=application` mode.
+    """
+    displayIconUrl: String
 
     """The Intercom conversation ID to link."""
     conversationId: String!
@@ -5371,6 +5419,20 @@ type Mutation {
     """The identifier of the comment to delete."""
     id: String!
   ): DeletePayload!
+
+  """[ALPHA] Resolves a comment."""
+  commentResolve(
+    resolvingCommentId: String
+
+    """The identifier of the comment to update."""
+    id: String!
+  ): CommentPayload!
+
+  """[ALPHA] Unresolves a comment."""
+  commentUnresolve(
+    """The identifier of the comment to update."""
+    id: String!
+  ): CommentPayload!
 
   """Saves user message."""
   contactCreate(
@@ -6206,7 +6268,7 @@ type Mutation {
   notificationSubscriptionDelete(
     """The identifier of the notification subscription reference to delete."""
     id: String!
-  ): DeletePayload!
+  ): DeletePayload! @deprecated(reason: "Update `notificationSubscription.active` to `false` instead.")
 
   """[INTERNAL] Verifies a domain claim."""
   organizationDomainClaim(
@@ -6978,6 +7040,9 @@ input NotificationSubscriptionCreateInput {
 
   """The types of notifications of the subscription."""
   notificationSubscriptionTypes: [String!]
+
+  """Whether the subscription is active."""
+  active: Boolean
 }
 
 type NotificationSubscriptionEdge {
@@ -7001,6 +7066,9 @@ type NotificationSubscriptionPayload {
 input NotificationSubscriptionUpdateInput {
   """The types of notifications of the subscription."""
   notificationSubscriptionTypes: [String!]
+
+  """Whether the subscription is active."""
+  active: Boolean
 }
 
 input NotificationUpdateInput {
@@ -9756,6 +9824,9 @@ type ProjectUpdate implements Node {
 
   """The URL to the project update."""
   url: String!
+
+  """The diff between the current update and the previous one."""
+  diff: JSON
 }
 
 type ProjectUpdateConnection {
@@ -11910,6 +11981,9 @@ type SlackChannelNameMapping {
 
   """The Slack channel name."""
   name: String!
+
+  """Whether or not the Slack channel is private"""
+  isPrivate: Boolean
 }
 
 input SlackChannelNameMappingInput {
@@ -11918,6 +11992,9 @@ input SlackChannelNameMappingInput {
 
   """The Slack channel name."""
   name: String!
+
+  """Whether or not the Slack channel is private"""
+  isPrivate: Boolean
 }
 
 """Slack notification specific settings."""
