@@ -147,6 +147,20 @@ type ArchiveResponse {
   includesDependencies: Boolean!
 }
 
+type AsksChannelConnectPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The integration that was created or updated."""
+  integration: Integration
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The new Asks Slack channel mapping for the connected channel."""
+  mapping: SlackChannelNameMapping!
+}
+
 """Issue attachment (e.g. support ticket, pull request)."""
 type Attachment implements Node {
   """The unique identifier of the entity."""
@@ -1623,11 +1637,26 @@ type DocumentContent implements Node {
   """The document content as JSON."""
   contentData: JSONObject
 
+  """The document content state as a base64 encoded string."""
+  contentState: JSONObject
+
   """The issue that the document is associated with."""
   issue: Issue
 
   """The project that the document is associated with."""
   project: Project
+}
+
+"""Document content filtering options."""
+input DocumentContentFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
 }
 
 input DocumentCreateInput {
@@ -5681,9 +5710,12 @@ type Mutation {
   ): IntegrationPayload!
 
   """[INTERNAL] Integrates the organization with PagerDuty."""
-  integrationPageDutyConnect(
-    """The PagerDuty API token."""
-    apiToken: String!
+  integrationPagerDutyConnect(
+    """The PagerDuty OAuth code."""
+    code: String!
+
+    """The PagerDuty OAuth redirect URI."""
+    redirectUri: String!
   ): IntegrationPayload!
 
   """Updates the organization's Slack integration."""
@@ -5734,7 +5766,7 @@ type Mutation {
 
     """The Slack OAuth code."""
     code: String!
-  ): IntegrationPayload!
+  ): AsksChannelConnectPayload!
 
   """Slack webhook integration."""
   integrationSlackPost(
@@ -7196,6 +7228,18 @@ input NullableDateComparator {
   Greater-than-or-equal constraint. Matches any values that are greater than or equal to the given value.
   """
   gte: DateTime
+}
+
+"""Document content filtering options."""
+input NullableDocumentContentFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
 }
 
 """Issue filtering options."""
@@ -13919,6 +13963,7 @@ enum UserFlagType {
   tryRoadmapsDismissed
   tryCyclesDismissed
   tryTriageDismissed
+  tryGithubDismissed
   rewindBannerDismissed
   dueDateShortcutMigration
   slackCommentReactionTipShown
