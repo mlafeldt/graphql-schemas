@@ -639,6 +639,9 @@ type Comment implements Node {
     """
     orderBy: PaginationOrderBy
   ): CommentConnection!
+
+  """The bot that created the comment"""
+  botActor: ActorBot
 }
 
 """Comment filtering options."""
@@ -2326,14 +2329,11 @@ type FirstResponderSchedule implements Node {
   """The team to which the schedule belongs to."""
   team: Team!
 
-  """The current schedule and available schedules."""
-  scheduleData: JSONObject!
+  """The schedule information."""
+  scheduleData: JSONObject
 
-  """The integration used for scheduling."""
+  """The integration used for time scheduling."""
   integration: Integration!
-
-  """The id of the integration schedule used for scheduling."""
-  integrationScheduleId: String
 }
 
 type FirstResponderScheduleConnection {
@@ -3587,6 +3587,9 @@ input IssueCreateInput {
   creating comments in `actor=application` mode.
   """
   displayIconUrl: String
+
+  """Whether the passed sort order should be preserved"""
+  preserveSortOrderOnCreate: Boolean
 
   """
   The date when the issue was created (e.g. if importing from another system).
@@ -4985,7 +4988,7 @@ input IssueUpdateInput {
   """The date at which the issue is due."""
   dueDate: TimelessDate
 
-  """Wether the issue has been trashed."""
+  """Whether the issue has been trashed."""
   trashed: Boolean
 
   """
