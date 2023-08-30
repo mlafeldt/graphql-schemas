@@ -1038,6 +1038,11 @@ type CustomViewEdge {
   cursor: String!
 }
 
+type CustomViewHasSubscribersPayload {
+  """Whether the custom view has subscribers."""
+  hasSubscribers: Boolean!
+}
+
 """A custom view notification subscription."""
 type CustomViewNotificationSubscription implements NotificationSubscription & Entity & Node {
   """The unique identifier of the entity."""
@@ -10438,6 +10443,12 @@ type Query {
 
   """[INTERNAL] Suggests metadata for a view based on it's filters."""
   customViewDetailsSuggestion(modelName: String, filter: JSONObject!): CustomViewSuggestionPayload!
+
+  """Whether a custom view has subscribers in the organization."""
+  customViewHasSubscribers(
+    """The identifier of the custom view."""
+    id: String!
+  ): CustomViewHasSubscribersPayload!
 
   """All cycles."""
   cycles(
