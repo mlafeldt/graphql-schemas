@@ -6373,7 +6373,7 @@ type Mutation {
   """Updates the user's organization."""
   organizationUpdate(
     """A partial organization object to update the organization with."""
-    input: UpdateOrganizationInput!
+    input: OrganizationUpdateInput!
   ): OrganizationPayload!
 
   """
@@ -6682,7 +6682,7 @@ type Mutation {
   """
   userUpdate(
     """A partial user object to update the user with."""
-    input: UpdateUserInput!
+    input: UserUpdateInput!
 
     """
     The identifier of the user to update. Use `me` to reference currently authenticated user.
@@ -8026,6 +8026,9 @@ type Organization implements Node {
   """
   previousUrlKeys: [String!]!
 
+  """Whether member users are allowed to send invites"""
+  allowMembersToInvite: Boolean
+
   """The feature release channel the organization belongs to."""
   releaseChannel: ReleaseChannel!
 
@@ -8466,6 +8469,66 @@ type OrganizationPayload {
 type OrganizationStartPlusTrialPayload {
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+input OrganizationUpdateInput {
+  """The name of the organization."""
+  name: String
+
+  """The logo of the organization."""
+  logoUrl: String
+
+  """The URL key of the organization."""
+  urlKey: String
+
+  """
+  How git branches are formatted. If null, default formatting will be used.
+  """
+  gitBranchFormat: String
+
+  """
+  Whether the Git integration linkback messages should be sent for private repositories.
+  """
+  gitLinkbackMessagesEnabled: Boolean
+
+  """
+  Whether the Git integration linkback messages should be sent for public repositories.
+  """
+  gitPublicLinkbackMessagesEnabled: Boolean
+
+  """Whether the organization is using roadmap."""
+  roadmapEnabled: Boolean
+
+  """The frequency at which project updates are sent."""
+  projectUpdatesReminderFrequency: ProjectUpdateReminderFrequency
+
+  """The day at which project updates are sent."""
+  projectUpdateRemindersDay: Day
+
+  """The hour at which project updates are sent."""
+  projectUpdateRemindersHour: Float
+
+  """
+  Whether the organization has opted for reduced customer support attachment information.
+  """
+  reducedPersonalInformation: Boolean
+
+  """
+  Whether the organization has opted for having to approve all OAuth applications for install.
+  """
+  oauthAppReview: Boolean
+
+  """Linear Preview feature flags"""
+  linearPreviewFlags: JSONObject
+
+  """List of services that are allowed to be used for login."""
+  allowedAuthServices: [String!]
+
+  """Internal. Whether SLAs have been enabled for the organization."""
+  slaEnabled: Boolean
+
+  """Which day count to use for SLA calculation."""
+  slaDayCount: SLADayCountType
 }
 
 type PageInfo {
@@ -9923,6 +9986,34 @@ type ProjectUpdateEdge {
   cursor: String!
 }
 
+"""ProjectUpdate filtering options."""
+input ProjectUpdateFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Filters that the project update creator must satisfy."""
+  user: UserFilter
+
+  """Filters that the project update project must satisfy."""
+  project: ProjectFilter
+
+  """
+  Compound filters, all of which need to be matched by the ProjectUpdate.
+  """
+  and: [ProjectUpdateFilter!]
+
+  """
+  Compound filters, one of which need to be matched by the ProjectUpdate.
+  """
+  or: [ProjectUpdateFilter!]
+}
+
 """The health type of a project when the update is created."""
 enum ProjectUpdateHealthType {
   onTrack
@@ -10658,6 +10749,9 @@ type Query {
 
   """All project updates."""
   projectUpdates(
+    """Filter returned project updates."""
+    filter: ProjectUpdateFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -12094,6 +12188,7 @@ enum SlaStatus {
   LowRisk
   Completed
   Failed
+  Paused
 }
 
 """Comparator for sla status."""
@@ -13424,101 +13519,6 @@ input TokenUserAccountAuthInput {
   inviteLink: String
 }
 
-input UpdateOrganizationInput {
-  """The name of the organization."""
-  name: String
-
-  """The logo of the organization."""
-  logoUrl: String
-
-  """The URL key of the organization."""
-  urlKey: String
-
-  """
-  How git branches are formatted. If null, default formatting will be used.
-  """
-  gitBranchFormat: String
-
-  """
-  Whether the Git integration linkback messages should be sent for private repositories.
-  """
-  gitLinkbackMessagesEnabled: Boolean
-
-  """
-  Whether the Git integration linkback messages should be sent for public repositories.
-  """
-  gitPublicLinkbackMessagesEnabled: Boolean
-
-  """Whether the organization is using roadmap."""
-  roadmapEnabled: Boolean
-
-  """The frequency at which project updates are sent."""
-  projectUpdatesReminderFrequency: ProjectUpdateReminderFrequency
-
-  """The day at which project updates are sent."""
-  projectUpdateRemindersDay: Day
-
-  """The hour at which project updates are sent."""
-  projectUpdateRemindersHour: Float
-
-  """
-  Whether the organization has opted for reduced customer support attachment information.
-  """
-  reducedPersonalInformation: Boolean
-
-  """
-  Whether the organization has opted for having to approve all OAuth applications for install.
-  """
-  oauthAppReview: Boolean
-
-  """Linear Preview feature flags"""
-  linearPreviewFlags: JSONObject
-
-  """List of services that are allowed to be used for login."""
-  allowedAuthServices: [String!]
-
-  """Internal. Whether SLAs have been enabled for the organization."""
-  slaEnabled: Boolean
-
-  """Which day count to use for SLA calculation."""
-  slaDayCount: SLADayCountType
-}
-
-input UpdateUserInput {
-  """The name of the user."""
-  name: String
-
-  """The display name of the user."""
-  displayName: String
-
-  """The avatar image URL of the user."""
-  avatarUrl: String
-
-  """Whether the user account is active."""
-  active: Boolean
-
-  """Reason for deactivation."""
-  disableReason: String
-
-  """Whether the user account has admin privileges."""
-  admin: Boolean
-
-  """The user description or a short bio."""
-  description: String
-
-  """The emoji part of the user status."""
-  statusEmoji: String
-
-  """The label part of the user status."""
-  statusLabel: String
-
-  """When the user status should be cleared."""
-  statusUntilAt: DateTime
-
-  """The local timezone of the user."""
-  timezone: String
-}
-
 """Object representing Google Cloud upload policy, plus additional data."""
 type UploadFile {
   """The filename."""
@@ -14200,6 +14200,41 @@ input UserSettingsUpdateInput {
 
   """[Internal] The user's usage warning history."""
   usageWarningHistory: JSONObject
+}
+
+input UserUpdateInput {
+  """The name of the user."""
+  name: String
+
+  """The display name of the user."""
+  displayName: String
+
+  """The avatar image URL of the user."""
+  avatarUrl: String
+
+  """Whether the user account is active."""
+  active: Boolean
+
+  """Reason for deactivation."""
+  disableReason: String
+
+  """Whether the user account has admin privileges."""
+  admin: Boolean
+
+  """The user description or a short bio."""
+  description: String
+
+  """The emoji part of the user status."""
+  statusEmoji: String
+
+  """The label part of the user status."""
+  statusLabel: String
+
+  """When the user status should be cleared."""
+  statusUntilAt: DateTime
+
+  """The local timezone of the user."""
+  timezone: String
 }
 
 """A universally unique identifier as specified by RFC 4122."""

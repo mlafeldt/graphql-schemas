@@ -16471,6 +16471,18 @@
             "deprecationReason": null
           },
           {
+            "name": "allowMembersToInvite",
+            "description": "Whether member users are allowed to send invites",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "releaseChannel",
             "description": "The feature release channel the organization belongs to.",
             "args": [],
@@ -37998,6 +38010,12 @@
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "Paused",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "possibleTypes": null
@@ -42839,7 +42857,7 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "UpdateOrganizationInput",
+        "name": "OrganizationUpdateInput",
         "description": null,
         "fields": null,
         "inputFields": [
@@ -43687,6 +43705,103 @@
                 "kind": "SCALAR",
                 "name": "DateTime",
                 "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectUpdateFilter",
+        "description": "ProjectUpdate filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "user",
+            "description": "Filters that the project update creator must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "project",
+            "description": "Filters that the project update project must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the ProjectUpdate.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectUpdateFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the ProjectUpdate.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectUpdateFilter",
+                  "ofType": null
+                }
               }
             },
             "defaultValue": null
@@ -45155,7 +45270,7 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "UpdateUserInput",
+        "name": "UserUpdateInput",
         "description": null,
         "fields": null,
         "inputFields": [
@@ -49972,6 +50087,16 @@
             "name": "projectUpdates",
             "description": "All project updates.",
             "args": [
+              {
+                "name": "filter",
+                "description": "Filter returned project updates.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectUpdateFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
               {
                 "name": "before",
                 "description": "A cursor to be used with last for backward pagination.",
@@ -58504,7 +58629,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "UpdateOrganizationInput",
+                    "name": "OrganizationUpdateInput",
                     "ofType": null
                   }
                 },
@@ -60004,7 +60129,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "UpdateUserInput",
+                    "name": "UserUpdateInput",
                     "ofType": null
                   }
                 },
