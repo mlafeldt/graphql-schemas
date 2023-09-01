@@ -1587,12 +1587,6 @@ type Document implements Node {
   """The document title."""
   title: String!
 
-  """The document content in markdown format."""
-  content: String
-
-  """The document content as JSON."""
-  contentData: JSONObject
-
   """The icon of the document."""
   icon: String
 
@@ -1610,6 +1604,12 @@ type Document implements Node {
 
   """The document's unique URL slug."""
   slugId: String!
+
+  """The documents content in markdown format."""
+  content: String
+
+  """[Internal] The documents content as a Prosemirror document."""
+  contentData: JSON
 }
 
 type DocumentConnection {
@@ -1646,13 +1646,16 @@ type DocumentContent implements Node {
   contentData: JSONObject
 
   """The document content state as a base64 encoded string."""
-  contentState: JSONObject
+  contentState: String
 
-  """The issue that the document is associated with."""
+  """The issue that the content is associated with."""
   issue: Issue
 
-  """The project that the document is associated with."""
+  """The project that the content is associated with."""
   project: Project
+
+  """The document that the content is associated with."""
+  document: Document
 }
 
 """Document content filtering options."""
@@ -1747,12 +1750,6 @@ type DocumentSearchResult implements Node {
   """The document title."""
   title: String!
 
-  """The document content in markdown format."""
-  content: String
-
-  """The document content as JSON."""
-  contentData: JSONObject
-
   """The icon of the document."""
   icon: String
 
@@ -1770,6 +1767,12 @@ type DocumentSearchResult implements Node {
 
   """The document's unique URL slug."""
   slugId: String!
+
+  """The documents content in markdown format."""
+  content: String
+
+  """[Internal] The documents content as a Prosemirror document."""
+  contentData: JSON
 
   """Metadata related to search result"""
   metadata: JSONObject!
@@ -10574,7 +10577,7 @@ type Query {
   """One specific cycle."""
   cycle(id: String!): Cycle!
 
-  """All documents for the project."""
+  """All documents in the workspace."""
   documents(
     """A cursor to be used with last for backward pagination."""
     before: String
