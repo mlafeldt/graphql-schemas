@@ -1654,6 +1654,9 @@ type DocumentContent implements Node {
   """The project that the content is associated with."""
   project: Project
 
+  """The project milestone that the content is associated with."""
+  projectMilestone: ProjectMilestone
+
   """The document that the content is associated with."""
   document: Document
 }
@@ -9282,9 +9285,6 @@ type ProjectMilestone implements Node {
   """The name of the project milestone."""
   name: String!
 
-  """The description of the project milestone."""
-  description: String
-
   """The planned completion date of the milestone."""
   targetDate: TimelessDate
 
@@ -9295,6 +9295,14 @@ type ProjectMilestone implements Node {
   The order of the milestone in relation to other milestones within a project.
   """
   sortOrder: Float!
+
+  """The project milestone's description in markdown format."""
+  description: String
+
+  """
+  [Internal] The project milestone's description as a Prosemirror document.
+  """
+  descriptionData: JSON
 }
 
 """Milestone collection filtering options."""
@@ -9345,8 +9353,11 @@ input ProjectMilestoneCreateInput {
   """The name of the project milestone."""
   name: String!
 
-  """The description of the project milestone."""
+  """The description of the project milestone in markdown format."""
   description: String
+
+  """The description of the project milestone as a Prosemirror document."""
+  descriptionData: JSONObject
 
   """The planned target date of the project milestone."""
   targetDate: TimelessDate
@@ -9408,14 +9419,14 @@ input ProjectMilestoneUpdateInput {
   """The name of the project milestone."""
   name: String
 
-  """The description of the project milestone."""
+  """The description of the project milestone in markdown format."""
   description: String
+
+  """The description of the project milestone as a Prosemirror document."""
+  descriptionData: JSONObject
 
   """The planned target date of the project milestone."""
   targetDate: TimelessDate
-
-  """Related project for the project milestone."""
-  projectId: String
 
   """The sort order for the project milestone within a project."""
   sortOrder: Float
