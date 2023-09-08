@@ -6525,6 +6525,17 @@ type Mutation {
     id: String!
   ): ProjectUpdateWithInteractionPayload!
 
+  """Create a notification to remind a user about a project update."""
+  createProjectUpdateReminder(
+    """
+    The user identifier to whom the notification will be sent. By default, it is set to the project lead.
+    """
+    userId: String
+
+    """The identifier of the project to remind about."""
+    projectId: String!
+  ): ProjectUpdateReminderPayload!
+
   """Creates a push subscription."""
   pushSubscriptionCreate(
     """The push subscription to create."""
@@ -10182,6 +10193,14 @@ enum ProjectUpdateReminderFrequency {
   twoWeeks
   month
   never
+}
+
+type ProjectUpdateReminderPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
 }
 
 input ProjectUpdateUpdateInput {
