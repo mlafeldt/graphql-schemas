@@ -492,6 +492,38 @@ type AuditEntryType {
   description: String!
 }
 
+"""User authentication session."""
+type AuthenticationSession {
+  id: String!
+
+  """Type of application used to authenticate."""
+  type: String!
+
+  """IP address."""
+  ip: String
+
+  """Location country name."""
+  locationCountry: String
+
+  """Location country code."""
+  locationCountryCode: String
+
+  """Location city name."""
+  locationCity: String
+
+  """Session's user-agent."""
+  userAgent: String
+
+  """Date when the session was created."""
+  createdAt: DateTime!
+
+  """Date when the session was last updated."""
+  updatedAt: DateTime!
+
+  """Human readable location"""
+  location: String
+}
+
 """[INTERNAL] An OAuth userId/createdDate tuple"""
 type AuthMembership {
   """The authorizing userId"""
@@ -1605,6 +1637,9 @@ type Document implements Node {
   """The document's unique URL slug."""
   slugId: String!
 
+  """The last template that was applied to this document."""
+  lastAppliedTemplate: Template
+
   """The documents content in markdown format."""
   content: String
 
@@ -1696,6 +1731,9 @@ input DocumentCreateInput {
 
   """Related project for the document."""
   projectId: String!
+
+  """The ID of the last template applied to the document."""
+  lastAppliedTemplateId: String
 }
 
 type DocumentEdge {
@@ -1771,6 +1809,9 @@ type DocumentSearchResult implements Node {
   """The document's unique URL slug."""
   slugId: String!
 
+  """The last template that was applied to this document."""
+  lastAppliedTemplate: Template
+
   """The documents content in markdown format."""
   content: String
 
@@ -1812,6 +1853,9 @@ input DocumentUpdateInput {
 
   """Related project for the document."""
   projectId: String
+
+  """The ID of the last template applied to the document."""
+  lastAppliedTemplateId: String
 }
 
 input EmailSubscribeInput {
@@ -3082,6 +3126,9 @@ type Issue implements Node {
   """The projectMilestone that the issue is associated with."""
   projectMilestone: ProjectMilestone
 
+  """The last template that was applied to this issue."""
+  lastAppliedTemplate: Template
+
   """Previous identifiers of the issue if it has been moved between teams."""
   previousIdentifiers: [String!]!
 
@@ -3570,6 +3617,9 @@ input IssueCreateInput {
 
   """The project milestone associated with the issue."""
   projectMilestoneId: String
+
+  """The ID of the last template applied to the issue."""
+  lastAppliedTemplateId: String
 
   """The team state of the issue."""
   stateId: String
@@ -4642,6 +4692,9 @@ type IssueSearchResult implements Node {
   """The projectMilestone that the issue is associated with."""
   projectMilestone: ProjectMilestone
 
+  """The last template that was applied to this issue."""
+  lastAppliedTemplate: Template
+
   """Previous identifiers of the issue if it has been moved between teams."""
   previousIdentifiers: [String!]!
 
@@ -4986,6 +5039,9 @@ input IssueUpdateInput {
 
   """The project milestone associated with the issue."""
   projectMilestoneId: String
+
+  """The ID of the last template applied to the issue."""
+  lastAppliedTemplateId: String
 
   """The team state of the issue."""
   stateId: String
@@ -5448,8 +5504,17 @@ type Mutation {
     organizationId: String!
   ): CreateOrJoinOrganizationResponse!
 
-  """Logout of all clients."""
+  """Logout the client."""
   logout: LogoutResponse!
+
+  """Logout an individual session with its ID."""
+  logoutSession(
+    """ID of the session to logout."""
+    sessionId: String!
+  ): LogoutResponse!
+
+  """Logout all of user's sessions including the active one."""
+  logoutAllSessions: LogoutResponse!
 
   """Creates a new comment."""
   commentCreate(
@@ -8723,6 +8788,9 @@ type Project implements Node {
   """The project was created based on this issue."""
   convertedFromIssue: Issue
 
+  """The last template that was applied to this project."""
+  lastAppliedTemplate: Template
+
   """The total number of issues in the project after each week."""
   issueCountHistory: [Float!]!
 
@@ -9092,6 +9160,9 @@ input ProjectCreateInput {
 
   """The ID of the issue from which that project is created."""
   convertedFromIssueId: String
+
+  """The ID of the last template applied to the project."""
+  lastAppliedTemplateId: String
 
   """The identifier of the project lead."""
   leadId: String
@@ -9671,6 +9742,9 @@ type ProjectSearchResult implements Node {
   """The project was created based on this issue."""
   convertedFromIssue: Issue
 
+  """The last template that was applied to this project."""
+  lastAppliedTemplate: Template
+
   """The total number of issues in the project after each week."""
   issueCountHistory: [Float!]!
 
@@ -10064,6 +10138,9 @@ input ProjectUpdateInput {
 
   """The ID of the issue from which that project is created."""
   convertedFromIssueId: String
+
+  """The ID of the last template applied to the project."""
+  lastAppliedTemplateId: String
 
   """The icon of the project."""
   icon: String
@@ -10504,6 +10581,9 @@ type Query {
     """Email to query the SSO login URL by."""
     email: String!
   ): SsoUrlFromEmailResponse!
+
+  """User's active sessions."""
+  authenticationSessions: [AuthenticationSession!]!
 
   """All comments."""
   comments(
@@ -11375,6 +11455,9 @@ type Query {
     """Search string to look for."""
     term: String!
 
+    """Should associated comments be searched (default: true)"""
+    includeComments: Boolean
+
     """UUID of a team to use as a boost"""
     teamId: String
   ): DocumentSearchPayload!
@@ -11407,6 +11490,9 @@ type Query {
 
     """Search string to look for."""
     term: String!
+
+    """Should associated comments be searched (default: true)"""
+    includeComments: Boolean
 
     """UUID of a team to use as a boost"""
     teamId: String
@@ -11443,6 +11529,9 @@ type Query {
 
     """Search string to look for."""
     term: String!
+
+    """Should associated comments be searched (default: true)"""
+    includeComments: Boolean
 
     """UUID of a team to use as a boost"""
     teamId: String
