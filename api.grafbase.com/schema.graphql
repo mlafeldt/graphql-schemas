@@ -466,14 +466,6 @@ type EnvironmentVariableUpdateSuccess {
   query: Query!
 }
 
-type FunctionLogEvent implements LogEvent {
-  id: String!
-  timestamp: DateTime!
-  region: String!
-  logLevel: LogLevel!
-  message: String!
-}
-
 type GitAccount {
   provider: GitProvider!
   id: ID!
@@ -668,7 +660,7 @@ enum LimitCycleChoice {
 
 interface LogEvent {
   id: String!
-  timestamp: DateTime!
+  createdAt: DateTime!
   region: String!
   logLevel: LogLevel!
 }
@@ -891,6 +883,15 @@ type NotAllowedToSlugUpdateError {
 
 type NotAllowedToUpdateOrganizationError {
   query: Query!
+}
+
+type OperationLogEvent implements LogEvent {
+  id: String!
+  createdAt: DateTime!
+  region: String!
+  logLevel: LogLevel!
+  name: String!
+  duration: Int!
 }
 
 type OrbBillingAddress {
@@ -1580,15 +1581,6 @@ type RequestAnalytics {
   metrics: RequestMetrics!
   periodStart: DateTime!
   periodEnd: DateTime!
-}
-
-type RequestLogEvent implements LogEvent {
-  id: String!
-  timestamp: DateTime!
-  region: String!
-  logLevel: LogLevel!
-  httpMethod: String!
-  httpStatus: Int!
 }
 
 type RequestMetrics {
