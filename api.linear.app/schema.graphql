@@ -8629,31 +8629,37 @@ type PageInfo {
 }
 
 input PagerDutyInput {
-  """The mapping of PagerDuty schedule id to names."""
-  scheduleMapping: [PagerDutyScheduleMappingInput!]!
+  """Metadata about a PagerDuty schedule."""
+  scheduleMapping: [PagerDutyScheduleInfoInput!]!
 }
 
-"""Tuple for mapping PagerDuty schedule id to names."""
-type PagerDutyScheduleMapping {
+"""Metadata about a PagerDuty schedule."""
+type PagerDutyScheduleInfo {
   """The PagerDuty schedule id."""
   scheduleId: String!
 
   """The PagerDuty schedule name."""
   scheduleName: String!
+
+  """The URL of the schedule in PagerDuty's web app."""
+  url: String!
 }
 
-input PagerDutyScheduleMappingInput {
+input PagerDutyScheduleInfoInput {
   """The PagerDuty schedule id."""
   scheduleId: String!
 
   """The PagerDuty schedule name."""
   scheduleName: String!
+
+  """The URL of the schedule in PagerDuty's web app."""
+  url: String!
 }
 
 """PagerDuty specific settings."""
 type PagerDutySettings {
-  """The mapping of PagerDuty schedule id to names."""
-  scheduleMapping: [PagerDutyScheduleMapping!]!
+  """Metadata about a PagerDuty schedule."""
+  scheduleMapping: [PagerDutyScheduleInfo!]!
 }
 
 """By which field should the pagination order by"""
@@ -10361,6 +10367,9 @@ type PushSubscriptionEdge {
 type PushSubscriptionPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
+
+  """The push subscription that was created or updated."""
+  entity: PushSubscription!
 
   """Whether the operation was successful."""
   success: Boolean!
