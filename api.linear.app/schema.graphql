@@ -514,6 +514,9 @@ type AuthenticationSession {
   """Session's user-agent."""
   userAgent: String
 
+  """When was the session last seen"""
+  lastActiveAt: DateTime
+
   """Date when the session was created."""
   createdAt: DateTime!
 
@@ -1708,6 +1711,42 @@ input DocumentContentFilter {
   updatedAt: DateComparator
 }
 
+"""A document content history for a document"""
+type DocumentContentHistory implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The document content that this history item is associated with."""
+  documentContent: DocumentContent!
+
+  """The document content as JSON."""
+  contentData: JSONObject
+
+  """IDs of actors whose edits went into this history item."""
+  actorIds: [String!]!
+
+  """
+  The timestamp associated with the DocumentContent when it was originally saved 
+  """
+  contentDataSnapshotAt: DateTime!
+}
+
 input DocumentCreateInput {
   """
   The identifier in UUID v4 format. If none is provided, the backend will generate one.
@@ -2549,6 +2588,51 @@ input GitHubSettingsInput {
   repositories: [String!]
 }
 
+"""GitHub repos available to sync."""
+type GitHubSyncRepo {
+  """The full name of the repository."""
+  fullName: String!
+
+  """The GitHub repo id."""
+  id: Float!
+}
+
+input GitHubSyncRepoInput {
+  """The full name of the repository."""
+  fullName: String!
+
+  """The GitHub repo id."""
+  id: Float!
+}
+
+"""Metadata and settings for a GitHub Sync integration."""
+type GitHubSyncSettings {
+  """The names of the repositories connected for the GitHub integration"""
+  repositories: [GitHubSyncRepo!]
+
+  """Mapping of team to repository for syncing"""
+  teamRepoMap: [TeamRepoMapping!]
+}
+
+input GitHubSyncSettingsInput {
+  """The names of the repositories connected for the GitHub integration"""
+  repositories: [GitHubSyncRepoInput!]
+
+  """Mapping of team to repository for syncing"""
+  teamRepoMap: [TeamRepoMappingInput!]
+}
+
+"""Metadata and settings for a GitLab integration."""
+type GitLabSettings {
+  """The self-hosted URL of the GitLab instance"""
+  url: String
+}
+
+input GitLabSettingsInput {
+  """The self-hosted URL of the GitLab instance"""
+  url: String
+}
+
 """Google Sheets specific settings."""
 type GoogleSheetsSettings {
   spreadsheetId: String!
@@ -2689,6 +2773,8 @@ type IntegrationSettings {
   slackOrgProjectUpdatesPost: SlackPostSettings
   googleSheets: GoogleSheetsSettings
   gitHub: GitHubSettings
+  gitHubSync: GitHubSyncSettings
+  gitLab: GitLabSettings
   sentry: SentrySettings
   zendesk: ZendeskSettings
   intercom: IntercomSettings
@@ -2705,6 +2791,8 @@ input IntegrationSettingsInput {
   slackOrgProjectUpdatesPost: SlackPostSettingsInput
   googleSheets: GoogleSheetsSettingsInput
   gitHub: GitHubSettingsInput
+  gitHubSync: GitHubSyncSettingsInput
+  gitLab: GitLabSettingsInput
   sentry: SentrySettingsInput
   zendesk: ZendeskSettingsInput
   intercom: IntercomSettingsInput
@@ -4467,6 +4555,9 @@ type IssueNotification implements Notification & Entity & Node {
 
   """The team related to the notification."""
   team: Team!
+
+  """The subscriptions related to the notification."""
+  subscriptions: [NotificationSubscription!]
 }
 
 type IssuePayload {
@@ -5299,6 +5390,74 @@ type Mutation {
     id: String
   ): AttachmentPayload!
 
+  """Link an existing GitLab MR to an issue."""
+  attachmentLinkGitLabMR(
+    """
+    Create attachment as a user with the provided name. This option is only
+    available to OAuth applications creating attachments in `actor=application` mode.
+    """
+    createAsUser: String
+
+    """
+    Provide an external user avatar URL. Can only be used in conjunction with
+    the `createAsUser` options. This option is only available to OAuth
+    applications creating comments in `actor=application` mode.
+    """
+    displayIconUrl: String
+
+    """The issue for which to link the GitLab merge request."""
+    issueId: String!
+
+    """Optional attachment ID that may be provided through the API"""
+    id: String
+
+    """The URL of the GitLab merge request to link."""
+    url: String!
+
+    """The owner of the GitLab repository."""
+    owner: String!
+
+    """The name of the GitLab repository."""
+    repo: String!
+
+    """The GitLab merge request number to link."""
+    number: Float!
+  ): AttachmentPayload!
+
+  """Link an existing GitHub PR to an issue."""
+  attachmentLinkGitHubPR(
+    """
+    Create attachment as a user with the provided name. This option is only
+    available to OAuth applications creating attachments in `actor=application` mode.
+    """
+    createAsUser: String
+
+    """
+    Provide an external user avatar URL. Can only be used in conjunction with
+    the `createAsUser` options. This option is only available to OAuth
+    applications creating comments in `actor=application` mode.
+    """
+    displayIconUrl: String
+
+    """The issue for which to link the GitHub pull request."""
+    issueId: String!
+
+    """Optional attachment ID that may be provided through the API"""
+    id: String
+
+    """The URL of the GitHub pull request to link."""
+    url: String!
+
+    """The owner of the GitHub repository."""
+    owner: String!
+
+    """The name of the GitHub repository."""
+    repo: String!
+
+    """The GitHub pull request number to link."""
+    number: Float!
+  ): AttachmentPayload!
+
   """Link an existing Zendesk ticket to an issue."""
   attachmentLinkZendesk(
     """
@@ -5736,6 +5895,12 @@ type Mutation {
 
   """Connects the organization with the GitHub App."""
   integrationGithubConnect(
+    """The GitHub data to connect with."""
+    installationId: String!
+  ): IntegrationPayload!
+
+  """Connects the organization with the GitHub Sync App."""
+  integrationGithubSync(
     """The GitHub data to connect with."""
     installationId: String!
   ): IntegrationPayload!
@@ -13336,6 +13501,23 @@ type TeamPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""Tuple for mapping Linear teams to GitHub repos."""
+type TeamRepoMapping {
+  """The Linear team id to map to the given project."""
+  linearTeamId: String!
+
+  """The GitHub repo id."""
+  gitHubRepoId: Float!
+}
+
+input TeamRepoMappingInput {
+  """The Linear team id to map to the given project."""
+  linearTeamId: String!
+
+  """The GitHub repo id."""
+  gitHubRepoId: Float!
 }
 
 input TeamUpdateInput {
