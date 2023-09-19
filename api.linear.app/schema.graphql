@@ -1950,53 +1950,6 @@ type EmailUserAccountAuthChallengeResponse {
   authType: String!
 }
 
-"""Information for creating embedded content for the provided URL"""
-type Embed {
-  """The type of embed"""
-  type: String!
-
-  """Title for the returned embed view"""
-  title: String
-
-  """The name of the provider"""
-  providerName: String
-
-  """The description of the content"""
-  description: String
-
-  """ The name of the author/owner of the resource"""
-  authorName: String
-
-  """The URL of the thumbnail preview image"""
-  thumbnailUrl: String
-
-  """The height of the thumbnail preview image"""
-  thumbnailHeight: Float
-
-  """The width of the thumbnail preview image"""
-  thumbnailWidth: Float
-
-  """The asset URL (photo)"""
-  url: String
-
-  """The HTML (video, rich)"""
-  html: String
-
-  """The height of embedded content (photo, video, rich)"""
-  height: Float
-
-  """The width of embedded content (photo, video, rich)"""
-  width: Float
-}
-
-type EmbedPayload {
-  """Embed information"""
-  embed: Embed
-
-  """Whether the query was successful"""
-  success: Boolean!
-}
-
 """A custom emoji."""
 type Emoji implements Node {
   """The unique identifier of the entity."""
@@ -2377,29 +2330,6 @@ input FavoriteUpdateInput {
 
   """The name of the favorite folder."""
   folderName: String
-}
-
-"""Object representing Figma preview information."""
-type FigmaEmbed {
-  """Figma file name."""
-  name: String!
-
-  """Date when the file was updated at the time of embedding."""
-  lastModified: DateTime!
-
-  """Node name."""
-  nodeName: String
-
-  """Figma screenshot URL."""
-  url: String
-}
-
-type FigmaEmbedPayload {
-  """Figma embed information."""
-  figmaEmbed: FigmaEmbed
-
-  """Whether the operation was successful."""
-  success: Boolean!
 }
 
 """A schedule for a team's first responder."""
@@ -4144,6 +4074,8 @@ type IssueHistory implements Node {
 
   """The bot that performed the action"""
   botActor: ActorBot
+  addedLabels: [IssueLabel!]
+  removedLabels: [IssueLabel!]
 }
 
 type IssueHistoryConnection {
@@ -6448,6 +6380,26 @@ type Mutation {
     reminderAt: DateTime!
 
     """The identifier of the issue to add a reminder for."""
+    id: String!
+  ): IssuePayload!
+
+  """Subscribes a user to an issue."""
+  issueSubscribe(
+    """The identifier of the user to subscribe, default is the current user."""
+    userId: String
+
+    """The identifier of the issue to subscribe to."""
+    id: String!
+  ): IssuePayload!
+
+  """Unsubscribes a user from an issue."""
+  issueUnsubscribe(
+    """
+    The identifier of the user to unsubscribe, default is the current user.
+    """
+    userId: String
+
+    """The identifier of the issue to unsubscribe from."""
     id: String!
   ): IssuePayload!
 
@@ -10891,23 +10843,6 @@ type Query {
   """One specific document."""
   document(id: String!): Document!
 
-  """Returns embed info for any url"""
-  embedInfo(
-    """The URL to lookup embed info for"""
-    url: String!
-  ): EmbedPayload!
-
-  """
-  Fetch Figma screenshot and other information with file and node identifiers.
-  """
-  figmaEmbedInfo(
-    """Figma node identifier."""
-    nodeId: String
-
-    """Figma file identifier."""
-    fileId: String!
-  ): FigmaEmbedPayload!
-
   """All custom emojis."""
   emojis(
     """A cursor to be used with last for backward pagination."""
@@ -14327,6 +14262,7 @@ enum UserFlagType {
   tryTriageDismissed
   tryGithubDismissed
   rewindBannerDismissed
+  helpIslandFeatureInsightsDismissed
   dueDateShortcutMigration
   slackCommentReactionTipShown
   issueLabelSuggestionUsed
