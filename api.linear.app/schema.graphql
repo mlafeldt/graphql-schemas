@@ -6372,6 +6372,24 @@ type Mutation {
     id: String!
   ): IssueArchivePayload!
 
+  """Adds a label to an issue."""
+  issueAddLabel(
+    """The identifier of the label to add."""
+    labelId: String!
+
+    """The identifier of the issue to add the label to."""
+    id: String!
+  ): IssuePayload!
+
+  """Removes a label from an issue."""
+  issueRemoveLabel(
+    """The identifier of the label to remove."""
+    labelId: String!
+
+    """The identifier of the issue to remove the label from."""
+    id: String!
+  ): IssuePayload!
+
   """
   Adds an issue reminder. Will cause a notification to be sent when the issue reminder time is reached.
   """
@@ -8207,7 +8225,7 @@ type Organization implements Node {
   samlEnabled: Boolean!
 
   """[INTERNAL] SAML settings"""
-  samlSettings: JSONObject!
+  samlSettings: JSONObject
 
   """Whether SCIM provisioning is enabled for organization."""
   scimEnabled: Boolean!
@@ -8729,6 +8747,9 @@ input OrganizationUpdateInput {
 
   """Which day count to use for SLA calculation."""
   slaDayCount: SLADayCountType
+
+  """Whether member users are allowed to send invites."""
+  allowMembersToInvite: Boolean
 }
 
 type PageInfo {
