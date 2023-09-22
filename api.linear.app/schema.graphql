@@ -537,6 +537,34 @@ type AuthMembership {
 }
 
 """
+An organization. Organizations are root-level objects that contain users and teams.
+"""
+type AuthOrganization {
+  id: ID!
+
+  """The organization's name."""
+  name: String!
+
+  """The organization's unique URL key."""
+  urlKey: String!
+
+  """
+  Previously used URL keys for the organization (last 3 are kept and redirected).
+  """
+  previousUrlKeys: [String!]!
+
+  """The organization's logo URL."""
+  logoUrl: String
+
+  """The time at which deletion of the organization was requested."""
+  deletionRequestedAt: DateTime
+
+  """Whether SAML authentication is enabled for organization."""
+  samlEnabled: Boolean!
+  userCount: Float!
+}
+
+"""
 [INTERNAL] Public information of the OAuth application, plus the authorized scopes for a given user.
 """
 type AuthorizedApplication {
@@ -573,13 +601,33 @@ type AuthResolverResponse {
   allowDomainAccess: Boolean
 
   """Users belonging to this account."""
-  users: [User!]!
+  users: [AuthUser!]!
 
   """Organizations this account has access to, but is not yet a member."""
-  availableOrganizations: [Organization!]
+  availableOrganizations: [AuthOrganization!]
 
   """ID of the organization last accessed by the user."""
   lastUsedOrganizationId: String
+}
+
+"""A user that has access to the the resources of an organization."""
+type AuthUser {
+  id: ID!
+
+  """The user's full name."""
+  name: String!
+
+  """The user's display (nick) name. Unique within each organization."""
+  displayName: String!
+
+  """The user's email address."""
+  email: String!
+
+  """An URL to the user's avatar image."""
+  avatarUrl: String
+
+  """Organization the user belongs to."""
+  organization: AuthOrganization!
 }
 
 """Comparator for booleans."""
@@ -8848,6 +8896,11 @@ type PaidSubscription implements Node {
   """The organization that the subscription is associated with."""
   organization: Organization!
 
+  """
+  The collection method for this subscription, either automatically charged or invoiced.
+  """
+  collectionMethod: String
+
   """The date the subscription was canceled, if any."""
   canceledAt: DateTime
 
@@ -10798,7 +10851,9 @@ type Query {
   """[INTERNAL] Suggests metadata for a view based on it's filters."""
   customViewDetailsSuggestion(modelName: String, filter: JSONObject!): CustomViewSuggestionPayload!
 
-  """Whether a custom view has subscribers in the organization."""
+  """
+  Whether a custom view has other subscribers than the current user in the organization.
+  """
   customViewHasSubscribers(
     """The identifier of the custom view."""
     id: String!
@@ -12395,6 +12450,27 @@ input SlackAsksSettingsInput {
 }
 
 """Tuple for mapping Slack channel IDs to names"""
+type SlackAsksTeamSettings {
+  """The Linear team ID."""
+  id: String!
+
+  """
+  Whether the default Asks template is enabled in the given channel for this team
+  """
+  hasDefaultAsk: Boolean!
+}
+
+input SlackAsksTeamSettingsInput {
+  """The Linear team ID."""
+  id: String!
+
+  """
+  Whether the default Asks template is enabled in the given channel for this team
+  """
+  hasDefaultAsk: Boolean!
+}
+
+"""Object for mapping Slack channel IDs to names and other settings"""
 type SlackChannelNameMapping {
   """The Slack channel ID."""
   id: String!
@@ -12404,6 +12480,9 @@ type SlackChannelNameMapping {
 
   """Whether or not the Slack channel is private"""
   isPrivate: Boolean
+
+  """Which teams are connected to the channel and settings for those teams"""
+  teams: [SlackAsksTeamSettings!]!
 }
 
 input SlackChannelNameMappingInput {
@@ -12415,6 +12494,9 @@ input SlackChannelNameMappingInput {
 
   """Whether or not the Slack channel is private"""
   isPrivate: Boolean
+
+  """Which teams are connected to the channel and settings for those teams"""
+  teams: [SlackAsksTeamSettingsInput!]!
 }
 
 """Slack notification specific settings."""
