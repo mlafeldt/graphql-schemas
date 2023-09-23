@@ -525,6 +525,9 @@ type AuthenticationSession {
 
   """Human readable location"""
   location: String
+
+  """Identifies the session used to make the request."""
+  isCurrentSession: Boolean!
 }
 
 """[INTERNAL] An OAuth userId/createdDate tuple"""
@@ -628,6 +631,9 @@ type AuthUser {
 
   """Organization the user belongs to."""
   organization: AuthOrganization!
+
+  """[Internal] Whether the user is the current user."""
+  isMe: Boolean! @deprecated(reason: "Will be removed by the end of October")
 }
 
 """Comparator for booleans."""
@@ -5657,6 +5663,9 @@ type Mutation {
 
   """Logout all of user's sessions including the active one."""
   logoutAllSessions: LogoutResponse!
+
+  """Logout all of user's sessions excluding the current one."""
+  logoutOtherSessions: LogoutResponse!
 
   """Creates a new comment."""
   commentCreate(
