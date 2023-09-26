@@ -565,6 +565,9 @@ type AuthOrganization {
   """Whether SAML authentication is enabled for organization."""
   samlEnabled: Boolean!
   userCount: Float!
+
+  """Allowed authentication providers, empty array means all are allowed"""
+  allowedAuthServices: [String!]!
 }
 
 """
@@ -608,6 +611,11 @@ type AuthResolverResponse {
 
   """Organizations this account has access to, but is not yet a member."""
   availableOrganizations: [AuthOrganization!]
+
+  """
+  List of organizations this user account is part of but are currently locked because of the current auth service.
+  """
+  lockedOrganizations: [AuthOrganization!]
 
   """ID of the organization last accessed by the user."""
   lastUsedOrganizationId: String
@@ -1015,8 +1023,8 @@ input CreateOrganizationInput {
 }
 
 type CreateOrJoinOrganizationResponse {
-  organization: Organization!
-  user: User!
+  organization: AuthOrganization!
+  user: AuthUser!
 }
 
 """A custom view that has been saved by a user."""
@@ -5913,6 +5921,14 @@ type Mutation {
   ): IntegrationPayload!
 
   """
+  [Internal] Connects the Google Calendar to the user to this Linear account via OAuth2.
+  """
+  integrationGoogleCalendarPersonalConnect(
+    """[Internal] The Google OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """
   [INTERNAL] Connects the organization with a Jira Personal Access Token.
   """
   jiraIntegrationConnect(
@@ -6982,14 +6998,6 @@ type Mutation {
   """Connects the GitHub user to this Linear account via OAuth2."""
   userGitHubConnect(
     """The GitHub OAuth code."""
-    code: String!
-  ): UserPayload!
-
-  """
-  Connects the Google Calendar to the user to this Linear account via OAuth2.
-  """
-  userGoogleCalendarConnect(
-    """[Internal] The Google OAuth code."""
     code: String!
   ): UserPayload!
 
@@ -11844,12 +11852,6 @@ type Query {
     integrationType: String!
   ): [Template!]!
 
-  """Finds a user account by email."""
-  userAccountExists(
-    """The email to find the user account by."""
-    email: String!
-  ): UserAccountExistsPayload
-
   """All users for the organization."""
   users(
     """Filter returned users."""
@@ -14148,9 +14150,6 @@ type UserAccount {
 
   """The authentication service used to create the account."""
   service: String!
-
-  """Users belonging to the account."""
-  users: [User!]!
 }
 
 """[INTERNAL] An email change verification challenge."""
@@ -14181,12 +14180,6 @@ type UserAccountEmailChange {
 
   """The timestamp this verification challenge was canceled at."""
   canceledAt: DateTime
-}
-
-"""[INTERNAL] Result of looking up a user account by email."""
-type UserAccountExistsPayload {
-  """[INTERNAL] Whether the operation was successful."""
-  success: Boolean!
 }
 
 type UserAdminPayload {

@@ -7185,6 +7185,30 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "allowedAuthServices",
+            "description": "Allowed authentication providers, empty array means all are allowed",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -20272,30 +20296,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "users",
-            "description": "Users belonging to the account.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "User",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -23391,6 +23391,26 @@
             "deprecationReason": null
           },
           {
+            "name": "lockedOrganizations",
+            "description": "List of organizations this user account is part of but are currently locked because of the current auth service.",
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "AuthOrganization",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "lastUsedOrganizationId",
             "description": "ID of the organization last accessed by the user.",
             "args": [],
@@ -23422,7 +23442,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Organization",
+                "name": "AuthOrganization",
                 "ofType": null
               }
             },
@@ -23438,7 +23458,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "User",
+                "name": "AuthUser",
                 "ofType": null
               }
             },
@@ -31074,33 +31094,6 @@
           {
             "name": "success",
             "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "UserAccountExistsPayload",
-        "description": "[INTERNAL] Result of looking up a user account by email.",
-        "fields": [
-          {
-            "name": "success",
-            "description": "[INTERNAL] Whether the operation was successful.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -54015,33 +54008,6 @@
             "deprecationReason": null
           },
           {
-            "name": "userAccountExists",
-            "description": "Finds a user account by email.",
-            "args": [
-              {
-                "name": "email",
-                "description": "The email to find the user account by.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "OBJECT",
-              "name": "UserAccountExistsPayload",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "users",
             "description": "All users for the organization.",
             "args": [
@@ -56955,6 +56921,37 @@
                   "ofType": {
                     "kind": "INPUT_OBJECT",
                     "name": "AirbyteConfigurationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IntegrationPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "integrationGoogleCalendarPersonalConnect",
+            "description": "[Internal] Connects the Google Calendar to the user to this Linear account via OAuth2.",
+            "args": [
+              {
+                "name": "code",
+                "description": "[Internal] The Google OAuth code.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   }
                 },
@@ -61855,37 +61852,6 @@
               {
                 "name": "code",
                 "description": "The GitHub OAuth code.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "UserPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "userGoogleCalendarConnect",
-            "description": "Connects the Google Calendar to the user to this Linear account via OAuth2.",
-            "args": [
-              {
-                "name": "code",
-                "description": "[Internal] The Google OAuth code.",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
