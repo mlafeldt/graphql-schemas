@@ -13889,6 +13889,61 @@ input TokenUserAccountAuthInput {
   inviteLink: String
 }
 
+"""A team's triage responsibility."""
+type TriageResponsibility implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The team to which the triage responsibility belongs to."""
+  team: Team!
+
+  """The action to take when an issue is added to triage."""
+  action: TriageResponsibilityAction!
+
+  """The responsibility configuration."""
+  config: JSONObject
+
+  """
+  The integration used for scheduling when using the 'integrationSchedule' configuration.
+  """
+  integration: Integration!
+}
+
+"""Which action should be taken after an issue is added to triage."""
+enum TriageResponsibilityAction {
+  assign
+  notify
+}
+
+type TriageResponsibilityConnection {
+  edges: [TriageResponsibilityEdge!]!
+  nodes: [TriageResponsibility!]!
+  pageInfo: PageInfo!
+}
+
+type TriageResponsibilityEdge {
+  node: TriageResponsibility!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
 """Object representing Google Cloud upload policy, plus additional data."""
 type UploadFile {
   """The filename."""
