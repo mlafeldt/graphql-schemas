@@ -468,14 +468,20 @@ type EnvironmentVariableUpdateSuccess {
 
 type GatewayRequestLogEvent implements LogEvent {
   id: String!
+  deploymentId: ID!
   createdAt: DateTime!
   region: String!
   logLevel: LogLevel!
   httpMethod: String!
   httpStatus: Int!
   url: String!
-  operationName: String
+  operation: GatewayRequestLogEventOperation
   duration: Int!
+}
+
+type GatewayRequestLogEventOperation {
+  name: String!
+  type: OperationType!
 }
 
 type GitAccount {
@@ -675,6 +681,7 @@ interface LogEvent {
   createdAt: DateTime!
   region: String!
   logLevel: LogLevel!
+  deploymentId: ID!
 }
 
 type LogEventConnection {
@@ -895,6 +902,12 @@ type NotAllowedToSlugUpdateError {
 
 type NotAllowedToUpdateOrganizationError {
   query: Query!
+}
+
+enum OperationType {
+  QUERY
+  MUTATION
+  SUBSCRIPTION
 }
 
 type OrbBillingAddress {
