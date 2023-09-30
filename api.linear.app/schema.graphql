@@ -525,7 +525,7 @@ type AuthenticationSession {
   id: String!
 
   """Type of application used to authenticate."""
-  type: String!
+  type: AuthenticationSessionType!
 
   """IP address."""
   ip: String
@@ -535,6 +535,9 @@ type AuthenticationSession {
 
   """Location country code."""
   locationCountryCode: String
+
+  """Previous location country codes."""
+  previousCountryCodes: [String!]!
 
   """Location city name."""
   locationCity: String
@@ -554,8 +557,24 @@ type AuthenticationSession {
   """Human readable location"""
   location: String
 
+  """Operating system used for the session"""
+  operatingSystem: String
+
+  """Client used for the session"""
+  client: String
+
+  """Name of the session, derived from the client and operating system"""
+  name: String!
+
   """Identifies the session used to make the request."""
   isCurrentSession: Boolean!
+}
+
+enum AuthenticationSessionType {
+  web
+  desktop
+  ios
+  android
 }
 
 """[INTERNAL] An OAuth userId/createdDate tuple"""
@@ -5503,6 +5522,9 @@ type Mutation {
 
     """The issue for which to link the Zendesk ticket."""
     issueId: String!
+
+    """Optional attachment ID that may be provided through the API"""
+    id: String
   ): AttachmentPayload!
 
   """Link an existing Discord message to an issue."""
@@ -5522,6 +5544,9 @@ type Mutation {
 
     """The issue for which to link the Discord message."""
     issueId: String!
+
+    """Optional attachment ID that may be provided through the API"""
+    id: String
 
     """The Discord channel ID for the message to link."""
     channelId: String!
@@ -5592,6 +5617,9 @@ type Mutation {
 
     """The issue for which to link the Front conversation."""
     issueId: String!
+
+    """Optional attachment ID that may be provided through the API"""
+    id: String
   ): FrontAttachmentPayload!
 
   """Link an existing Intercom conversation to an issue."""
@@ -5611,6 +5639,9 @@ type Mutation {
 
     """The Intercom conversation ID to link."""
     conversationId: String!
+
+    """Optional attachment ID that may be provided through the API"""
+    id: String
 
     """The issue for which to link the Intercom conversation."""
     issueId: String!
@@ -15135,7 +15166,9 @@ type WorkflowState implements Node {
   """The position of the state in the team flow."""
   position: Float!
 
-  """The type of the state."""
+  """
+  The type of the state. One of "triage", "backlog", "unstarted", "started", "completed", "canceled".
+  """
   type: String!
 
   """The team to which this state belongs to."""
