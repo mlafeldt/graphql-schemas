@@ -466,8 +466,28 @@ type EnvironmentVariableUpdateSuccess {
   query: Query!
 }
 
+enum FunctionKind {
+  AUTHORIZER
+  RESOLVER
+}
+
+type FunctionLogEvent implements LogEvent {
+  id: String!
+  branch: String!
+  environment: BranchEnvironment!
+  deploymentId: ID!
+  createdAt: DateTime!
+  functionKind: FunctionKind!
+  functionName: String!
+  region: String!
+  logLevel: LogLevel!
+  message: String!
+}
+
 type GatewayRequestLogEvent implements LogEvent {
   id: String!
+  branch: String!
+  environment: BranchEnvironment!
   deploymentId: ID!
   createdAt: DateTime!
   region: String!
@@ -477,10 +497,11 @@ type GatewayRequestLogEvent implements LogEvent {
   url: String!
   operation: GatewayRequestLogEventOperation
   duration: Int!
+  message: String!
 }
 
 type GatewayRequestLogEventOperation {
-  name: String!
+  name: String
   type: OperationType!
 }
 
@@ -682,6 +703,9 @@ interface LogEvent {
   region: String!
   logLevel: LogLevel!
   deploymentId: ID!
+  branch: String!
+  environment: BranchEnvironment!
+  message: String!
 }
 
 type LogEventConnection {
@@ -1597,6 +1621,21 @@ type RequestAnalytics {
   metrics: RequestMetrics!
   periodStart: DateTime!
   periodEnd: DateTime!
+}
+
+type RequestLogEvent implements LogEvent {
+  id: String!
+  branch: String!
+  environment: BranchEnvironment!
+  deploymentId: ID!
+  createdAt: DateTime!
+  region: String!
+  logLevel: LogLevel!
+  url: String!
+  httpMethod: String!
+  httpStatus: Int!
+  duration: Int!
+  message: String!
 }
 
 type RequestMetrics {
