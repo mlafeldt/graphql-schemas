@@ -565,6 +565,52 @@ type AuthenticationSession {
 
   """Name of the session, derived from the client and operating system"""
   name: String!
+}
+
+type AuthenticationSessionResponse {
+  id: String!
+
+  """Type of application used to authenticate."""
+  type: AuthenticationSessionType!
+
+  """IP address."""
+  ip: String
+
+  """Location country name."""
+  locationCountry: String
+
+  """Location country code."""
+  locationCountryCode: String
+
+  """Previous location country codes."""
+  previousCountryCodes: [String!]!
+
+  """Location city name."""
+  locationCity: String
+
+  """Session's user-agent."""
+  userAgent: String
+
+  """When was the session last seen"""
+  lastActiveAt: DateTime
+
+  """Date when the session was created."""
+  createdAt: DateTime!
+
+  """Date when the session was last updated."""
+  updatedAt: DateTime!
+
+  """Human readable location"""
+  location: String
+
+  """Operating system used for the session"""
+  operatingSystem: String
+
+  """Client used for the session"""
+  client: String
+
+  """Name of the session, derived from the client and operating system"""
+  name: String!
 
   """Identifies the session used to make the request."""
   isCurrentSession: Boolean!
@@ -686,9 +732,6 @@ type AuthUser {
 
   """Organization the user belongs to."""
   organization: AuthOrganization!
-
-  """[Internal] Whether the user is the current user."""
-  isMe: Boolean! @deprecated(reason: "Will be removed by the end of October")
 }
 
 """Comparator for booleans."""
@@ -3578,6 +3621,9 @@ input IssueCollectionFilter {
   """Filters that the issues assignee must satisfy."""
   assignee: NullableUserFilter
 
+  """Filters that the last applied template must satisfy."""
+  lastAppliedTemplate: NullableTemplateFilter
+
   """Filters that the issues creator must satisfy."""
   creator: NullableUserFilter
 
@@ -3896,6 +3942,9 @@ input IssueFilter {
 
   """Filters that the issues assignee must satisfy."""
   assignee: NullableUserFilter
+
+  """Filters that the last applied template must satisfy."""
+  lastAppliedTemplate: NullableTemplateFilter
 
   """Filters that the issues creator must satisfy."""
   creator: NullableUserFilter
@@ -7612,6 +7661,9 @@ input NullableIssueFilter {
   """Filters that the issues assignee must satisfy."""
   assignee: NullableUserFilter
 
+  """Filters that the last applied template must satisfy."""
+  lastAppliedTemplate: NullableTemplateFilter
+
   """Filters that the issues creator must satisfy."""
   creator: NullableUserFilter
 
@@ -7781,6 +7833,9 @@ input NullableProjectFilter {
   """Filters that the project's team must satisfy."""
   accessibleTeams: TeamCollectionFilter
 
+  """Filters that the last applied template must satisfy."""
+  lastAppliedTemplate: NullableTemplateFilter
+
   """Filter based on the existence of the relation."""
   null: Boolean
 
@@ -7926,6 +7981,30 @@ input NullableTeamFilter {
 
   """Compound filters, one of which need to be matched by the team."""
   or: [NullableTeamFilter!]
+}
+
+"""Template filtering options."""
+input NullableTemplateFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the template's name."""
+  name: StringComparator
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
+
+  """Compound filters, all of which need to be matched by the template."""
+  and: [NullableTemplateFilter!]
+
+  """Compound filters, one of which need to be matched by the template."""
+  or: [NullableTemplateFilter!]
 }
 
 input NullableTimelessDateComparator {
@@ -9341,6 +9420,9 @@ input ProjectCollectionFilter {
   """Filters that the project's team must satisfy."""
   accessibleTeams: TeamCollectionFilter
 
+  """Filters that the last applied template must satisfy."""
+  lastAppliedTemplate: NullableTemplateFilter
+
   """Compound filters, all of which need to be matched by the project."""
   and: [ProjectCollectionFilter!]
 
@@ -9477,6 +9559,9 @@ input ProjectFilter {
 
   """Filters that the project's team must satisfy."""
   accessibleTeams: TeamCollectionFilter
+
+  """Filters that the last applied template must satisfy."""
+  lastAppliedTemplate: NullableTemplateFilter
 
   """Compound filters, all of which need to be matched by the project."""
   and: [ProjectFilter!]
@@ -10802,6 +10887,9 @@ type Query {
   """Fetch users belonging to this user account."""
   availableUsers: AuthResolverResponse!
 
+  """User's active sessions."""
+  authenticationSessions: [AuthenticationSessionResponse!]!
+
   """Fetch SSO login URL for the email provided."""
   ssoUrlFromEmail(
     """Whether the client is the desktop app."""
@@ -10810,9 +10898,6 @@ type Query {
     """Email to query the SSO login URL by."""
     email: String!
   ): SsoUrlFromEmailResponse!
-
-  """User's active sessions."""
-  authenticationSessions: [AuthenticationSession!]!
 
   """All comments."""
   comments(
