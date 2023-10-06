@@ -770,6 +770,9 @@ type Comment implements Node {
   """The issue that the comment is associated with."""
   issue: Issue!
 
+  """[ALPHA] The project update that the comment is associated with."""
+  projectUpdate: ProjectUpdate!
+
   """The parent comment under which the current comment is nested."""
   parent: Comment
 
@@ -12594,6 +12597,11 @@ type SlackChannelNameMapping {
 
   """Which teams are connected to the channel and settings for those teams"""
   teams: [SlackAsksTeamSettings!]!
+
+  """
+  Whether or not top-level messages in this channel should automatically create Asks
+  """
+  autoCreateOnMessage: Boolean
 }
 
 input SlackChannelNameMappingInput {
@@ -12608,6 +12616,11 @@ input SlackChannelNameMappingInput {
 
   """Which teams are connected to the channel and settings for those teams"""
   teams: [SlackAsksTeamSettingsInput!]!
+
+  """
+  Whether or not top-level messages in this channel should automatically create Asks
+  """
+  autoCreateOnMessage: Boolean
 }
 
 """Slack notification specific settings."""
@@ -12958,6 +12971,9 @@ type Team implements Node {
   The id of the default template to use for new issues created by non-members of the team.
   """
   defaultTemplateForNonMembersId: String @deprecated(reason: "Use defaultTemplateForNonMembers instead")
+
+  """The default template to use for new projects created for the team."""
+  defaultProjectTemplate: Template
 
   """
   The workflow state into which issues are set when they are opened by non-team
@@ -13429,6 +13445,9 @@ input TeamCreateInput {
   """The identifier of the default template for non-members of this team."""
   defaultTemplateForNonMembersId: String
 
+  """The identifier of the default project template of this team."""
+  defaultProjectTemplateId: String
+
   """Internal. Whether the team is private or not."""
   private: Boolean
 
@@ -13774,6 +13793,9 @@ input TeamUpdateInput {
 
   """The identifier of the default template for non-members of this team."""
   defaultTemplateForNonMembersId: String
+
+  """The identifier of the default project template of this team."""
+  defaultProjectTemplateId: String
 
   """Whether the team is private or not."""
   private: Boolean
