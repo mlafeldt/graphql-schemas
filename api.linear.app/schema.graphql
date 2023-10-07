@@ -536,8 +536,8 @@ type AuthenticationSession {
   """Location country code."""
   locationCountryCode: String
 
-  """Previous location country codes."""
-  previousCountryCodes: [String!]!
+  """Country codes of all seen locations."""
+  countryCodes: [String!]!
 
   """Location city name."""
   locationCity: String
@@ -582,8 +582,8 @@ type AuthenticationSessionResponse {
   """Location country code."""
   locationCountryCode: String
 
-  """Previous location country codes."""
-  previousCountryCodes: [String!]!
+  """Country codes of all seen locations."""
+  countryCodes: [String!]!
 
   """Location city name."""
   locationCity: String
@@ -770,6 +770,9 @@ type Comment implements Node {
   """The issue that the comment is associated with."""
   issue: Issue!
 
+  """The document content that the comment is associated with."""
+  documentContent: DocumentContent!
+
   """[ALPHA] The project update that the comment is associated with."""
   projectUpdate: ProjectUpdate!
 
@@ -892,7 +895,10 @@ input CommentCreateInput {
   bodyData: JSON
 
   """The issue to associate the comment with."""
-  issueId: String!
+  issueId: String
+
+  """The document content to associate the comment with."""
+  documentContentId: String
 
   """The parent comment under which to nest a current comment."""
   parentId: String
@@ -12602,6 +12608,11 @@ type SlackChannelNameMapping {
   Whether or not top-level messages in this channel should automatically create Asks
   """
   autoCreateOnMessage: Boolean
+
+  """
+  Whether or not using the :ticket: emoji in this channel should automatically create Asks
+  """
+  autoCreateOnEmoji: Boolean
 }
 
 input SlackChannelNameMappingInput {
@@ -12621,6 +12632,11 @@ input SlackChannelNameMappingInput {
   Whether or not top-level messages in this channel should automatically create Asks
   """
   autoCreateOnMessage: Boolean
+
+  """
+  Whether or not using the :ticket: emoji in this channel should automatically create Asks
+  """
+  autoCreateOnEmoji: Boolean
 }
 
 """Slack notification specific settings."""
@@ -14769,9 +14785,6 @@ input UserUpdateInput {
 
   """The local timezone of the user."""
   timezone: String
-
-  """The id of the calendar to use for out of office events."""
-  outOfOfficeCalendarId: String
 }
 
 """A universally unique identifier as specified by RFC 4122."""
