@@ -623,6 +623,11 @@ enum AuthenticationSessionType {
   android
 }
 
+type AuthIntegration {
+  """The unique identifier of the entity."""
+  id: ID!
+}
+
 """[INTERNAL] An OAuth userId/createdDate tuple"""
 type AuthMembership {
   """The authorizing userId"""
@@ -1912,6 +1917,36 @@ type DocumentContentHistory implements Node {
   The timestamp associated with the DocumentContent when it was originally saved 
   """
   contentDataSnapshotAt: DateTime!
+}
+
+type DocumentContentHistoryPayload {
+  """The document content history entries."""
+  history: [DocumentContentHistoryType!]
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+type DocumentContentHistoryType {
+  """The UUID of the document content history entry."""
+  id: String!
+
+  """The date when the document content history entry was created."""
+  createdAt: DateTime!
+
+  """
+  The date when the document content history snapshot was taken. This can be
+  different than createdAt since the content is captured from its state at the
+  previously known updatedAt timestamp in the case of an update. On document
+  create, these timestamps can be the same.
+  """
+  contentDataSnapshotAt: DateTime!
+
+  """The document content as Prosemirror document."""
+  contentData: JSON!
+
+  """The ID of the author of the change."""
+  actorIds: [String!]
 }
 
 input DocumentCreateInput {
@@ -11033,6 +11068,9 @@ type Query {
   """One specific cycle."""
   cycle(id: String!): Cycle!
 
+  """A collection of document content history entries."""
+  documentContentHistory(id: String!): DocumentContentHistoryPayload!
+
   """All documents in the workspace."""
   documents(
     """A cursor to be used with last for backward pagination."""
@@ -14908,14 +14946,14 @@ input ViewPreferencesCreateInput {
   """The label these view preferences are associated with."""
   labelId: String
 
-  """The user profile these view preferences are associated with."""
-  userId: String
-
   """The cycle these view preferences are associated with."""
   cycleId: String
 
   """The custom view these view preferences are associated with."""
   customViewId: String
+
+  """The user profile these view preferences are associated with."""
+  userId: String
 }
 
 type ViewPreferencesPayload {
