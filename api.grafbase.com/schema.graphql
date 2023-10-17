@@ -260,12 +260,6 @@ type DatabaseUsage {
   granularity: DatabaseUsageGranularity!
 }
 
-input DatabaseUsageFilter {
-  environment: BranchEnvironment
-  startDate: DateTime
-  endDate: DateTime
-}
-
 enum DatabaseUsageGranularity {
   HOURLY
   DAILY
@@ -801,13 +795,6 @@ type MissingStripeCustomerError {
   query: Query!
 }
 
-type MonthlyLimits {
-  reads: Int
-  writes: Int
-  apiRequests: Int
-  size: Int
-}
-
 type MustLeaveAtLeastOneKeyForEnvironmentError {
   query: Query!
 }
@@ -1326,8 +1313,6 @@ type Project {
   environmentVariables(after: String, before: String, first: Int, last: Int): EnvironmentVariableConnection!
   deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
   databaseRegions: [DatabaseRegion!]!
-  usage(filter: DatabaseUsageFilter): DatabaseUsage!
-  plan: ProjectPlan!
   status: ProjectStatus!
   databaseRegionChangeStatus: DatabaseRegionChangeStatus!
   customDomains: [String!]!
@@ -1498,11 +1483,6 @@ type ProjectEdge {
 
 type ProjectNotDeployed {
   query: Query!
-}
-
-type ProjectPlan {
-  name: String!
-  monthlyLimits: MonthlyLimits!
 }
 
 input ProjectRequestAnalyticsFilter {
