@@ -19928,8 +19928,32 @@
             "deprecationReason": null
           },
           {
+            "name": "manualSelection",
+            "description": "Set of users used for triage responsibility.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSONObject",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "schedule",
+            "description": "Schedule used for triage responsibility.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSONObject",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "integration",
-            "description": "The integration used for scheduling when using the 'integrationSchedule' configuration.",
+            "description": "The integration used for scheduling.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -34365,6 +34389,157 @@
             "type": {
               "kind": "SCALAR",
               "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "TriageResponsibilityScheduleEntry",
+        "description": "The triage responsibility schedule entry.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "startsAt",
+            "description": "The start date in ISO 8601 date-time format.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "endsAt",
+            "description": "The end date in ISO 8601 date-time format.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "userId",
+            "description": "The linear user id of the user on schedule.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "externalUserEmail",
+            "description": "The external email of the user on schedule if the external user could not be found in Linear.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "TriageResponsibilitySchedule",
+        "description": "Triage responsibility schedule.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "entries",
+            "description": "The schedule entries, undefined if the schedule is not fetched yet or failed.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "TriageResponsibilityScheduleEntry",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "integrationError",
+            "description": "Optional user presentable error message when using an integration.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "integrationScheduleId",
+            "description": "Reference to the integration's schedule when using an integration.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "TriageResponsibilityManualSelection",
+        "description": "Manual triage responsibility using a set of users.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "userIds",
+            "description": "The set of users responsible for triage.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "assignmentIndex",
+            "description": "[INTERNAL] The index of the current userId used for the assign action when having more than one user.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
               "ofType": null
             },
             "defaultValue": null
