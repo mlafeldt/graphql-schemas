@@ -937,6 +937,12 @@ input CommentCreateInput {
   Flag to prevent auto subscription to the issue the comment is created on.
   """
   doNotSubscribeToIssue: Boolean
+
+  """
+  Flag to indicate this comment should be created on the issue's synced Slack
+  comment thread. If no synced Slack comment thread exists, the mutation will fail.
+  """
+  createOnSyncedSlackThread: Boolean
 }
 
 type CommentEdge {
@@ -2861,6 +2867,35 @@ type IntegrationRequestPayload {
   success: Boolean!
 }
 
+"""Linear supported integration services."""
+enum IntegrationService {
+  airbyte
+  discord
+  figma
+  figmaPlugin
+  front
+  github
+  githubCommit
+  gitHubSync
+  gitlab
+  googleCalendarPersonal
+  googleSheets
+  intercom
+  jira
+  loom
+  notion
+  pagerDuty
+  slack
+  slackAsks
+  slackOrgProjectUpdatesPost
+  slackPersonal
+  slackPost
+  slackProjectPost
+  slackProjectUpdatesPost
+  sentry
+  zendesk
+}
+
 """The integration resource's settings"""
 type IntegrationSettings {
   slack: SlackSettings
@@ -3340,6 +3375,9 @@ type Issue implements Node {
 
   """Label for the priority."""
   priorityLabel: String!
+
+  """Integration type that created this issue, if applicable."""
+  integrationSourceType: IntegrationService
 
   """The users favorite associated with this issue."""
   favorite: Favorite
@@ -4923,6 +4961,9 @@ type IssueSearchResult implements Node {
 
   """Label for the priority."""
   priorityLabel: String!
+
+  """Integration type that created this issue, if applicable."""
+  integrationSourceType: IntegrationService
 
   """The users favorite associated with this issue."""
   favorite: Favorite
@@ -10429,6 +10470,9 @@ type ProjectUpdate implements Node {
   """
   infoSnapshot: JSONObject
 
+  """[ALPHA] Whether project update diff should be hidden"""
+  isDiffHidden: Boolean!
+
   """The URL to the project update."""
   url: String!
 
@@ -10462,6 +10506,11 @@ input ProjectUpdateCreateInput {
 
   """The health of the project at the time of the update."""
   health: ProjectUpdateHealthType
+
+  """
+  [ALPHA] Whether the diff between the current update and the previous one should be hidden.
+  """
+  isDiffHidden: Boolean
 }
 
 type ProjectUpdateEdge {
@@ -10669,6 +10718,11 @@ input ProjectUpdateUpdateInput {
 
   """The health of the project at the time of the update."""
   health: ProjectUpdateHealthType
+
+  """
+  [ALPHA] Whether the diff between the current update and the previous one should be hidden.
+  """
+  isDiffHidden: Boolean
 }
 
 type ProjectUpdateWithInteractionPayload {
@@ -12679,6 +12733,11 @@ type SlackChannelNameMapping {
   Whether or not using the :ticket: emoji in this channel should automatically create Asks
   """
   autoCreateOnEmoji: Boolean
+
+  """
+  Whether or not @-mentioning the bot should automatically create an Ask with the message
+  """
+  autoCreateOnBotMention: Boolean
 }
 
 input SlackChannelNameMappingInput {
@@ -12706,6 +12765,11 @@ input SlackChannelNameMappingInput {
   Whether or not using the :ticket: emoji in this channel should automatically create Asks
   """
   autoCreateOnEmoji: Boolean
+
+  """
+  Whether or not @-mentioning the bot should automatically create an Ask with the message
+  """
+  autoCreateOnBotMention: Boolean
 }
 
 """Slack notification specific settings."""
@@ -13184,6 +13248,9 @@ type Team implements Node {
   duplicate of another issue. Defaults to the first canceled state.
   """
   markedAsDuplicateWorkflowState: WorkflowState
+
+  """[INTERNAL] Whether new users should join this team by default."""
+  joinByDefault: Boolean
 
   """Calendar feed URL (iCal) for cycles."""
   cycleCalenderUrl: String!
@@ -13967,6 +14034,11 @@ input TeamUpdateInput {
   The workflow state into which issues are moved when they are marked as a duplicate of another issue.
   """
   markedAsDuplicateWorkflowStateId: String
+
+  """
+  Whether new users should join this team by default. Mutation restricted to workspace admins!
+  """
+  joinByDefault: Boolean
 }
 
 """A template object used for creating entities faster."""
