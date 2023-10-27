@@ -996,6 +996,12 @@ input CommentUpdateInput {
 
   """The comment content as a Prosemirror document."""
   bodyData: JSON
+
+  """[INTERNAL] The user who resolved this thread."""
+  resolvingUserId: String
+
+  """[INTERNAL] The child comment that resolves this thread."""
+  resolvingCommentId: String
 }
 
 """A company related to issue's origin."""
@@ -5864,7 +5870,7 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
-  """[ALPHA] Resolves a comment."""
+  """Resolves a comment."""
   commentResolve(
     resolvingCommentId: String
 
@@ -5872,7 +5878,7 @@ type Mutation {
     id: String!
   ): CommentPayload!
 
-  """[ALPHA] Unresolves a comment."""
+  """Unresolves a comment."""
   commentUnresolve(
     """The identifier of the comment to update."""
     id: String!
