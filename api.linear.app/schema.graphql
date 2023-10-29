@@ -11696,7 +11696,7 @@ type Query {
   projectLink(id: String!): ProjectLink!
 
   """All milestones for the project."""
-  ProjectMilestones(
+  projectMilestones(
     """Filter returned project milestones."""
     filter: ProjectMilestoneFilter
 
@@ -11726,7 +11726,40 @@ type Query {
   ): ProjectMilestoneConnection!
 
   """One specific project milestone."""
-  ProjectMilestone(id: String!): ProjectMilestone!
+  projectMilestone(id: String!): ProjectMilestone!
+
+  """[DEPRECATED] All milestones for the project."""
+  ProjectMilestones(
+    """Filter returned project milestones."""
+    filter: ProjectMilestoneFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectMilestoneConnection! @deprecated(reason: "This mutation is deprecated, please use `projectMilestones` instead.")
+
+  """[DEPRECATED] One specific project milestone."""
+  ProjectMilestone(id: String!): ProjectMilestone! @deprecated(reason: "This mutation is deprecated, please use `projectMilestone` instead.")
 
   """All projects."""
   projects(
