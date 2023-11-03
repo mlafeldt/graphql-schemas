@@ -2903,6 +2903,7 @@ enum IntegrationService {
   front
   github
   githubCommit
+  githubPersonal
   gitHubSync
   gitlab
   googleCalendarPersonal
@@ -6138,6 +6139,12 @@ type Mutation {
     code: String!
   ): IntegrationPayload!
 
+  """Connect your GitHub account to Linear."""
+  integrationGitHubPersonal(
+    """The GitHub OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
   """Integrates the organization with Intercom."""
   integrationIntercom(
     """
@@ -7200,11 +7207,13 @@ type Mutation {
     code: String!
   ): UserPayload!
 
-  """Connects the GitHub user to this Linear account via OAuth2."""
+  """
+  [DEPRECATED] Connects the GitHub user to this Linear account via OAuth2.
+  """
   userGitHubConnect(
     """The GitHub OAuth code."""
     code: String!
-  ): UserPayload!
+  ): UserPayload! @deprecated(reason: "Replaced by integrationGitHubPersonal mutation on Integration resolver.")
 
   """[DEPRECATED] Connects the Jira user to this Linear account via OAuth2."""
   userJiraConnect(
