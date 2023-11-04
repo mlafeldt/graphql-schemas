@@ -2943,6 +2943,7 @@ type IntegrationSettings {
   jira: JiraSettings
   notion: NotionSettings
   pagerDuty: PagerDutySettings
+  jiraPersonal: JiraPersonalSettings
 }
 
 input IntegrationSettingsInput {
@@ -2962,6 +2963,7 @@ input IntegrationSettingsInput {
   jira: JiraSettingsInput
   notion: NotionSettingsInput
   pagerDuty: PagerDutyInput
+  jiraPersonal: JiraPersonalSettingsInput
 }
 
 """The configuration of all integrations for a project or a team."""
@@ -5380,6 +5382,21 @@ input JiraLinearMappingInput {
   linearTeamId: String!
 }
 
+"""Jira personal specific settings."""
+type JiraPersonalSettings {
+  """
+  The name of the Jira site currently authorized through the integration.
+  """
+  siteName: String
+}
+
+input JiraPersonalSettingsInput {
+  """
+  The name of the Jira site currently authorized through the integration.
+  """
+  siteName: String
+}
+
 """Metadata about a Jira project."""
 type JiraProjectData {
   """The Jira id for this project."""
@@ -5596,11 +5613,10 @@ type Mutation {
     """The URL of the GitLab merge request to link."""
     url: String!
 
-    """The owner of the GitLab repository."""
-    owner: String!
-
-    """The name of the GitLab repository."""
-    repo: String!
+    """
+    The path name to the project including any (sub)groups. E.g. linear/main/client
+    """
+    projectPathWithNamespace: String!
 
     """The GitLab merge request number to link."""
     number: Float!
@@ -12797,6 +12813,11 @@ type SlackChannelNameMapping {
   """Whether or not the Slack channel is shared with an external org"""
   isShared: Boolean
 
+  """
+  Whether or not we the Linear Asks bot has been added to this Slack channel
+  """
+  botAdded: Boolean
+
   """Which teams are connected to the channel and settings for those teams"""
   teams: [SlackAsksTeamSettings!]!
 
@@ -12828,6 +12849,11 @@ input SlackChannelNameMappingInput {
 
   """Whether or not the Slack channel is shared with an external org"""
   isShared: Boolean
+
+  """
+  Whether or not we the Linear Asks bot has been added to this Slack channel
+  """
+  botAdded: Boolean
 
   """Which teams are connected to the channel and settings for those teams"""
   teams: [SlackAsksTeamSettingsInput!]!
