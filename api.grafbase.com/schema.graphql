@@ -149,6 +149,7 @@ type Branch {
   deployments(after: String, before: String, first: Int, last: Int): DeploymentConnection!
   project: Project!
   environment: BranchEnvironment!
+  subgraphs: [Subgraph!]!
 }
 
 type BranchConnection {
@@ -1618,6 +1619,21 @@ type Query {
     id: ID!
   ): Project
 
+  """Get subgraph."""
+  subgraph(
+    """account slug"""
+    accountSlug: String!
+
+    """project slug"""
+    projectSlug: String!
+
+    """name of the branch"""
+    branch: String
+
+    """name of the subgraph"""
+    subgraphName: String!
+  ): Subgraph
+
   """Give the actual connected user."""
   viewer: User
 }
@@ -1795,6 +1811,14 @@ union StripeSetupIntentCreatePayload = StripeSetupIntentCreateSuccess
 type StripeSetupIntentCreateSuccess {
   setupIntent: StripeSetupIntent!
   query: Query!
+}
+
+type Subgraph {
+  name: String!
+  url: String!
+  schema: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type TemplateDoesNotExistError {
