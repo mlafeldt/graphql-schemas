@@ -603,6 +603,10 @@ type InvalidEnvironmentVariablesError {
   errors: [InvalidEnvironmentVariableError!]!
 }
 
+type InvalidProjectRootPathError {
+  query: Query!
+}
+
 type Invite {
   id: ID!
   role: MemberRole!
@@ -1423,9 +1427,10 @@ input ProjectCreateFromRepositoryInput {
   productionBranch: String!
   databaseRegions: [String!]! = []
   environmentVariables: [EnvironmentVariableSpecification!]! = []
+  projectRootPath: String! = "grafbase"
 }
 
-union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | RepositoryContainsNoBranchesError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError
+union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | RepositoryContainsNoBranchesError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidProjectRootPathError
 
 type ProjectCreateFromRepositorySuccess {
   project: Project!
@@ -1456,9 +1461,10 @@ input ProjectCreateFromTemplateInput {
   repoPrivate: Boolean!
   databaseRegions: [String!]! = []
   environmentVariables: [EnvironmentVariableSpecification!]! = []
+  projectRootPath: String! = "grafbase"
 }
 
-union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | RepositorySlugInUseError | TemplateDoesNotExistError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | GithubInstallationInsufficientPermissionsError
+union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | RepositorySlugInUseError | TemplateDoesNotExistError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidProjectRootPathError | GithubInstallationInsufficientPermissionsError
 
 type ProjectCreateFromTemplateSuccess {
   project: Project!
@@ -1468,11 +1474,12 @@ type ProjectCreateFromTemplateSuccess {
 input ProjectCreateInput {
   accountId: ID!
   projectSlug: String!
-  databaseRegions: [String!]!
+  databaseRegions: [String!]! = []
   environmentVariables: [EnvironmentVariableSpecification!]! = []
+  projectRootPath: String! = "grafbase"
 }
 
-union ProjectCreatePayload = ProjectCreateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError
+union ProjectCreatePayload = ProjectCreateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidProjectRootPathError
 
 type ProjectCreateSuccess {
   project: Project!
@@ -1528,6 +1535,7 @@ input ProjectUpdateInput {
   id: ID!
   projectSlug: String
   productionBranch: String
+  projectRootPath: String
 }
 
 union ProjectUpdatePayload = ProjectUpdateSuccess | ProjectDoesNotExistError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
