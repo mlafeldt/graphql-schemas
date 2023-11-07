@@ -320,7 +320,7 @@ input AttachmentCreateInput {
   commentBody: String
 
   """
-  Create a linked comment with Prosemirror body. Please use `commentBody` instead
+  [Internal] Create a linked comment with Prosemirror body. Please use `commentBody` instead.
   """
   commentBodyData: JSONObject
 
@@ -785,7 +785,7 @@ type Comment implements Node {
   issue: Issue!
 
   """The document content that the comment is associated with."""
-  documentContent: DocumentContent!
+  documentContent: DocumentContent
 
   """[ALPHA] The project update that the comment is associated with."""
   projectUpdate: ProjectUpdate!
@@ -811,7 +811,7 @@ type Comment implements Node {
   """The time user edited the comment."""
   editedAt: DateTime
 
-  """The comment content as a Prosemirror document."""
+  """[Internal] The comment content as a Prosemirror document."""
   bodyData: String!
 
   """Emoji reaction summary, grouped by emoji type"""
@@ -905,7 +905,7 @@ input CommentCreateInput {
   """The comment content in markdown format."""
   body: String
 
-  """The comment content as a Prosemirror document."""
+  """[Internal] The comment content as a Prosemirror document."""
   bodyData: JSON
 
   """The issue to associate the comment with."""
@@ -1876,7 +1876,7 @@ type DocumentContent implements Node {
   """The document content in markdown format."""
   content: String
 
-  """The document content as JSON."""
+  """[Internal] The document content as a Prosemirror document."""
   contentData: JSONObject
 
   """The document content state as a base64 encoded string."""
@@ -1936,7 +1936,7 @@ type DocumentContentHistory implements Node {
   """The document content that this history item is associated with."""
   documentContent: DocumentContent!
 
-  """The document content as JSON."""
+  """[Internal] The document content as a Prosemirror document."""
   contentData: JSONObject
 
   """IDs of actors whose edits went into this history item."""
@@ -1971,7 +1971,7 @@ type DocumentContentHistoryType {
   """
   contentDataSnapshotAt: DateTime!
 
-  """The document content as Prosemirror document."""
+  """[Internal] The document content as Prosemirror document."""
   contentData: JSON!
 
   """The ID of the author of the change."""
@@ -3844,7 +3844,7 @@ input IssueCreateInput {
   """The issue description in markdown format."""
   description: String
 
-  """The issue description as a Prosemirror document."""
+  """[Internal] The issue description as a Prosemirror document."""
   descriptionData: JSON
 
   """The identifier of the user to assign the issue to."""
@@ -9921,7 +9921,9 @@ input ProjectMilestoneCreateInput {
   """The description of the project milestone in markdown format."""
   description: String
 
-  """The description of the project milestone as a Prosemirror document."""
+  """
+  [Internal] The description of the project milestone as a Prosemirror document.
+  """
   descriptionData: JSONObject
 
   """The planned target date of the project milestone."""
@@ -9987,7 +9989,9 @@ input ProjectMilestoneUpdateInput {
   """The description of the project milestone in markdown format."""
   description: String
 
-  """The description of the project milestone as a Prosemirror document."""
+  """
+  [Internal] The description of the project milestone as a Prosemirror document.
+  """
   descriptionData: JSONObject
 
   """The planned target date of the project milestone."""
@@ -10557,7 +10561,9 @@ input ProjectUpdateCreateInput {
   """The content of the project update in markdown format."""
   body: String
 
-  """The content of the project update as a Prosemirror document."""
+  """
+  [Internal] The content of the project update as a Prosemirror document.
+  """
   bodyData: JSON
 
   """The project to associate the project update with."""
