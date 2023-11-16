@@ -653,11 +653,33 @@ type AuthOauthClient {
   """OAuth application's client ID."""
   clientId: String!
 
+  """OAuth application's client name."""
+  name: String!
+
+  """Information about the application."""
+  description: String
+
+  """Name of the developer."""
+  developer: String!
+
+  """Url of the developer."""
+  developerUrl: String!
+
+  """Image of the application."""
+  imageUrl: String
+
   """OAuth application's client secret."""
   clientSecret: String!
 
   """List of allowed redirect URIs for the application."""
   redirectUris: [String!]!
+
+  """Whether the OAuth application can be installed in other organizations."""
+  publicEnabled: Boolean!
+
+  """Webhook URL"""
+  webhookUrl: String
+  archivedAt: DateTime
 }
 
 """
@@ -1770,6 +1792,15 @@ input DateComparator {
   Greater-than-or-equal constraint. Matches any values that are greater than or equal to the given value.
   """
   gte: DateTime
+}
+
+"""[INTERNAL] By which resolution is a date defined."""
+enum DateResolutionType {
+  week
+  month
+  quarter
+  halfYear
+  year
 }
 
 """
@@ -9262,8 +9293,14 @@ type Project implements Node {
   """The estimated start date of the project."""
   startDate: TimelessDate
 
+  """[INTERNAL] The resolution of the project's start date."""
+  startDateResolution: DateResolutionType
+
   """The estimated completion date of the project."""
   targetDate: TimelessDate
+
+  """[INTERNAL] The resolution of the project's estimated completion date."""
+  targetDateResolution: DateResolutionType
 
   """The time at which the project was moved into started state."""
   startedAt: DateTime
@@ -9673,8 +9710,14 @@ input ProjectCreateInput {
   """The planned start date of the project."""
   startDate: TimelessDate
 
+  """[INTERNAL] The resolution of the project's start date."""
+  startDateResolution: DateResolutionType
+
   """The planned target date of the project."""
   targetDate: TimelessDate
+
+  """[INTERNAL] The resolution of the project's estimated completion date."""
+  targetDateResolution: DateResolutionType
 
   """The sort order for the project within shared views."""
   sortOrder: Float
@@ -10223,8 +10266,14 @@ type ProjectSearchResult implements Node {
   """The estimated start date of the project."""
   startDate: TimelessDate
 
+  """[INTERNAL] The resolution of the project's start date."""
+  startDateResolution: DateResolutionType
+
   """The estimated completion date of the project."""
   targetDate: TimelessDate
+
+  """[INTERNAL] The resolution of the project's estimated completion date."""
+  targetDateResolution: DateResolutionType
 
   """The time at which the project was moved into started state."""
   startedAt: DateTime
@@ -10677,8 +10726,14 @@ input ProjectUpdateInput {
   """The planned start date of the project."""
   startDate: TimelessDate
 
+  """[INTERNAL] The resolution of the project's start date."""
+  startDateResolution: DateResolutionType
+
   """The planned target date of the project."""
   targetDate: TimelessDate
+
+  """[INTERNAL] The resolution of the project's estimated completion date."""
+  targetDateResolution: DateResolutionType
 
   """The date when the project was completed."""
   completedAt: DateTime
@@ -11731,6 +11786,9 @@ type Query {
 
   """Does the organization exist."""
   organizationExists(urlKey: String!): OrganizationExistsPayload!
+
+  """All archived teams of the organization."""
+  archivedTeams: [Team!]!
 
   """All links for the project."""
   projectLinks(
@@ -12867,6 +12925,12 @@ type SlackChannelNameMapping {
   Whether or not @-mentioning the bot should automatically create an Ask with the message
   """
   autoCreateOnBotMention: Boolean
+
+  """
+  The optional template ID to use for Asks auto-created in this channel. If not
+  set, auto-created Asks won't use any template.
+  """
+  autoCreateTemplateId: String
 }
 
 input SlackChannelNameMappingInput {
@@ -12904,6 +12968,12 @@ input SlackChannelNameMappingInput {
   Whether or not @-mentioning the bot should automatically create an Ask with the message
   """
   autoCreateOnBotMention: Boolean
+
+  """
+  The optional template ID to use for Asks auto-created in this channel. If not
+  set, auto-created Asks won't use any template.
+  """
+  autoCreateTemplateId: String
 }
 
 """Slack notification specific settings."""
