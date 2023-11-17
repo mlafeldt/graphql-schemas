@@ -3455,6 +3455,9 @@ type Issue implements Node {
   """Integration type that created this issue, if applicable."""
   integrationSourceType: IntegrationService
 
+  """The bot that created the issue, if applicable."""
+  botActor: ActorBot
+
   """The users favorite associated with this issue."""
   favorite: Favorite
 
@@ -5040,6 +5043,9 @@ type IssueSearchResult implements Node {
 
   """Integration type that created this issue, if applicable."""
   integrationSourceType: IntegrationService
+
+  """The bot that created the issue, if applicable."""
+  botActor: ActorBot
 
   """The users favorite associated with this issue."""
   favorite: Favorite
@@ -7224,6 +7230,12 @@ type Mutation {
     """The identifier of the team to delete."""
     id: String!
   ): DeletePayload!
+
+  """Unarchives a team and cancels deletion."""
+  teamUnarchive(
+    """The identifier of the team to delete."""
+    id: String!
+  ): TeamArchivePayload!
 
   """Deletes team's cycles data"""
   teamCyclesDelete(
@@ -13736,6 +13748,18 @@ type Team implements Node {
 
   """Settings for all integrations associated with that team."""
   integrationsSettings: IntegrationsSettings
+}
+
+"""A generic payload return from entity archive mutations."""
+type TeamArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: Team
 }
 
 """Roadmap collection filtering options."""
