@@ -1,4 +1,4 @@
-type AccessToken {
+type AccessToken implements Node {
   id: ID!
   name: String!
   accountId: ID
@@ -142,7 +142,7 @@ type ArchiveFileSizeLimitExceededError {
   limit: Int!
 }
 
-type Branch {
+type Branch implements Node {
   id: ID!
   name: String!
   domains: [String!]!
@@ -278,7 +278,7 @@ enum DatabaseUsageGranularity {
 scalar DateTime
 
 """Deployment"""
-type Deployment {
+type Deployment implements Node {
   id: ID!
   commit: GitCommit
   branch: Branch!
@@ -394,7 +394,7 @@ type EmptyDatabaseRegionsError {
   query: Query!
 }
 
-type EnvironmentVariable {
+type EnvironmentVariable implements Node {
   id: ID!
   name: String!
   value: String!
@@ -610,7 +610,7 @@ type InvalidProjectRootPathError {
   query: Query!
 }
 
-type Invite {
+type Invite implements Node {
   id: ID!
   role: MemberRole!
   email: String!
@@ -761,7 +761,7 @@ enum LogLevel {
   ERROR
 }
 
-type Member {
+type Member implements Node {
   id: ID!
   role: MemberRole!
   createdAt: DateTime!
@@ -921,6 +921,10 @@ type NameSizeCheckError {
 
 type NameTooLongError {
   query: Query!
+}
+
+interface Node {
+  id: ID!
 }
 
 type NotAllowedError {
@@ -1332,7 +1336,7 @@ type PersonalAccountUpdateSuccess {
   query: Query!
 }
 
-type Project {
+type Project implements Node {
   id: ID!
   accountSlug: String!
   slug: String!
@@ -1351,7 +1355,7 @@ type Project {
   logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
 }
 
-type ProjectApiKey {
+type ProjectApiKey implements Node {
   id: ID!
   key: String!
   environment: BranchEnvironment!
@@ -1646,7 +1650,7 @@ type Query {
   projectById(
     """ID of the project"""
     id: ID!
-  ): Project
+  ): Project @deprecated(reason: "use the top-level `node` query")
 
   """Get subgraph."""
   subgraph(
@@ -1665,6 +1669,7 @@ type Query {
 
   """Give the actual connected user."""
   viewer: User
+  node(id: ID!): Node
 }
 
 type RepositoryContainsNoBranchesError {
@@ -1895,7 +1900,7 @@ URL is a String implementing the [URL Standard](http://url.spec.whatwg.org/)
 """
 scalar Url
 
-type User {
+type User implements Node {
   id: ID!
   name: String!
   email: String!
