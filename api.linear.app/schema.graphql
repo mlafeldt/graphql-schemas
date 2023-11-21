@@ -510,17 +510,12 @@ input AuthApiKeyCreateInput {
   key: String!
 }
 
-type AuthApiKeyDeletePayload {
+type AuthApiKeyPayload {
   """Whether the operation was successful."""
   success: Boolean!
-}
 
-type AuthApiKeyPayload {
   """The auth API key that was created."""
   authApiKey: AuthApiKey!
-
-  """Whether the operation was successful."""
-  success: Boolean!
 }
 
 """User authentication session."""
@@ -762,6 +757,11 @@ type AuthResolverResponse {
 
   """ID of the organization last accessed by the user."""
   lastUsedOrganizationId: String
+}
+
+type AuthSuccessPayload {
+  """Whether the operation was successful."""
+  success: Boolean!
 }
 
 """A user that has access to the the resources of an organization."""
@@ -2727,6 +2727,23 @@ type GithubRepo {
   name: String!
 }
 
+"""GitHub repos available to sync."""
+type GitHubRepo {
+  """The full name of the repository."""
+  fullName: String!
+
+  """The GitHub repo id."""
+  id: Float!
+}
+
+input GitHubRepoInput {
+  """The full name of the repository."""
+  fullName: String!
+
+  """The GitHub repo id."""
+  id: Float!
+}
+
 """Metadata and settings for a GitHub integration."""
 type GitHubSettings {
   """The avatar URL for the GitHub organization"""
@@ -2736,7 +2753,10 @@ type GitHubSettings {
   orgLogin: String!
 
   """The names of the repositories connected for the GitHub integration"""
-  repositories: [String!]
+  repositories: [GitHubRepo!]
+
+  """Mapping of team to repository for syncing"""
+  repositoriesMapping: [TeamRepoMapping!]
 }
 
 input GitHubSettingsInput {
@@ -2747,41 +2767,10 @@ input GitHubSettingsInput {
   orgLogin: String!
 
   """The names of the repositories connected for the GitHub integration"""
-  repositories: [String!]
-}
-
-"""GitHub repos available to sync."""
-type GitHubSyncRepo {
-  """The full name of the repository."""
-  fullName: String!
-
-  """The GitHub repo id."""
-  id: Float!
-}
-
-input GitHubSyncRepoInput {
-  """The full name of the repository."""
-  fullName: String!
-
-  """The GitHub repo id."""
-  id: Float!
-}
-
-"""Metadata and settings for a GitHub Sync integration."""
-type GitHubSyncSettings {
-  """The names of the repositories connected for the GitHub integration"""
-  repos: [GitHubSyncRepo!]
+  repositories: [GitHubRepoInput!]
 
   """Mapping of team to repository for syncing"""
-  repoMapping: [TeamRepoMapping!]
-}
-
-input GitHubSyncSettingsInput {
-  """The names of the repositories connected for the GitHub integration"""
-  repos: [GitHubSyncRepoInput!]
-
-  """Mapping of team to repository for syncing"""
-  repoMapping: [TeamRepoMappingInput!]
+  repositoriesMapping: [TeamRepoMappingInput!]
 }
 
 """Metadata and settings for a GitLab integration."""
@@ -2949,7 +2938,6 @@ enum IntegrationService {
   github
   githubCommit
   githubPersonal
-  gitHubSync
   gitlab
   googleCalendarPersonal
   googleSheets
@@ -2979,7 +2967,6 @@ type IntegrationSettings {
   slackOrgProjectUpdatesPost: SlackPostSettings
   googleSheets: GoogleSheetsSettings
   gitHub: GitHubSettings
-  gitHubSync: GitHubSyncSettings
   gitLab: GitLabSettings
   sentry: SentrySettings
   zendesk: ZendeskSettings
@@ -2999,7 +2986,6 @@ input IntegrationSettingsInput {
   slackOrgProjectUpdatesPost: SlackPostSettingsInput
   googleSheets: GoogleSheetsSettingsInput
   gitHub: GitHubSettingsInput
-  gitHubSync: GitHubSyncSettingsInput
   gitLab: GitLabSettingsInput
   sentry: SentrySettingsInput
   zendesk: ZendeskSettingsInput
@@ -6165,12 +6151,6 @@ type Mutation {
 
   """Connects the organization with the GitHub App."""
   integrationGithubConnect(
-    """The GitHub data to connect with."""
-    installationId: String!
-  ): IntegrationPayload!
-
-  """Connects the organization with the GitHub Sync App."""
-  integrationGithubSyncConnect(
     """The GitHub data to connect with."""
     installationId: String!
   ): IntegrationPayload!
@@ -12988,17 +12968,26 @@ input SlackChannelNameMappingInput {
   autoCreateTemplateId: String
 }
 
+enum SlackChannelType {
+  DirectMessage
+  MultiPersonDirectMessage
+  Private
+  Public
+}
+
 """Slack notification specific settings."""
 type SlackPostSettings {
   channel: String!
   channelId: String!
   configurationUrl: String!
+  channelType: SlackChannelType
 }
 
 input SlackPostSettingsInput {
   channel: String!
   channelId: String!
   configurationUrl: String!
+  channelType: SlackChannelType
 }
 
 """Settings for the regular Slack integration."""

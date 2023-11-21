@@ -3423,11 +3423,58 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "channelType",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "SlackChannelType",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "SlackChannelType",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "DirectMessage",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MultiPersonDirectMessage",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "Private",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "Public",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -3478,39 +3525,8 @@
                 "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "GitHubSyncSettings",
-        "description": "Metadata and settings for a GitHub Sync integration.",
-        "fields": [
-          {
-            "name": "repos",
-            "description": "The names of the repositories connected for the GitHub integration",
-            "args": [],
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
                   "kind": "OBJECT",
-                  "name": "GitHubSyncRepo",
+                  "name": "GitHubRepo",
                   "ofType": null
                 }
               }
@@ -3519,7 +3535,7 @@
             "deprecationReason": null
           },
           {
-            "name": "repoMapping",
+            "name": "repositoriesMapping",
             "description": "Mapping of team to repository for syncing",
             "args": [],
             "type": {
@@ -3546,7 +3562,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "GitHubSyncRepo",
+        "name": "GitHubRepo",
         "description": "GitHub repos available to sync.",
         "fields": [
           {
@@ -4307,18 +4323,6 @@
             "type": {
               "kind": "OBJECT",
               "name": "GitHubSettings",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "gitHubSync",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "GitHubSyncSettings",
               "ofType": null
             },
             "isDeprecated": false,
@@ -8529,12 +8533,6 @@
           },
           {
             "name": "githubPersonal",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "gitHubSync",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -23312,25 +23310,9 @@
       },
       {
         "kind": "OBJECT",
-        "name": "AuthApiKeyPayload",
+        "name": "AuthSuccessPayload",
         "description": null,
         "fields": [
-          {
-            "name": "authApiKey",
-            "description": "The auth API key that was created.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AuthApiKey",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "success",
             "description": "Whether the operation was successful.",
@@ -23355,7 +23337,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "AuthApiKeyDeletePayload",
+        "name": "AuthApiKeyPayload",
         "description": null,
         "fields": [
           {
@@ -23368,6 +23350,22 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "authApiKey",
+            "description": "The auth API key that was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AuthApiKey",
                 "ofType": null
               }
             },
@@ -36102,6 +36100,16 @@
               }
             },
             "defaultValue": null
+          },
+          {
+            "name": "channelType",
+            "description": null,
+            "type": {
+              "kind": "ENUM",
+              "name": "SlackChannelType",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -36152,37 +36160,8 @@
                 "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "GitHubSyncSettingsInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "repos",
-            "description": "The names of the repositories connected for the GitHub integration",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
                   "kind": "INPUT_OBJECT",
-                  "name": "GitHubSyncRepoInput",
+                  "name": "GitHubRepoInput",
                   "ofType": null
                 }
               }
@@ -36190,7 +36169,7 @@
             "defaultValue": null
           },
           {
-            "name": "repoMapping",
+            "name": "repositoriesMapping",
             "description": "Mapping of team to repository for syncing",
             "type": {
               "kind": "LIST",
@@ -36214,7 +36193,7 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "GitHubSyncRepoInput",
+        "name": "GitHubRepoInput",
         "description": null,
         "fields": null,
         "inputFields": [
@@ -36893,16 +36872,6 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "GitHubSettingsInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "gitHubSync",
-            "description": null,
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "GitHubSyncSettingsInput",
               "ofType": null
             },
             "defaultValue": null
@@ -59364,37 +59333,6 @@
           {
             "name": "integrationGithubConnect",
             "description": "Connects the organization with the GitHub App.",
-            "args": [
-              {
-                "name": "installationId",
-                "description": "The GitHub data to connect with.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IntegrationPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "integrationGithubSyncConnect",
-            "description": "Connects the organization with the GitHub Sync App.",
             "args": [
               {
                 "name": "installationId",
