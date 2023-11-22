@@ -681,6 +681,7 @@ type AuthOauthClient {
 An organization. Organizations are root-level objects that contain users and teams.
 """
 type AuthOrganization {
+  """The unique identifier of the entity."""
   id: ID!
 
   """The organization's name."""
@@ -702,10 +703,16 @@ type AuthOrganization {
 
   """Whether SAML authentication is enabled for organization."""
   samlEnabled: Boolean!
-  userCount: Float!
+
+  """[INTERNAL] SAML settings"""
+  samlSettings: JSONObject
 
   """Allowed authentication providers, empty array means all are allowed"""
   allowedAuthServices: [String!]!
+
+  """Whether SCIM provisioning is enabled for organization."""
+  scimEnabled: Boolean!
+  userCount: Float!
 }
 
 """
@@ -1796,7 +1803,6 @@ input DateComparator {
 
 """[INTERNAL] By which resolution is a date defined."""
 enum DateResolutionType {
-  week
   month
   quarter
   halfYear
@@ -5412,6 +5418,9 @@ type JiraLinearMapping {
 
   """Whether the sync for this mapping is bidirectional."""
   bidirectional: Boolean
+
+  """Whether this mapping is the default one for issue creation."""
+  default: Boolean
 }
 
 input JiraLinearMappingInput {
@@ -5423,6 +5432,9 @@ input JiraLinearMappingInput {
 
   """Whether the sync for this mapping is bidirectional."""
   bidirectional: Boolean
+
+  """Whether this mapping is the default one for issue creation."""
+  default: Boolean
 }
 
 """Jira personal specific settings."""
@@ -5478,6 +5490,14 @@ input JiraSettingsInput {
 
   """The Jira projects for the organization."""
   projects: [JiraProjectDataInput!]!
+}
+
+input JiraUpdateInput {
+  """The id of the integration to update"""
+  id: String!
+
+  """Whether to refresh Jira Projects for the integration"""
+  updateProjects: Boolean
 }
 
 input JoinOrganizationInput {
@@ -6184,6 +6204,12 @@ type Mutation {
   jiraIntegrationConnect(
     """Jira integration settings."""
     input: JiraConfigurationInput!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Updates a Jira Integration"""
+  integrationJiraUpdate(
+    """Jira integration update input"""
+    input: JiraUpdateInput!
   ): IntegrationPayload!
 
   """Connect your Jira account to Linear."""
