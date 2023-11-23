@@ -672,6 +672,12 @@ type AuthOauthClient {
   """Whether the OAuth application can be installed in other organizations."""
   publicEnabled: Boolean!
 
+  """The ID of the user who created the OAuth application."""
+  creatorId: String!
+
+  """The ID of the workspace the OAuth application belongs to."""
+  organizationId: String!
+
   """Webhook URL"""
   webhookUrl: String
   archivedAt: DateTime
@@ -8621,6 +8627,9 @@ type Organization implements Node {
   """The hour at which to prompt for project updates."""
   projectUpdateRemindersHour: Float!
 
+  """The month at which the fiscal year starts. Defaults to January (0)."""
+  fiscalYearStartMonth: Float!
+
   """Whether SAML authentication is enabled for organization."""
   samlEnabled: Boolean!
 
@@ -9125,6 +9134,9 @@ input OrganizationUpdateInput {
 
   """The hour at which project updates are sent."""
   projectUpdateRemindersHour: Float
+
+  """The month at which the fiscal year starts."""
+  fiscalYearStartMonth: Float
 
   """
   Whether the organization has opted for reduced customer support attachment information.
@@ -13370,8 +13382,14 @@ type Team implements Node {
   """Whether to allow zeros in issues estimates."""
   issueEstimationAllowZero: Boolean!
 
-  """Whether to move issues to bottom of the column when changing state."""
+  """
+  [DEPRECATED] Whether to move issues to bottom of the column when changing
+  state. Use setIssueSortOrderOnStateChange instead.
+  """
   issueSortOrderDefaultToBottom: Boolean!
+
+  """Where to move issues when changing state."""
+  setIssueSortOrderOnStateChange: String!
 
   """Whether to add additional points to the estimate scale."""
   issueEstimationExtended: Boolean!
@@ -13880,8 +13898,14 @@ input TeamCreateInput {
   """Whether to allow zeros in issues estimates."""
   issueEstimationAllowZero: Boolean
 
-  """Whether to move issues to bottom of the column when changing state."""
+  """
+  [DEPRECATED] Whether to move issues to bottom of the column when changing
+  state. Use setIssueSortOrderOnStateChange instead.
+  """
   issueSortOrderDefaultToBottom: Boolean
+
+  """Whether to move issues to bottom of the column when changing state."""
+  setIssueSortOrderOnStateChange: String
 
   """Whether to add additional points to the estimate scale."""
   issueEstimationExtended: Boolean
@@ -14195,8 +14219,14 @@ input TeamUpdateInput {
   """Whether to allow zeros in issues estimates."""
   issueEstimationAllowZero: Boolean
 
-  """Whether to move issues to bottom of the column when changing state."""
+  """
+  [DEPRECATED] Whether to move issues to bottom of the column when changing
+  state. Use setIssueSortOrderOnStateChange instead.
+  """
   issueSortOrderDefaultToBottom: Boolean
+
+  """Whether to move issues to bottom of the column when changing state."""
+  setIssueSortOrderOnStateChange: String
 
   """Whether to add additional points to the estimate scale."""
   issueEstimationExtended: Boolean
