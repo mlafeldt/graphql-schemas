@@ -160,7 +160,7 @@ type AsksChannelConnectPayload {
   """The new Asks Slack channel mapping for the connected channel."""
   mapping: SlackChannelNameMapping!
 
-  """Whether the bot needs to be added to the channel."""
+  """Whether the bot needs to be manually added to the channel."""
   addBot: Boolean!
 }
 
@@ -5488,6 +5488,9 @@ type JiraSettings {
 
   """The Jira projects for the organization."""
   projects: [JiraProjectData!]!
+
+  """Whether this integration is for Jira Server or not."""
+  isJiraServer: Boolean
 }
 
 input JiraSettingsInput {
@@ -5496,6 +5499,9 @@ input JiraSettingsInput {
 
   """The Jira projects for the organization."""
   projects: [JiraProjectDataInput!]!
+
+  """Whether this integration is for Jira Server or not."""
+  isJiraServer: Boolean = false
 }
 
 input JiraUpdateInput {
@@ -6341,7 +6347,7 @@ type Mutation {
 
     """The Slack OAuth code."""
     code: String!
-  ): IntegrationPayload!
+  ): SlackChannelConnectPayload!
 
   """Slack integration for project notifications."""
   integrationSlackProjectPost(
@@ -6358,7 +6364,7 @@ type Mutation {
 
     """The Slack OAuth code."""
     code: String!
-  ): IntegrationPayload!
+  ): SlackChannelConnectPayload!
 
   """Slack integration for organization level project update notifications."""
   integrationSlackOrgProjectUpdatesPost(
@@ -6367,7 +6373,7 @@ type Mutation {
 
     """The Slack OAuth code."""
     code: String!
-  ): IntegrationPayload!
+  ): SlackChannelConnectPayload!
 
   """Imports custom emojis from your Slack workspace."""
   integrationSlackImportEmojis(
@@ -12917,6 +12923,20 @@ input SlackAsksTeamSettingsInput {
   Whether the default Asks template is enabled in the given channel for this team
   """
   hasDefaultAsk: Boolean!
+}
+
+type SlackChannelConnectPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The integration that was created or updated."""
+  integration: Integration
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """Whether the bot needs to be manually added to the channel."""
+  addBot: Boolean!
 }
 
 """Object for mapping Slack channel IDs to names and other settings"""
