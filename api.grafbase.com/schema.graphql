@@ -1673,6 +1673,24 @@ type Query {
     """name of the subgraph"""
     subgraphName: String!
   ): Subgraph
+  schemaVersion(id: ID!): SchemaVersion
+  schemaVersions(
+    """account slug"""
+    accountSlug: String!
+
+    """project slug"""
+    projectSlug: String!
+
+    """name of the branch"""
+    branch: String
+
+    """name of the subgraph"""
+    subgraphName: String!
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): SchemaVersionConnection!
 
   """Give the actual connected user."""
   viewer: User
@@ -1756,6 +1774,114 @@ type ResourceStatus {
   limit: Int
   remaining: Int
   percentage: Float
+}
+
+enum SchemaChangeType {
+  FIELD_ARGUMENT_DESCRIPTION_CHANGED
+  FIELD_ARGUMENT_DEFAULT_CHANGED
+  FIELD_ARGUMENT_TYPE_CHANGED
+  DIRECTIVE_REMOVED
+  DIRECTIVE_ADDED
+  DIRECTIVE_DESCRIPTION_CHANGED
+  DIRECTIVE_LOCATION_ADDED
+  DIRECTIVE_LOCATION_REMOVED
+  DIRECTIVE_ARGUMENT_ADDED
+  DIRECTIVE_ARGUMENT_REMOVED
+  DIRECTIVE_ARGUMENT_DESCRIPTION_CHANGED
+  DIRECTIVE_ARGUMENT_DEFAULT_VALUE_CHANGED
+  DIRECTIVE_ARGUMENT_TYPE_CHANGED
+  ENUM_VALUE_REMOVED
+  ENUM_VALUE_ADDED
+  ENUM_VALUE_DESCRIPTION_CHANGED
+  ENUM_VALUE_DEPRECATION_REASON_CHANGED
+  ENUM_VALUE_DEPRECATION_REASON_ADDED
+  ENUM_VALUE_DEPRECATION_REASON_REMOVED
+  FIELD_REMOVED
+  FIELD_ADDED
+  FIELD_DESCRIPTION_CHANGED
+  FIELD_DESCRIPTION_ADDED
+  FIELD_DESCRIPTION_REMOVED
+  FIELD_DEPRECATION_ADDED
+  FIELD_DEPRECATION_REMOVED
+  FIELD_DEPRECATION_REASON_CHANGED
+  FIELD_DEPRECATION_REASON_ADDED
+  FIELD_DEPRECATION_REASON_REMOVED
+  FIELD_TYPE_CHANGED
+  FIELD_ARGUMENT_ADDED
+  FIELD_ARGUMENT_REMOVED
+  INPUT_FIELD_REMOVED
+  INPUT_FIELD_ADDED
+  INPUT_FIELD_DESCRIPTION_ADDED
+  INPUT_FIELD_DESCRIPTION_REMOVED
+  INPUT_FIELD_DESCRIPTION_CHANGED
+  INPUT_FIELD_DEFAULT_VALUE_CHANGED
+  INPUT_FIELD_TYPE_CHANGED
+  OBJECT_TYPE_INTERFACE_ADDED
+  OBJECT_TYPE_INTERFACE_REMOVED
+  SCHEMA_QUERY_TYPE_CHANGED
+  SCHEMA_MUTATION_TYPE_CHANGED
+  SCHEMA_SUBSCRIPTION_TYPE_CHANGED
+  TYPE_REMOVED
+  TYPE_ADDED
+  TYPE_KIND_CHANGED
+  TYPE_DESCRIPTION_CHANGED
+  TYPE_DESCRIPTION_REMOVED
+  TYPE_DESCRIPTION_ADDED
+  UNION_MEMBER_REMOVED
+  UNION_MEMBER_ADDED
+}
+
+type SchemaVersion {
+  id: ID!
+  schema: String!
+  changes(after: String, before: String, first: Int, last: Int): SchemaVersionChangeConnection!
+  createdAt: DateTime!
+}
+
+type SchemaVersionChange {
+  path: String!
+  type: SchemaChangeType!
+  message: String!
+}
+
+type SchemaVersionChangeConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [SchemaVersionChangeEdge!]!
+
+  """A list of nodes."""
+  nodes: [SchemaVersionChange!]!
+}
+
+"""An edge in a connection."""
+type SchemaVersionChangeEdge {
+  """The item at the end of the edge"""
+  node: SchemaVersionChange!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type SchemaVersionConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [SchemaVersionEdge!]!
+
+  """A list of nodes."""
+  nodes: [SchemaVersion!]!
+}
+
+"""An edge in a connection."""
+type SchemaVersionEdge {
+  """The item at the end of the edge"""
+  node: SchemaVersion!
+
+  """A cursor for use in pagination"""
+  cursor: String!
 }
 
 type SlugAlreadyExistsError {
