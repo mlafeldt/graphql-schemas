@@ -11998,7 +11998,13 @@ type Query {
   ): ProjectUpdate!
 
   """Sends a test push message."""
-  pushSubscriptionTest: PushSubscriptionTestPayload!
+  pushSubscriptionTest(
+    """Whether to send to mobile devices."""
+    targetMobile: Boolean = false
+
+    """The send strategy to use."""
+    sendStrategy: SendStrategy = push
+  ): PushSubscriptionTestPayload!
 
   """The status of the rate limiter."""
   rateLimitStatus: RateLimitPayload!
@@ -12870,6 +12876,13 @@ type SamlConfigurationPayload {
 
   """The issuer's custom entity ID."""
   issuerEntityId: String
+}
+
+enum SendStrategy {
+  desktopThenPush
+  desktopAndPush
+  desktop
+  push
 }
 
 """Sentry specific settings."""
