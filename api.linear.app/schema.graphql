@@ -2730,6 +2730,17 @@ type GithubOrg {
   isPersonal: Boolean
 }
 
+"""Metadata and settings for a GitHub Personal integration."""
+type GitHubPersonalSettings {
+  """The GitHub user's name"""
+  login: String!
+}
+
+input GitHubPersonalSettingsInput {
+  """The GitHub user's name"""
+  login: String!
+}
+
 """Relevant information for the GitHub repository."""
 type GithubRepo {
   """The id of the GitHub repository."""
@@ -2979,6 +2990,7 @@ type IntegrationSettings {
   slackOrgProjectUpdatesPost: SlackPostSettings
   googleSheets: GoogleSheetsSettings
   gitHub: GitHubSettings
+  gitHubPersonal: GitHubPersonalSettings
   gitLab: GitLabSettings
   sentry: SentrySettings
   zendesk: ZendeskSettings
@@ -2998,6 +3010,7 @@ input IntegrationSettingsInput {
   slackOrgProjectUpdatesPost: SlackPostSettingsInput
   googleSheets: GoogleSheetsSettingsInput
   gitHub: GitHubSettingsInput
+  gitHubPersonal: GitHubPersonalSettingsInput
   gitLab: GitLabSettingsInput
   sentry: SentrySettingsInput
   zendesk: ZendeskSettingsInput
@@ -8566,6 +8579,11 @@ type OauthClientEdge {
   cursor: String!
 }
 
+type OauthToken {
+  id: ID!
+  createdAt: DateTime!
+}
+
 input OnboardingCustomerSurvey {
   companyRole: String
   companySize: String
@@ -11823,7 +11841,7 @@ type Query {
   """Does the organization exist."""
   organizationExists(urlKey: String!): OrganizationExistsPayload!
 
-  """All archived teams of the organization."""
+  """[Internal] All archived teams of the organization."""
   archivedTeams: [Team!]!
 
   """All links for the project."""
