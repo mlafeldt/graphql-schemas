@@ -6239,8 +6239,11 @@ type Mutation {
 
   """Connect your Jira account to Linear."""
   integrationJiraPersonal(
-    """The Jira OAuth code."""
-    code: String!
+    """The Jira OAuth code, when connecting using OAuth."""
+    code: String
+
+    """The Jira personal access token, when connecting using a PAT."""
+    accessToken: String
   ): IntegrationPayload!
 
   """Connect your GitHub account to Linear."""
@@ -7324,12 +7327,6 @@ type Mutation {
     """The GitHub OAuth code."""
     code: String!
   ): UserPayload! @deprecated(reason: "Replaced by integrationGitHubPersonal mutation on Integration resolver.")
-
-  """[DEPRECATED] Connects the Jira user to this Linear account via OAuth2."""
-  userJiraConnect(
-    """The Jira OAuth code."""
-    code: String!
-  ): UserPayload! @deprecated(reason: "Replaced by integrationJiraPersonal mutation on Integration resolver.")
 
   """Disconnects the external user from this Linear account."""
   userExternalUserDisconnect(
