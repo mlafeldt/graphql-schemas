@@ -1755,6 +1755,14 @@ type CyclePayload {
   success: Boolean!
 }
 
+input CycleShiftAllInput {
+  """The cycle id at which to start the shift."""
+  id: String!
+
+  """The number of days to shift the cycles by."""
+  daysToShift: Float!
+}
+
 input CycleUpdateInput {
   """The custom name of the cycle."""
   name: String
@@ -6064,6 +6072,12 @@ type Mutation {
     """The identifier of the cycle to archive."""
     id: String!
   ): CycleArchivePayload!
+
+  """Shifts all cycles starts by a certain number of weeks."""
+  cycleShiftAll(
+    """A partial cycle object to update the cycle with."""
+    input: CycleShiftAllInput!
+  ): CyclePayload!
 
   """Creates a new document."""
   documentCreate(
