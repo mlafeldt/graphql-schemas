@@ -479,6 +479,11 @@ type EnvironmentVariableUpdateSuccess {
   query: Query!
 }
 
+type FederatedGraphCompositionError {
+  query: Query!
+  messages: [String!]!
+}
+
 enum FunctionKind {
   AUTHORIZER
   RESOLVER
@@ -952,6 +957,42 @@ type NotAllowedToUpdateOrganizationError {
   query: Query!
 }
 
+input OperationRequestAnalyticsFilter {
+  branch: String
+  period: ProjectRequestAnalyticsPeriod!
+  now: DateTime!
+  operationName: String
+  operationTypes: [OperationType!]
+}
+
+type OperationRequestMetrics {
+  operationType: OperationType!
+  operationName: String!
+  operationId: String!
+  operationContent: String!
+  requestCount: Int!
+}
+
+type OperationRequestMetricsConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [OperationRequestMetricsEdge!]!
+
+  """A list of nodes."""
+  nodes: [OperationRequestMetrics!]!
+}
+
+"""An edge in a connection."""
+type OperationRequestMetricsEdge {
+  """The item at the end of the edge"""
+  node: OperationRequestMetrics!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
 enum OperationType {
   QUERY
   MUTATION
@@ -1355,6 +1396,7 @@ type Project implements Node {
   databaseRegionChangeStatus: DatabaseRegionChangeStatus!
   customDomains: [String!]!
   requestAnalytics(filter: ProjectRequestAnalyticsFilter!): RequestAnalytics!
+  operationAnalytics(first: Int, after: String, filter: OperationRequestAnalyticsFilter!): OperationRequestMetricsConnection!
   logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
 }
 
@@ -1531,6 +1573,7 @@ input ProjectRequestAnalyticsFilter {
   period: ProjectRequestAnalyticsPeriod!
   now: DateTime!
   graphqlOperation: String
+  operationId: String
 }
 
 enum ProjectRequestAnalyticsPeriod {
@@ -1572,7 +1615,7 @@ input PublishInput {
   schema: String!
 }
 
-union PublishPayload = PublishSuccess | ProjectDoesNotExistError
+union PublishPayload = PublishSuccess | ProjectDoesNotExistError | FederatedGraphCompositionError
 
 type PublishSuccess {
   query: Query!
@@ -1835,6 +1878,7 @@ enum SchemaChangeType {
 type SchemaVersion {
   id: ID!
   schema: String!
+  delta: SchemaVersionDelta!
   changes(after: String, before: String, first: Int, last: Int): SchemaVersionChangeConnection!
   createdAt: DateTime!
 }
@@ -1874,6 +1918,17 @@ type SchemaVersionConnection {
 
   """A list of nodes."""
   nodes: [SchemaVersion!]!
+}
+
+type SchemaVersionDelta {
+  """Additions."""
+  added: Int!
+
+  """Removals."""
+  removed: Int!
+
+  """Modifications."""
+  modified: Int!
 }
 
 """An edge in a connection."""
