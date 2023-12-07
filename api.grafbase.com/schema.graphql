@@ -188,6 +188,11 @@ type BranchMetricsSuccess {
   request: Distribution!
 }
 
+type CompositionCheckError {
+  title: String!
+  message: String!
+}
+
 type CurrentPlanLimitReachedError {
   max: Int!
   query: Query!
@@ -286,6 +291,7 @@ type Deployment implements Node {
   createdAt: DateTime!
   startedAt: DateTime
   finishedAt: DateTime
+  triggerType: DeploymentTriggerType!
 
   """The duration of the deployment in milliseconds."""
   duration: Int
@@ -363,6 +369,15 @@ enum DeploymentStatus {
   IN_PROGRESS
   SUCCEEDED
   FAILED
+}
+
+enum DeploymentTriggerType {
+  PROJECT_CREATION
+  GIT_PUSH
+  CLI
+  REDEPLOYMENT
+  NEW_SCHEMA_PUBLICATION
+  INTERNAL
 }
 
 type DisabledAccountError {
@@ -906,6 +921,9 @@ type Mutation {
   projectUpdate(input: ProjectUpdateInput!): ProjectUpdatePayload!
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
 
+  """Run checks against the given schema"""
+  schemaCheckCreate(input: SchemaCheckCreateInput!): SchemaCheckPayload!
+
   """Publish a new subgraph."""
   publish(input: PublishInput!): PublishPayload!
   stripeSetupIntentCreate: StripeSetupIntentCreatePayload!
@@ -1397,6 +1415,7 @@ type Project implements Node {
   customDomains: [String!]!
   requestAnalytics(filter: ProjectRequestAnalyticsFilter!): RequestAnalytics!
   operationAnalytics(first: Int, after: String, filter: OperationRequestAnalyticsFilter!): OperationRequestMetricsConnection!
+  schemaChecks(first: Int, after: String, branch: String): SchemaCheckConnection!
   logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
 }
 
@@ -1702,6 +1721,7 @@ type Query {
     """ID of the project"""
     id: ID!
   ): Project @deprecated(reason: "use the top-level `node` query")
+  schemaCheck(id: ID!): SchemaCheck
 
   """Get subgraph."""
   subgraph(
@@ -1874,6 +1894,67 @@ enum SchemaChangeType {
   UNION_MEMBER_REMOVED
   UNION_MEMBER_ADDED
 }
+
+type SchemaCheck {
+  id: ID!
+  schema: String!
+  subgraphName: String
+  publishedSchemaVersion: ID
+  errorCount: Int!
+  validationCheckErrors: [ValidationCheckError!]!
+  compositionCheckErrors: [CompositionCheckError!]!
+  createdAt: DateTime!
+  gitCommit: SchemaCheckGitCommit
+}
+
+type SchemaCheckConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [SchemaCheckEdge!]!
+
+  """A list of nodes."""
+  nodes: [SchemaCheck!]!
+}
+
+input SchemaCheckCreateInput {
+  accountSlug: String!
+  projectSlug: String!
+  branch: String
+  subgraphName: String
+  schema: String!
+  gitCommit: SchemaCheckGitCommitInput
+}
+
+"""An edge in a connection."""
+type SchemaCheckEdge {
+  """The item at the end of the edge"""
+  node: SchemaCheck!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type SchemaCheckGitCommit {
+  branch: String!
+  commitSha: String!
+  commitUrl: String
+  message: String!
+  authorName: String!
+  authorAvatarUrl: String
+}
+
+input SchemaCheckGitCommitInput {
+  branch: String!
+  commitSha: String!
+  commitUrl: String
+  message: String!
+  authorName: String!
+  authorAvatarUrl: String
+}
+
+union SchemaCheckPayload = SchemaCheck | ProjectDoesNotExistError
 
 type SchemaVersion {
   id: ID!
@@ -2099,6 +2180,11 @@ type User implements Node {
   organizationMemberships: [Member!]!
   personalAccount: PersonalAccount
   limits: ViewerLimits! @deprecated(reason: "Moved to account level")
+}
+
+type ValidationCheckError {
+  title: String!
+  message: String!
 }
 
 type ValueTooLongError {
