@@ -3442,6 +3442,9 @@ type Issue implements Node {
   """The time until an issue will be snoozed in Triage view."""
   snoozedUntilAt: DateTime
 
+  """Id of the labels associated with this issue."""
+  labelIds: [String!]!
+
   """The team that the issue is associated with."""
   team: Team!
 
@@ -5031,6 +5034,9 @@ type IssueSearchResult implements Node {
   """The time until an issue will be snoozed in Triage view."""
   snoozedUntilAt: DateTime
 
+  """Id of the labels associated with this issue."""
+  labelIds: [String!]!
+
   """The team that the issue is associated with."""
   team: Team!
 
@@ -5730,7 +5736,7 @@ type Mutation {
     number: Float!
   ): AttachmentPayload!
 
-  """Link an existing GitHub PR to an issue."""
+  """Link a GitHub pull request to an issue."""
   attachmentLinkGitHubPR(
     """
     Create attachment as a user with the provided name. This option is only
@@ -5755,13 +5761,13 @@ type Mutation {
     url: String!
 
     """The owner of the GitHub repository."""
-    owner: String!
+    owner: String
 
     """The name of the GitHub repository."""
-    repo: String!
+    repo: String
 
     """The GitHub pull request number to link."""
-    number: Float!
+    number: Float
   ): AttachmentPayload!
 
   """Link an existing Zendesk ticket to an issue."""
