@@ -518,6 +518,14 @@ type AuthApiKeyPayload {
   authApiKey: AuthApiKey!
 }
 
+type AuthCreateOrJoinOrganizationResponse {
+  organization: AuthOrganization!
+  user: AuthUser!
+  authOrganization: AuthOrganization!
+  authUser: AuthUser!
+  grantDomainAccess: Boolean
+}
+
 """User authentication session."""
 type AuthenticationSession {
   id: String!
@@ -684,6 +692,68 @@ type AuthOauthClient {
 }
 
 """
+AuthOauthClient with token creator IDs and counts (memberships), for use in the GraphQL API.
+"""
+type AuthOauthClientWithMemberships {
+  """Application name."""
+  name: String!
+
+  """Image of the application."""
+  imageUrl: String
+
+  """Scopes that are authorized for this application for a given user."""
+  scope: [String!]!
+
+  """OAuth application's ID."""
+  appId: String!
+
+  """OAuth application's client ID."""
+  clientId: String!
+
+  """The application's webhook URL."""
+  webhookUrl: String
+
+  """Total number of members that authorized the application."""
+  totalMembers: Float!
+
+  """
+  User IDs and membership dates of everyone who has authorized the application with the set of scopes.
+  """
+  memberships: [AuthMembership!]!
+}
+
+"""
+AuthOauthClient with scope from OauthToken, for use in the GraphQL API.
+"""
+type AuthOauthClientWithScope {
+  """Application name."""
+  name: String!
+
+  """Image of the application."""
+  imageUrl: String
+
+  """Scopes that are authorized for this application for a given user."""
+  scope: [String!]!
+
+  """OAuth application's ID."""
+  appId: String!
+
+  """OAuth application's client ID."""
+  clientId: String!
+
+  """The application's webhook URL."""
+  webhookUrl: String
+}
+
+type AuthOauthClientWithTokens {
+  """The auth OAuth client."""
+  client: AuthOauthClient!
+
+  """The token matching the app, scope, and actor."""
+  tokens: [OauthToken!]!
+}
+
+"""
 An organization. Organizations are root-level objects that contain users and teams.
 """
 type AuthOrganization {
@@ -742,6 +812,23 @@ type AuthorizedApplication {
 
   """Whether or not webhooks are enabled for the application."""
   webhooksEnabled: Boolean!
+}
+
+type AuthorizedApplicationBase {
+  """Application name."""
+  name: String!
+
+  """Image of the application."""
+  imageUrl: String
+
+  """Scopes that are authorized for this application for a given user."""
+  scope: [String!]!
+
+  """OAuth application's ID."""
+  appId: String!
+
+  """OAuth application's client ID."""
+  clientId: String!
 }
 
 type AuthResolverResponse {
@@ -13349,35 +13436,6 @@ input SubTypeComparator {
 type SynchronizedPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
-}
-
-"""
-Contains either the full serialized state of the application or delta packets
-that the requester can apply to the local data set in order to be up-to-date.
-"""
-type SyncResponse {
-  """
-  The full state of the organization as a serialized JSON object.
-      Mutually exclusive with the delta property
-  """
-  state: String
-
-  """
-  JSON serialized delta changes that the client can apply to its local state in
-  order to catch up with the state of the world.
-  """
-  delta: String
-
-  """The sync groups that the user is subscribed to."""
-  subscribedSyncGroups: [String!]!
-
-  """The last sync id covered by the response."""
-  lastSyncId: Float!
-
-  """
-  The version of the remote database. Incremented by 1 for each migration run on the database.
-  """
-  databaseVersion: Float!
 }
 
 """An organizational unit that contains issues."""
