@@ -791,6 +791,11 @@ type AuthOrganization {
   userCount: Float!
 }
 
+type AuthOrganizationDomain {
+  """The unique identifier of the entity."""
+  id: ID!
+}
+
 """
 [INTERNAL] Public information of the OAuth application, plus the authorized scopes for a given user.
 """
@@ -2003,6 +2008,9 @@ type Document implements Node {
   """The last template that was applied to this document."""
   lastAppliedTemplate: Template
 
+  """The order of the item in the project resources list."""
+  sortOrder: Float!
+
   """The documents content in markdown format."""
   content: String
 
@@ -2168,6 +2176,9 @@ input DocumentCreateInput {
 
   """The ID of the last template applied to the document."""
   lastAppliedTemplateId: String
+
+  """The order of the item in the project resources list."""
+  sortOrder: Float
 }
 
 type DocumentEdge {
@@ -2246,6 +2257,9 @@ type DocumentSearchResult implements Node {
   """The last template that was applied to this document."""
   lastAppliedTemplate: Template
 
+  """The order of the item in the project resources list."""
+  sortOrder: Float!
+
   """The documents content in markdown format."""
   content: String
 
@@ -2290,6 +2304,9 @@ input DocumentUpdateInput {
 
   """The ID of the last template applied to the document."""
   lastAppliedTemplateId: String
+
+  """The order of the item in the project resources list."""
+  sortOrder: Float
 }
 
 input EmailSubscribeInput {
@@ -5823,6 +5840,31 @@ type Mutation {
     number: Float!
   ): AttachmentPayload!
 
+  """Link a GitHub issue to a Linear issue."""
+  attachmentLinkGitHubIssue(
+    """
+    Create attachment as a user with the provided name. This option is only
+    available to OAuth applications creating attachments in `actor=application` mode.
+    """
+    createAsUser: String
+
+    """
+    Provide an external user avatar URL. Can only be used in conjunction with
+    the `createAsUser` options. This option is only available to OAuth
+    applications creating comments in `actor=application` mode.
+    """
+    displayIconUrl: String
+
+    """The Linear issue for which to link the GitHub issue."""
+    issueId: String!
+
+    """Optional attachment ID that may be provided through the API"""
+    id: String
+
+    """The URL of the GitHub issue to link."""
+    url: String!
+  ): AttachmentPayload!
+
   """Link a GitHub pull request to an issue."""
   attachmentLinkGitHubPR(
     """
@@ -7166,6 +7208,9 @@ type Mutation {
 
   """Creates a new project."""
   projectCreate(
+    """Whether to connect a Slack channel to the project."""
+    connectSlackChannel: Boolean
+
     """The issue object to create."""
     input: ProjectCreateInput!
   ): ProjectPayload!
@@ -10004,6 +10049,9 @@ type ProjectLink implements Node {
   """The link's label."""
   label: String!
 
+  """The order of the item in the project resources list."""
+  sortOrder: Float!
+
   """The user who created the link."""
   creator: User!
 
@@ -10031,6 +10079,9 @@ input ProjectLinkCreateInput {
 
   """Related project for the link."""
   projectId: String!
+
+  """The order of the item in the project resources list."""
+  sortOrder: Float
 }
 
 type ProjectLinkEdge {
@@ -10057,6 +10108,9 @@ input ProjectLinkUpdateInput {
 
   """The label for the link."""
   label: String
+
+  """The order of the item in the project resources list."""
+  sortOrder: Float
 }
 
 """A milestone for a project."""
