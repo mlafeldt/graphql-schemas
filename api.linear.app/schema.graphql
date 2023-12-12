@@ -576,6 +576,7 @@ type AuthenticationSession {
   name: String!
 }
 
+"""Authentication session information"""
 type AuthenticationSessionResponse {
   id: String!
 
@@ -2593,6 +2594,9 @@ type Favorite implements Node {
   """The name of the folder. Only applies to favorites of type folder."""
   folderName: String
 
+  """The targeted tab of the project."""
+  projectTab: ProjectTab
+
   """The type of favorited predefined view."""
   predefinedViewType: String
 
@@ -2681,6 +2685,9 @@ input FavoriteCreateInput {
 
   """The identifier of the project to favorite."""
   projectId: String
+
+  """The tab of the project to favorite."""
+  projectTab: ProjectTab
 
   """The identifier of the project team to favorite."""
   projectTeamId: String
@@ -2807,6 +2814,107 @@ input FrontSettingsInput {
   Whether a ticket should be automatically reopened when a comment is posted on its linked Linear issue
   """
   automateTicketReopeningOnComment: Boolean
+}
+
+"""A trigger that updates the issue status according to Git automations."""
+type GitAutomationState implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The associated workflow state."""
+  state: WorkflowState
+
+  """The team to which this automation state belongs."""
+  team: Team!
+
+  """
+  The target branch, if null, the automation will be triggered on any branch.
+  """
+  branchPattern: String!
+
+  """The event that triggers the automation."""
+  event: GitAutomationStates!
+}
+
+type GitAutomationStateConnection {
+  edges: [GitAutomationStateEdge!]!
+  nodes: [GitAutomationState!]!
+  pageInfo: PageInfo!
+}
+
+input GitAutomationStateCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The team associated with the automation state."""
+  teamId: String!
+
+  """
+  The associated workflow state. If null, will override default behaviour and take no action.
+  """
+  stateId: String
+
+  """The target branch pattern. If null, all branches are targeted."""
+  branchPattern: String
+
+  """The event that triggers the automation."""
+  event: GitAutomationStates!
+}
+
+type GitAutomationStateEdge {
+  node: GitAutomationState!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type GitAutomationStatePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The automation state that was created or updated."""
+  gitAutomationState: GitAutomationState!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+"""The various states of a pull/merge request."""
+enum GitAutomationStates {
+  draft
+  start
+  review
+  mergeable
+  merge
+}
+
+input GitAutomationStateUpdateInput {
+  """The associated workflow state."""
+  stateId: String
+
+  """The target branch pattern. If null, all branches are targeted."""
+  branchPattern: String
+
+  """The event that triggers the automation."""
+  event: GitAutomationStates
 }
 
 type GitHubCommitIntegrationPayload {
@@ -6336,6 +6444,27 @@ type Mutation {
     """URL of the file to be uploaded to Linear."""
     url: String!
   ): ImageUploadFromUrlPayload!
+
+  """Creates a new automation state."""
+  gitAutomationStateCreate(
+    """The automation state to create."""
+    input: GitAutomationStateCreateInput!
+  ): GitAutomationStatePayload!
+
+  """Updates an existing state."""
+  gitAutomationStateUpdate(
+    """The state to update."""
+    input: GitAutomationStateUpdateInput!
+
+    """The identifier of the state to update."""
+    id: String!
+  ): GitAutomationStatePayload!
+
+  """Archives an automation state."""
+  gitAutomationStateDelete(
+    """The identifier of the automation state to archive."""
+    id: String!
+  ): DeletePayload!
 
   """Requests a currently unavailable integration."""
   integrationRequest(
@@ -10785,6 +10914,13 @@ type ProjectSearchResultEdge {
   cursor: String!
 }
 
+"""Different tabs available inside a project."""
+enum ProjectTab {
+  documents
+  issues
+  activity
+}
+
 """A update associated with an project."""
 type ProjectUpdate implements Node {
   """The unique identifier of the entity."""
@@ -12655,7 +12791,16 @@ type Reaction implements Node {
   """Name of the reaction's emoji."""
   emoji: String!
 
-  """The user who reacted."""
+  """The issue that the reaction is associated with."""
+  issue: Issue
+
+  """The comment that the reaction is associated with."""
+  comment: Comment
+
+  """The project update that the reaction is associated with."""
+  projectUpdate: ProjectUpdate
+
+  """The user that created the reaction."""
   user: User
 }
 
@@ -13138,6 +13283,12 @@ type SlackChannelConnectPayload {
 
   """Whether the bot needs to be manually added to the channel."""
   addBot: Boolean!
+
+  """Whether it's recommended to connect main Slack integration."""
+  nudgeToConnectMainSlackIntegration: Boolean
+
+  """Whether it's recommended to update main Slack integration."""
+  nudgeToUpdateMainSlackIntegration: Boolean
 }
 
 """Object for mapping Slack channel IDs to names and other settings"""
@@ -13886,6 +14037,33 @@ type Team implements Node {
     """
     orderBy: PaginationOrderBy
   ): WorkflowStateConnection!
+
+  """The automation states for the team."""
+  automationStates(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): GitAutomationStateConnection!
 
   """Templates associated with the team."""
   templates(
@@ -15607,7 +15785,7 @@ enum ViewType {
   completedCycle
   cycle
   project
-  projectDocumentation
+  projectDocuments
   label
   triage
   activeIssues
