@@ -167,6 +167,10 @@ type BranchConnection {
   nodes: [Branch!]!
 }
 
+type BranchDoesNotExistError {
+  query: Query!
+}
+
 """An edge in a connection."""
 type BranchEdge {
   """The item at the end of the edge"""
@@ -282,6 +286,20 @@ enum DatabaseUsageGranularity {
 
 """RFC3339 formatted date in the UTC time zone denoted by letter 'Z'"""
 scalar DateTime
+
+input DeleteSubgraphInput {
+  accountSlug: String!
+  projectSlug: String!
+  branch: String!
+  subgraph: String!
+  dryRun: Boolean!
+}
+
+union DeleteSubgraphPayload = DeleteSubgraphSuccess | SubgraphNotFoundError | ProjectDoesNotExistError | ProjectNotFederatedError | FederatedGraphCompositionError
+
+type DeleteSubgraphSuccess {
+  query: Query!
+}
 
 """Deployment"""
 type Deployment implements Node {
@@ -926,6 +944,9 @@ type Mutation {
 
   """Publish a new subgraph."""
   publish(input: PublishInput!): PublishPayload!
+
+  """Delete a subgraph"""
+  deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
   stripeSetupIntentCreate: StripeSetupIntentCreatePayload!
 }
 
@@ -1638,7 +1659,7 @@ input PublishInput {
   schema: String!
 }
 
-union PublishPayload = PublishSuccess | ProjectDoesNotExistError | ProjectNotFederatedError | FederatedGraphCompositionError
+union PublishPayload = PublishSuccess | ProjectDoesNotExistError | ProjectNotFederatedError | FederatedGraphCompositionError | BranchDoesNotExistError
 
 type PublishSuccess {
   query: Query!
@@ -2126,7 +2147,11 @@ type Subgraph {
   url: String!
   schema: String!
   createdAt: DateTime!
-  updatedAt: DateTime!
+  updatedAt: DateTime
+}
+
+type SubgraphNotFoundError {
+  query: Query!
 }
 
 type TemplateDoesNotExistError {
