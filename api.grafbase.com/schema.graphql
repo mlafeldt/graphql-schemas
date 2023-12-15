@@ -1979,7 +1979,7 @@ input SchemaCheckGitCommitInput {
   authorAvatarUrl: String
 }
 
-union SchemaCheckPayload = SchemaCheck | ProjectDoesNotExistError
+union SchemaCheckPayload = SchemaCheck | ProjectDoesNotExistError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameMissingOnFederatedProjectError
 
 type SchemaVersion {
   id: ID!
@@ -2148,6 +2148,14 @@ type Subgraph {
   schema: String!
   createdAt: DateTime!
   updatedAt: DateTime
+}
+
+type SubgraphNameMissingOnFederatedProjectError {
+  query: Query!
+}
+
+type SubgraphNameProvidedOnSingleProjectError {
+  query: Query!
 }
 
 type SubgraphNotFoundError {
