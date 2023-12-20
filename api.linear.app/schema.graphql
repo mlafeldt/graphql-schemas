@@ -795,6 +795,11 @@ type AuthOrganization {
 type AuthOrganizationDomain {
   """The unique identifier of the entity."""
   id: ID!
+  organizationId: String!
+  name: String!
+  verified: Boolean!
+  claimed: Boolean
+  authType: OrganizationDomainAuthType!
 }
 
 """
@@ -959,6 +964,11 @@ type Comment implements Node {
   """[Internal] The comment content as a Prosemirror document."""
   bodyData: String!
 
+  """
+  The text that this comment references. Only defined for inline comments.
+  """
+  quotedText: String
+
   """Emoji reaction summary, grouped by emoji type"""
   reactionData: JSONObject!
 
@@ -1100,6 +1110,11 @@ input CommentCreateInput {
   comment thread. If no synced Slack comment thread exists, the mutation will fail.
   """
   createOnSyncedSlackThread: Boolean
+
+  """
+  The text that this comment references. Only defined for inline comments.
+  """
+  quotedText: String
 }
 
 type CommentEdge {
@@ -1165,6 +1180,11 @@ input CommentUpdateInput {
 
   """[INTERNAL] The child comment that resolves this thread."""
   resolvingCommentId: String
+
+  """
+  The text that this comment references. Only defined for inline comments.
+  """
+  quotedText: String
 }
 
 """A company related to issue's origin."""
