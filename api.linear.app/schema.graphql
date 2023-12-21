@@ -519,8 +519,6 @@ type AuthApiKeyPayload {
 }
 
 type AuthCreateOrJoinOrganizationResponse {
-  organization: AuthOrganization!
-  user: AuthUser!
   authOrganization: AuthOrganization!
   authUser: AuthUser!
   grantDomainAccess: Boolean
@@ -893,6 +891,9 @@ type AuthUser {
 
   """Whether the user is active."""
   active: Boolean!
+
+  """User account id the user belongs to."""
+  userAccountId: String!
 
   """Organization the user belongs to."""
   organization: AuthOrganization!
@@ -5818,6 +5819,9 @@ input JiraUpdateInput {
 
   """Whether to refresh Jira Projects for the integration"""
   updateProjects: Boolean
+
+  """Whether to refresh Jira metadata for the integration"""
+  updateMetadata: Boolean
 }
 
 input JoinOrganizationInput {
@@ -15277,6 +15281,9 @@ type UserAccount {
 
   """The authentication service used to create the account."""
   service: String!
+
+  """Whether not to send email auth links in the email auth emails."""
+  authTokenLinkDisabled: Boolean!
 }
 
 """[INTERNAL] An email change verification challenge."""
