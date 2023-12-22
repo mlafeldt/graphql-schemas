@@ -800,6 +800,12 @@ type AuthOrganizationDomain {
   authType: OrganizationDomainAuthType!
 }
 
+"""An invitation to the organization that has been sent via email."""
+type AuthOrganizationInvite {
+  """The unique identifier of the entity."""
+  id: ID!
+}
+
 """
 [INTERNAL] Public information of the OAuth application, plus the authorized scopes for a given user.
 """
@@ -844,28 +850,30 @@ type AuthResolverResponse {
   """User account ID."""
   id: String!
 
-  """JWT token for authentication of the account."""
-  token: String
-
   """Email for the authenticated account."""
-  email: String
+  email: String!
 
   """Should the signup flow allow access for the domain."""
   allowDomainAccess: Boolean
 
-  """Users belonging to this account."""
+  """List of active users that belong to the user account."""
   users: [AuthUser!]!
 
-  """Organizations this account has access to, but is not yet a member."""
+  """
+  List of organizations allowing this user account to join automatically.
+  """
   availableOrganizations: [AuthOrganization!]
 
   """
-  List of organizations this user account is part of but are currently locked because of the current auth service.
+  List of organization available to this user account but locked due to the current auth method.
   """
   lockedOrganizations: [AuthOrganization!]
 
   """ID of the organization last accessed by the user."""
   lastUsedOrganizationId: String
+
+  """Application token."""
+  token: String @deprecated(reason: "Deprecated and not used anymore. Never populated.")
 }
 
 type AuthSuccessPayload {
@@ -3140,7 +3148,9 @@ input GoogleUserAccountAuthInput {
   """Signup code."""
   signupCode: String
 
-  """An optional invite link for an organization."""
+  """
+  An optional invite link for an organization used to populate available organizations.
+  """
   inviteLink: String
 }
 
