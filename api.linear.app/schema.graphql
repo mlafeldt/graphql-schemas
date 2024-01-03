@@ -2373,6 +2373,37 @@ type EmailIntakeAddress implements Node {
   creator: User
 }
 
+input EmailIntakeAddressCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """
+  The identifier or key of the team this email address will intake issues for.
+  """
+  teamId: String!
+}
+
+type EmailIntakeAddressPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The email address that was created or updated."""
+  emailIntakeAddress: EmailIntakeAddress!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input EmailIntakeAddressUpdateInput {
+  """
+  Whether the email address is currently enabled. If set to false, the email
+  address will be disabled and no longer accept incoming emails.
+  """
+  enabled: Boolean!
+}
+
 input EmailSubscribeInput {
   """[INTERNAL] Email to subscribe."""
   email: String!
@@ -6422,6 +6453,33 @@ type Mutation {
   """Deletes a document."""
   documentDelete(
     """The identifier of the document to delete."""
+    id: String!
+  ): DeletePayload!
+
+  """Creates a new email intake address."""
+  emailIntakeAddressCreate(
+    """The email intake address object to create."""
+    input: EmailIntakeAddressCreateInput!
+  ): EmailIntakeAddressPayload!
+
+  """Rotates an existing email intake address."""
+  emailIntakeAddressRotate(
+    """The identifier of the email intake address."""
+    id: String!
+  ): EmailIntakeAddressPayload!
+
+  """Updates an existing email intake address."""
+  emailIntakeAddressUpdate(
+    """The properties of the email intake address to update."""
+    input: EmailIntakeAddressUpdateInput!
+
+    """The identifier of the email intake address."""
+    id: String!
+  ): EmailIntakeAddressPayload!
+
+  """Deletes an email intake address object."""
+  emailIntakeAddressDelete(
+    """The identifier of the email intake address to delete."""
     id: String!
   ): DeletePayload!
 
@@ -14629,8 +14687,13 @@ input TeamUpdateInput {
   """Only allow issues with cycles in Active Issues."""
   cycleLockToActive: Boolean
 
-  """Whether the first cycle should start in the current or the next week."""
+  """
+  [DEPRECATED] Whether the first cycle should start in the current or the next week.
+  """
   cycleEnabledStartWeek: String
+
+  """The date to begin cycles on."""
+  cycleEnabledStartDate: DateTime
 
   """How many upcoming cycles to create."""
   upcomingCycleCount: Float
