@@ -2048,6 +2048,45 @@ type Document implements Node {
   contentData: JSON @deprecated(reason: "Use content instead.")
 }
 
+"""Document filtering options."""
+input DocumentCollectionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the document title."""
+  title: StringComparator
+
+  """Comparator for the document slug ID."""
+  slugId: StringComparator
+
+  """Filters that the document's creator must satisfy."""
+  creator: UserFilter
+
+  """Filters that the document's project must satisfy."""
+  project: ProjectFilter
+
+  """Compound filters, all of which need to be matched by the document."""
+  and: [DocumentCollectionFilter!]
+
+  """Compound filters, one of which need to be matched by the document."""
+  or: [DocumentCollectionFilter!]
+
+  """Filters that needs to be matched by some documents."""
+  some: DocumentFilter
+
+  """Filters that needs to be matched by all documents."""
+  every: DocumentFilter
+
+  """Comparator for the collection length."""
+  length: NumberComparator
+}
+
 type DocumentConnection {
   edges: [DocumentEdge!]!
   nodes: [Document!]!
@@ -2112,6 +2151,12 @@ input DocumentContentFilter {
 
   """Comparator for the updated at date."""
   updatedAt: DateComparator
+
+  """Filters that the document content project must satisfy."""
+  project: ProjectFilter
+
+  """Filters that the document content document must satisfy."""
+  document: DocumentFilter
 }
 
 """A document content history for a document"""
@@ -2216,6 +2261,36 @@ type DocumentEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Document filtering options."""
+input DocumentFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the document title."""
+  title: StringComparator
+
+  """Comparator for the document slug ID."""
+  slugId: StringComparator
+
+  """Filters that the document's creator must satisfy."""
+  creator: UserFilter
+
+  """Filters that the document's project must satisfy."""
+  project: ProjectFilter
+
+  """Compound filters, all of which need to be matched by the document."""
+  and: [DocumentFilter!]
+
+  """Compound filters, one of which need to be matched by the document."""
+  or: [DocumentFilter!]
 }
 
 type DocumentPayload {
@@ -3206,6 +3281,91 @@ type ImageUploadFromUrlPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""A initiative to group projects."""
+type Initiative implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The name of the initiative."""
+  name: String!
+
+  """The description of the initiative."""
+  description: String
+
+  """The organization of the initiative."""
+  organization: Organization!
+
+  """The user who created the initiative."""
+  creator: User!
+
+  """The user who owns the initiative."""
+  owner: User!
+
+  """The initiative's unique URL slug."""
+  slugId: String!
+
+  """The sort order of the initiative within the organization."""
+  sortOrder: Float!
+
+  """The initiative's color."""
+  color: String
+
+  """The estimated completion date of the initiative."""
+  targetDate: TimelessDate
+
+  """
+  [INTERNAL] The resolution of the initiative's estimated completion date.
+  """
+  targetDateResolution: DateResolutionType
+}
+
+"""Join table between projects and initiatives"""
+type InitiativeToProject implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The project that the initiative is associated with."""
+  project: Project!
+
+  """The initiative that the project is associated with."""
+  initiative: Initiative!
+
+  """The sort order of the project within the initiative."""
+  sortOrder: String!
 }
 
 """An integration with an external service."""
@@ -6882,6 +7042,12 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """Archives an integration."""
+  integrationArchive(
+    """The identifier of the integration to archive."""
+    id: String!
+  ): DeletePayload!
+
   """Creates new settings for one or more integrations."""
   integrationsSettingsCreate(
     """The settings to create."""
@@ -8274,6 +8440,45 @@ input NullableDocumentContentFilter {
 
   """Comparator for the updated at date."""
   updatedAt: DateComparator
+
+  """Filters that the document content project must satisfy."""
+  project: ProjectFilter
+
+  """Filters that the document content document must satisfy."""
+  document: DocumentFilter
+}
+
+"""Document filtering options."""
+input NullableDocumentFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the document title."""
+  title: StringComparator
+
+  """Comparator for the document slug ID."""
+  slugId: StringComparator
+
+  """Filters that the document's creator must satisfy."""
+  creator: UserFilter
+
+  """Filters that the document's project must satisfy."""
+  project: ProjectFilter
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
+
+  """Compound filters, all of which need to be matched by the document."""
+  and: [NullableDocumentFilter!]
+
+  """Compound filters, one of which need to be matched by the document."""
+  or: [NullableDocumentFilter!]
 }
 
 """Issue filtering options."""
@@ -8988,8 +9193,16 @@ type OauthClientEdge {
 }
 
 type OauthToken {
-  id: ID!
+  id: Float!
+  revokedAt: DateTime
   createdAt: DateTime!
+  clientId: String!
+
+  """Auth user who authorized the OAuth application."""
+  user: AuthUser!
+
+  """Id of the user who authorized the OAuth application."""
+  userId: String!
 }
 
 input OnboardingCustomerSurvey {
@@ -9909,6 +10122,9 @@ type Project implements Node {
 
   """Documents associated with the project."""
   documents(
+    """Filter returned documents."""
+    filter: DocumentFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -9936,6 +10152,9 @@ type Project implements Node {
 
   """Milestones associated with the project."""
   projectMilestones(
+    """Filter returned milestones."""
+    filter: ProjectMilestoneFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -10891,6 +11110,9 @@ type ProjectSearchResult implements Node {
 
   """Documents associated with the project."""
   documents(
+    """Filter returned documents."""
+    filter: DocumentFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -10918,6 +11140,9 @@ type ProjectSearchResult implements Node {
 
   """Milestones associated with the project."""
   projectMilestones(
+    """Filter returned milestones."""
+    filter: ProjectMilestoneFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -11761,6 +11986,9 @@ type Query {
 
   """All documents in the workspace."""
   documents(
+    """Filter returned documents."""
+    filter: DocumentFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
