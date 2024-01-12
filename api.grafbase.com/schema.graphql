@@ -937,6 +937,7 @@ type Mutation {
   """
   projectCreateFromTemplate(input: ProjectCreateFromTemplateInput!): ProjectCreateFromTemplatePayload!
   projectUpdate(input: ProjectUpdateInput!): ProjectUpdatePayload!
+  projectOperationCheckConfigurationUpdate(input: ProjectOperationCheckConfigurationInput!): ProjectOperationCheckConfigurationUpdatePayload!
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
 
   """Run checks against the given schema"""
@@ -1437,6 +1438,7 @@ type Project implements Node {
   requestAnalytics(filter: ProjectRequestAnalyticsFilter!): RequestAnalytics!
   operationAnalytics(first: Int, after: String, filter: OperationRequestAnalyticsFilter!): OperationRequestMetricsConnection!
   schemaChecks(first: Int, after: String, branch: String): SchemaCheckConnection!
+  operationChecksConfiguration: ProjectOperationCheckConfiguration!
   logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
 }
 
@@ -1611,6 +1613,57 @@ type ProjectNotDeployed {
 type ProjectNotFederatedError {
   query: Query!
 }
+
+type ProjectOperationCheckConfiguration {
+  """Whether operation checks are enabled for the project."""
+  enabled: Boolean!
+
+  """
+  The time range in days to consider for operation checks. Operations older than the specificied
+  number of days are ignored.
+  """
+  timeRangeDays: Int!
+
+  """
+  The request count threshold to consider for operation checks. Operations that have been
+  registered less than the specified number of occurrences are ignored.
+  """
+  requestCountThreshold: Int!
+
+  """The clients to exclude from operation checks."""
+  excludedClients: [String!]!
+
+  """The operations to exclude from operation checks."""
+  excludedOperations: [String!]!
+}
+
+input ProjectOperationCheckConfigurationInput {
+  """The project to update."""
+  projectId: ID!
+
+  """Whether operation checks are enabled for the project."""
+  enabled: Boolean!
+
+  """
+  The time range in days to consider for operation checks. Operations older than the specificied
+  number of days are ignored.
+  """
+  timeRangeDays: Int!
+
+  """
+  The request count threshold to consider for operation checks. Operations that have been
+  registered less than the specified number of occurrences are ignored.
+  """
+  requestCountThreshold: Int!
+
+  """The clients to exclude from operation checks."""
+  excludedClients: [String!]!
+
+  """The operations to exclude from operation checks."""
+  excludedOperations: [String!]!
+}
+
+union ProjectOperationCheckConfigurationUpdatePayload = ProjectDoesNotExistError | ProjectOperationCheckConfiguration
 
 input ProjectRequestAnalyticsFilter {
   branch: String = null
