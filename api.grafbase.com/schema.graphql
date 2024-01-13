@@ -997,6 +997,11 @@ type NotAllowedToUpdateOrganizationError {
   query: Query!
 }
 
+type OperationCheckError {
+  title: String!
+  message: String!
+}
+
 input OperationRequestAnalyticsFilter {
   branch: String
   period: ProjectRequestAnalyticsPeriod!
@@ -1754,10 +1759,6 @@ type Query {
     name: String!
   ): CustomDomain
 
-  """Get all database regions available for replication."""
-  databaseRegions: [DatabaseRegion!]!
-  closestDatabaseRegion: DatabaseRegion
-
   """Get deployment by ID."""
   deployment(
     """ID of the deployment"""
@@ -1981,6 +1982,7 @@ type SchemaCheck {
   errorCount: Int!
   validationCheckErrors: [ValidationCheckError!]!
   compositionCheckErrors: [CompositionCheckError!]!
+  operationCheckErrors: [OperationCheckError!]!
   createdAt: DateTime!
   gitCommit: SchemaCheckGitCommit
 }
