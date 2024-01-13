@@ -2733,6 +2733,34 @@ type ExternalUserEdge {
   cursor: String!
 }
 
+"""
+[ALPHA] A facet. Facets are joins between entities. A facet can tie a custom
+view to a project, or a a project to a roadmap for example.
+"""
+type Facet implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The sort order of the facet."""
+  sortOrder: Float!
+}
+
 """User favorites presented in the sidebar."""
 type Favorite implements Node {
   """The unique identifier of the entity."""
@@ -11312,7 +11340,7 @@ type ProjectUpdate implements Node {
   url: String!
 
   """The diff between the current update and the previous one."""
-  diff: JSON
+  diff: JSONObject
 
   """
   The diff between the current update and the previous one, formatted as markdown.
@@ -14806,13 +14834,19 @@ type TeamPayload {
   success: Boolean!
 }
 
-"""Tuple for mapping Linear teams to GitHub repos."""
+"""Mapping of Linear teams to GitHub repos."""
 type TeamRepoMapping {
   """The Linear team id to map to the given project."""
   linearTeamId: String!
 
   """The GitHub repo id."""
   gitHubRepoId: Float!
+
+  """Whether the sync for this mapping is bidirectional."""
+  bidirectional: Boolean
+
+  """Whether this mapping is the default one for issue creation."""
+  default: Boolean
 }
 
 input TeamRepoMappingInput {
@@ -14821,6 +14855,12 @@ input TeamRepoMappingInput {
 
   """The GitHub repo id."""
   gitHubRepoId: Float!
+
+  """Whether the sync for this mapping is bidirectional."""
+  bidirectional: Boolean
+
+  """Whether this mapping is the default one for issue creation."""
+  default: Boolean
 }
 
 input TeamUpdateInput {
