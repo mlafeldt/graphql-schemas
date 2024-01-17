@@ -2764,6 +2764,57 @@ type Facet implements Node {
   sortOrder: Float!
 }
 
+type FacetConnection {
+  edges: [FacetEdge!]!
+  nodes: [Facet!]!
+  pageInfo: PageInfo!
+}
+
+input FacetCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The identifier of the user to assign as the creator."""
+  creatorId: String
+
+  """The position of the facet related to other facets with same source."""
+  sortOrder: Float
+
+  """The identifier of the project to use as the facet source."""
+  sourceProjectId: String
+
+  """The identifier of the initiative to use as the facet source."""
+  sourceInitiativeId: String
+
+  """The identifier of the custom view to use as the facet target."""
+  targetCustomViewId: String
+}
+
+type FacetEdge {
+  node: Facet!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type FacetPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The facet that was created or updated."""
+  facet: Facet
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input FacetUpdateInput {
+  """The position of the facet related to other facets with same source."""
+  sortOrder: Float
+}
+
 """User favorites presented in the sidebar."""
 type Favorite implements Node {
   """The unique identifier of the entity."""
@@ -5315,7 +5366,7 @@ type IssueNotification implements Notification & Entity & Node {
   """The comment related to the notification."""
   comment: Comment
 
-  """The team related to the notification."""
+  """The team related to the issue notification."""
   team: Team!
 
   """The subscriptions related to the notification."""
@@ -6695,6 +6746,27 @@ type Mutation {
   """Deletes an emoji."""
   emojiDelete(
     """The identifier of the emoji to delete."""
+    id: String!
+  ): DeletePayload!
+
+  """[ALPHA] Creates a new facet."""
+  facetCreate(
+    """The facet object to create."""
+    input: FacetCreateInput!
+  ): FacetPayload!
+
+  """[ALPHA] Updates a facet."""
+  facetUpdate(
+    """A partial facet object to update the facet with."""
+    input: FacetUpdateInput!
+
+    """The identifier of the facet to update."""
+    id: String!
+  ): FacetPayload!
+
+  """Deletes a facet."""
+  facetDelete(
+    """[ALPHA] The identifier of the facet to delete."""
     id: String!
   ): DeletePayload!
 
@@ -12116,6 +12188,36 @@ type Query {
     """The identifier of the external user to retrieve."""
     id: String!
   ): ExternalUser!
+
+  """[ALPHA] All facets."""
+  facets(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): FacetConnection!
+
+  """[ALPHA] One specific facet."""
+  facet(id: String!): Facet!
 
   """The user's favorites."""
   favorites(
