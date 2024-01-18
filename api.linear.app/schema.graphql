@@ -2447,6 +2447,9 @@ type EmailIntakeAddress implements Node {
   """The team that the email address is associated with."""
   team: Team!
 
+  """The organization that the email address is associated with."""
+  organization: Organization!
+
   """The user who created the email intake address."""
   creator: User
 }
@@ -2961,6 +2964,9 @@ input FavoriteCreateInput {
   """The identifier of the roadmap to favorite."""
   roadmapId: String
 
+  """[INTERNAL] The identifier of the initiative to favorite."""
+  initiativeId: String
+
   """The identifier of the label to favorite."""
   labelId: String
 
@@ -3365,7 +3371,7 @@ type ImageUploadFromUrlPayload {
   success: Boolean!
 }
 
-"""A initiative to group projects."""
+"""[INTERNAL] An initiative to group projects."""
 type Initiative implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -3417,9 +3423,99 @@ type Initiative implements Node {
   [INTERNAL] The resolution of the initiative's estimated completion date.
   """
   targetDateResolution: DateResolutionType
+
+  """Projects associated with the initiative."""
+  projects(
+    """[Internal] Filter returned projects."""
+    filter: ProjectFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectConnection!
 }
 
-"""Join table between projects and initiatives"""
+"""A generic payload return from entity archive mutations."""
+type InitiativeArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: Initiative
+}
+
+type InitiativeConnection {
+  edges: [InitiativeEdge!]!
+  nodes: [Initiative!]!
+  pageInfo: PageInfo!
+}
+
+"""[Internal] The properties of the initiative to create."""
+input InitiativeCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The name of the initiative."""
+  name: String!
+
+  """The description of the initiative."""
+  description: String
+
+  """The owner of the initiative"""
+  ownerId: String
+
+  """The sort order of the initiative within the organization."""
+  sortOrder: Float
+
+  """The initiative's color."""
+  color: String
+}
+
+type InitiativeEdge {
+  node: Initiative!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""[Internal] The payload returned by the initiative mutations."""
+type InitiativePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The initiative that was created or updated."""
+  initiative: Initiative!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+"""[INTERNAL] Join table between projects and initiatives"""
 type InitiativeToProject implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -3448,6 +3544,75 @@ type InitiativeToProject implements Node {
 
   """The sort order of the project within the initiative."""
   sortOrder: String!
+}
+
+type InitiativeToProjectConnection {
+  edges: [InitiativeToProjectEdge!]!
+  nodes: [InitiativeToProject!]!
+  pageInfo: PageInfo!
+}
+
+"""[INTERNAL] The properties of the initiativeToProject to create."""
+input InitiativeToProjectCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The identifier of the project."""
+  projectId: String!
+
+  """The identifier of the initiative."""
+  initiativeId: String!
+
+  """The sort order for the project within its organization."""
+  sortOrder: Float
+}
+
+type InitiativeToProjectEdge {
+  node: InitiativeToProject!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""[INTERNAL] The result of a initiativeToProject mutation."""
+type InitiativeToProjectPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The initiativeToProject that was created or updated."""
+  initiativeToProject: InitiativeToProject!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+"""[INTERNAL] The properties of the initiativeToProject to update."""
+input InitiativeToProjectUpdateInput {
+  """The sort order for the project within its organization."""
+  sortOrder: Float
+}
+
+"""[Internal] The properties of the initiative to update."""
+input InitiativeUpdateInput {
+  """The name of the initiative."""
+  name: String
+
+  """The description of the initiative."""
+  description: String
+
+  """The owner of the initiative"""
+  ownerId: String
+
+  """The sort order of the initiative within the organization."""
+  sortOrder: Float
+
+  """The initiative's color."""
+  color: String
+
+  """The estimated completion date of the initiative."""
+  targetDate: TimelessDate
 }
 
 """An integration with an external service."""
@@ -6243,14 +6408,14 @@ type Mutation {
     """
     displayIconUrl: String
 
+    """The title to use for the attachment."""
+    title: String
+
     """The url to link."""
     url: String!
 
     """The issue for which to link the url."""
     issueId: String!
-
-    """The title to use for the attachment."""
-    title: String
 
     """The id for the attachment."""
     id: String
@@ -6270,6 +6435,9 @@ type Mutation {
     applications creating comments in `actor=application` mode.
     """
     displayIconUrl: String
+
+    """The title to use for the attachment."""
+    title: String
 
     """The issue for which to link the GitLab merge request."""
     issueId: String!
@@ -6304,6 +6472,9 @@ type Mutation {
     """
     displayIconUrl: String
 
+    """The title to use for the attachment."""
+    title: String
+
     """The Linear issue for which to link the GitHub issue."""
     issueId: String!
 
@@ -6328,6 +6499,9 @@ type Mutation {
     applications creating comments in `actor=application` mode.
     """
     displayIconUrl: String
+
+    """The title to use for the attachment."""
+    title: String
 
     """The issue for which to link the GitHub pull request."""
     issueId: String!
@@ -6363,6 +6537,9 @@ type Mutation {
     """
     displayIconUrl: String
 
+    """The title to use for the attachment."""
+    title: String
+
     """The Zendesk ticket ID to link."""
     ticketId: String!
 
@@ -6387,6 +6564,9 @@ type Mutation {
     applications creating comments in `actor=application` mode.
     """
     displayIconUrl: String
+
+    """The title to use for the attachment."""
+    title: String
 
     """The issue for which to link the Discord message."""
     issueId: String!
@@ -6419,6 +6599,9 @@ type Mutation {
     """
     displayIconUrl: String
 
+    """The title to use for the attachment."""
+    title: String
+
     """The Slack channel ID for the message to link."""
     channel: String!
 
@@ -6435,9 +6618,6 @@ type Mutation {
 
     """The Slack message URL for the message to link."""
     url: String!
-
-    """Optional title that may be provided through the API"""
-    title: String
 
     """Optional attachment ID that may be provided through the API"""
     id: String
@@ -6457,6 +6637,9 @@ type Mutation {
     applications creating comments in `actor=application` mode.
     """
     displayIconUrl: String
+
+    """The title to use for the attachment."""
+    title: String
 
     """The Front conversation ID to link."""
     conversationId: String!
@@ -6482,6 +6665,9 @@ type Mutation {
     applications creating comments in `actor=application` mode.
     """
     displayIconUrl: String
+
+    """The title to use for the attachment."""
+    title: String
 
     """The Intercom conversation ID to link."""
     conversationId: String!
@@ -6767,6 +6953,60 @@ type Mutation {
   """Deletes a facet."""
   facetDelete(
     """[ALPHA] The identifier of the facet to delete."""
+    id: String!
+  ): DeletePayload!
+
+  """[Internal] Creates a new initiative."""
+  initiativeCreate(
+    """The properties of the initiative to create."""
+    input: InitiativeCreateInput!
+  ): InitiativePayload!
+
+  """[Internal] Updates a initiative."""
+  initiativeUpdate(
+    """The properties of the initiative to update."""
+    input: InitiativeUpdateInput!
+
+    """The identifier of the initiative to update."""
+    id: String!
+  ): InitiativePayload!
+
+  """[Internal] Archives a initiative."""
+  initiativeArchive(
+    """The identifier of the initiative to archive."""
+    id: String!
+  ): InitiativeArchivePayload!
+
+  """[Internal] Unarchives a initiative."""
+  initiativeUnarchive(
+    """The identifier of the initiative to unarchive."""
+    id: String!
+  ): InitiativeArchivePayload!
+
+  """[Internal] Deletes a initiative."""
+  initiativeDelete(
+    """The identifier of the initiative to delete."""
+    id: String!
+  ): DeletePayload!
+
+  """[INTERNAL] Creates a new initiativeToProject join."""
+  initiativeToProjectCreate(
+    """The properties of the initiativeToProject to create."""
+    input: InitiativeToProjectCreateInput!
+  ): InitiativeToProjectPayload!
+
+  """[INTERNAL] Updates a initiativeToProject."""
+  initiativeToProjectUpdate(
+    """The properties of the initiativeToProject to update."""
+    input: InitiativeToProjectUpdateInput!
+
+    """The identifier of the initiativeToProject to update."""
+    id: String!
+  ): InitiativeToProjectPayload!
+
+  """[INTERNAL] Deletes a initiativeToProject."""
+  initiativeToProjectDelete(
+    """The identifier of the initiativeToProject to delete."""
     id: String!
   ): DeletePayload!
 
@@ -12218,6 +12458,66 @@ type Query {
 
   """[ALPHA] One specific facet."""
   facet(id: String!): Facet!
+
+  """[Internal] All initiatives in the workspace."""
+  initiatives(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): InitiativeConnection!
+
+  """[Internal] One specific initiative."""
+  initiative(id: String!): Initiative!
+
+  """[INTERNAL] returns a list of initiative to project entities."""
+  initiativeToProjects(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): InitiativeToProjectConnection!
+
+  """[INTERNAL] One specific initiativeToProject."""
+  initiativeToProject(id: String!): InitiativeToProject!
 
   """The user's favorites."""
   favorites(
