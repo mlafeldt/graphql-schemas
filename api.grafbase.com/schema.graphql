@@ -223,6 +223,41 @@ type BranchOperationCheckConfiguration {
   excludedOperationsAppendProjectSettings: Boolean!
 }
 
+input BranchOperationCheckConfigurationInput {
+  projectId: ID!
+  branch: String!
+
+  """Whether operation checks are enabled for the branch."""
+  enabled: Boolean!
+
+  """
+  The time range in days to consider for operation checks. Operations older than the specificied
+  number of days are ignored. Overrides project configuration if defined.
+  """
+  timeRangeDaysOverride: Int
+
+  """
+  The request count threshold to consider for operation checks. Operations that have been
+  registered less than the specified number of occurrences are ignored. Overrides project
+  configuration if defined.
+  """
+  requestCountThresholdOverride: Int
+
+  """The clients to exclude from operation checks."""
+  excludedClients: [String!]!
+
+  """Whether to merge excluded clients with the project's."""
+  excludedClientsAppendProjectSettings: Boolean!
+
+  """The operations to exclude from operation checks."""
+  excludedOperations: [String!]!
+
+  """Whether to merge excluded operations with the project's."""
+  excludedOperationsAppendProjectSettings: Boolean!
+}
+
+union BranchOperationCheckConfigurationUpdatePayload = ProjectDoesNotExistError | BranchOperationCheckConfiguration
+
 type CompositionCheckError {
   title: String!
   message: String!
@@ -391,6 +426,7 @@ type DeploymentLogEntry {
 
 enum DeploymentLogLevel {
   ERROR
+  WARN
   INFO
 }
 
@@ -968,6 +1004,7 @@ type Mutation {
   """Delete a subgraph"""
   deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
   stripeSetupIntentCreate: StripeSetupIntentCreatePayload!
+  branchOperationCheckConfigurationUpdate(input: BranchOperationCheckConfigurationInput!): BranchOperationCheckConfigurationUpdatePayload!
 }
 
 type NameAlreadyExistsError {
