@@ -2430,7 +2430,7 @@
           },
           {
             "name": "isDiffHidden",
-            "description": "[ALPHA] Whether project update diff should be hidden.",
+            "description": "Whether project update diff should be hidden.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -8576,7 +8576,7 @@
           },
           {
             "name": "updatedBy",
-            "description": "[ALPHA] The user who last updated the custom view.",
+            "description": "The user who last updated the custom view.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -8624,7 +8624,7 @@
           },
           {
             "name": "projectFilterData",
-            "description": "[ALPHA] The filter applied to projects in the custom view.",
+            "description": "The filter applied to projects in the custom view.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -9397,7 +9397,7 @@
           },
           {
             "name": "externalUserCreator",
-            "description": "[ALPHA] The external user who created the issue.",
+            "description": "The external user who created the issue.",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -10286,6 +10286,18 @@
             },
             "isDeprecated": true,
             "deprecationReason": "Use description instead."
+          },
+          {
+            "name": "descriptionState",
+            "description": "[Internal] The issue's description content state.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -12388,7 +12400,7 @@
       {
         "kind": "OBJECT",
         "name": "ExternalUser",
-        "description": "[ALPHA] An external authenticated (e.g., through Slack) user which doesn't have a Linear account, but can create and update entities in Linear from the external system that authenticated them.",
+        "description": "An external authenticated (e.g., through Slack) user which doesn't have a Linear account, but can create and update entities in Linear from the external system that authenticated them.",
         "fields": [
           {
             "name": "id",
@@ -20583,6 +20595,336 @@
       },
       {
         "kind": "OBJECT",
+        "name": "ProjectStatus",
+        "description": "[ALPHA] A project status.",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The unique identifier of the entity.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createdAt",
+            "description": "The time at which the entity was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those\n    for which updates should not produce an update to updatedAt (see skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't\n    been updated after creation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "archivedAt",
+            "description": "The time at which the entity was archived. Null if the entity has not been archived.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": "The name of the status.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "color",
+            "description": "The UI color of the status as a HEX string.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "description",
+            "description": "Description of the status.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "position",
+            "description": "The position of the status in the workspace's project flow.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "type",
+            "description": "The type of the project status.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "ProjectStatusType",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "indefinite",
+            "description": "Whether or not a project can be in this status indefinitely.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "ProjectStatusType",
+        "description": "A type of project status.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "backlog",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "planned",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "started",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "paused",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "completed",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "canceled",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "ProjectStatusEdge",
+        "description": null,
+        "fields": [
+          {
+            "name": "node",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectStatus",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cursor",
+            "description": "Used in `before` and `after` args",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "ProjectStatusConnection",
+        "description": null,
+        "fields": [
+          {
+            "name": "edges",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "ProjectStatusEdge",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "nodes",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "ProjectStatus",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pageInfo",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PageInfo",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "ProjectUpdateInteraction",
         "description": "Holds information about when a user has interacted with a project update.",
         "fields": [
@@ -23376,7 +23718,7 @@
           },
           {
             "name": "error",
-            "description": "User readable error message, if an error occurred while updating the schedule.",
+            "description": "User presentable error message, if an error occurred while updating the schedule.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -32529,7 +32871,7 @@
           },
           {
             "name": "externalUserCreator",
-            "description": "[ALPHA] The external user who created the issue.",
+            "description": "The external user who created the issue.",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -33418,6 +33760,18 @@
             },
             "isDeprecated": true,
             "deprecationReason": "Use description instead."
+          },
+          {
+            "name": "descriptionState",
+            "description": "[Internal] The issue's description content state.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           },
           {
             "name": "metadata",
@@ -36540,6 +36894,11 @@
           {
             "kind": "OBJECT",
             "name": "ProjectLink",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ProjectStatus",
             "ofType": null
           },
           {
@@ -48024,7 +48383,7 @@
           },
           {
             "name": "projectFilterData",
-            "description": "[ALPHA] The project filter applied to issues in the custom view.",
+            "description": "The project filter applied to issues in the custom view.",
             "type": {
               "kind": "SCALAR",
               "name": "JSONObject",
@@ -48145,7 +48504,7 @@
           },
           {
             "name": "projectFilterData",
-            "description": "[ALPHA] The project filter applied to issues in the custom view.",
+            "description": "The project filter applied to issues in the custom view.",
             "type": {
               "kind": "SCALAR",
               "name": "JSONObject",
@@ -51611,7 +51970,7 @@
           },
           {
             "name": "isDiffHidden",
-            "description": "[ALPHA] Whether the diff between the current update and the previous one should be hidden.",
+            "description": "Whether the diff between the current update and the previous one should be hidden.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -51662,7 +52021,7 @@
           },
           {
             "name": "isDiffHidden",
-            "description": "[ALPHA] Whether the diff between the current update and the previous one should be hidden.",
+            "description": "Whether the diff between the current update and the previous one should be hidden.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",

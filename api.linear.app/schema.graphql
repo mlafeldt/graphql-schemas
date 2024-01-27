@@ -1389,7 +1389,7 @@ type CustomView implements Node {
   """The user who owns the custom view."""
   owner: User!
 
-  """[ALPHA] The user who last updated the custom view."""
+  """The user who last updated the custom view."""
   updatedBy: User!
 
   """The filters applied to issues in the custom view."""
@@ -1398,7 +1398,7 @@ type CustomView implements Node {
   """The filter applied to issues in the custom view."""
   filterData: JSONObject!
 
-  """[ALPHA] The filter applied to projects in the custom view."""
+  """The filter applied to projects in the custom view."""
   projectFilterData: JSONObject
 
   """Whether the custom view is shared with everyone in the organization."""
@@ -1477,7 +1477,7 @@ input CustomViewCreateInput {
   """The filter applied to issues in the custom view."""
   filterData: JSONObject
 
-  """[ALPHA] The project filter applied to issues in the custom view."""
+  """The project filter applied to issues in the custom view."""
   projectFilterData: JSONObject
 
   """Whether the custom view is shared with everyone in the organization."""
@@ -1611,7 +1611,7 @@ input CustomViewUpdateInput {
   """The filter applied to issues in the custom view."""
   filterData: JSONObject
 
-  """[ALPHA] The project filter applied to issues in the custom view."""
+  """The project filter applied to issues in the custom view."""
   projectFilterData: JSONObject
 
   """Whether the custom view is shared with everyone in the organization."""
@@ -2745,9 +2745,9 @@ input EstimateComparator {
 }
 
 """
-[ALPHA] An external authenticated (e.g., through Slack) user which doesn't have
-a Linear account, but can create and update entities in Linear from the external
-system that authenticated them.
+An external authenticated (e.g., through Slack) user which doesn't have a Linear
+account, but can create and update entities in Linear from the external system
+that authenticated them.
 """
 type ExternalUser implements Node {
   """The unique identifier of the entity."""
@@ -4207,7 +4207,7 @@ type Issue implements Node {
   """The user who created the issue."""
   creator: User
 
-  """[ALPHA] The external user who created the issue."""
+  """The external user who created the issue."""
   externalUserCreator: ExternalUser
 
   """The user to whom the issue is assigned to."""
@@ -4492,6 +4492,9 @@ type Issue implements Node {
 
   """[Internal] The issue's description as a Prosemirror document."""
   descriptionData: JSON @deprecated(reason: "Use description instead.")
+
+  """[Internal] The issue's description content state."""
+  descriptionState: String
 }
 
 """A generic payload return from entity archive mutations."""
@@ -5799,7 +5802,7 @@ type IssueSearchResult implements Node {
   """The user who created the issue."""
   creator: User
 
-  """[ALPHA] The external user who created the issue."""
+  """The external user who created the issue."""
   externalUserCreator: ExternalUser
 
   """The user to whom the issue is assigned to."""
@@ -6084,6 +6087,9 @@ type IssueSearchResult implements Node {
 
   """[Internal] The issue's description as a Prosemirror document."""
   descriptionData: JSON @deprecated(reason: "Use description instead.")
+
+  """[Internal] The issue's description content state."""
+  descriptionState: String
 
   """Metadata related to search result."""
   metadata: JSONObject!
@@ -11608,6 +11614,69 @@ type ProjectSearchResultEdge {
   cursor: String!
 }
 
+"""[ALPHA] A project status."""
+type ProjectStatus implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The name of the status."""
+  name: String!
+
+  """The UI color of the status as a HEX string."""
+  color: String!
+
+  """Description of the status."""
+  description: String
+
+  """The position of the status in the workspace's project flow."""
+  position: Float!
+
+  """The type of the project status."""
+  type: ProjectStatusType
+
+  """Whether or not a project can be in this status indefinitely."""
+  indefinite: Boolean!
+}
+
+type ProjectStatusConnection {
+  edges: [ProjectStatusEdge!]!
+  nodes: [ProjectStatus!]!
+  pageInfo: PageInfo!
+}
+
+type ProjectStatusEdge {
+  node: ProjectStatus!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""A type of project status."""
+enum ProjectStatusType {
+  backlog
+  planned
+  started
+  paused
+  completed
+  canceled
+}
+
 """Different tabs available inside a project."""
 enum ProjectTab {
   documents
@@ -11656,7 +11725,7 @@ type ProjectUpdate implements Node {
   """
   infoSnapshot: JSONObject
 
-  """[ALPHA] Whether project update diff should be hidden."""
+  """Whether project update diff should be hidden."""
   isDiffHidden: Boolean!
 
   """
@@ -11701,7 +11770,7 @@ input ProjectUpdateCreateInput {
   health: ProjectUpdateHealthType
 
   """
-  [ALPHA] Whether the diff between the current update and the previous one should be hidden.
+  Whether the diff between the current update and the previous one should be hidden.
   """
   isDiffHidden: Boolean
 }
@@ -11919,7 +11988,7 @@ input ProjectUpdateUpdateInput {
   health: ProjectUpdateHealthType
 
   """
-  [ALPHA] Whether the diff between the current update and the previous one should be hidden.
+  Whether the diff between the current update and the previous one should be hidden.
   """
   isDiffHidden: Boolean
 }
@@ -15602,7 +15671,7 @@ type TimeSchedule implements Node {
   entries: JSONObject!
 
   """
-  User readable error message, if an error occurred while updating the schedule.
+  User presentable error message, if an error occurred while updating the schedule.
   """
   error: String
 
