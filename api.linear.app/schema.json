@@ -16014,6 +16014,155 @@
       },
       {
         "kind": "OBJECT",
+        "name": "GitAutomationTargetBranch",
+        "description": "A Git target branch for which there are automations (GitAutomationState).",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The unique identifier of the entity.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createdAt",
+            "description": "The time at which the entity was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those\n    for which updates should not produce an update to updatedAt (see skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't\n    been updated after creation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "archivedAt",
+            "description": "The time at which the entity was archived. Null if the entity has not been archived.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "team",
+            "description": "The team to which this Git target branch automation belongs.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Team",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "branchPattern",
+            "description": "The target branch pattern.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "isRegex",
+            "description": "Whether the branch pattern is a regular expression.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "automationStates",
+            "description": "The automation states associated with this target branch.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GitAutomationState",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "GitAutomationState",
         "description": "A trigger that updates the issue status according to Git automations.",
         "fields": [
@@ -16107,7 +16256,7 @@
           },
           {
             "name": "branchPattern",
-            "description": "The target branch, if null, the automation will be triggered on any branch.",
+            "description": "[DEPRECATED] The target branch, if null, the automation will be triggered on any branch.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -16117,6 +16266,18 @@
                 "name": "String",
                 "ofType": null
               }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use targetBranch instead."
+          },
+          {
+            "name": "targetBranch",
+            "description": "The target branch associated to this automation state.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "GitAutomationTargetBranch",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -29285,6 +29446,65 @@
       },
       {
         "kind": "OBJECT",
+        "name": "GitAutomationTargetBranchPayload",
+        "description": null,
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "The identifier of the last sync operation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "targetBranch",
+            "description": "The Git target branch automation that was created or updated.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "GitAutomationTargetBranch",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "IntegrationRequestPayload",
         "description": null,
         "fields": [
@@ -36829,6 +37049,11 @@
           {
             "kind": "OBJECT",
             "name": "Favorite",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "GitAutomationTargetBranch",
             "ofType": null
           },
           {
@@ -49597,7 +49822,17 @@
           },
           {
             "name": "branchPattern",
-            "description": "The target branch pattern. If null, all branches are targeted.",
+            "description": "[DEPRECATED] The target branch pattern. If null, all branches are targeted.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "targetBranchId",
+            "description": "The associated target branch. If null, all branches are targeted.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -49642,7 +49877,17 @@
           },
           {
             "name": "branchPattern",
-            "description": "The target branch pattern. If null, all branches are targeted.",
+            "description": "[DEPRECATED] The target branch pattern. If null, all branches are targeted.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "targetBranchId",
+            "description": "The associated target branch. If null, all branches are targeted.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -49656,6 +49901,96 @@
             "type": {
               "kind": "ENUM",
               "name": "GitAutomationStates",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "GitAutomationTargetBranchCreateInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "teamId",
+            "description": "The team associated with the Git target branch automation.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "branchPattern",
+            "description": "The target branch pattern.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "isRegex",
+            "description": "Whether the branch pattern is a regular expression.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": "false"
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "GitAutomationTargetBranchUpdateInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "branchPattern",
+            "description": "The target branch pattern.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "isRegex",
+            "description": "Whether the branch pattern is a regular expression.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
               "ofType": null
             },
             "defaultValue": null
@@ -64965,6 +65300,113 @@
               {
                 "name": "id",
                 "description": "The identifier of the automation state to archive.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "gitAutomationTargetBranchCreate",
+            "description": "Creates a Git target branch automation.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The Git target branch automation to create.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "GitAutomationTargetBranchCreateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "GitAutomationTargetBranchPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "gitAutomationTargetBranchUpdate",
+            "description": "Updates an existing Git target branch automation.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The updates.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "GitAutomationTargetBranchUpdateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the Git target branch automation to update.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "GitAutomationTargetBranchPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "gitAutomationTargetBranchDelete",
+            "description": "Archives a Git target branch automation.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The identifier of the Git target branch automation to archive.",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,

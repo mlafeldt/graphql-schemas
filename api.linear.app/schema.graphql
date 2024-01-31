@@ -3127,9 +3127,12 @@ type GitAutomationState implements Node {
   team: Team!
 
   """
-  The target branch, if null, the automation will be triggered on any branch.
+  [DEPRECATED] The target branch, if null, the automation will be triggered on any branch.
   """
-  branchPattern: String!
+  branchPattern: String! @deprecated(reason: "Use targetBranch instead.")
+
+  """The target branch associated to this automation state."""
+  targetBranch: GitAutomationTargetBranch
 
   """The event that triggers the automation."""
   event: GitAutomationStates!
@@ -3155,8 +3158,13 @@ input GitAutomationStateCreateInput {
   """
   stateId: String
 
-  """The target branch pattern. If null, all branches are targeted."""
+  """
+  [DEPRECATED] The target branch pattern. If null, all branches are targeted.
+  """
   branchPattern: String
+
+  """The associated target branch. If null, all branches are targeted."""
+  targetBranchId: String
 
   """The event that triggers the automation."""
   event: GitAutomationStates!
@@ -3193,11 +3201,87 @@ input GitAutomationStateUpdateInput {
   """The associated workflow state."""
   stateId: String
 
-  """The target branch pattern. If null, all branches are targeted."""
+  """
+  [DEPRECATED] The target branch pattern. If null, all branches are targeted.
+  """
   branchPattern: String
+
+  """The associated target branch. If null, all branches are targeted."""
+  targetBranchId: String
 
   """The event that triggers the automation."""
   event: GitAutomationStates
+}
+
+"""
+A Git target branch for which there are automations (GitAutomationState).
+"""
+type GitAutomationTargetBranch implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The team to which this Git target branch automation belongs."""
+  team: Team!
+
+  """The target branch pattern."""
+  branchPattern: String!
+
+  """Whether the branch pattern is a regular expression."""
+  isRegex: Boolean!
+
+  """The automation states associated with this target branch."""
+  automationStates: [GitAutomationState!]!
+}
+
+input GitAutomationTargetBranchCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The team associated with the Git target branch automation."""
+  teamId: String!
+
+  """The target branch pattern."""
+  branchPattern: String!
+
+  """Whether the branch pattern is a regular expression."""
+  isRegex: Boolean = false
+}
+
+type GitAutomationTargetBranchPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The Git target branch automation that was created or updated."""
+  targetBranch: GitAutomationTargetBranch!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input GitAutomationTargetBranchUpdateInput {
+  """The target branch pattern."""
+  branchPattern: String
+
+  """Whether the branch pattern is a regular expression."""
+  isRegex: Boolean
 }
 
 type GitHubCommitIntegrationPayload {
@@ -7103,6 +7187,27 @@ type Mutation {
   """Archives an automation state."""
   gitAutomationStateDelete(
     """The identifier of the automation state to archive."""
+    id: String!
+  ): DeletePayload!
+
+  """Creates a Git target branch automation."""
+  gitAutomationTargetBranchCreate(
+    """The Git target branch automation to create."""
+    input: GitAutomationTargetBranchCreateInput!
+  ): GitAutomationTargetBranchPayload!
+
+  """Updates an existing Git target branch automation."""
+  gitAutomationTargetBranchUpdate(
+    """The updates."""
+    input: GitAutomationTargetBranchUpdateInput!
+
+    """The identifier of the Git target branch automation to update."""
+    id: String!
+  ): GitAutomationTargetBranchPayload!
+
+  """Archives a Git target branch automation."""
+  gitAutomationTargetBranchDelete(
+    """The identifier of the Git target branch automation to archive."""
     id: String!
   ): DeletePayload!
 
