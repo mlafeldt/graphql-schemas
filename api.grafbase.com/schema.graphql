@@ -258,6 +258,10 @@ input BranchOperationCheckConfigurationInput {
 
 union BranchOperationCheckConfigurationUpdatePayload = ProjectDoesNotExistError | BranchOperationCheckConfiguration
 
+type CannotUseInvitationsWithSSO {
+  query: Query!
+}
+
 type CompositionCheckError {
   title: String!
   message: String!
@@ -719,7 +723,7 @@ input InviteAcceptInput {
   id: ID!
 }
 
-union InviteAcceptPayload = InviteAcceptSuccess | InviteDoesNotExistError | AlreadyMemberError
+union InviteAcceptPayload = InviteAcceptSuccess | InviteDoesNotExistError | AlreadyMemberError | CannotUseInvitationsWithSSO
 
 type InviteAcceptSuccess {
   member: Member!
@@ -778,7 +782,7 @@ input InviteSendInput {
   role: MemberRole!
 }
 
-union InviteSendPayload = InviteSendSuccess | OrganizationDoesNotExistError | NotAllowedToSendInvitesError
+union InviteSendPayload = InviteSendSuccess | OrganizationDoesNotExistError | NotAllowedToSendInvitesError | CannotUseInvitationsWithSSO
 
 type InviteSendSuccess {
   invite: Invite!
@@ -1320,6 +1324,7 @@ type Organization implements Account {
   name: String!
   createdAt: DateTime!
   status: AccountStatus!
+  samlDomain: String
   stripeCustomer: StripeCustomer
   orbCustomer: OrbCustomer
   orbActiveSubscription: OrbSubscription
