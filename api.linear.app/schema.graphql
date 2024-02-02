@@ -3126,16 +3126,16 @@ type GitAutomationState implements Node {
   """The team to which this automation state belongs."""
   team: Team!
 
-  """
-  [DEPRECATED] The target branch, if null, the automation will be triggered on any branch.
-  """
-  branchPattern: String! @deprecated(reason: "Use targetBranch instead.")
-
   """The target branch associated to this automation state."""
   targetBranch: GitAutomationTargetBranch
 
   """The event that triggers the automation."""
   event: GitAutomationStates!
+
+  """
+  [DEPRECATED] The target branch, if null, the automation will be triggered on any branch.
+  """
+  branchPattern: String @deprecated(reason: "Use targetBranch instead.")
 }
 
 type GitAutomationStateConnection {
@@ -3245,8 +3245,32 @@ type GitAutomationTargetBranch implements Node {
   """Whether the branch pattern is a regular expression."""
   isRegex: Boolean!
 
-  """The automation states associated with this target branch."""
-  automationStates: [GitAutomationState!]!
+  """Automation states associated with the target branch."""
+  automationStates(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): GitAutomationStateConnection!
 }
 
 input GitAutomationTargetBranchCreateInput {
@@ -10832,6 +10856,9 @@ input ProjectCreateInput {
   """The state of the project."""
   state: String
 
+  """[INTERNAL] The ID of the project status."""
+  statusId: String
+
   """The description for the project."""
   description: String
 
@@ -11925,6 +11952,9 @@ enum ProjectUpdateHealthType {
 input ProjectUpdateInput {
   """The state of the project."""
   state: String
+
+  """[INTERNAL] The ID of the project status."""
+  statusId: String
 
   """The name of the project."""
   name: String
@@ -14919,8 +14949,8 @@ type Team implements Node {
     orderBy: PaginationOrderBy
   ): WorkflowStateConnection!
 
-  """The automation states for the team."""
-  automationStates(
+  """The Git automation states for the team."""
+  gitAutomationStates(
     """A cursor to be used with last for backward pagination."""
     before: String
 

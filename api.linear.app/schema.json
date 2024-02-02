@@ -16127,23 +16127,76 @@
           },
           {
             "name": "automationStates",
-            "description": "The automation states associated with this target branch.",
-            "args": [],
+            "description": "Automation states associated with the target branch.",
+            "args": [
+              {
+                "name": "before",
+                "description": "A cursor to be used with last for backward pagination.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "after",
+                "description": "A cursor to be used with first for forward pagination",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "The number of items to forward paginate (used with after). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "The number of items to backward paginate (used with before). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeArchived",
+                "description": "Should archived resources be included (default: false)",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt.",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "PaginationOrderBy",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "GitAutomationState",
-                    "ofType": null
-                  }
-                }
+                "kind": "OBJECT",
+                "name": "GitAutomationStateConnection",
+                "ofType": null
               }
             },
             "isDeprecated": false,
@@ -16255,22 +16308,6 @@
             "deprecationReason": null
           },
           {
-            "name": "branchPattern",
-            "description": "[DEPRECATED] The target branch, if null, the automation will be triggered on any branch.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Use targetBranch instead."
-          },
-          {
             "name": "targetBranch",
             "description": "The target branch associated to this automation state.",
             "args": [],
@@ -16297,6 +16334,18 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "branchPattern",
+            "description": "[DEPRECATED] The target branch, if null, the automation will be triggered on any branch.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use targetBranch instead."
           }
         ],
         "inputFields": null,
@@ -23050,8 +23099,8 @@
             "deprecationReason": null
           },
           {
-            "name": "automationStates",
-            "description": "The automation states for the team.",
+            "name": "gitAutomationStates",
+            "description": "The Git automation states for the team.",
             "args": [
               {
                 "name": "before",
@@ -51823,6 +51872,16 @@
             "defaultValue": null
           },
           {
+            "name": "statusId",
+            "description": "[INTERNAL] The ID of the project status.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "description",
             "description": "The description for the project.",
             "type": {
@@ -51966,6 +52025,16 @@
           {
             "name": "state",
             "description": "The state of the project.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "statusId",
+            "description": "[INTERNAL] The ID of the project status.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
