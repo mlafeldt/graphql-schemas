@@ -2111,7 +2111,10 @@ type Document implements Node {
   """The documents content in markdown format."""
   content: String
 
-  """The documents content as a Prosemirror document."""
+  """[Internal] The documents content as YJS state."""
+  contentState: String
+
+  """[Internal] The documents content as a Prosemirror document."""
   contentData: JSON @deprecated(reason: "Use content instead.")
 }
 
@@ -2185,7 +2188,7 @@ type DocumentContent implements Node {
   content: String
 
   """[Internal] The document content as a Prosemirror document."""
-  contentData: JSONObject
+  contentData: JSONObject @deprecated(reason: "Use `contentState` instead")
 
   """The document content state as a base64 encoded string."""
   contentState: String
@@ -2435,7 +2438,10 @@ type DocumentSearchResult implements Node {
   """The documents content in markdown format."""
   content: String
 
-  """The documents content as a Prosemirror document."""
+  """[Internal] The documents content as YJS state."""
+  contentState: String
+
+  """[Internal] The documents content as a Prosemirror document."""
   contentData: JSON @deprecated(reason: "Use content instead.")
 
   """Metadata related to search result."""
@@ -4601,7 +4607,7 @@ type Issue implements Node {
   """[Internal] The issue's description as a Prosemirror document."""
   descriptionData: JSON @deprecated(reason: "Use description instead.")
 
-  """[Internal] The issue's description content state."""
+  """[Internal] The issue's description content as YJS state."""
   descriptionState: String
 }
 
@@ -6196,7 +6202,7 @@ type IssueSearchResult implements Node {
   """[Internal] The issue's description as a Prosemirror document."""
   descriptionData: JSON @deprecated(reason: "Use description instead.")
 
-  """[Internal] The issue's description content state."""
+  """[Internal] The issue's description content as YJS state."""
   descriptionState: String
 
   """Metadata related to search result."""
@@ -10737,6 +10743,9 @@ type Project implements Node {
 
   """The project's content in markdown format."""
   content: String
+
+  """[Internal] The project's content as YJS state."""
+  contentState: String
 }
 
 """A generic payload return from entity archive mutations."""
@@ -11109,7 +11118,10 @@ type ProjectMilestone implements Node {
   """
   [Internal] The project milestone's description as a Prosemirror document.
   """
-  descriptionData: JSON
+  descriptionData: JSON @deprecated(reason: "Use `descriptionState` instead.")
+
+  """[Internal] The project milestone's description as YJS state."""
+  descriptionState: String
 }
 
 """Milestone collection filtering options."""
@@ -11728,6 +11740,9 @@ type ProjectSearchResult implements Node {
 
   """The project's content in markdown format."""
   content: String
+
+  """[Internal] The project's content as YJS state."""
+  contentState: String
 
   """Metadata related to search result."""
   metadata: JSONObject!
