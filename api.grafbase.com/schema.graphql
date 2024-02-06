@@ -1332,6 +1332,14 @@ type Organization implements Account {
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
   projectsCountStatus: ResourceStatus!
+  slackIntegration: SlackIntegration
+
+  """
+  The url for the UI button to install the Grafbase slack app. It is
+  important to use this link and keep it private, since it contains the signed
+  account id of the authenticated user.
+  """
+  addToSlackLink: String!
   usage(filter: AccountResourcesUsageDashboardFilter): DatabaseUsage! @deprecated(reason: "Use resources_usage_dashboard")
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
   resources: AccountResources! @deprecated(reason: "Not relevant for organizations")
@@ -2176,6 +2184,11 @@ type SchemaVersionEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+type SlackIntegration {
+  """This is the ID of the token in our database, not the token itself."""
+  id: String!
 }
 
 type SlugAlreadyExistsError {
