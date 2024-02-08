@@ -1009,6 +1009,8 @@ type Mutation {
   deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
   stripeSetupIntentCreate: StripeSetupIntentCreatePayload!
   branchOperationCheckConfigurationUpdate(input: BranchOperationCheckConfigurationInput!): BranchOperationCheckConfigurationUpdatePayload!
+  slackIntegrationCreate(input: SlackIntegrationCreateInput!): SlackNotificationCreatePayload!
+  slackNotificationDelete(id: String!): SlackNotificationDeletePayload!
 }
 
 type NameAlreadyExistsError {
@@ -2186,10 +2188,34 @@ type SchemaVersionEdge {
   cursor: String!
 }
 
-type SlackIntegration {
-  """This is the ID of the token in our database, not the token itself."""
+"""A Slack channel returned from the Slack API."""
+type SlackChannel {
   id: String!
+  name: String!
 }
+
+type SlackIntegration {
+  id: ID!
+  availableChannels: [SlackChannel!]!
+  notifications: [SlackNotification!]!
+}
+
+input SlackIntegrationCreateInput {
+  tokenId: String!
+  graphId: String!
+  channelId: String!
+  channelName: String!
+}
+
+type SlackNotification {
+  id: String!
+  graphId: String!
+  channelName: String!
+}
+
+union SlackNotificationCreatePayload = SlackNotification
+
+union SlackNotificationDeletePayload = Query
 
 type SlugAlreadyExistsError {
   query: Query!
