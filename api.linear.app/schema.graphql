@@ -2514,6 +2514,9 @@ type EmailIntakeAddress implements Node {
   """Whether the email address is enabled."""
   enabled: Boolean!
 
+  """The template that the email address is associated with."""
+  template: Template
+
   """The team that the email address is associated with."""
   team: Team!
 
@@ -3800,6 +3803,14 @@ type IntegrationEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+type IntegrationHasScopesPayload {
+  """Whether the integration has the required scopes."""
+  hasAllScopes: Boolean!
+
+  """The missing scopes."""
+  missingScopes: [String!]
 }
 
 type IntegrationPayload {
@@ -12778,6 +12789,15 @@ type Query {
   """One specific integration."""
   integration(id: String!): Integration!
 
+  """Checks if the integration has all required scopes."""
+  integrationHasScopes(
+    """Required scopes."""
+    scopes: [String!]!
+
+    """The integration ID."""
+    integrationId: String!
+  ): IntegrationHasScopesPayload!
+
   """All project updates."""
   projectUpdates(
     """Filter returned project updates."""
@@ -13199,39 +13219,6 @@ type Query {
 
   """One specific project milestone."""
   projectMilestone(id: String!): ProjectMilestone!
-
-  """[DEPRECATED] [INTERNAL] All milestones for the project."""
-  ProjectMilestones(
-    """Filter returned project milestones."""
-    filter: ProjectMilestoneFilter
-
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): ProjectMilestoneConnection! @deprecated(reason: "This mutation is deprecated, please use `projectMilestones` instead.")
-
-  """[DEPRECATED] [INTERNAL] One specific project milestone."""
-  ProjectMilestone(id: String!): ProjectMilestone! @deprecated(reason: "This mutation is deprecated, please use `projectMilestone` instead.")
 
   """All projects."""
   projects(
