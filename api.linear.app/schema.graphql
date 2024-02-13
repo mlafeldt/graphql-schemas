@@ -2537,6 +2537,11 @@ input EmailIntakeAddressCreateInput {
   The identifier or key of the team this email address will intake issues for.
   """
   teamId: String!
+
+  """
+  The identifier of the template this email address will intake issues for.
+  """
+  templateId: String
 }
 
 type EmailIntakeAddressPayload {
@@ -10480,6 +10485,9 @@ type Project implements Node {
   """The time at which the project was moved into started state."""
   startedAt: DateTime
 
+  """[INTERNAL] The latest time at which the project was paused."""
+  pausedAt: DateTime
+
   """The time at which the project was moved into completed state."""
   completedAt: DateTime
 
@@ -11133,6 +11141,36 @@ type ProjectMilestone implements Node {
 
   """[Internal] The project milestone's description as YJS state."""
   descriptionState: String
+
+  """Issues associated with the project milestone."""
+  issues(
+    """Filter returned issues."""
+    filter: IssueFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueConnection!
 }
 
 """Milestone collection filtering options."""
@@ -11476,6 +11514,9 @@ type ProjectSearchResult implements Node {
 
   """The time at which the project was moved into started state."""
   startedAt: DateTime
+
+  """[INTERNAL] The latest time at which the project was paused."""
+  pausedAt: DateTime
 
   """The time at which the project was moved into completed state."""
   completedAt: DateTime
