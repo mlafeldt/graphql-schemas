@@ -7097,6 +7097,27 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """[INTERNAL] Creates a new initiativeToProject join."""
+  initiativeToProjectCreate(
+    """The properties of the initiativeToProject to create."""
+    input: InitiativeToProjectCreateInput!
+  ): InitiativeToProjectPayload!
+
+  """[INTERNAL] Updates a initiativeToProject."""
+  initiativeToProjectUpdate(
+    """The properties of the initiativeToProject to update."""
+    input: InitiativeToProjectUpdateInput!
+
+    """The identifier of the initiativeToProject to update."""
+    id: String!
+  ): InitiativeToProjectPayload!
+
+  """[INTERNAL] Deletes a initiativeToProject."""
+  initiativeToProjectDelete(
+    """The identifier of the initiativeToProject to delete."""
+    id: String!
+  ): DeletePayload!
+
   """[Internal] Creates a new initiative."""
   initiativeCreate(
     """The properties of the initiative to create."""
@@ -7127,27 +7148,6 @@ type Mutation {
   """[Internal] Deletes a initiative."""
   initiativeDelete(
     """The identifier of the initiative to delete."""
-    id: String!
-  ): DeletePayload!
-
-  """[INTERNAL] Creates a new initiativeToProject join."""
-  initiativeToProjectCreate(
-    """The properties of the initiativeToProject to create."""
-    input: InitiativeToProjectCreateInput!
-  ): InitiativeToProjectPayload!
-
-  """[INTERNAL] Updates a initiativeToProject."""
-  initiativeToProjectUpdate(
-    """The properties of the initiativeToProject to update."""
-    input: InitiativeToProjectUpdateInput!
-
-    """The identifier of the initiativeToProject to update."""
-    id: String!
-  ): InitiativeToProjectPayload!
-
-  """[INTERNAL] Deletes a initiativeToProject."""
-  initiativeToProjectDelete(
-    """The identifier of the initiativeToProject to delete."""
     id: String!
   ): DeletePayload!
 
@@ -12710,36 +12710,6 @@ type Query {
     id: String!
   ): ExternalUser!
 
-  """[Internal] All initiatives in the workspace."""
-  initiatives(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): InitiativeConnection!
-
-  """[Internal] One specific initiative."""
-  initiative(id: String!): Initiative!
-
   """[INTERNAL] returns a list of initiative to project entities."""
   initiativeToProjects(
     """A cursor to be used with last for backward pagination."""
@@ -12769,6 +12739,36 @@ type Query {
 
   """[INTERNAL] One specific initiativeToProject."""
   initiativeToProject(id: String!): InitiativeToProject!
+
+  """[Internal] All initiatives in the workspace."""
+  initiatives(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): InitiativeConnection!
+
+  """[Internal] One specific initiative."""
+  initiative(id: String!): Initiative!
 
   """The user's favorites."""
   favorites(
