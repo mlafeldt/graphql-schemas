@@ -168,10 +168,6 @@ type BranchConnection {
   nodes: [Branch!]!
 }
 
-type BranchDoesNotExistError {
-  query: Query!
-}
-
 """An edge in a connection."""
 type BranchEdge {
   """The item at the end of the edge"""
@@ -353,7 +349,7 @@ input DeleteSubgraphInput {
   dryRun: Boolean!
 }
 
-union DeleteSubgraphPayload = DeleteSubgraphSuccess | SubgraphNotFoundError | ProjectDoesNotExistError | ProjectNotFederatedError | FederatedGraphCompositionError
+union DeleteSubgraphPayload = DeleteSubgraphSuccess | SubgraphNotFoundError | ProjectDoesNotExistError | ProjectNotFederatedError | ProjectBranchDoesNotExistError | FederatedGraphCompositionError
 
 type DeleteSubgraphSuccess {
   query: Query!
@@ -1581,6 +1577,10 @@ type ProjectApiKeyUpdateSuccess {
   query: Query!
 }
 
+type ProjectBranchDoesNotExistError {
+  query: Query!
+}
+
 type ProjectConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
@@ -1784,7 +1784,7 @@ input PublishInput {
   schema: String!
 }
 
-union PublishPayload = PublishSuccess | ProjectDoesNotExistError | ProjectNotFederatedError | FederatedGraphCompositionError | BranchDoesNotExistError
+union PublishPayload = PublishSuccess | ProjectDoesNotExistError | ProjectNotFederatedError | FederatedGraphCompositionError | SchemaRegistryBranchDoesNotExistError
 
 type PublishSuccess {
   query: Query!
@@ -2122,7 +2122,11 @@ input SchemaCheckGitCommitInput {
   authorAvatarUrl: String
 }
 
-union SchemaCheckPayload = SchemaCheck | ProjectDoesNotExistError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameMissingOnFederatedProjectError
+union SchemaCheckPayload = SchemaCheck | ProjectBranchDoesNotExistError | ProjectDoesNotExistError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameMissingOnFederatedProjectError
+
+type SchemaRegistryBranchDoesNotExistError {
+  query: Query!
+}
 
 type SchemaVersion {
   id: ID!
@@ -2196,7 +2200,6 @@ type SlackChannel {
 }
 
 type SlackIntegration {
-  id: ID!
   availableChannels: [SlackChannel!]!
   notifications: [SlackNotification!]!
 }
