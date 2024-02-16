@@ -53,6 +53,7 @@ interface Account {
   id: ID!
   slug: String!
   name: String!
+  plan: GrafbasePlan!
   createdAt: DateTime!
   status: AccountStatus!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
@@ -664,6 +665,12 @@ type GitRepository {
   private: Boolean!
   updatedAt: DateTime!
   branches: [String!]!
+}
+
+enum GrafbasePlan {
+  HOBBY
+  PRO
+  ENTERPRISE
 }
 
 type HasAlreadyPaymentMethodError {
@@ -1323,6 +1330,7 @@ type Organization implements Account {
   name: String!
   createdAt: DateTime!
   status: AccountStatus!
+  plan: GrafbasePlan!
   samlDomain: String
   stripeCustomer: StripeCustomer
   orbCustomer: OrbCustomer
@@ -1458,6 +1466,7 @@ type PersonalAccount implements Account {
   name: String!
   createdAt: DateTime!
   status: AccountStatus!
+  plan: GrafbasePlan!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
   projectsCountStatus: ResourceStatus!
   usage(filter: AccountResourcesUsageDashboardFilter): DatabaseUsage! @deprecated(reason: "Use resources_usage_dashboard")
