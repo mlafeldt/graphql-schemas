@@ -981,6 +981,9 @@ type Comment implements Node {
   """
   quotedText: String
 
+  """[Internal] Summary for comment thread."""
+  summaryText: String
+
   """Emoji reaction summary, grouped by emoji type."""
   reactionData: JSONObject!
 
@@ -9172,11 +9175,17 @@ input NullableProjectFilter {
   """Comparator for the project state."""
   state: StringComparator
 
-  """[Internal] Comparator for the projects content."""
+  """[Internal] Filters that the project's status must satisfy."""
+  status: ProjectStatusFilter
+
+  """[Internal] Comparator for the project's content."""
   searchableContent: ContentComparator
 
   """Comparator for the project completion date."""
   completedAt: NullableDateComparator
+
+  """[Internal] Comparator for the date when the project was last paused."""
+  pausedAt: NullableDateComparator
 
   """Comparator for the project start date."""
   startDate: NullableDateComparator
@@ -10461,6 +10470,9 @@ type Project implements Node {
   """The project's color."""
   color: String!
 
+  """[Internal] The status that the project is associated with."""
+  status: ProjectStatus!
+
   """The user who created the project."""
   creator: User
 
@@ -10799,11 +10811,17 @@ input ProjectCollectionFilter {
   """Comparator for the project state."""
   state: StringComparator
 
-  """[Internal] Comparator for the projects content."""
+  """[Internal] Filters that the project's status must satisfy."""
+  status: ProjectStatusFilter
+
+  """[Internal] Comparator for the project's content."""
   searchableContent: ContentComparator
 
   """Comparator for the project completion date."""
   completedAt: NullableDateComparator
+
+  """[Internal] Comparator for the date when the project was last paused."""
+  pausedAt: NullableDateComparator
 
   """Comparator for the project start date."""
   startDate: NullableDateComparator
@@ -10948,11 +10966,17 @@ input ProjectFilter {
   """Comparator for the project state."""
   state: StringComparator
 
-  """[Internal] Comparator for the projects content."""
+  """[Internal] Filters that the project's status must satisfy."""
+  status: ProjectStatusFilter
+
+  """[Internal] Comparator for the project's content."""
   searchableContent: ContentComparator
 
   """Comparator for the project completion date."""
   completedAt: NullableDateComparator
+
+  """[Internal] Comparator for the date when the project was last paused."""
+  pausedAt: NullableDateComparator
 
   """Comparator for the project start date."""
   startDate: NullableDateComparator
@@ -11491,6 +11515,9 @@ type ProjectSearchResult implements Node {
   """The project's color."""
   color: String!
 
+  """[Internal] The status that the project is associated with."""
+  status: ProjectStatus!
+
   """The user who created the project."""
   creator: User
 
@@ -11864,6 +11891,43 @@ type ProjectStatusEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Project status filtering options."""
+input ProjectStatusFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the project status name."""
+  name: StringComparator
+
+  """Comparator for the project status description."""
+  description: StringComparator
+
+  """Comparator for the project status position."""
+  position: NumberComparator
+
+  """Comparator for the project status type."""
+  type: StringComparator
+
+  """Filters that the project status projects must satisfy."""
+  projects: ProjectCollectionFilter
+
+  """
+  Compound filters, all of which need to be matched by the project status.
+  """
+  and: [ProjectStatusFilter!]
+
+  """
+  Compound filters, one of which needs to be matched by the project status.
+  """
+  or: [ProjectStatusFilter!]
 }
 
 """A type of project status."""
@@ -12530,10 +12594,10 @@ type Query {
     """The identifier of the comment to retrieve."""
     id: String
 
-    """The issue for which to find the comment."""
+    """[Deprecated] The issue for which to find the comment."""
     issueId: String
 
-    """The hash of the comment to retrieve, must be combined with an issueId."""
+    """The hash of the comment to retrieve."""
     hash: String
   ): Comment!
 

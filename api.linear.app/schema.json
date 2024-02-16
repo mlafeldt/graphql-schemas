@@ -2801,6 +2801,22 @@
             "deprecationReason": null
           },
           {
+            "name": "status",
+            "description": "[Internal] The status that the project is associated with.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectStatus",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "creator",
             "description": "The user who created the project.",
             "args": [],
@@ -4432,6 +4448,18 @@
           {
             "name": "quotedText",
             "description": "The text that this comment references. Only defined for inline comments.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "summaryText",
+            "description": "[Internal] Summary for comment thread.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -34667,6 +34695,22 @@
             "deprecationReason": null
           },
           {
+            "name": "status",
+            "description": "[Internal] The status that the project is associated with.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectStatus",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "creator",
             "description": "The user who created the project.",
             "args": [],
@@ -42389,6 +42433,133 @@
       },
       {
         "kind": "INPUT_OBJECT",
+        "name": "ProjectStatusFilter",
+        "description": "Project status filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "Comparator for the project status name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "description",
+            "description": "Comparator for the project status description.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "position",
+            "description": "Comparator for the project status position.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NumberComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "type",
+            "description": "Comparator for the project status type.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projects",
+            "description": "Filters that the project status projects must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the project status.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectStatusFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which needs to be matched by the project status.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectStatusFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
         "name": "NullableTemplateFilter",
         "description": "Template filtering options.",
         "fields": null,
@@ -42551,8 +42722,18 @@
             "defaultValue": null
           },
           {
+            "name": "status",
+            "description": "[Internal] Filters that the project's status must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectStatusFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "searchableContent",
-            "description": "[Internal] Comparator for the projects content.",
+            "description": "[Internal] Comparator for the project's content.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "ContentComparator",
@@ -42563,6 +42744,16 @@
           {
             "name": "completedAt",
             "description": "Comparator for the project completion date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "pausedAt",
+            "description": "[Internal] Comparator for the date when the project was last paused.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDateComparator",
@@ -42808,8 +42999,18 @@
             "defaultValue": null
           },
           {
+            "name": "status",
+            "description": "[Internal] Filters that the project's status must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectStatusFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "searchableContent",
-            "description": "[Internal] Comparator for the projects content.",
+            "description": "[Internal] Comparator for the project's content.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "ContentComparator",
@@ -42820,6 +43021,16 @@
           {
             "name": "completedAt",
             "description": "Comparator for the project completion date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "pausedAt",
+            "description": "[Internal] Comparator for the date when the project was last paused.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDateComparator",
@@ -43075,8 +43286,18 @@
             "defaultValue": null
           },
           {
+            "name": "status",
+            "description": "[Internal] Filters that the project's status must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectStatusFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "searchableContent",
-            "description": "[Internal] Comparator for the projects content.",
+            "description": "[Internal] Comparator for the project's content.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "ContentComparator",
@@ -43087,6 +43308,16 @@
           {
             "name": "completedAt",
             "description": "Comparator for the project completion date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "pausedAt",
+            "description": "[Internal] Comparator for the date when the project was last paused.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDateComparator",
@@ -58057,7 +58288,7 @@
               },
               {
                 "name": "issueId",
-                "description": "The issue for which to find the comment.",
+                "description": "[Deprecated] The issue for which to find the comment.",
                 "type": {
                   "kind": "SCALAR",
                   "name": "String",
@@ -58067,7 +58298,7 @@
               },
               {
                 "name": "hash",
-                "description": "The hash of the comment to retrieve, must be combined with an issueId.",
+                "description": "The hash of the comment to retrieve.",
                 "type": {
                   "kind": "SCALAR",
                   "name": "String",
