@@ -1766,7 +1766,8 @@ enum ProjectStatus {
 }
 
 enum ProjectType {
-  SINGLE
+  STANDALONE
+  SINGLE @deprecated(reason: "Renamed to STANDALONE")
   FEDERATED
 }
 
@@ -1877,6 +1878,9 @@ type Query {
     id: ID!
   ): Project @deprecated(reason: "use the top-level `node` query")
   schemaCheck(id: ID!): SchemaCheck
+
+  """Temporary endpoint to test the new slack changelog notifications."""
+  helloWorld: String!
 
   """Get subgraph."""
   subgraph(
@@ -2131,7 +2135,7 @@ input SchemaCheckGitCommitInput {
   authorAvatarUrl: String
 }
 
-union SchemaCheckPayload = SchemaCheck | ProjectBranchDoesNotExistError | ProjectDoesNotExistError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameMissingOnFederatedProjectError
+union SchemaCheckPayload = SchemaCheck | ProjectBranchDoesNotExistError | ProjectDoesNotExistError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameProvidedOnStandaloneProjectError | SubgraphNameMissingOnFederatedProjectError
 
 type SchemaRegistryBranchDoesNotExistError {
   query: Query!
@@ -2339,6 +2343,10 @@ type SubgraphNameMissingOnFederatedProjectError {
 }
 
 type SubgraphNameProvidedOnSingleProjectError {
+  query: Query! @deprecated(reason: "Type renamed to SubgraphNameProvidedOnStandaloneProjectError")
+}
+
+type SubgraphNameProvidedOnStandaloneProjectError {
   query: Query!
 }
 
