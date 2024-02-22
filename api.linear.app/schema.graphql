@@ -3338,9 +3338,6 @@ type GithubOrg {
   """GitHub organization id."""
   id: String!
 
-  """The name of the GitHub organization."""
-  name: String!
-
   """The login for the GitHub organization."""
   login: String!
 
@@ -12374,6 +12371,12 @@ type Query {
     ids: [String!]!
   ): [Application!]!
 
+  """[INTERNAL] Get information for a list of applications with memberships"""
+  applicationInfoWithMembershipsByIds(
+    """The client IDs to look up."""
+    clientIds: [String!]!
+  ): [WorkspaceAuthorizedApplication!]!
+
   """
   Get information for an application and whether a user has approved it for the given scopes.
   """
@@ -12395,7 +12398,7 @@ type Query {
   authorizedApplications: [AuthorizedApplication!]!
 
   """
-  [INTERNAL] Get all authorized applications (with limited fields) for a workspace.
+  [INTERNAL] Get non-internal authorized applications (with limited fields) for a workspace
   """
   workspaceAuthorizedApplications: [WorkspaceAuthorizedApplication!]!
 
@@ -13485,6 +13488,9 @@ type Query {
     """Search string to look for."""
     term: String!
 
+    """Size of search snippet to return (default: 100)"""
+    snippetSize: Float
+
     """Should associated comments be searched (default: true)."""
     includeComments: Boolean
 
@@ -13520,6 +13526,9 @@ type Query {
 
     """Search string to look for."""
     term: String!
+
+    """Size of search snippet to return (default: 100)"""
+    snippetSize: Float
 
     """Should associated comments be searched (default: true)."""
     includeComments: Boolean
@@ -13559,6 +13568,9 @@ type Query {
 
     """Search string to look for."""
     term: String!
+
+    """Size of search snippet to return (default: 100)"""
+    snippetSize: Float
 
     """Should associated comments be searched (default: true)."""
     includeComments: Boolean
