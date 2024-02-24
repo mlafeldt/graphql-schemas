@@ -23913,6 +23913,73 @@
       },
       {
         "kind": "OBJECT",
+        "name": "TimeScheduleEntry",
+        "description": null,
+        "fields": [
+          {
+            "name": "startsAt",
+            "description": "The start date of the schedule in ISO 8601 date-time format.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "endsAt",
+            "description": "The end date of the schedule in ISO 8601 date-time format.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userId",
+            "description": "The Linear user id of the user on schedule. If the user cannot be mapped to a Linear user then `userEmail` can be used as a reference.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userEmail",
+            "description": "The email of the user on schedule. This is used in case the external user could not be mapped to a Linear user id.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "TimeSchedule",
         "description": "A time schedule.",
         "fields": [
@@ -24016,9 +24083,17 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "JSONObject",
-                "ofType": null
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "TimeScheduleEntry",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,
@@ -36615,6 +36690,65 @@
       },
       {
         "kind": "OBJECT",
+        "name": "TimeSchedulePayload",
+        "description": null,
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "The identifier of the last sync operation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "timeSchedule",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "TimeSchedule",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "UserPayload",
         "description": null,
         "fields": [
@@ -41072,8 +41206,8 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "TimeScheduleEntry",
-        "description": "The time schedule entry.",
+        "name": "TimeScheduleEntryInput",
+        "description": null,
         "fields": null,
         "inputFields": [
           {
@@ -41106,7 +41240,7 @@
           },
           {
             "name": "userId",
-            "description": "The Linear user id of the user on schedule. If the user cannot be mapped to a Linear user, use `userEmail` instead.",
+            "description": "The Linear user id of the user on schedule. If the user cannot be mapped to a Linear user then `userEmail` can be used as a reference.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -41116,7 +41250,7 @@
           },
           {
             "name": "userEmail",
-            "description": "The email of the user on schedule. This is only used in case the user could not be mapped to a Linear user id.",
+            "description": "The email of the user on schedule. This is used in case the external user could not be mapped to a Linear user id.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -42559,1208 +42693,6 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "ProjectFilter",
-        "description": "Project filtering options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "Comparator for the identifier.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Comparator for the created at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "Comparator for the updated at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "name",
-            "description": "Comparator for the project name.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "slugId",
-            "description": "Comparator for the project slug ID.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "state",
-            "description": "Comparator for the project state.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "status",
-            "description": "[Internal] Filters that the project's status must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectStatusFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "searchableContent",
-            "description": "[Internal] Comparator for the project's content.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ContentComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "completedAt",
-            "description": "Comparator for the project completion date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "pausedAt",
-            "description": "[Internal] Comparator for the date when the project was last paused.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "startDate",
-            "description": "Comparator for the project start date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "targetDate",
-            "description": "Comparator for the project target date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "health",
-            "description": "Comparator for the project health.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "creator",
-            "description": "Filters that the projects creator must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "UserFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "lead",
-            "description": "Filters that the projects lead must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableUserFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "members",
-            "description": "Filters that the projects members must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "UserFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "issues",
-            "description": "Filters that the projects issues must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IssueCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "roadmaps",
-            "description": "Filters that the projects roadmaps must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "RoadmapCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "projectMilestones",
-            "description": "Filters that the project's milestones must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectMilestoneCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "completedProjectMilestones",
-            "description": "Filters that the project's completed milestones must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectMilestoneCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "nextProjectMilestone",
-            "description": "Filters that the project's next milestone must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectMilestoneFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "accessibleTeams",
-            "description": "Filters that the project's team must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "TeamCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "lastAppliedTemplate",
-            "description": "Filters that the last applied template must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableTemplateFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "and",
-            "description": "Compound filters, all of which need to be matched by the project.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "or",
-            "description": "Compound filters, one of which need to be matched by the project.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "NullableProjectFilter",
-        "description": "Project filtering options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "Comparator for the identifier.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Comparator for the created at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "Comparator for the updated at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "name",
-            "description": "Comparator for the project name.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "slugId",
-            "description": "Comparator for the project slug ID.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "state",
-            "description": "Comparator for the project state.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "status",
-            "description": "[Internal] Filters that the project's status must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectStatusFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "searchableContent",
-            "description": "[Internal] Comparator for the project's content.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ContentComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "completedAt",
-            "description": "Comparator for the project completion date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "pausedAt",
-            "description": "[Internal] Comparator for the date when the project was last paused.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "startDate",
-            "description": "Comparator for the project start date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "targetDate",
-            "description": "Comparator for the project target date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "health",
-            "description": "Comparator for the project health.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "creator",
-            "description": "Filters that the projects creator must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "UserFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "lead",
-            "description": "Filters that the projects lead must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableUserFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "members",
-            "description": "Filters that the projects members must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "UserFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "issues",
-            "description": "Filters that the projects issues must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IssueCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "roadmaps",
-            "description": "Filters that the projects roadmaps must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "RoadmapCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "projectMilestones",
-            "description": "Filters that the project's milestones must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectMilestoneCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "completedProjectMilestones",
-            "description": "Filters that the project's completed milestones must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectMilestoneCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "nextProjectMilestone",
-            "description": "Filters that the project's next milestone must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectMilestoneFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "accessibleTeams",
-            "description": "Filters that the project's team must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "TeamCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "lastAppliedTemplate",
-            "description": "Filters that the last applied template must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableTemplateFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "null",
-            "description": "Filter based on the existence of the relation.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "and",
-            "description": "Compound filters, all of which need to be matched by the project.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "NullableProjectFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "or",
-            "description": "Compound filters, one of which need to be matched by the project.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "NullableProjectFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ProjectCollectionFilter",
-        "description": "Project filtering options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "Comparator for the identifier.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Comparator for the created at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "Comparator for the updated at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "name",
-            "description": "Comparator for the project name.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "slugId",
-            "description": "Comparator for the project slug ID.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "state",
-            "description": "Comparator for the project state.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "status",
-            "description": "[Internal] Filters that the project's status must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectStatusFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "searchableContent",
-            "description": "[Internal] Comparator for the project's content.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ContentComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "completedAt",
-            "description": "Comparator for the project completion date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "pausedAt",
-            "description": "[Internal] Comparator for the date when the project was last paused.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "startDate",
-            "description": "Comparator for the project start date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "targetDate",
-            "description": "Comparator for the project target date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "health",
-            "description": "Comparator for the project health.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "creator",
-            "description": "Filters that the projects creator must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "UserFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "lead",
-            "description": "Filters that the projects lead must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableUserFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "members",
-            "description": "Filters that the projects members must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "UserFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "issues",
-            "description": "Filters that the projects issues must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IssueCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "roadmaps",
-            "description": "Filters that the projects roadmaps must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "RoadmapCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "projectMilestones",
-            "description": "Filters that the project's milestones must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectMilestoneCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "completedProjectMilestones",
-            "description": "Filters that the project's completed milestones must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectMilestoneCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "nextProjectMilestone",
-            "description": "Filters that the project's next milestone must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectMilestoneFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "accessibleTeams",
-            "description": "Filters that the project's team must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "TeamCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "lastAppliedTemplate",
-            "description": "Filters that the last applied template must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableTemplateFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "and",
-            "description": "Compound filters, all of which need to be matched by the project.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectCollectionFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "or",
-            "description": "Compound filters, one of which need to be matched by the project.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectCollectionFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "some",
-            "description": "Filters that needs to be matched by some projects.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "every",
-            "description": "Filters that needs to be matched by all projects.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "length",
-            "description": "Comparator for the collection length.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NumberComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ProjectMilestoneFilter",
-        "description": "Project milestone filtering options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "Comparator for the identifier.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Comparator for the created at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "Comparator for the updated at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "name",
-            "description": "Comparator for the project milestone name.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "targetDate",
-            "description": "Comparator for the project milestone target date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "and",
-            "description": "Compound filters, all of which need to be matched by the project milestone.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectMilestoneFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "or",
-            "description": "Compound filters, one of which need to be matched by the project milestone.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectMilestoneFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "NullableProjectMilestoneFilter",
-        "description": "Project milestone filtering options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "Comparator for the identifier.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Comparator for the created at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "Comparator for the updated at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "name",
-            "description": "Comparator for the project milestone name.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "targetDate",
-            "description": "Comparator for the project milestone target date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "null",
-            "description": "Filter based on the existence of the relation.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "and",
-            "description": "Compound filters, all of which need to be matched by the project milestone.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "NullableProjectMilestoneFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "or",
-            "description": "Compound filters, one of which need to be matched by the project milestone.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "NullableProjectMilestoneFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ProjectMilestoneCollectionFilter",
-        "description": "Milestone collection filtering options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "Comparator for the identifier.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Comparator for the created at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "Comparator for the updated at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "name",
-            "description": "Comparator for the project milestone name.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "targetDate",
-            "description": "Comparator for the project milestone target date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableDateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "and",
-            "description": "Compound filters, all of which need to be matched by the milestone.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectMilestoneCollectionFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "or",
-            "description": "Compound filters, one of which need to be matched by the milestone.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectMilestoneCollectionFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "some",
-            "description": "Filters that needs to be matched by some milestones.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectMilestoneFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "every",
-            "description": "Filters that needs to be matched by all milestones.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectMilestoneFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "length",
-            "description": "Comparator for the collection length.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NumberComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
         "name": "UserFilter",
         "description": "User filtering options.",
         "fields": null,
@@ -44221,6 +43153,1482 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "UserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "length",
+            "description": "Comparator for the collection length.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NumberComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "InitiativeFilter",
+        "description": "Initiative filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "Comparator for the initiative name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slugId",
+            "description": "Comparator for the initiative slug ID.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "creator",
+            "description": "Filters that the initiative creator must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the initiative.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "InitiativeFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the initiative.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "InitiativeFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "InitiativeCollectionFilter",
+        "description": "Initiative collection filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "Comparator for the initiative name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slugId",
+            "description": "Comparator for the initiative slug ID.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "creator",
+            "description": "Filters that the initiative creator must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the initiative.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "InitiativeCollectionFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the initiative.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "InitiativeCollectionFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "some",
+            "description": "Filters that needs to be matched by some initiatives.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "InitiativeFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "every",
+            "description": "Filters that needs to be matched by all initiatives.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "InitiativeFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "length",
+            "description": "Comparator for the collection length.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NumberComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectFilter",
+        "description": "Project filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "Comparator for the project name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slugId",
+            "description": "Comparator for the project slug ID.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "state",
+            "description": "Comparator for the project state.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "status",
+            "description": "[Internal] Filters that the project's status must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectStatusFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "searchableContent",
+            "description": "[Internal] Comparator for the project's content.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ContentComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "completedAt",
+            "description": "Comparator for the project completion date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "pausedAt",
+            "description": "[Internal] Comparator for the date when the project was last paused.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "startDate",
+            "description": "Comparator for the project start date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "targetDate",
+            "description": "Comparator for the project target date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "health",
+            "description": "Comparator for the project health.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "creator",
+            "description": "Filters that the projects creator must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "lead",
+            "description": "Filters that the projects lead must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableUserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "members",
+            "description": "Filters that the projects members must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "issues",
+            "description": "Filters that the projects issues must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IssueCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "roadmaps",
+            "description": "Filters that the projects roadmaps must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "RoadmapCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "initiatives",
+            "description": "Filters that the projects initiatives must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "InitiativeCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectMilestones",
+            "description": "Filters that the project's milestones must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectMilestoneCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "completedProjectMilestones",
+            "description": "Filters that the project's completed milestones must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectMilestoneCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "nextProjectMilestone",
+            "description": "Filters that the project's next milestone must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectMilestoneFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "accessibleTeams",
+            "description": "Filters that the project's team must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "TeamCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "lastAppliedTemplate",
+            "description": "Filters that the last applied template must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableTemplateFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the project.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the project.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "NullableProjectFilter",
+        "description": "Project filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "Comparator for the project name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slugId",
+            "description": "Comparator for the project slug ID.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "state",
+            "description": "Comparator for the project state.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "status",
+            "description": "[Internal] Filters that the project's status must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectStatusFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "searchableContent",
+            "description": "[Internal] Comparator for the project's content.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ContentComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "completedAt",
+            "description": "Comparator for the project completion date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "pausedAt",
+            "description": "[Internal] Comparator for the date when the project was last paused.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "startDate",
+            "description": "Comparator for the project start date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "targetDate",
+            "description": "Comparator for the project target date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "health",
+            "description": "Comparator for the project health.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "creator",
+            "description": "Filters that the projects creator must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "lead",
+            "description": "Filters that the projects lead must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableUserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "members",
+            "description": "Filters that the projects members must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "issues",
+            "description": "Filters that the projects issues must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IssueCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "roadmaps",
+            "description": "Filters that the projects roadmaps must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "RoadmapCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "initiatives",
+            "description": "Filters that the projects initiatives must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "InitiativeCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectMilestones",
+            "description": "Filters that the project's milestones must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectMilestoneCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "completedProjectMilestones",
+            "description": "Filters that the project's completed milestones must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectMilestoneCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "nextProjectMilestone",
+            "description": "Filters that the project's next milestone must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectMilestoneFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "accessibleTeams",
+            "description": "Filters that the project's team must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "TeamCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "lastAppliedTemplate",
+            "description": "Filters that the last applied template must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableTemplateFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "null",
+            "description": "Filter based on the existence of the relation.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the project.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "NullableProjectFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the project.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "NullableProjectFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectCollectionFilter",
+        "description": "Project filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "Comparator for the project name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slugId",
+            "description": "Comparator for the project slug ID.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "state",
+            "description": "Comparator for the project state.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "status",
+            "description": "[Internal] Filters that the project's status must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectStatusFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "searchableContent",
+            "description": "[Internal] Comparator for the project's content.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ContentComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "completedAt",
+            "description": "Comparator for the project completion date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "pausedAt",
+            "description": "[Internal] Comparator for the date when the project was last paused.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "startDate",
+            "description": "Comparator for the project start date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "targetDate",
+            "description": "Comparator for the project target date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "health",
+            "description": "Comparator for the project health.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "creator",
+            "description": "Filters that the projects creator must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "lead",
+            "description": "Filters that the projects lead must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableUserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "members",
+            "description": "Filters that the projects members must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "issues",
+            "description": "Filters that the projects issues must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IssueCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "roadmaps",
+            "description": "Filters that the projects roadmaps must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "RoadmapCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "initiatives",
+            "description": "Filters that the projects initiatives must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "InitiativeCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectMilestones",
+            "description": "Filters that the project's milestones must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectMilestoneCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "completedProjectMilestones",
+            "description": "Filters that the project's completed milestones must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectMilestoneCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "nextProjectMilestone",
+            "description": "Filters that the project's next milestone must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectMilestoneFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "accessibleTeams",
+            "description": "Filters that the project's team must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "TeamCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "lastAppliedTemplate",
+            "description": "Filters that the last applied template must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableTemplateFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the project.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectCollectionFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the project.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectCollectionFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "some",
+            "description": "Filters that needs to be matched by some projects.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "every",
+            "description": "Filters that needs to be matched by all projects.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "length",
+            "description": "Comparator for the collection length.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NumberComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectMilestoneFilter",
+        "description": "Project milestone filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "Comparator for the project milestone name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "targetDate",
+            "description": "Comparator for the project milestone target date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the project milestone.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectMilestoneFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the project milestone.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectMilestoneFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "NullableProjectMilestoneFilter",
+        "description": "Project milestone filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "Comparator for the project milestone name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "targetDate",
+            "description": "Comparator for the project milestone target date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "null",
+            "description": "Filter based on the existence of the relation.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the project milestone.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "NullableProjectMilestoneFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the project milestone.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "NullableProjectMilestoneFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectMilestoneCollectionFilter",
+        "description": "Milestone collection filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "Comparator for the project milestone name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "targetDate",
+            "description": "Comparator for the project milestone target date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the milestone.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectMilestoneCollectionFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the milestone.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectMilestoneCollectionFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "some",
+            "description": "Filters that needs to be matched by some milestones.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectMilestoneFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "every",
+            "description": "Filters that needs to be matched by all milestones.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectMilestoneFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -54236,6 +54644,168 @@
       },
       {
         "kind": "INPUT_OBJECT",
+        "name": "TimeScheduleCreateInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "The name of the schedule.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "entries",
+            "description": "The schedule entries.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "TimeScheduleEntryInput",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "error",
+            "description": "User readable error message, if an error occurred while updating the schedule.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "integrationId",
+            "description": "The identifier of the Linear integration populating the schedule.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "externalId",
+            "description": "The identifier of the external schedule.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "externalUrl",
+            "description": "The URL to the external schedule.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "TimeScheduleUpdateInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "entries",
+            "description": "The schedule entries.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "TimeScheduleEntryInput",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "The name of the schedule.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "error",
+            "description": "User readable error message, if an error occurred while updating the schedule.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "externalId",
+            "description": "The identifier of the external schedule.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "externalUrl",
+            "description": "The URL to the external schedule.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
         "name": "UserUpdateInput",
         "description": null,
         "fields": null,
@@ -62359,6 +62929,114 @@
                     "ofType": null
                   }
                 }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "timeSchedules",
+            "description": "[ALPHA] All time schedules.",
+            "args": [
+              {
+                "name": "before",
+                "description": "A cursor to be used with last for backward pagination.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "after",
+                "description": "A cursor to be used with first for forward pagination",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "The number of items to forward paginate (used with after). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "The number of items to backward paginate (used with before). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeArchived",
+                "description": "Should archived resources be included (default: false)",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt.",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "PaginationOrderBy",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "TimeScheduleConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "timeSchedule",
+            "description": "[ALPHA] A specific time schedule.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The identifier of the time schedule to retrieve.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "TimeSchedule",
+                "ofType": null
               }
             },
             "isDeprecated": false,
@@ -71115,6 +71793,144 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "DeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "timeScheduleCreate",
+            "description": "[ALPHA] Creates a new time schedule.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The properties of the time schedule to create.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "TimeScheduleCreateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "TimeSchedulePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "timeScheduleUpdate",
+            "description": "[ALPHA] Updates a time schedule.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The properties of the time schedule to update.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "TimeScheduleUpdateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the time schedule to update.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "TimeSchedulePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "timeScheduleDelete",
+            "description": "[ALPHA] Deletes a time schedule.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The identifier of the time schedule to delete.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "timeScheduleRefreshIntegrationSchedule",
+            "description": "[ALPHA] Refresh the integration schedule information.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The identifier of the time schedule to refresh.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "TimeSchedulePayload",
                 "ofType": null
               }
             },
