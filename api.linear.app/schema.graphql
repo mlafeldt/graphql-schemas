@@ -2739,6 +2739,12 @@ input EstimateComparator {
   and: [NullableNumberComparator!]
 }
 
+"""Issue estimate sorting options."""
+input EstimateSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+}
+
 """
 An external authenticated (e.g., through Slack) user which doesn't have a Linear
 account, but can create and update entities in Linear from the external system
@@ -6282,6 +6288,24 @@ type IssueSearchResultEdge {
   cursor: String!
 }
 
+"""Issue filtering options."""
+input IssueSortInput {
+  """Sort by priority"""
+  priority: PrioritySort
+
+  """Sort by estimate"""
+  estimate: EstimateSort
+
+  """Sort by issue title"""
+  title: TitleSort
+
+  """Sort by label"""
+  label: LabelSort
+
+  """Sort by SLA status"""
+  slaStatus: SlaStatusSort
+}
+
 input IssueUpdateInput {
   """The issue title."""
   title: String
@@ -6556,6 +6580,12 @@ type LabelNotificationSubscription implements NotificationSubscription & Entity 
 
   """The type of subscription."""
   notificationSubscriptionTypes: [String!]!
+}
+
+"""Issue sorting options."""
+input LabelSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
 }
 
 type LogoutResponse {
@@ -10445,6 +10475,12 @@ type PagerDutySettings {
   scheduleMapping: [PagerDutyScheduleInfo!]!
 }
 
+"""How to treat NULL values, whether they should appear first or last"""
+enum PaginationNulls {
+  first
+  last
+}
+
 """By which field should the pagination order by"""
 enum PaginationOrderBy {
   createdAt
@@ -10503,6 +10539,15 @@ type PaidSubscription implements Node {
 
   """The date the subscription will be billed next."""
   nextBillingAt: DateTime
+}
+
+"""Issue priority sorting options."""
+input PrioritySort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """Whether to consider no priority as the highest or lowest priority"""
+  noPriorityFirst: Boolean = false
 }
 
 """A project."""
@@ -13132,6 +13177,9 @@ type Query {
 
   """All issues."""
   issues(
+    """[INTERNAL] Sort returned issues."""
+    sort: [IssueSortInput!]
+
     """Filter returned issues."""
     filter: IssueFilter
 
@@ -14595,6 +14643,12 @@ input SlaStatusComparator {
   Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.
   """
   null: Boolean
+}
+
+"""Issue SLA status sorting options."""
+input SlaStatusSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
 }
 
 """Comparator for issue source type."""
@@ -16159,6 +16213,12 @@ input TimeScheduleUpdateInput {
 
   """The URL to the external schedule."""
   externalUrl: String
+}
+
+"""Issue title sorting options."""
+input TitleSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
 }
 
 input TokenUserAccountAuthInput {
