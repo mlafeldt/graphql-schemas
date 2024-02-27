@@ -15116,6 +15116,9 @@ type Team implements Node {
   """Team's currently active cycle."""
   activeCycle: Cycle
 
+  """Team's triage responsibility."""
+  triageResponsibility: TriageResponsibility
+
   """Users who are members of this team."""
   members(
     """Filter returned users."""
@@ -16085,9 +16088,6 @@ type TimeSchedule implements Node {
   """
   archivedAt: DateTime
 
-  """The organization of the schedule."""
-  organization: Organization!
-
   """The name of the schedule."""
   name: String!
 
@@ -16099,14 +16099,17 @@ type TimeSchedule implements Node {
   """
   error: String
 
-  """The identifier of the Linear integration populating the schedule."""
-  integration: Integration
-
   """The identifier of the external schedule."""
   externalId: String
 
   """The URL to the external schedule."""
   externalUrl: String
+
+  """The organization of the schedule."""
+  organization: Organization!
+
+  """The identifier of the Linear integration populating the schedule."""
+  integration: Integration
 }
 
 type TimeScheduleConnection {
@@ -16265,17 +16268,11 @@ type TriageResponsibility implements Node {
   """Set of users used for triage responsibility."""
   manualSelection: JSONObject
 
-  """Schedule used for triage responsibility."""
-  schedule: JSONObject
-
   """The team to which the triage responsibility belongs to."""
   team: Team!
 
-  """The integration used for scheduling."""
-  integration: Integration!
-
   """The time schedule used for scheduling."""
-  timeSchedule: TimeSchedule!
+  timeSchedule: TimeSchedule
 }
 
 """Which action should be taken after an issue is added to triage."""
@@ -16306,37 +16303,6 @@ input TriageResponsibilityManualSelection {
   [INTERNAL] The index of the current userId used for the assign action when having more than one user.
   """
   assignmentIndex: Int
-}
-
-"""Triage responsibility schedule."""
-input TriageResponsibilitySchedule {
-  """
-  The schedule entries, undefined if the schedule is not fetched yet or failed.
-  """
-  entries: [TriageResponsibilityScheduleEntry!]
-
-  """Optional user presentable error message when using an integration."""
-  integrationError: String
-
-  """Reference to the integration's schedule when using an integration."""
-  integrationScheduleId: String
-}
-
-"""The triage responsibility schedule entry."""
-input TriageResponsibilityScheduleEntry {
-  """The start date in ISO 8601 date-time format."""
-  startsAt: DateTime!
-
-  """The end date in ISO 8601 date-time format."""
-  endsAt: DateTime!
-
-  """The linear user id of the user on schedule."""
-  userId: String
-
-  """
-  The external email of the user on schedule if the external user could not be found in Linear.
-  """
-  externalUserEmail: String
 }
 
 """Object representing Google Cloud upload policy, plus additional data."""
