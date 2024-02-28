@@ -1258,6 +1258,12 @@ type CompanyEdge {
   cursor: String!
 }
 
+"""Issue completion date sorting options."""
+input CompletedAtSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+}
+
 input ContactCreateInput {
   """The type of support contact."""
   type: String!
@@ -1321,6 +1327,12 @@ enum ContextViewType {
 type CreateCsvExportReportPayload {
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""Issue creation date sorting options."""
+input CreatedAtSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
 }
 
 input CreateOrganizationInput {
@@ -1943,6 +1955,12 @@ input CycleShiftAllInput {
 
   """[DEPRECATED] The number of days to shift the cycles by."""
   daysToShift: Float!
+}
+
+"""Issue cycle sorting options."""
+input CycleSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
 }
 
 input CycleUpdateInput {
@@ -6304,6 +6322,21 @@ input IssueSortInput {
 
   """Sort by SLA status"""
   slaStatus: SlaStatusSort
+
+  """Sort by issue creation date"""
+  createdAt: CreatedAtSort
+
+  """Sort by issue update date"""
+  updatedAt: UpdatedAtSort
+
+  """Sort by issue completion date"""
+  completedAt: CompletedAtSort
+
+  """Sort by Cycle start date"""
+  cycle: CycleSort
+
+  """Sort by Project Milestone target date"""
+  milestone: MilestoneSort
 }
 
 input IssueUpdateInput {
@@ -6591,6 +6624,12 @@ input LabelSort {
 type LogoutResponse {
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""Issue project milestone options."""
+input MilestoneSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
 }
 
 type Mutation {
@@ -8477,6 +8516,15 @@ type Mutation {
     id: String!
   ): TimeSchedulePayload!
 
+  """[ALPHA] Upsert an external time schedule."""
+  timeScheduleUpsertExternal(
+    """The properties of the time schedule to insert or update."""
+    input: TimeScheduleUpdateInput!
+
+    """The unique identifier of the external schedule."""
+    externalId: String!
+  ): TimeSchedulePayload!
+
   """[ALPHA] Deletes a time schedule."""
   timeScheduleDelete(
     """The identifier of the time schedule to delete."""
@@ -8488,6 +8536,27 @@ type Mutation {
     """The identifier of the time schedule to refresh."""
     id: String!
   ): TimeSchedulePayload!
+
+  """[ALPHA] Creates a new triage responsibility."""
+  triageResponsibilityCreate(
+    """The properties of the triage responsibility to create."""
+    input: TriageResponsibilityCreateInput!
+  ): TriageResponsibilityPayload!
+
+  """[ALPHA] Updates an existing triage responsibility."""
+  triageResponsibilityUpdate(
+    """The properties of the triage responsibility to update."""
+    input: TriageResponsibilityUpdateInput!
+
+    """The identifier of the triage responsibility to update."""
+    id: String!
+  ): TriageResponsibilityPayload!
+
+  """[ALPHA] Deletes a triage responsibility."""
+  triageResponsibilityDelete(
+    """The identifier of the triage responsibility to delete."""
+    id: String!
+  ): DeletePayload!
 
   """
   Updates a user. Only available to organization admins and the user themselves.
@@ -13875,6 +13944,39 @@ type Query {
     id: String!
   ): TimeSchedule!
 
+  """[ALPHA] All triage responsibilities."""
+  triageResponsibilities(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): TriageResponsibilityConnection!
+
+  """[ALPHA] A specific triage responsibility."""
+  triageResponsibility(
+    """The identifier of the triage responsibility to retrieve."""
+    id: String!
+  ): TriageResponsibility!
+
   """All users for the organization."""
   users(
     """Filter returned users."""
@@ -16094,11 +16196,6 @@ type TimeSchedule implements Node {
   """The schedule entries."""
   entries: [TimeScheduleEntry!]!
 
-  """
-  User presentable error message, if an error occurred while updating the schedule.
-  """
-  error: String
-
   """The identifier of the external schedule."""
   externalId: String
 
@@ -16128,17 +16225,9 @@ input TimeScheduleCreateInput {
   name: String!
 
   """The schedule entries."""
-  entries: [TimeScheduleEntryInput!]
+  entries: [TimeScheduleEntryInput!]!
 
-  """
-  User readable error message, if an error occurred while updating the schedule.
-  """
-  error: String
-
-  """The identifier of the Linear integration populating the schedule."""
-  integrationId: String
-
-  """The identifier of the external schedule."""
+  """The unique identifier of the external schedule."""
   externalId: String
 
   """The URL to the external schedule."""
@@ -16200,18 +16289,13 @@ type TimeSchedulePayload {
 }
 
 input TimeScheduleUpdateInput {
-  """The schedule entries."""
-  entries: [TimeScheduleEntryInput!]
-
   """The name of the schedule."""
   name: String
 
-  """
-  User readable error message, if an error occurred while updating the schedule.
-  """
-  error: String
+  """The schedule entries."""
+  entries: [TimeScheduleEntryInput!]
 
-  """The identifier of the external schedule."""
+  """The unique identifier of the external schedule."""
   externalId: String
 
   """The URL to the external schedule."""
@@ -16273,6 +16357,9 @@ type TriageResponsibility implements Node {
 
   """The time schedule used for scheduling."""
   timeSchedule: TimeSchedule
+
+  """The user currently responsible for triage."""
+  currentUser: User
 }
 
 """Which action should be taken after an issue is added to triage."""
@@ -16285,6 +16372,27 @@ type TriageResponsibilityConnection {
   edges: [TriageResponsibilityEdge!]!
   nodes: [TriageResponsibility!]!
   pageInfo: PageInfo!
+}
+
+input TriageResponsibilityCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The identifier of the team associated with the triage responsibility."""
+  teamId: String!
+
+  """The action to take when an issue is added to triage."""
+  action: String!
+
+  """The manual selection of users responsible for triage."""
+  manualSelection: TriageResponsibilityManualSelection
+
+  """
+  The identifier of the time schedule used for scheduling triage responsibility
+  """
+  timeScheduleId: String
 }
 
 type TriageResponsibilityEdge {
@@ -16303,6 +16411,34 @@ input TriageResponsibilityManualSelection {
   [INTERNAL] The index of the current userId used for the assign action when having more than one user.
   """
   assignmentIndex: Int
+}
+
+type TriageResponsibilityPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+  triageResponsibility: TriageResponsibility!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input TriageResponsibilityUpdateInput {
+  """The action to take when an issue is added to triage."""
+  action: String
+
+  """The manual selection of users responsible for triage."""
+  manualSelection: TriageResponsibilityManualSelection
+
+  """
+  The identifier of the time schedule used for scheduling triage responsibility.
+  """
+  timeScheduleId: String
+}
+
+"""Issue update date sorting options."""
+input UpdatedAtSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
 }
 
 """Object representing Google Cloud upload policy, plus additional data."""
