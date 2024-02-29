@@ -164,6 +164,12 @@ type AsksChannelConnectPayload {
   addBot: Boolean!
 }
 
+"""Issue assignee sorting options."""
+input AssigneeSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+}
+
 """Issue attachment (e.g. support ticket, pull request)."""
 type Attachment implements Node {
   """The unique identifier of the entity."""
@@ -807,6 +813,11 @@ type AuthOrganizationDomain {
 type AuthOrganizationInvite {
   """The unique identifier of the entity."""
   id: ID!
+
+  """
+  The time at which the invite will be expiring. Null, if the invite shouldn't expire.
+  """
+  expiresAt: DateTime
 }
 
 """
@@ -2484,6 +2495,12 @@ input DocumentUpdateInput {
 
   """The order of the item in the project resources list."""
   sortOrder: Float
+}
+
+"""Issue due date sorting options."""
+input DueDateSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
 }
 
 """An email address that can be used for submitting issues."""
@@ -6332,11 +6349,29 @@ input IssueSortInput {
   """Sort by issue completion date"""
   completedAt: CompletedAtSort
 
+  """Sort by issue due date"""
+  dueDate: DueDateSort
+
   """Sort by Cycle start date"""
   cycle: CycleSort
 
   """Sort by Project Milestone target date"""
   milestone: MilestoneSort
+
+  """Sort by assignee name"""
+  assignee: AssigneeSort
+
+  """Sort by Project name"""
+  project: ProjectSort
+
+  """Sort by Team name"""
+  team: TeamSort
+
+  """Sort by manual order"""
+  manual: ManualSort
+
+  """Sort by workflow state type"""
+  workflowState: WorkflowStateSort
 }
 
 input IssueUpdateInput {
@@ -6624,6 +6659,12 @@ input LabelSort {
 type LogoutResponse {
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""Issue manual sorting options."""
+input ManualSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
 }
 
 """Issue project milestone options."""
@@ -12031,6 +12072,12 @@ type ProjectSearchResultEdge {
   cursor: String!
 }
 
+"""Issue project sorting options."""
+input ProjectSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+}
+
 """[ALPHA] A project status."""
 type ProjectStatus implements Node {
   """The unique identifier of the entity."""
@@ -15849,6 +15896,12 @@ input TeamRepoMappingInput {
   default: Boolean
 }
 
+"""Issue team sorting options."""
+input TeamSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+}
+
 input TeamUpdateInput {
   """The name of the team."""
   name: String
@@ -16350,7 +16403,7 @@ type TriageResponsibility implements Node {
   action: TriageResponsibilityAction!
 
   """Set of users used for triage responsibility."""
-  manualSelection: JSONObject
+  manualSelection: TriageResponsibilityManualSelection
 
   """The team to which the triage responsibility belongs to."""
   team: Team!
@@ -16387,7 +16440,7 @@ input TriageResponsibilityCreateInput {
   action: String!
 
   """The manual selection of users responsible for triage."""
-  manualSelection: TriageResponsibilityManualSelection
+  manualSelection: TriageResponsibilityManualSelectionInput
 
   """
   The identifier of the time schedule used for scheduling triage responsibility
@@ -16402,8 +16455,18 @@ type TriageResponsibilityEdge {
   cursor: String!
 }
 
+type TriageResponsibilityManualSelection {
+  """The set of users responsible for triage."""
+  userIds: [String!]!
+
+  """
+  [INTERNAL] The index of the current userId used for the assign action when having more than one user.
+  """
+  assignmentIndex: Int
+}
+
 """Manual triage responsibility using a set of users."""
-input TriageResponsibilityManualSelection {
+input TriageResponsibilityManualSelectionInput {
   """The set of users responsible for triage."""
   userIds: [String!]!
 
@@ -16427,7 +16490,7 @@ input TriageResponsibilityUpdateInput {
   action: String
 
   """The manual selection of users responsible for triage."""
-  manualSelection: TriageResponsibilityManualSelection
+  manualSelection: TriageResponsibilityManualSelectionInput
 
   """
   The identifier of the time schedule used for scheduling triage responsibility.
@@ -17754,6 +17817,12 @@ type WorkflowStatePayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""Issue workflow state sorting options."""
+input WorkflowStateSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
 }
 
 input WorkflowStateUpdateInput {

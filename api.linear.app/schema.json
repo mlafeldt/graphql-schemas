@@ -1466,6 +1466,18 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "expiresAt",
+            "description": "The time at which the invite will be expiring. Null, if the invite shouldn't expire.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -24279,6 +24291,53 @@
       },
       {
         "kind": "OBJECT",
+        "name": "TriageResponsibilityManualSelection",
+        "description": null,
+        "fields": [
+          {
+            "name": "userIds",
+            "description": "The set of users responsible for triage.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "assignmentIndex",
+            "description": "[INTERNAL] The index of the current userId used for the assign action when having more than one user.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "TriageResponsibility",
         "description": "A team's triage responsibility.",
         "fields": [
@@ -24363,8 +24422,8 @@
             "description": "Set of users used for triage responsibility.",
             "args": [],
             "type": {
-              "kind": "SCALAR",
-              "name": "JSONObject",
+              "kind": "OBJECT",
+              "name": "TriageResponsibilityManualSelection",
               "ofType": null
             },
             "isDeprecated": false,
@@ -41304,7 +41363,7 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "TriageResponsibilityManualSelection",
+        "name": "TriageResponsibilityManualSelectionInput",
         "description": "Manual triage responsibility using a set of users.",
         "fields": null,
         "inputFields": [
@@ -51816,6 +51875,132 @@
       },
       {
         "kind": "INPUT_OBJECT",
+        "name": "AssigneeSort",
+        "description": "Issue assignee sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "DueDateSort",
+        "description": "Issue due date sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectSort",
+        "description": "Issue project sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "TeamSort",
+        "description": "Issue team sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "WorkflowStateSort",
+        "description": "Issue workflow state sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ManualSort",
+        "description": "Issue manual sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
         "name": "IssueSortInput",
         "description": "Issue filtering options.",
         "fields": null,
@@ -51901,6 +52086,16 @@
             "defaultValue": null
           },
           {
+            "name": "dueDate",
+            "description": "Sort by issue due date",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DueDateSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "cycle",
             "description": "Sort by Cycle start date",
             "type": {
@@ -51916,6 +52111,56 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "MilestoneSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "assignee",
+            "description": "Sort by assignee name",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "AssigneeSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "project",
+            "description": "Sort by Project name",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "team",
+            "description": "Sort by Team name",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "TeamSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "manual",
+            "description": "Sort by manual order",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ManualSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "workflowState",
+            "description": "Sort by workflow state type",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "WorkflowStateSort",
               "ofType": null
             },
             "defaultValue": null
@@ -55112,7 +55357,7 @@
             "description": "The manual selection of users responsible for triage.",
             "type": {
               "kind": "INPUT_OBJECT",
-              "name": "TriageResponsibilityManualSelection",
+              "name": "TriageResponsibilityManualSelectionInput",
               "ofType": null
             },
             "defaultValue": null
@@ -55153,7 +55398,7 @@
             "description": "The manual selection of users responsible for triage.",
             "type": {
               "kind": "INPUT_OBJECT",
-              "name": "TriageResponsibilityManualSelection",
+              "name": "TriageResponsibilityManualSelectionInput",
               "ofType": null
             },
             "defaultValue": null
