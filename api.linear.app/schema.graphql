@@ -170,7 +170,7 @@ input AssigneeSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Ascending
+  order: PaginationSortOrder
 }
 
 """Issue attachment (e.g. support ticket, pull request)."""
@@ -1278,7 +1278,7 @@ input CompletedAtSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Ascending
+  order: PaginationSortOrder
 }
 
 input ContactCreateInput {
@@ -1352,7 +1352,7 @@ input CreatedAtSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Ascending
+  order: PaginationSortOrder
 }
 
 input CreateOrganizationInput {
@@ -1983,7 +1983,7 @@ input CycleSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Descending
+  order: PaginationSortOrder
 }
 
 input CycleUpdateInput {
@@ -2515,7 +2515,7 @@ input DueDateSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Ascending
+  order: PaginationSortOrder
 }
 
 """An email address that can be used for submitting issues."""
@@ -2795,7 +2795,7 @@ input EstimateSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Ascending
+  order: PaginationSortOrder
 }
 
 """
@@ -6674,7 +6674,7 @@ input LabelSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Ascending
+  order: PaginationSortOrder
 }
 
 type LogoutResponse {
@@ -6688,7 +6688,7 @@ input ManualSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Ascending
+  order: PaginationSortOrder
 }
 
 """Issue project milestone options."""
@@ -6697,7 +6697,7 @@ input MilestoneSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Ascending
+  order: PaginationSortOrder
 }
 
 type Mutation {
@@ -10579,37 +10579,14 @@ type PageInfo {
 }
 
 input PagerDutyInput {
-  """Metadata about a PagerDuty schedule."""
-  scheduleMapping: [PagerDutyScheduleInfoInput!]!
-}
-
-"""Metadata about a PagerDuty schedule."""
-type PagerDutyScheduleInfo {
-  """The PagerDuty schedule id."""
-  scheduleId: String!
-
-  """The PagerDuty schedule name."""
-  scheduleName: String!
-
-  """The URL of the schedule in PagerDuty's web app."""
-  url: String!
-}
-
-input PagerDutyScheduleInfoInput {
-  """The PagerDuty schedule id."""
-  scheduleId: String!
-
-  """The PagerDuty schedule name."""
-  scheduleName: String!
-
-  """The URL of the schedule in PagerDuty's web app."""
-  url: String!
+  """The date when the PagerDuty API failed with an unauthorized error."""
+  apiFailedWithUnauthorizedErrorAt: DateTime!
 }
 
 """PagerDuty specific settings."""
 type PagerDutySettings {
-  """Metadata about a PagerDuty schedule."""
-  scheduleMapping: [PagerDutyScheduleInfo!]!
+  """The date when the PagerDuty API failed with an unauthorized error."""
+  apiFailedWithUnauthorizedErrorAt: DateTime!
 }
 
 """How to treat NULL values, whether they should appear first or last"""
@@ -10690,7 +10667,7 @@ input PrioritySort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Descending
+  order: PaginationSortOrder
 
   """Whether to consider no priority as the highest or lowest priority"""
   noPriorityFirst: Boolean = false
@@ -12114,7 +12091,7 @@ input ProjectSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Ascending
+  order: PaginationSortOrder
 }
 
 """[ALPHA] A project status."""
@@ -13441,7 +13418,11 @@ type Query {
   issuePriorityValues: [IssuePriorityValue!]!
 
   """Suggests filters for an issue view based on a text prompt."""
-  issueFilterSuggestion(prompt: String!): IssueFilterSuggestionPayload!
+  issueFilterSuggestion(
+    """The ID of the project if filtering a project view"""
+    projectId: String
+    prompt: String!
+  ): IssueFilterSuggestionPayload!
 
   """All notifications."""
   notifications(
@@ -14839,7 +14820,7 @@ input SlaStatusSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Ascending
+  order: PaginationSortOrder
 }
 
 """Comparator for issue source type."""
@@ -15944,7 +15925,7 @@ input TeamSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Ascending
+  order: PaginationSortOrder
 }
 
 input TeamUpdateInput {
@@ -16406,7 +16387,7 @@ input TitleSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Ascending
+  order: PaginationSortOrder
 }
 
 input TokenUserAccountAuthInput {
@@ -16552,7 +16533,7 @@ input UpdatedAtSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Ascending
+  order: PaginationSortOrder
 }
 
 """Object representing Google Cloud upload policy, plus additional data."""
@@ -17876,7 +17857,7 @@ input WorkflowStateSort {
   nulls: PaginationNulls = last
 
   """The order for the individual sort"""
-  order: PaginationSortOrder = Ascending
+  order: PaginationSortOrder
 }
 
 input WorkflowStateUpdateInput {
