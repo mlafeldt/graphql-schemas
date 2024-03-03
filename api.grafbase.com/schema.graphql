@@ -169,6 +169,12 @@ type BranchConnection {
   nodes: [Branch!]!
 }
 
+union BranchDeletePayload = Query | BranchDoesNotExistError
+
+type BranchDoesNotExistError {
+  query: Query!
+}
+
 """An edge in a connection."""
 type BranchEdge {
   """The item at the end of the edge"""
@@ -1024,6 +1030,16 @@ type Mutation {
   deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
   stripeSetupIntentCreate: StripeSetupIntentCreatePayload!
   branchUpdate(input: BranchUpdateInput!): BranchUpdatePayload!
+  branchDelete(
+    """slug of the account"""
+    accountSlug: String!
+
+    """slug of the project"""
+    projectSlug: String!
+
+    """name of the branch"""
+    branchName: String!
+  ): BranchDeletePayload!
   branchOperationCheckConfigurationUpdate(input: BranchOperationCheckConfigurationInput!): BranchOperationCheckConfigurationUpdatePayload!
   slackIntegrationCreate(input: SlackIntegrationCreateInput!): SlackNotificationCreatePayload!
   slackNotificationDelete(id: String!): SlackNotificationDeletePayload!
