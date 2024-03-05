@@ -411,7 +411,7 @@ input DeploymentCreateInput {
   branch: String
 }
 
-union DeploymentCreatePayload = DeploymentCreateSuccess | ProjectDoesNotExistError | ArchiveFileSizeLimitExceededError | DailyDeploymentCountLimitExceededError
+union DeploymentCreatePayload = DeploymentCreateSuccess | ProjectDoesNotExistError | ArchiveFileSizeLimitExceededError | DailyDeploymentCountLimitExceededError | ProjectNotManagedError
 
 type DeploymentCreateSuccess {
   deployment: Deployment!
@@ -688,6 +688,11 @@ enum GrafbasePlan {
   HOBBY
   PRO
   ENTERPRISE
+}
+
+enum GraphMode {
+  MANAGED
+  SELF_HOSTED
 }
 
 type HasAlreadyPaymentMethodError {
@@ -1684,6 +1689,7 @@ input ProjectCreateInput {
   projectSlug: String!
   environmentVariables: [EnvironmentVariableSpecification!]! = []
   projectRootPath: String! = "grafbase"
+  graphMode: GraphMode! = MANAGED
 }
 
 union ProjectCreatePayload = ProjectCreateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidProjectRootPathError
@@ -1721,6 +1727,10 @@ type ProjectNotDeployed {
 }
 
 type ProjectNotFederatedError {
+  query: Query!
+}
+
+type ProjectNotManagedError {
   query: Query!
 }
 
