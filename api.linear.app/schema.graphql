@@ -3963,6 +3963,7 @@ enum IntegrationService {
   jiraPersonal
   loom
   notion
+  opsgenie
   pagerDuty
   slack
   slackAsks
@@ -3992,6 +3993,7 @@ type IntegrationSettings {
   front: FrontSettings
   jira: JiraSettings
   notion: NotionSettings
+  opsgenie: OpsgenieSettings
   pagerDuty: PagerDutySettings
   jiraPersonal: JiraPersonalSettings
 }
@@ -4012,6 +4014,7 @@ input IntegrationSettingsInput {
   front: FrontSettingsInput
   jira: JiraSettingsInput
   notion: NotionSettingsInput
+  opsgenie: OpsgenieInput
   pagerDuty: PagerDutyInput
   jiraPersonal: JiraPersonalSettingsInput
 }
@@ -7548,6 +7551,15 @@ type Mutation {
     code: String!
   ): IntegrationPayload!
 
+  """[INTERNAL] Integrates the organization with Opsgenie."""
+  integrationOpsgenieConnect(
+    """The Opsgenie API key."""
+    apiKey: String!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Refresh Opsgenie schedule mappings."""
+  integrationOpsgenieRefreshScheduleMappings: IntegrationPayload!
+
   """[INTERNAL] Integrates the organization with PagerDuty."""
   integrationPagerDutyConnect(
     """The PagerDuty OAuth code."""
@@ -9963,6 +9975,17 @@ type OauthToken {
 input OnboardingCustomerSurvey {
   companyRole: String
   companySize: String
+}
+
+input OpsgenieInput {
+  """The date when the Opsgenie API failed with an unauthorized error."""
+  apiFailedWithUnauthorizedErrorAt: DateTime!
+}
+
+"""Opsgenie specific settings."""
+type OpsgenieSettings {
+  """The date when the Opsgenie API failed with an unauthorized error."""
+  apiFailedWithUnauthorizedErrorAt: DateTime!
 }
 
 """
@@ -15097,12 +15120,6 @@ type Team implements Node {
   """Whether to allow zeros in issues estimates."""
   issueEstimationAllowZero: Boolean!
 
-  """
-  [DEPRECATED] Whether to move issues to bottom of the column when changing
-  state. Use setIssueSortOrderOnStateChange instead.
-  """
-  issueSortOrderDefaultToBottom: Boolean!
-
   """Where to move issues when changing state."""
   setIssueSortOrderOnStateChange: String!
 
@@ -15526,6 +15543,11 @@ type Team implements Node {
 
   """Settings for all integrations associated with that team."""
   integrationsSettings: IntegrationsSettings
+
+  """
+  [DEPRECATED] Whether to move issues to bottom of the column when changing state.
+  """
+  issueSortOrderDefaultToBottom: Boolean! @deprecated(reason: "Use setIssueSortOrderOnStateChange instead.")
 }
 
 """A generic payload return from entity archive mutations."""
@@ -15642,12 +15664,6 @@ input TeamCreateInput {
 
   """Whether to allow zeros in issues estimates."""
   issueEstimationAllowZero: Boolean
-
-  """
-  [DEPRECATED] Whether to move issues to bottom of the column when changing
-  state. Use setIssueSortOrderOnStateChange instead.
-  """
-  issueSortOrderDefaultToBottom: Boolean
 
   """Whether to move issues to bottom of the column when changing state."""
   setIssueSortOrderOnStateChange: String
@@ -15989,12 +16005,6 @@ input TeamUpdateInput {
 
   """Whether to allow zeros in issues estimates."""
   issueEstimationAllowZero: Boolean
-
-  """
-  [DEPRECATED] Whether to move issues to bottom of the column when changing
-  state. Use setIssueSortOrderOnStateChange instead.
-  """
-  issueSortOrderDefaultToBottom: Boolean
 
   """Whether to move issues to bottom of the column when changing state."""
   setIssueSortOrderOnStateChange: String
@@ -17155,13 +17165,32 @@ type UserSettings implements Node {
   notificationPreferences: JSONObject!
 
   """The email types the user has unsubscribed from."""
-  unsubscribedFrom: [String!]!
+  unsubscribedFrom: [String!]! @deprecated(reason: "Use individual subscription fields instead.")
 
   """The user associated with these settings."""
   user: User!
 
   """Hash for the user to be used in calendar URLs."""
   calendarHash: String
+
+  """Whether this user is subscribed to changelog email or not."""
+  subscribedToChangelog: Boolean!
+
+  """Whether this user is subscribed to DPA emails or not."""
+  subscribedToDPA: Boolean!
+
+  """Whether this user is subscribed to invite accepted emails or not."""
+  subscribedToInviteAccepted: Boolean!
+
+  """
+  Whether this user is subscribed to privacy and legal update emails or not.
+  """
+  subscribedToPrivacyLegalUpdates: Boolean!
+
+  """
+  Whether this user is subscribed to unread notifications reminder emails or not.
+  """
+  subscribedToUnreadNotificationsReminder: Boolean!
 
   """Whether to show full user names instead of display names."""
   showFullUserNames: Boolean!
@@ -17206,6 +17235,20 @@ input UserSettingsUpdateInput {
 
   """The types of emails the user has unsubscribed from."""
   unsubscribedFrom: [String!]
+
+  """Whether this user is subscribed to changelog email or not."""
+  subscribedToChangelog: Boolean
+
+  """Whether this user is subscribed to DPA emails or not."""
+  subscribedToDPA: Boolean
+
+  """Whether this user is subscribed to invite accepted emails or not."""
+  subscribedToInviteAccepted: Boolean
+
+  """
+  Whether this user is subscribed to privacy and legal update emails or not.
+  """
+  subscribedToPrivacyLegalUpdates: Boolean
 
   """The user's notification preferences."""
   notificationPreferences: JSONObject
