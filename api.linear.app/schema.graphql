@@ -917,7 +917,7 @@ type AuthUser {
   """Whether the user is active."""
   active: Boolean!
 
-  """User account id the user belongs to."""
+  """User account ID the user belongs to."""
   userAccountId: String!
 
   """Organization the user belongs to."""
@@ -1470,6 +1470,9 @@ type CustomView implements Node {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
+
+    """[INTERNAL] Sort returned issues."""
+    sort: [IssueSortInput!]
   ): IssueConnection!
 }
 
@@ -2592,16 +2595,6 @@ input EmailIntakeAddressUpdateInput {
   address will be disabled and no longer accept incoming emails.
   """
   enabled: Boolean!
-}
-
-input EmailSubscribeInput {
-  """[INTERNAL] Email to subscribe."""
-  email: String!
-}
-
-type EmailSubscribePayload {
-  """[INTERNAL] Whether the operation was successful."""
-  success: Boolean!
 }
 
 input EmailUnsubscribeInput {
@@ -7256,12 +7249,6 @@ type Mutation {
     """The identifier of the email intake address to delete."""
     id: String!
   ): DeletePayload!
-
-  """[INTERNAL] Subscribes the email to the newsletter."""
-  emailSubscribe(
-    """Subscription details."""
-    input: EmailSubscribeInput!
-  ): EmailSubscribePayload!
 
   """Unsubscribes the user from one type of emails."""
   emailUnsubscribe(

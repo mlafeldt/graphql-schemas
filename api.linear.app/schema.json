@@ -1584,7 +1584,7 @@
           },
           {
             "name": "userAccountId",
-            "description": "User account id the user belongs to.",
+            "description": "User account ID the user belongs to.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -6710,6 +6710,24 @@
                   "kind": "ENUM",
                   "name": "PaginationOrderBy",
                   "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "sort",
+                "description": "[INTERNAL] Sort returned issues.",
+                "type": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "IssueSortInput",
+                      "ofType": null
+                    }
+                  }
                 },
                 "defaultValue": null
               }
@@ -29075,33 +29093,6 @@
       },
       {
         "kind": "OBJECT",
-        "name": "EmailSubscribePayload",
-        "description": null,
-        "fields": [
-          {
-            "name": "success",
-            "description": "[INTERNAL] Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
         "name": "EmailUnsubscribePayload",
         "description": null,
         "fields": [
@@ -49340,6 +49331,729 @@
       },
       {
         "kind": "INPUT_OBJECT",
+        "name": "PrioritySort",
+        "description": "Issue priority sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "noPriorityFirst",
+            "description": "Whether to consider no priority as the highest or lowest priority",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": "false"
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "PaginationNulls",
+        "description": "How to treat NULL values, whether they should appear first or last",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "first",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "last",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "PaginationSortOrder",
+        "description": "Whether to sort in ascending or descending order",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "Ascending",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "Descending",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "EstimateSort",
+        "description": "Issue estimate sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "TitleSort",
+        "description": "Issue title sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "LabelSort",
+        "description": "Issue sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "SlaStatusSort",
+        "description": "Issue SLA status sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "CreatedAtSort",
+        "description": "Issue creation date sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "CycleSort",
+        "description": "Issue cycle sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "UpdatedAtSort",
+        "description": "Issue update date sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "MilestoneSort",
+        "description": "Issue project milestone options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "CompletedAtSort",
+        "description": "Issue completion date sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AssigneeSort",
+        "description": "Issue assignee sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "DueDateSort",
+        "description": "Issue due date sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectSort",
+        "description": "Issue project sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "TeamSort",
+        "description": "Issue team sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "WorkflowStateSort",
+        "description": "Issue workflow state sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ManualSort",
+        "description": "Issue manual sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "IssueSortInput",
+        "description": "Issue filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "priority",
+            "description": "Sort by priority",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "PrioritySort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "estimate",
+            "description": "Sort by estimate",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "EstimateSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "title",
+            "description": "Sort by issue title",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "TitleSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "label",
+            "description": "Sort by label",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "LabelSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slaStatus",
+            "description": "Sort by SLA status",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "SlaStatusSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Sort by issue creation date",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "CreatedAtSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Sort by issue update date",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UpdatedAtSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "completedAt",
+            "description": "Sort by issue completion date",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "CompletedAtSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "dueDate",
+            "description": "Sort by issue due date",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DueDateSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "cycle",
+            "description": "Sort by Cycle start date",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "CycleSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "milestone",
+            "description": "Sort by Project Milestone target date",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "MilestoneSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "assignee",
+            "description": "Sort by assignee name",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "AssigneeSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "project",
+            "description": "Sort by Project name",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "team",
+            "description": "Sort by Team name",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "TeamSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "manual",
+            "description": "Sort by manual order",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ManualSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "workflowState",
+            "description": "Sort by workflow state type",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "WorkflowStateSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
         "name": "CustomViewCreateInput",
         "description": null,
         "fields": null,
@@ -50043,31 +50757,6 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "EmailSubscribeInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "email",
-            "description": "[INTERNAL] Email to subscribe.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
                 "ofType": null
               }
             },
@@ -51653,729 +52342,6 @@
             "type": {
               "kind": "SCALAR",
               "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "PrioritySort",
-        "description": "Issue priority sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "noPriorityFirst",
-            "description": "Whether to consider no priority as the highest or lowest priority",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": "false"
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "ENUM",
-        "name": "PaginationNulls",
-        "description": "How to treat NULL values, whether they should appear first or last",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "first",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "last",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
-      },
-      {
-        "kind": "ENUM",
-        "name": "PaginationSortOrder",
-        "description": "Whether to sort in ascending or descending order",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "Ascending",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "Descending",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "EstimateSort",
-        "description": "Issue estimate sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "TitleSort",
-        "description": "Issue title sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "LabelSort",
-        "description": "Issue sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "SlaStatusSort",
-        "description": "Issue SLA status sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "CreatedAtSort",
-        "description": "Issue creation date sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "CycleSort",
-        "description": "Issue cycle sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "UpdatedAtSort",
-        "description": "Issue update date sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "MilestoneSort",
-        "description": "Issue project milestone options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "CompletedAtSort",
-        "description": "Issue completion date sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "AssigneeSort",
-        "description": "Issue assignee sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "DueDateSort",
-        "description": "Issue due date sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ProjectSort",
-        "description": "Issue project sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "TeamSort",
-        "description": "Issue team sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "WorkflowStateSort",
-        "description": "Issue workflow state sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ManualSort",
-        "description": "Issue manual sorting options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "nulls",
-            "description": "Whether nulls should be sorted first or last",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationNulls",
-              "ofType": null
-            },
-            "defaultValue": "last"
-          },
-          {
-            "name": "order",
-            "description": "The order for the individual sort",
-            "type": {
-              "kind": "ENUM",
-              "name": "PaginationSortOrder",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "IssueSortInput",
-        "description": "Issue filtering options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "priority",
-            "description": "Sort by priority",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "PrioritySort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "estimate",
-            "description": "Sort by estimate",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "EstimateSort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "title",
-            "description": "Sort by issue title",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "TitleSort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "label",
-            "description": "Sort by label",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "LabelSort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "slaStatus",
-            "description": "Sort by SLA status",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "SlaStatusSort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Sort by issue creation date",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "CreatedAtSort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "Sort by issue update date",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "UpdatedAtSort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "completedAt",
-            "description": "Sort by issue completion date",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "CompletedAtSort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "dueDate",
-            "description": "Sort by issue due date",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DueDateSort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "cycle",
-            "description": "Sort by Cycle start date",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "CycleSort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "milestone",
-            "description": "Sort by Project Milestone target date",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "MilestoneSort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "assignee",
-            "description": "Sort by assignee name",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "AssigneeSort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "project",
-            "description": "Sort by Project name",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectSort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "team",
-            "description": "Sort by Team name",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "TeamSort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "manual",
-            "description": "Sort by manual order",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ManualSort",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "workflowState",
-            "description": "Sort by workflow state type",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "WorkflowStateSort",
               "ofType": null
             },
             "defaultValue": null
@@ -66676,37 +66642,6 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "DeletePayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "emailSubscribe",
-            "description": "[INTERNAL] Subscribes the email to the newsletter.",
-            "args": [
-              {
-                "name": "input",
-                "description": "Subscription details.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "EmailSubscribeInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "EmailSubscribePayload",
                 "ofType": null
               }
             },
