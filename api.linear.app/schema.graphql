@@ -4456,6 +4456,9 @@ type Issue implements Node {
   """Label for the priority."""
   priorityLabel: String!
 
+  """The comment that this issue was created from."""
+  sourceComment: Comment
+
   """Integration type that created this issue, if applicable."""
   integrationSourceType: IntegrationService
 
@@ -4942,6 +4945,9 @@ input IssueCreateInput {
 
   """The comment the issue is referencing."""
   referenceCommentId: String
+
+  """The comment the issue is created from."""
+  sourceCommentId: String
 
   """The position of the issue in its column on the board view."""
   boardOrder: Float
@@ -6050,6 +6056,9 @@ type IssueSearchResult implements Node {
 
   """Label for the priority."""
   priorityLabel: String!
+
+  """The comment that this issue was created from."""
+  sourceComment: Comment
 
   """Integration type that created this issue, if applicable."""
   integrationSourceType: IntegrationService
@@ -14602,8 +14611,31 @@ input SentrySettingsInput {
   organizationSlug: String!
 }
 
+"""Shared Slack integration settings."""
+type SharedSlackSettings {
+  """Slack workspace name"""
+  teamName: String
+
+  """Slack workspace id"""
+  teamId: String
+}
+
+input SharedSlackSettingsInput {
+  """Slack workspace name"""
+  teamName: String
+
+  """Slack workspace id"""
+  teamId: String
+}
+
 """Slack Asks specific settings."""
 type SlackAsksSettings {
+  """Slack workspace name"""
+  teamName: String
+
+  """Slack workspace id"""
+  teamId: String
+
   """
   The mapping of Slack channel ID => Slack channel name for connected channels.
   """
@@ -14614,6 +14646,12 @@ type SlackAsksSettings {
 }
 
 input SlackAsksSettingsInput {
+  """Slack workspace name"""
+  teamName: String
+
+  """Slack workspace id"""
+  teamId: String
+
   """
   The mapping of Slack channel ID => Slack channel name for connected channels.
   """
@@ -14775,6 +14813,12 @@ input SlackPostSettingsInput {
 
 """Settings for the regular Slack integration."""
 type SlackSettings {
+  """Slack workspace name"""
+  teamName: String
+
+  """Slack workspace id"""
+  teamId: String
+
   """
   Whether Linear should automatically respond with issue unfurls when an issue identifier is mentioned in a Slack message.
   """
@@ -14782,6 +14826,12 @@ type SlackSettings {
 }
 
 input SlackSettingsInput {
+  """Slack workspace name"""
+  teamName: String
+
+  """Slack workspace id"""
+  teamId: String
+
   """
   Whether Linear should automatically respond with issue unfurls when an issue identifier is mentioned in a Slack message.
   """
@@ -15162,27 +15212,27 @@ type Team implements Node {
   """
   The workflow state into which issues are moved when a PR has been opened as draft.
   """
-  draftWorkflowState: WorkflowState
+  draftWorkflowState: WorkflowState @deprecated(reason: "Use team.gitAutomationStates instead.")
 
   """
   The workflow state into which issues are moved when a PR has been opened.
   """
-  startWorkflowState: WorkflowState
+  startWorkflowState: WorkflowState @deprecated(reason: "Use team.gitAutomationStates instead.")
 
   """
   The workflow state into which issues are moved when a review has been requested for the PR.
   """
-  reviewWorkflowState: WorkflowState
+  reviewWorkflowState: WorkflowState @deprecated(reason: "Use team.gitAutomationStates instead.")
 
   """
   The workflow state into which issues are moved when a PR is ready to be merged.
   """
-  mergeableWorkflowState: WorkflowState
+  mergeableWorkflowState: WorkflowState @deprecated(reason: "Use team.gitAutomationStates instead.")
 
   """
   The workflow state into which issues are moved when a PR has been merged.
   """
-  mergeWorkflowState: WorkflowState
+  mergeWorkflowState: WorkflowState @deprecated(reason: "Use team.gitAutomationStates instead.")
 
   """Whether to group recent issue history entries."""
   groupIssueHistory: Boolean!
@@ -16331,7 +16381,8 @@ type TimeScheduleEntry {
   userId: String
 
   """
-  The email of the user on schedule. This is used in case the external user could not be mapped to a Linear user id.
+  The email, name or reference to the user on schedule. This is used in case the
+  external user could not be mapped to a Linear user id.
   """
   userEmail: String
 }
@@ -16350,7 +16401,8 @@ input TimeScheduleEntryInput {
   userId: String
 
   """
-  The email of the user on schedule. This is used in case the external user could not be mapped to a Linear user id.
+  The email, name or reference to the user on schedule. This is used in case the
+  external user could not be mapped to a Linear user id.
   """
   userEmail: String
 }
