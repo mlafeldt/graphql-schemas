@@ -1868,6 +1868,11 @@ input CycleFilter {
   """Comparator for the filtering active cycle."""
   isActive: BooleanComparator
 
+  """
+  Comparator for filtering for whether the cycle is currently in cooldown.
+  """
+  isInCooldown: BooleanComparator
+
   """Comparator for the filtering next cycle."""
   isNext: BooleanComparator
 
@@ -6735,12 +6740,6 @@ type Mutation {
     id: String!
   ): AttachmentPayload!
 
-  """[DEPRECATED] Unsyncs an existing synced Slack attachment."""
-  attachmentUnsyncSlack(
-    """The identifier of the attachment to unsync."""
-    id: String!
-  ): AttachmentPayload!
-
   """Link any url to an issue."""
   attachmentLinkURL(
     """
@@ -9113,6 +9112,11 @@ input NullableCycleFilter {
   """Comparator for the filtering active cycle."""
   isActive: BooleanComparator
 
+  """
+  Comparator for filtering for whether the cycle is currently in cooldown.
+  """
+  isInCooldown: BooleanComparator
+
   """Comparator for the filtering next cycle."""
   isNext: BooleanComparator
 
@@ -9426,9 +9430,6 @@ input NullableProjectFilter {
 
   """Comparator for the project completion date."""
   completedAt: NullableDateComparator
-
-  """[Internal] Comparator for the date when the project was last paused."""
-  pausedAt: NullableDateComparator
 
   """Comparator for the project start date."""
   startDate: NullableDateComparator
@@ -10755,9 +10756,6 @@ type Project implements Node {
   """The time at which the project was moved into started state."""
   startedAt: DateTime
 
-  """[INTERNAL] The latest time at which the project was paused."""
-  pausedAt: DateTime
-
   """The time at which the project was moved into completed state."""
   completedAt: DateTime
 
@@ -11078,9 +11076,6 @@ input ProjectCollectionFilter {
   """Comparator for the project completion date."""
   completedAt: NullableDateComparator
 
-  """[Internal] Comparator for the date when the project was last paused."""
-  pausedAt: NullableDateComparator
-
   """Comparator for the project start date."""
   startDate: NullableDateComparator
 
@@ -11235,9 +11230,6 @@ input ProjectFilter {
 
   """Comparator for the project completion date."""
   completedAt: NullableDateComparator
-
-  """[Internal] Comparator for the date when the project was last paused."""
-  pausedAt: NullableDateComparator
 
   """Comparator for the project start date."""
   startDate: NullableDateComparator
@@ -11805,9 +11797,6 @@ type ProjectSearchResult implements Node {
 
   """The time at which the project was moved into started state."""
   startedAt: DateTime
-
-  """[INTERNAL] The latest time at which the project was paused."""
-  pausedAt: DateTime
 
   """The time at which the project was moved into completed state."""
   completedAt: DateTime
@@ -12407,9 +12396,6 @@ input ProjectUpdateInput {
 
   """The date when the project was canceled."""
   canceledAt: DateTime
-
-  """[INTERNAL] The date when the project was paused."""
-  pausedAt: DateTime
 
   """Whether to send new issue notifications to Slack."""
   slackNewIssue: Boolean
