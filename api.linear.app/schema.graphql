@@ -799,6 +799,9 @@ type AuthOrganization {
 
   """The email domain or URL key for the organization."""
   serviceId: String!
+
+  """The region the organization is hosted in."""
+  region: String!
   userCount: Float!
 }
 
@@ -10513,6 +10516,14 @@ type OrganizationPayload {
   success: Boolean!
 }
 
+type OrganizationRegionResponse {
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The region for the organization."""
+  region: String
+}
+
 type OrganizationStartPlusTrialPayload {
   """Whether the operation was successful."""
   success: Boolean!
@@ -10802,6 +10813,9 @@ type Project implements Node {
 
   """Whether to send new issue status updates to Slack."""
   slackIssueStatuses: Boolean!
+
+  """The user's favorite associated with this project."""
+  favorite: Favorite
 
   """Project URL."""
   url: String!
@@ -11845,6 +11859,9 @@ type ProjectSearchResult implements Node {
   """Whether to send new issue status updates to Slack."""
   slackIssueStatuses: Boolean!
 
+  """The user's favorite associated with this project."""
+  favorite: Favorite
+
   """Project URL."""
   url: String!
 
@@ -12814,6 +12831,12 @@ type Query {
 
   """User's active sessions."""
   authenticationSessions: [AuthenticationSessionResponse!]!
+
+  """Fetch the region for the organization."""
+  organizationRegion(
+    """The ID of the organization to retrieve."""
+    id: String!
+  ): OrganizationRegionResponse!
 
   """Fetch SSO login URL for the email provided."""
   ssoUrlFromEmail(
@@ -17190,7 +17213,7 @@ type UserSettings implements Node {
   notificationPreferences: JSONObject!
 
   """The email types the user has unsubscribed from."""
-  unsubscribedFrom: [String!]! @deprecated(reason: "Use individual subscription fields instead.")
+  unsubscribedFrom: [String!]! @deprecated(reason: "Use individual subscription fields instead. This field's value is now outdated.")
 
   """The user associated with these settings."""
   user: User!
