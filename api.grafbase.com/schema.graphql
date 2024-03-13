@@ -19,6 +19,7 @@ type AccessTokenConnection {
 input AccessTokenCreateInput {
   name: String!
   accountId: ID
+  kind: AccessTokenKind! = USER
 }
 
 union AccessTokenCreatePayload = AccessTokenCreateSuccess | InvalidAccountError | TokenLimitExceededError
@@ -47,6 +48,11 @@ type AccessTokenEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+enum AccessTokenKind {
+  USER
+  ACCOUNT
 }
 
 interface Account {
@@ -1841,7 +1847,7 @@ type PublishSuccess {
 }
 
 type Query {
-  accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
+  accessTokens(after: String, before: String, first: Int, last: Int, accountId: ID): AccessTokenConnection!
   accountBySlug(
     """slug of the account"""
     slug: String!
