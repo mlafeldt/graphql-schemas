@@ -530,6 +530,24 @@ type AuthApiKeyPayload {
   authApiKey: AuthApiKey!
 }
 
+"""An email address that can be used for submitting issues."""
+type AuthEmailIntakeAddress {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """Unique email address user name (before @) used for incoming email."""
+  address: String!
+
+  """Whether the email address is enabled."""
+  enabled: Boolean!
+
+  """The auth organization that the email address is associated with."""
+  organization: AuthOrganization!
+
+  """The auth user who created the email intake address."""
+  creator: AuthUser
+}
+
 """User authentication session."""
 type AuthenticationSession {
   id: String!
@@ -10487,6 +10505,9 @@ type OrganizationInviteFullDetailsPayload {
 
   """Whether the invite has expired."""
   expired: Boolean!
+
+  """Allowed authentication providers, empty array means all are allowed."""
+  allowedAuthServices: [String!]!
 }
 
 type OrganizationInvitePayload {
@@ -14634,6 +14655,9 @@ type SharedSlackSettings {
 
   """Slack workspace id"""
   teamId: String
+
+  """Enterprise name of the connected Slack enterprise"""
+  enterpriseName: String
 }
 
 input SharedSlackSettingsInput {
@@ -14642,6 +14666,9 @@ input SharedSlackSettingsInput {
 
   """Slack workspace id"""
   teamId: String
+
+  """Enterprise name of the connected Slack enterprise"""
+  enterpriseName: String
 }
 
 """Slack Asks specific settings."""
@@ -14651,6 +14678,9 @@ type SlackAsksSettings {
 
   """Slack workspace id"""
   teamId: String
+
+  """Enterprise name of the connected Slack enterprise"""
+  enterpriseName: String
 
   """
   The mapping of Slack channel ID => Slack channel name for connected channels.
@@ -14667,6 +14697,9 @@ input SlackAsksSettingsInput {
 
   """Slack workspace id"""
   teamId: String
+
+  """Enterprise name of the connected Slack enterprise"""
+  enterpriseName: String
 
   """
   The mapping of Slack channel ID => Slack channel name for connected channels.
@@ -14835,6 +14868,9 @@ type SlackSettings {
   """Slack workspace id"""
   teamId: String
 
+  """Enterprise name of the connected Slack enterprise"""
+  enterpriseName: String
+
   """
   Whether Linear should automatically respond with issue unfurls when an issue identifier is mentioned in a Slack message.
   """
@@ -14847,6 +14883,9 @@ input SlackSettingsInput {
 
   """Slack workspace id"""
   teamId: String
+
+  """Enterprise name of the connected Slack enterprise"""
+  enterpriseName: String
 
   """
   Whether Linear should automatically respond with issue unfurls when an issue identifier is mentioned in a Slack message.
@@ -17493,6 +17532,7 @@ enum ViewType {
   teams
   archive
   quickView
+  issueIdentifiers
 }
 
 """A webhook used to send HTTP notifications over data updates."""
