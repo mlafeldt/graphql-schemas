@@ -279,6 +279,10 @@ input BranchUpdateInput {
 
 union BranchUpdatePayload = Query | ProjectDoesNotExistError
 
+type CannotBeRenamedError {
+  query: Query!
+}
+
 type CannotUseInvitationsWithSSO {
   query: Query!
 }
@@ -1552,6 +1556,7 @@ type Project implements Node {
   projectType: ProjectType
   graphMode: GraphMode!
   createdAt: DateTime!
+  canBeRenamed: Boolean!
   repository: GitRepository
   branches(after: String, before: String, first: Int, last: Int): BranchConnection!
   apiKeys(after: String, before: String, first: Int, last: Int): ProjectApiKeyConnection!
@@ -1827,7 +1832,7 @@ input ProjectUpdateInput {
   projectRootPath: String
 }
 
-union ProjectUpdatePayload = ProjectUpdateSuccess | ProjectDoesNotExistError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
+union ProjectUpdatePayload = ProjectUpdateSuccess | ProjectDoesNotExistError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | CannotBeRenamedError
 
 type ProjectUpdateSuccess {
   project: Project!
