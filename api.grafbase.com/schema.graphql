@@ -1059,7 +1059,7 @@ type Mutation {
   branchOperationCheckConfigurationUpdate(input: BranchOperationCheckConfigurationInput!): BranchOperationCheckConfigurationUpdatePayload!
   slackIntegrationCreate(input: SlackIntegrationCreateInput!): SlackNotificationCreatePayload!
   slackNotificationDelete(id: String!): SlackNotificationDeletePayload!
-  trustedDocumentsSubmit(accountSlug: String!, projectSlug: String!, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
+  trustedDocumentsSubmit(accountSlug: String, projectSlug: String!, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
 }
 
 type NameAlreadyExistsError {
@@ -1105,6 +1105,10 @@ type NotAllowedToSlugUpdateError {
 }
 
 type NotAllowedToUpdateOrganizationError {
+  query: Query!
+}
+
+type OldAccessTokenError {
   query: Query!
 }
 
@@ -2471,7 +2475,7 @@ input TrustedDocumentInput {
   documentText: String!
 }
 
-union TrustedDocumentsSubmitPayload = TrustedDocumentsSubmitSuccess | ReusedIds | ProjectDoesNotExistError
+union TrustedDocumentsSubmitPayload = TrustedDocumentsSubmitSuccess | ReusedIds | ProjectDoesNotExistError | OldAccessTokenError
 
 type TrustedDocumentsSubmitSuccess {
   count: Int!
