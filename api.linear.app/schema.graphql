@@ -2163,6 +2163,11 @@ type Document implements Node {
   """The last template that was applied to this document."""
   lastAppliedTemplate: Template
 
+  """
+  The time at which the document was hidden. Null if the entity has not been hidden.
+  """
+  hiddenAt: DateTime
+
   """The order of the item in the project resources list."""
   sortOrder: Float!
 
@@ -2490,6 +2495,11 @@ type DocumentSearchResult implements Node {
   """The last template that was applied to this document."""
   lastAppliedTemplate: Template
 
+  """
+  The time at which the document was hidden. Null if the entity has not been hidden.
+  """
+  hiddenAt: DateTime
+
   """The order of the item in the project resources list."""
   sortOrder: Float!
 
@@ -2540,6 +2550,9 @@ input DocumentUpdateInput {
 
   """The ID of the last template applied to the document."""
   lastAppliedTemplateId: String
+
+  """The time at which the document was hidden."""
+  hiddenAt: DateTime
 
   """The order of the item in the project resources list."""
   sortOrder: Float
@@ -9447,10 +9460,10 @@ input NullableProjectFilter {
   """Comparator for the project slug ID."""
   slugId: StringComparator
 
-  """Comparator for the project state."""
+  """[DEPRECATED] Comparator for the project state."""
   state: StringComparator
 
-  """[Internal] Filters that the project's status must satisfy."""
+  """Filters that the project's status must satisfy."""
   status: ProjectStatusFilter
 
   """[Internal] Comparator for the project's content."""
@@ -10768,7 +10781,7 @@ type Project implements Node {
   """The project's color."""
   color: String!
 
-  """[Internal] The status that the project is associated with."""
+  """The status that the project is associated with."""
   status: ProjectStatus!
 
   """The user who created the project."""
@@ -11073,8 +11086,8 @@ type Project implements Node {
   """[Internal] The project's content as YJS state."""
   contentState: String
 
-  """The type of the state."""
-  state: String!
+  """[DEPRECATED] The type of the state."""
+  state: String! @deprecated(reason: "Use project.status instead")
 }
 
 """A generic payload return from entity archive mutations."""
@@ -11106,10 +11119,10 @@ input ProjectCollectionFilter {
   """Comparator for the project slug ID."""
   slugId: StringComparator
 
-  """Comparator for the project state."""
+  """[DEPRECATED] Comparator for the project state."""
   state: StringComparator
 
-  """[Internal] Filters that the project's status must satisfy."""
+  """Filters that the project's status must satisfy."""
   status: ProjectStatusFilter
 
   """[Internal] Comparator for the project's content."""
@@ -11197,10 +11210,10 @@ input ProjectCreateInput {
   """The color of the project."""
   color: String
 
-  """The state of the project."""
+  """[DEPRECATED] The state of the project."""
   state: String
 
-  """[INTERNAL] The ID of the project status."""
+  """The ID of the project status."""
   statusId: String
 
   """The description for the project."""
@@ -11261,10 +11274,10 @@ input ProjectFilter {
   """Comparator for the project slug ID."""
   slugId: StringComparator
 
-  """Comparator for the project state."""
+  """[DEPRECATED] Comparator for the project state."""
   state: StringComparator
 
-  """[Internal] Filters that the project's status must satisfy."""
+  """Filters that the project's status must satisfy."""
   status: ProjectStatusFilter
 
   """[Internal] Comparator for the project's content."""
@@ -11813,7 +11826,7 @@ type ProjectSearchResult implements Node {
   """The project's color."""
   color: String!
 
-  """[Internal] The status that the project is associated with."""
+  """The status that the project is associated with."""
   status: ProjectStatus!
 
   """The user who created the project."""
@@ -12118,8 +12131,8 @@ type ProjectSearchResult implements Node {
   """[Internal] The project's content as YJS state."""
   contentState: String
 
-  """The type of the state."""
-  state: String!
+  """[DEPRECATED] The type of the state."""
+  state: String! @deprecated(reason: "Use project.status instead")
 
   """Metadata related to search result."""
   metadata: JSONObject!
@@ -12388,10 +12401,10 @@ enum ProjectUpdateHealthType {
 }
 
 input ProjectUpdateInput {
-  """The state of the project."""
+  """[DEPRECATED] The state of the project."""
   state: String
 
-  """[INTERNAL] The ID of the project status."""
+  """The ID of the project status."""
   statusId: String
 
   """The name of the project."""
