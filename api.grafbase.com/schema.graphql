@@ -1112,6 +1112,13 @@ type OldAccessTokenError {
   query: Query!
 }
 
+type Operation implements Node {
+  id: ID!
+  name: String
+  type: OperationType!
+  normalizedQuery: String!
+}
+
 type OperationCheckError {
   title: String!
   message: String!
@@ -1129,8 +1136,7 @@ input OperationRequestAnalyticsFilter {
 type OperationRequestMetrics {
   operationType: OperationType!
   operationName: String!
-  operationId: String!
-  operationContent: String!
+  operationId: ID!
   requestCount: Int!
 }
 
@@ -1810,7 +1816,7 @@ input ProjectRequestAnalyticsFilter {
   period: ProjectRequestAnalyticsPeriod!
   now: DateTime!
   graphqlOperation: String
-  operationId: String
+  operationId: ID
 }
 
 enum ProjectRequestAnalyticsPeriod {
