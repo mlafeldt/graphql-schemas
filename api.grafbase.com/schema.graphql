@@ -305,6 +305,7 @@ type CustomDomain {
   sslVerificationCnameName: String
   sslVerificationCnameValue: String
   sslVerificationStatus: CustomDomainStatus!
+  branch: String!
 }
 
 type CustomDomainAlreadyExists {
@@ -313,6 +314,7 @@ type CustomDomainAlreadyExists {
 
 input CustomDomainCreateInput {
   projectId: ID!
+  branch: String!
   name: String!
 }
 
@@ -1113,10 +1115,10 @@ type OldAccessTokenError {
 }
 
 type Operation implements Node {
-  id: ID!
   name: String
   type: OperationType!
   normalizedQuery: String!
+  id: ID!
 }
 
 type OperationCheckError {
@@ -1574,7 +1576,7 @@ type Project implements Node {
   environmentVariables(after: String, before: String, first: Int, last: Int): EnvironmentVariableConnection!
   deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
   status: ProjectStatus!
-  customDomains: [String!]!
+  customDomains: [CustomDomain!]!
   requestAnalytics(filter: ProjectRequestAnalyticsFilter!): RequestAnalytics!
   operationAnalytics(first: Int, after: String, filter: OperationRequestAnalyticsFilter!): OperationRequestMetricsConnection!
   schemaChecks(first: Int, after: String, branch: String): SchemaCheckConnection!
