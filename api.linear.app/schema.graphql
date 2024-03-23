@@ -13753,6 +13753,14 @@ type Query {
     id: String!
   ): ProjectUpdate!
 
+  """
+  [Internal] AI summary of the latest project updates for the given projects
+  """
+  summarizeProjectUpdates(
+    """The identifiers of the projects to summarize."""
+    ids: [String!]!
+  ): SummaryPayload!
+
   """Sends a test push message."""
   pushSubscriptionTest(
     """Whether to send to mobile devices."""
@@ -15168,6 +15176,11 @@ input SubTypeComparator {
   Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.
   """
   null: Boolean
+}
+
+type SummaryPayload {
+  """Summary for project updates."""
+  summary: String!
 }
 
 type SynchronizedPayload {
