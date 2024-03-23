@@ -2681,7 +2681,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "CustomDomainAlreadyExists",
+        "name": "CustomDomainAlreadyExistsError",
         "description": null,
         "fields": [
           {
@@ -2780,12 +2780,17 @@
           },
           {
             "kind": "OBJECT",
-            "name": "CustomDomainAlreadyExists",
+            "name": "CustomDomainAlreadyExistsError",
             "ofType": null
           },
           {
             "kind": "OBJECT",
-            "name": "ProjectNotDeployed",
+            "name": "TooManyCustomDomainsError",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ProjectNotDeployedError",
             "ofType": null
           }
         ]
@@ -2925,6 +2930,152 @@
         "name": "CustomDomainDoesNotExistError",
         "description": null,
         "fields": [
+          {
+            "name": "query",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Query",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "CustomDomainReplaceInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "projectId",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "existingName",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "branch",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "UNION",
+        "name": "CustomDomainReplacePayload",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "CustomDomainReplaceSuccess",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "CustomDomainDoesNotExistError",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "CustomDomainAlreadyExistsError",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ProjectDoesNotExistError",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ProjectNotDeployedError",
+            "ofType": null
+          }
+        ]
+      },
+      {
+        "kind": "OBJECT",
+        "name": "CustomDomainReplaceSuccess",
+        "description": null,
+        "fields": [
+          {
+            "name": "domain",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "CustomDomain",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "query",
             "description": null,
@@ -8508,7 +8659,7 @@
           },
           {
             "name": "customDomainDelete",
-            "description": "Delete a custom hostname token.",
+            "description": "Delete a custom domain.",
             "args": [
               {
                 "name": "input",
@@ -8531,6 +8682,37 @@
               "ofType": {
                 "kind": "UNION",
                 "name": "CustomDomainDeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "customDomainReplace",
+            "description": "Replace a single domain.",
+            "args": [
+              {
+                "name": "input",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "CustomDomainReplaceInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "UNION",
+                "name": "CustomDomainReplacePayload",
                 "ofType": null
               }
             },
@@ -16526,7 +16708,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "ProjectNotDeployed",
+        "name": "ProjectNotDeployedError",
         "description": null,
         "fields": [
           {
@@ -22252,6 +22434,33 @@
       {
         "kind": "OBJECT",
         "name": "TokenLimitExceededError",
+        "description": null,
+        "fields": [
+          {
+            "name": "query",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Query",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "TooManyCustomDomainsError",
         "description": null,
         "fields": [
           {

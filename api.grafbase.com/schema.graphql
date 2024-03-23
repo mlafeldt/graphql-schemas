@@ -308,7 +308,7 @@ type CustomDomain {
   branch: String!
 }
 
-type CustomDomainAlreadyExists {
+type CustomDomainAlreadyExistsError {
   query: Query!
 }
 
@@ -318,7 +318,7 @@ input CustomDomainCreateInput {
   name: String!
 }
 
-union CustomDomainCreatePayload = CustomDomainCreateSuccess | ProjectDoesNotExistError | CustomDomainAlreadyExists | ProjectNotDeployed
+union CustomDomainCreatePayload = CustomDomainCreateSuccess | ProjectDoesNotExistError | CustomDomainAlreadyExistsError | TooManyCustomDomainsError | ProjectNotDeployedError
 
 type CustomDomainCreateSuccess {
   domain: CustomDomain!
@@ -337,6 +337,20 @@ type CustomDomainDeleteSuccess {
 }
 
 type CustomDomainDoesNotExistError {
+  query: Query!
+}
+
+input CustomDomainReplaceInput {
+  projectId: ID!
+  existingName: String!
+  branch: String!
+  name: String!
+}
+
+union CustomDomainReplacePayload = CustomDomainReplaceSuccess | CustomDomainDoesNotExistError | CustomDomainAlreadyExistsError | ProjectDoesNotExistError | ProjectNotDeployedError
+
+type CustomDomainReplaceSuccess {
+  domain: CustomDomain!
   query: Query!
 }
 
@@ -981,8 +995,11 @@ type Mutation {
   """Add a new custom domain."""
   customDomainCreate(input: CustomDomainCreateInput!): CustomDomainCreatePayload!
 
-  """Delete a custom hostname token."""
+  """Delete a custom domain."""
   customDomainDelete(input: CustomDomainDeleteInput!): CustomDomainDeletePayload!
+
+  """Replace a single domain."""
+  customDomainReplace(input: CustomDomainReplaceInput!): CustomDomainReplacePayload!
 
   """Create a new deployment for an existing project."""
   deploymentCreate(input: DeploymentCreateInput!): DeploymentCreatePayload!
@@ -1750,7 +1767,7 @@ type ProjectEdge {
   cursor: String!
 }
 
-type ProjectNotDeployed {
+type ProjectNotDeployedError {
   query: Query!
 }
 
@@ -2474,6 +2491,10 @@ type TokenDoesNotExistError {
 }
 
 type TokenLimitExceededError {
+  query: Query!
+}
+
+type TooManyCustomDomainsError {
   query: Query!
 }
 
