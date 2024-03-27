@@ -2262,6 +2262,9 @@ type DocumentContent implements Node {
   """The project that the content is associated with."""
   project: Project
 
+  """The initiative that the content is associated with."""
+  initiative: Initiative
+
   """The project milestone that the content is associated with."""
   projectMilestone: ProjectMilestone
 
@@ -11795,6 +11798,66 @@ type ProjectPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""A relation between two projects."""
+type ProjectRelation implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The relationship of the project with the related project."""
+  type: String!
+
+  """The project whose relationship is being described."""
+  project: Project!
+
+  """
+  The milestone within the project whose relationship is being described.
+  """
+  projectMilestone: ProjectMilestone!
+
+  """The type of anchor on the project end of the relation."""
+  anchorType: String!
+
+  """The related project."""
+  relatedProject: Project!
+
+  """
+  The milestone within the related project whose relationship is being described.
+  """
+  relatedProjectMilestone: ProjectMilestone!
+
+  """The type of anchor on the relatedProject end of the relation."""
+  relatedAnchorType: String!
+}
+
+type ProjectRelationConnection {
+  edges: [ProjectRelationEdge!]!
+  nodes: [ProjectRelation!]!
+  pageInfo: PageInfo!
+}
+
+type ProjectRelationEdge {
+  node: ProjectRelation!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
 }
 
 type ProjectSearchPayload {
