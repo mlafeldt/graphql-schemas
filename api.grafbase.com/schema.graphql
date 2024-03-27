@@ -82,6 +82,40 @@ type AccountDoesNotExistError {
   query: Query!
 }
 
+type AccountIntegration {
+  accountId: ID!
+  createdAt: DateTime!
+  enabled: Boolean!
+  id: ID!
+  integrationId: ID!
+  attributes: AccountIntegrationAttributes!
+  projects: [ProjectIntegration!]!
+}
+
+union AccountIntegrationAttributes = DatadogIntegration
+
+input AccountIntegrationAttributesInput {
+  datadog: DatadogIntegrationInput
+}
+
+input AccountIntegrationInput {
+  enabled: Boolean!
+  projects: [ID!]
+  attributes: AccountIntegrationAttributesInput!
+}
+
+type AccountIntegrationMutationError {
+  message: String!
+  query: Query!
+}
+
+union AccountIntegrationMutationPayload = AccountIntegrationMutationSuccess | AccountIntegrationMutationError
+
+type AccountIntegrationMutationSuccess {
+  account: Account!
+  query: Query!
+}
+
 type AccountResources {
   projects: ResourceStatus!
 }
@@ -381,6 +415,29 @@ enum DatabaseUsageGranularity {
   DAILY
   WEEKLY
   MONTHLY
+}
+
+type DatadogIntegration {
+  apiKey: String!
+  region: DatadogRegion!
+  environments: [BranchEnvironment!]!
+  sampling: Int!
+}
+
+input DatadogIntegrationInput {
+  apiKey: String!
+  region: DatadogRegion!
+  environments: [BranchEnvironment!]!
+  sampling: Int!
+}
+
+enum DatadogRegion {
+  US1
+  US3
+  US5
+  EU1
+  US1_FED
+  AP1
 }
 
 """RFC3339 formatted date in the UTC time zone denoted by letter 'Z'"""
@@ -991,6 +1048,9 @@ type Mutation {
   personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
+  accountIntegrationCreate(accountId: ID!, input: AccountIntegrationInput!): AccountIntegrationMutationPayload!
+  accountIntegrationUpdate(id: ID!, input: AccountIntegrationInput!): AccountIntegrationMutationPayload!
+  accountIntegrationDelete(id: ID!): AccountIntegrationMutationPayload!
 
   """Add a new custom domain."""
   customDomainCreate(input: CustomDomainCreateInput!): CustomDomainCreatePayload!
@@ -1410,6 +1470,7 @@ type Organization implements Account {
   orbCustomer: OrbCustomer
   orbActiveSubscription: OrbSubscription
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
+  integrations: [AccountIntegration!]!
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
   projectsCountStatus: ResourceStatus!
@@ -1765,6 +1826,14 @@ type ProjectEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+type ProjectIntegration {
+  accountIntegrationId: ID!
+  createdAt: DateTime!
+  enabled: Boolean!
+  id: ID!
+  projectId: ID!
 }
 
 type ProjectNotDeployedError {
