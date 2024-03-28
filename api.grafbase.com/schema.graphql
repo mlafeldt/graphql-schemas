@@ -352,7 +352,7 @@ input CustomDomainCreateInput {
   name: String!
 }
 
-union CustomDomainCreatePayload = CustomDomainCreateSuccess | ProjectDoesNotExistError | CustomDomainAlreadyExistsError | TooManyCustomDomainsError | ProjectNotDeployedError
+union CustomDomainCreatePayload = CustomDomainCreateSuccess | ProjectDoesNotExistError | CustomDomainAlreadyExistsError | TooManyCustomDomainsError | ProjectNotDeployedError | OperationNotAllowedByPlanError
 
 type CustomDomainCreateSuccess {
   domain: CustomDomain!
@@ -381,7 +381,7 @@ input CustomDomainReplaceInput {
   name: String!
 }
 
-union CustomDomainReplacePayload = CustomDomainReplaceSuccess | CustomDomainDoesNotExistError | CustomDomainAlreadyExistsError | ProjectDoesNotExistError | ProjectNotDeployedError
+union CustomDomainReplacePayload = CustomDomainReplaceSuccess | CustomDomainDoesNotExistError | CustomDomainAlreadyExistsError | ProjectDoesNotExistError | ProjectNotDeployedError | OperationNotAllowedByPlanError
 
 type CustomDomainReplaceSuccess {
   domain: CustomDomain!
@@ -1204,6 +1204,10 @@ type OperationCheckError {
   severity: SchemaCheckErrorSeverity!
 }
 
+type OperationNotAllowedByPlanError {
+  query: Query!
+}
+
 input OperationRequestAnalyticsFilter {
   branch: String
   period: ProjectRequestAnalyticsPeriod!
@@ -1798,7 +1802,7 @@ input ProjectCreateInput {
   projectType: ProjectType
 }
 
-union ProjectCreatePayload = ProjectCreateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidProjectRootPathError | SelfHostedProjectsNotSupportedError
+union ProjectCreatePayload = ProjectCreateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidProjectRootPathError | OperationNotAllowedByPlanError
 
 type ProjectCreateSuccess {
   project: Project!
@@ -2375,10 +2379,6 @@ type SchemaVersionEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
-}
-
-type SelfHostedProjectsNotSupportedError {
-  query: Query!
 }
 
 """A Slack channel returned from the Slack API."""
