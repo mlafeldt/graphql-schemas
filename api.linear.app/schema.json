@@ -3894,6 +3894,22 @@
             "deprecationReason": null
           },
           {
+            "name": "reactionData",
+            "description": "Emoji reaction summary, grouped by emoji type.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "JSONObject",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "infoSnapshot",
             "description": "[Internal] Serialized JSON representing current state of the project properties when posting the project update.",
             "args": [],
@@ -3973,6 +3989,93 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "comments",
+            "description": "Comments associated with the project update.",
+            "args": [
+              {
+                "name": "filter",
+                "description": "Filter returned comments.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CommentFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "A cursor to be used with last for backward pagination.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "after",
+                "description": "A cursor to be used with first for forward pagination",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "The number of items to forward paginate (used with after). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "The number of items to backward paginate (used with before). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeArchived",
+                "description": "Should archived resources be included (default: false)",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt.",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "PaginationOrderBy",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "CommentConnection",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -21305,13 +21408,9 @@
             "description": "The milestone within the project whose relationship is being described.",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectMilestone",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "ProjectMilestone",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -21353,13 +21452,9 @@
             "description": "The milestone within the related project whose relationship is being described.",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectMilestone",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "ProjectMilestone",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -32681,6 +32776,65 @@
       },
       {
         "kind": "OBJECT",
+        "name": "ProjectRelationPayload",
+        "description": null,
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "The identifier of the last sync operation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectRelation",
+            "description": "The project relation that was created or updated.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectRelation",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "ProjectPayload",
         "description": null,
         "fields": [
@@ -42803,7 +42957,7 @@
             "description": "Filters that the comments issue must satisfy.",
             "type": {
               "kind": "INPUT_OBJECT",
-              "name": "IssueFilter",
+              "name": "NullableIssueFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -42814,6 +42968,16 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "ProjectUpdateFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "parent",
+            "description": "Filters that the comment parent must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableCommentFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -42858,6 +43022,153 @@
                 "ofType": {
                   "kind": "INPUT_OBJECT",
                   "name": "CommentFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "NullableCommentFilter",
+        "description": "Comment filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "body",
+            "description": "Comparator for the comments body.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "user",
+            "description": "Filters that the comments creator must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "issue",
+            "description": "Filters that the comments issue must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableIssueFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectUpdate",
+            "description": "Filters that the comments project update must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectUpdateFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "parent",
+            "description": "Filters that the comment parent must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableCommentFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "documentContent",
+            "description": "Filters that the comments document content must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DocumentContentFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "null",
+            "description": "Filter based on the existence of the relation.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the comment.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "NullableCommentFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the comment.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "NullableCommentFilter",
                   "ofType": null
                 }
               }
@@ -42930,7 +43241,7 @@
             "description": "Filters that the comments issue must satisfy.",
             "type": {
               "kind": "INPUT_OBJECT",
-              "name": "IssueFilter",
+              "name": "NullableIssueFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -42941,6 +43252,16 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "ProjectUpdateFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "parent",
+            "description": "Filters that the comment parent must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableCommentFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -54281,6 +54602,188 @@
       },
       {
         "kind": "INPUT_OBJECT",
+        "name": "ProjectRelationCreateInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "type",
+            "description": "The type of relation of the project to the related project.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectId",
+            "description": "The identifier of the project that is related to another project.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectMilestoneId",
+            "description": "The identifier of the project milestone.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "anchorType",
+            "description": "The type of the anchor for the project.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "relatedProjectId",
+            "description": "The identifier of the related project.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "relatedProjectMilestoneId",
+            "description": "The identifier of the related project milestone.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "relatedAnchorType",
+            "description": "The type of the anchor for the related project.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectRelationUpdateInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "type",
+            "description": "The type of relation of the project to the related project.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectId",
+            "description": "The identifier of the project that is related to another project.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectMilestoneId",
+            "description": "The identifier of the project milestone.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "anchorType",
+            "description": "The type of the anchor for the project.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "relatedProjectId",
+            "description": "The identifier of the related project.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "relatedProjectMilestoneId",
+            "description": "The identifier of the related project milestone.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "relatedAnchorType",
+            "description": "The type of the anchor for the related project.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
         "name": "ProjectCreateInput",
         "description": null,
         "fields": null,
@@ -63417,6 +63920,114 @@
             "deprecationReason": null
           },
           {
+            "name": "projectRelations",
+            "description": "All project relationships.",
+            "args": [
+              {
+                "name": "before",
+                "description": "A cursor to be used with last for backward pagination.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "after",
+                "description": "A cursor to be used with first for forward pagination",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "The number of items to forward paginate (used with after). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "The number of items to backward paginate (used with before). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeArchived",
+                "description": "Should archived resources be included (default: false)",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt.",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "PaginationOrderBy",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectRelationConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectRelation",
+            "description": "One specific project relation.",
+            "args": [
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectRelation",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "projects",
             "description": "All projects.",
             "args": [
@@ -72460,6 +73071,113 @@
               {
                 "name": "id",
                 "description": "The identifier of the project milestone to delete.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectRelationCreate",
+            "description": "Creates a new project relation.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The project relation to create.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ProjectRelationCreateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectRelationPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectRelationUpdate",
+            "description": "Updates a project relation.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The properties of the project relation to update.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ProjectRelationUpdateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the project relation to update.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectRelationPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectRelationDelete",
+            "description": "Deletes a project relation.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The identifier of the project relation to delete.",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,

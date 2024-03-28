@@ -1077,10 +1077,13 @@ input CommentCollectionFilter {
   user: UserFilter
 
   """Filters that the comments issue must satisfy."""
-  issue: IssueFilter
+  issue: NullableIssueFilter
 
   """Filters that the comments project update must satisfy."""
   projectUpdate: ProjectUpdateFilter
+
+  """Filters that the comment parent must satisfy."""
+  parent: NullableCommentFilter
 
   """Filters that the comments document content must satisfy."""
   documentContent: DocumentContentFilter
@@ -1192,10 +1195,13 @@ input CommentFilter {
   user: UserFilter
 
   """Filters that the comments issue must satisfy."""
-  issue: IssueFilter
+  issue: NullableIssueFilter
 
   """Filters that the comments project update must satisfy."""
   projectUpdate: ProjectUpdateFilter
+
+  """Filters that the comment parent must satisfy."""
+  parent: NullableCommentFilter
 
   """Filters that the comments document content must satisfy."""
   documentContent: DocumentContentFilter
@@ -8364,6 +8370,27 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """Creates a new project relation."""
+  projectRelationCreate(
+    """The project relation to create."""
+    input: ProjectRelationCreateInput!
+  ): ProjectRelationPayload!
+
+  """Updates a project relation."""
+  projectRelationUpdate(
+    """The properties of the project relation to update."""
+    input: ProjectRelationUpdateInput!
+
+    """The identifier of the project relation to update."""
+    id: String!
+  ): ProjectRelationPayload!
+
+  """Deletes a project relation."""
+  projectRelationDelete(
+    """The identifier of the project relation to delete."""
+    id: String!
+  ): DeletePayload!
+
   """Creates a new project."""
   projectCreate(
     """Whether to connect a Slack channel to the project."""
@@ -9125,6 +9152,45 @@ input NotionSettingsInput {
 
   """The name of the Notion workspace being connected."""
   workspaceName: String!
+}
+
+"""Comment filtering options."""
+input NullableCommentFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the comments body."""
+  body: StringComparator
+
+  """Filters that the comments creator must satisfy."""
+  user: UserFilter
+
+  """Filters that the comments issue must satisfy."""
+  issue: NullableIssueFilter
+
+  """Filters that the comments project update must satisfy."""
+  projectUpdate: ProjectUpdateFilter
+
+  """Filters that the comment parent must satisfy."""
+  parent: NullableCommentFilter
+
+  """Filters that the comments document content must satisfy."""
+  documentContent: DocumentContentFilter
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
+
+  """Compound filters, all of which need to be matched by the comment."""
+  and: [NullableCommentFilter!]
+
+  """Compound filters, one of which need to be matched by the comment."""
+  or: [NullableCommentFilter!]
 }
 
 """Cycle filtering options."""
@@ -11830,7 +11896,7 @@ type ProjectRelation implements Node {
   """
   The milestone within the project whose relationship is being described.
   """
-  projectMilestone: ProjectMilestone!
+  projectMilestone: ProjectMilestone
 
   """The type of anchor on the project end of the relation."""
   anchorType: String!
@@ -11841,7 +11907,7 @@ type ProjectRelation implements Node {
   """
   The milestone within the related project whose relationship is being described.
   """
-  relatedProjectMilestone: ProjectMilestone!
+  relatedProjectMilestone: ProjectMilestone
 
   """The type of anchor on the relatedProject end of the relation."""
   relatedAnchorType: String!
@@ -11853,11 +11919,68 @@ type ProjectRelationConnection {
   pageInfo: PageInfo!
 }
 
+input ProjectRelationCreateInput {
+  """The type of relation of the project to the related project."""
+  type: String!
+
+  """The identifier of the project that is related to another project."""
+  projectId: String!
+
+  """The identifier of the project milestone."""
+  projectMilestoneId: String
+
+  """The type of the anchor for the project."""
+  anchorType: String!
+
+  """The identifier of the related project."""
+  relatedProjectId: String!
+
+  """The identifier of the related project milestone."""
+  relatedProjectMilestoneId: String
+
+  """The type of the anchor for the related project."""
+  relatedAnchorType: String!
+}
+
 type ProjectRelationEdge {
   node: ProjectRelation!
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+type ProjectRelationPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The project relation that was created or updated."""
+  projectRelation: ProjectRelation!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input ProjectRelationUpdateInput {
+  """The type of relation of the project to the related project."""
+  type: String
+
+  """The identifier of the project that is related to another project."""
+  projectId: String
+
+  """The identifier of the project milestone."""
+  projectMilestoneId: String
+
+  """The type of the anchor for the project."""
+  anchorType: String
+
+  """The identifier of the related project."""
+  relatedProjectId: String
+
+  """The identifier of the related project milestone."""
+  relatedProjectMilestoneId: String
+
+  """The type of the anchor for the related project."""
+  relatedAnchorType: String
 }
 
 type ProjectSearchPayload {
@@ -12386,6 +12509,9 @@ type ProjectUpdate implements Node {
   """The time the project update was edited."""
   editedAt: DateTime
 
+  """Emoji reaction summary, grouped by emoji type."""
+  reactionData: JSONObject!
+
   """
   [Internal] Serialized JSON representing current state of the project properties when posting the project update.
   """
@@ -12409,6 +12535,36 @@ type ProjectUpdate implements Node {
   The diff between the current update and the previous one, formatted as markdown.
   """
   diffMarkdown: String
+
+  """Comments associated with the project update."""
+  comments(
+    """Filter returned comments."""
+    filter: CommentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CommentConnection!
 }
 
 type ProjectUpdateConnection {
@@ -13740,6 +13896,36 @@ type Query {
 
   """One specific project milestone."""
   projectMilestone(id: String!): ProjectMilestone!
+
+  """All project relationships."""
+  projectRelations(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectRelationConnection!
+
+  """One specific project relation."""
+  projectRelation(id: String!): ProjectRelation!
 
   """All projects."""
   projects(
