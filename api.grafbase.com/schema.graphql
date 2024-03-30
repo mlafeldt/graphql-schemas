@@ -237,6 +237,10 @@ type BranchMetricsSuccess {
   request: Distribution!
 }
 
+type BranchNotDeployedError {
+  query: Query!
+}
+
 type BranchOperationCheckConfiguration {
   """Whether operation checks are enabled for the branch."""
   enabled: Boolean!
@@ -352,7 +356,7 @@ input CustomDomainCreateInput {
   name: String!
 }
 
-union CustomDomainCreatePayload = CustomDomainCreateSuccess | ProjectDoesNotExistError | CustomDomainAlreadyExistsError | TooManyCustomDomainsError | ProjectNotDeployedError | OperationNotAllowedByPlanError
+union CustomDomainCreatePayload = CustomDomainCreateSuccess | ProjectDoesNotExistError | CustomDomainAlreadyExistsError | TooManyCustomDomainsError | BranchNotDeployedError | OperationNotAllowedByPlanError
 
 type CustomDomainCreateSuccess {
   domain: CustomDomain!
@@ -381,7 +385,7 @@ input CustomDomainReplaceInput {
   name: String!
 }
 
-union CustomDomainReplacePayload = CustomDomainReplaceSuccess | CustomDomainDoesNotExistError | CustomDomainAlreadyExistsError | ProjectDoesNotExistError | ProjectNotDeployedError | OperationNotAllowedByPlanError
+union CustomDomainReplacePayload = CustomDomainReplaceSuccess | CustomDomainDoesNotExistError | ProjectDoesNotExistError | BranchNotDeployedError | OperationNotAllowedByPlanError
 
 type CustomDomainReplaceSuccess {
   domain: CustomDomain!
@@ -1058,7 +1062,11 @@ type Mutation {
   """Delete a custom domain."""
   customDomainDelete(input: CustomDomainDeleteInput!): CustomDomainDeletePayload!
 
-  """Replace a single domain."""
+  """
+  Replace a configured custom domain with another one (domain and target branch)
+  – or modify the target branch of an existing one
+  without changing the domain name.
+  """
   customDomainReplace(input: CustomDomainReplaceInput!): CustomDomainReplacePayload!
 
   """Create a new deployment for an existing project."""
@@ -1838,10 +1846,6 @@ type ProjectIntegration {
   enabled: Boolean!
   id: ID!
   projectId: ID!
-}
-
-type ProjectNotDeployedError {
-  query: Query!
 }
 
 type ProjectNotFederatedError {
