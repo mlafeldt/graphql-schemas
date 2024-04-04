@@ -20,9 +20,10 @@ input AccessTokenCreateInput {
   name: String!
   accountId: ID
   kind: AccessTokenKind! = USER
+  projectScopes: [ID!]
 }
 
-union AccessTokenCreatePayload = AccessTokenCreateSuccess | InvalidAccountError | TokenLimitExceededError
+union AccessTokenCreatePayload = AccessTokenCreateSuccess | InvalidAccountError | TokenLimitExceededError | ProjectScopeLimitExceededError | CouldNotFindProjectsError
 
 type AccessTokenCreateSuccess {
   token: AccessToken!
@@ -330,6 +331,10 @@ type CompositionCheckError {
   message: String!
 }
 
+type CouldNotFindProjectsError {
+  unknownProjectIds: [ID!]!
+}
+
 type CurrentPlanLimitReachedError {
   max: Int!
   query: Query!
@@ -356,7 +361,7 @@ input CustomDomainCreateInput {
   name: String!
 }
 
-union CustomDomainCreatePayload = CustomDomainCreateSuccess | ProjectDoesNotExistError | BranchDoesNotExistError | CustomDomainAlreadyExistsError | TooManyCustomDomainsError | BranchNotDeployedError | OperationNotAllowedByPlanError
+union CustomDomainCreatePayload = CustomDomainCreateSuccess | ProjectDoesNotExistError | BranchDoesNotExistError | CustomDomainAlreadyExistsError | TooManyCustomDomainsError | BranchNotDeployedError | OperationNotAllowedByPlanError | InvalidDomainError
 
 type CustomDomainCreateSuccess {
   domain: CustomDomain!
@@ -386,7 +391,7 @@ input CustomDomainReplaceInput {
   name: String!
 }
 
-union CustomDomainReplacePayload = CustomDomainReplaceSuccess | CustomDomainDoesNotExistError | ProjectDoesNotExistError | BranchDoesNotExistError | BranchNotDeployedError | OperationNotAllowedByPlanError
+union CustomDomainReplacePayload = CustomDomainReplaceSuccess | CustomDomainDoesNotExistError | ProjectDoesNotExistError | BranchDoesNotExistError | BranchNotDeployedError | OperationNotAllowedByPlanError | InvalidDomainError
 
 type CustomDomainReplaceSuccess {
   domain: CustomDomain!
@@ -799,6 +804,10 @@ type InvalidAccountError {
 
 type InvalidDatabaseRegionsError {
   invalid: [String!]!
+  query: Query!
+}
+
+type InvalidDomainError {
   query: Query!
 }
 
@@ -1922,6 +1931,10 @@ enum ProjectRequestAnalyticsPeriod {
   LAST_7_DAYS
 }
 
+type ProjectScopeLimitExceededError {
+  query: Query!
+}
+
 enum ProjectStatus {
   ACTIVE
   INACTIVE
@@ -2410,7 +2423,7 @@ type SlackNotification {
   channelName: String!
 }
 
-union SlackNotificationCreatePayload = SlackNotification
+union SlackNotificationCreatePayload = SlackNotification | ProjectDoesNotExistError
 
 union SlackNotificationDeletePayload = Query
 
