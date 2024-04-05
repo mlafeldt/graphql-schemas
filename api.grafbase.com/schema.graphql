@@ -196,7 +196,7 @@ type Branch implements Node {
   environment: BranchEnvironment!
   schema: String
   federatedSchema: String
-  operationChecksConfig: BranchOperationCheckConfiguration!
+  operationChecksEnabled: Boolean!
   subgraphs: [Subgraph!]!
 }
 
@@ -242,71 +242,6 @@ type BranchNotDeployedError {
   query: Query!
 }
 
-type BranchOperationCheckConfiguration {
-  """Whether operation checks are enabled for the branch."""
-  enabled: Boolean!
-
-  """
-  The time range in days to consider for operation checks. Operations older than the specificied
-  number of days are ignored. Overrides project configuration if defined.
-  """
-  timeRangeDaysOverride: Int
-
-  """
-  The request count threshold to consider for operation checks. Operations that have been
-  registered less than the specified number of occurrences are ignored. Overrides project
-  configuration if defined.
-  """
-  requestCountThresholdOverride: Int
-
-  """The clients to exclude from operation checks."""
-  excludedClients: [String!]!
-
-  """Whether to merge excluded clients with the project's."""
-  excludedClientsAppendProjectSettings: Boolean!
-
-  """The operations to exclude from operation checks."""
-  excludedOperations: [String!]!
-
-  """Whether to merge excluded operations with the project's."""
-  excludedOperationsAppendProjectSettings: Boolean!
-}
-
-input BranchOperationCheckConfigurationInput {
-  projectId: ID!
-  branch: String!
-
-  """Whether operation checks are enabled for the branch."""
-  enabled: Boolean!
-
-  """
-  The time range in days to consider for operation checks. Operations older than the specificied
-  number of days are ignored. Overrides project configuration if defined.
-  """
-  timeRangeDaysOverride: Int
-
-  """
-  The request count threshold to consider for operation checks. Operations that have been
-  registered less than the specified number of occurrences are ignored. Overrides project
-  configuration if defined.
-  """
-  requestCountThresholdOverride: Int
-
-  """The clients to exclude from operation checks."""
-  excludedClients: [String!]!
-
-  """Whether to merge excluded clients with the project's."""
-  excludedClientsAppendProjectSettings: Boolean!
-
-  """The operations to exclude from operation checks."""
-  excludedOperations: [String!]!
-
-  """Whether to merge excluded operations with the project's."""
-  excludedOperationsAppendProjectSettings: Boolean!
-}
-
-union BranchOperationCheckConfigurationUpdatePayload = ProjectDoesNotExistError | BranchOperationCheckConfiguration
-
 input BranchUpdateInput {
   accountSlug: String!
   projectSlug: String!
@@ -314,6 +249,7 @@ input BranchUpdateInput {
   trustedDocumentsEnforce: Boolean
   trustedDocumentsBypassHeaderName: String
   trustedDocumentsBypassHeaderValue: String
+  operationChecksEnabled: Boolean
 }
 
 union BranchUpdatePayload = Query | ProjectDoesNotExistError
@@ -1153,7 +1089,6 @@ type Mutation {
     """name of the branch"""
     branchName: String!
   ): BranchDeletePayload!
-  branchOperationCheckConfigurationUpdate(input: BranchOperationCheckConfigurationInput!): BranchOperationCheckConfigurationUpdatePayload!
   slackIntegrationCreate(input: SlackIntegrationCreateInput!): SlackNotificationCreatePayload!
   slackNotificationDelete(id: String!): SlackNotificationDeletePayload!
   trustedDocumentsSubmit(accountSlug: String, projectSlug: String!, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
