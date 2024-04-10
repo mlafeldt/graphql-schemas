@@ -2124,7 +2124,7 @@ type DeletePayload implements ArchivePayload {
   entityId: String!
 }
 
-"""A document for a project."""
+"""A document that can be attached to different entities."""
 type Document implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -2161,7 +2161,10 @@ type Document implements Node {
   updatedBy: User!
 
   """The project that the document is associated with."""
-  project: Project!
+  project: Project
+
+  """[Internal] The initiative that the document is associated with."""
+  initiative: Initiative
 
   """The document's unique URL slug."""
   slugId: String!
@@ -2174,7 +2177,7 @@ type Document implements Node {
   """
   hiddenAt: DateTime
 
-  """The order of the item in the project resources list."""
+  """The order of the item in the resources list."""
   sortOrder: Float!
 
   """The documents content in markdown format."""
@@ -2392,12 +2395,15 @@ input DocumentCreateInput {
   content: String
 
   """Related project for the document."""
-  projectId: String!
+  projectId: String
+
+  """[Internal] Related initiative for the document."""
+  initiativeId: String
 
   """The ID of the last template applied to the document."""
   lastAppliedTemplateId: String
 
-  """The order of the item in the project resources list."""
+  """The order of the item in the resources list."""
   sortOrder: Float
 }
 
@@ -2555,7 +2561,10 @@ type DocumentSearchResult implements Node {
   updatedBy: User!
 
   """The project that the document is associated with."""
-  project: Project!
+  project: Project
+
+  """[Internal] The initiative that the document is associated with."""
+  initiative: Initiative
 
   """The document's unique URL slug."""
   slugId: String!
@@ -2568,7 +2577,7 @@ type DocumentSearchResult implements Node {
   """
   hiddenAt: DateTime
 
-  """The order of the item in the project resources list."""
+  """The order of the item in the resources list."""
   sortOrder: Float!
 
   """The documents content in markdown format."""
@@ -2619,13 +2628,16 @@ input DocumentUpdateInput {
   """Related project for the document."""
   projectId: String
 
+  """[Internal] Related initiative for the document."""
+  initiativeId: String
+
   """The ID of the last template applied to the document."""
   lastAppliedTemplateId: String
 
   """The time at which the document was hidden."""
   hiddenAt: DateTime
 
-  """The order of the item in the project resources list."""
+  """The order of the item in the resources list."""
   sortOrder: Float
 }
 
@@ -2745,6 +2757,11 @@ input EmailUserAccountAuthChallengeInput {
 
   """The organization invite link to associate with this authentication."""
   inviteLink: String
+
+  """
+  Whether to only return the login code. This is used by mobile apps to skip showing the login link.
+  """
+  loginCodeOnly: Boolean
 }
 
 type EmailUserAccountAuthChallengeResponse {
@@ -4517,10 +4534,10 @@ type Issue implements Node {
   """The date at which the issue is due."""
   dueDate: TimelessDate
 
-  """[Internal] The time at which the issue's SLA began."""
+  """The time at which the issue's SLA began."""
   slaStartedAt: DateTime
 
-  """[Internal] The time at which the issue's SLA will breach."""
+  """The time at which the issue's SLA will breach."""
   slaBreachesAt: DateTime
 
   """A flag that indicates whether the issue is in the trash bin."""
@@ -6118,10 +6135,10 @@ type IssueSearchResult implements Node {
   """The date at which the issue is due."""
   dueDate: TimelessDate
 
-  """[Internal] The time at which the issue's SLA began."""
+  """The time at which the issue's SLA began."""
   slaStartedAt: DateTime
 
-  """[Internal] The time at which the issue's SLA will breach."""
+  """The time at which the issue's SLA will breach."""
   slaBreachesAt: DateTime
 
   """A flag that indicates whether the issue is in the trash bin."""
@@ -15135,7 +15152,7 @@ type SlackChannelNameMapping {
   isShared: Boolean
 
   """
-  Whether or not we the Linear Asks bot has been added to this Slack channel.
+  Whether or not the Linear Asks bot has been added to this Slack channel.
   """
   botAdded: Boolean
 
@@ -15183,7 +15200,7 @@ input SlackChannelNameMappingInput {
   isShared: Boolean
 
   """
-  Whether or not we the Linear Asks bot has been added to this Slack channel.
+  Whether or not the Linear Asks bot has been added to this Slack channel.
   """
   botAdded: Boolean
 
