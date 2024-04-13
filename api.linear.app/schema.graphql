@@ -8087,7 +8087,7 @@ type Mutation {
   """Creates a new label."""
   issueLabelCreate(
     """
-    Whether to replace all team-specific labels with the same name with this newly created workspace label.
+    Whether to replace all team-specific labels with the same name with this newly created workspace label (default: false).
     """
     replaceTeamLabels: Boolean
 
@@ -8097,6 +8097,11 @@ type Mutation {
 
   """Updates an label."""
   issueLabelUpdate(
+    """
+    Whether to replace all team-specific labels with the same name with this updated workspace label (default: false).
+    """
+    replaceTeamLabels: Boolean
+
     """A partial label object to update."""
     input: IssueLabelUpdateInput!
 
@@ -15670,6 +15675,9 @@ type Team implements Node {
 
   """Whether the team is private or not."""
   private: Boolean!
+
+  """Whether the team is managed by SCIM."""
+  scimManaged: Boolean!
 
   """
   The workflow state into which issues are moved when a PR has been opened as draft.
