@@ -143,6 +143,18 @@
             "deprecationReason": null
           },
           {
+            "name": "locationRegionCode",
+            "description": "Location region code.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "locationCity",
             "description": "Location city name.",
             "args": [],
@@ -6970,6 +6982,42 @@
                 "name": "IssueConnection",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userViewPreferences",
+            "description": "The current users view preferences for this custom view.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "ViewPreferences",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationViewPreferences",
+            "description": "The organizations default view preferences for this custom view.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "ViewPreferences",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "viewPreferencesValues",
+            "description": "The calculated view preferences values for this custom view.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "ViewPreferencesValues",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -25658,6 +25706,53 @@
       },
       {
         "kind": "OBJECT",
+        "name": "ViewPreferencesValues",
+        "description": null,
+        "fields": [
+          {
+            "name": "viewOrdering",
+            "description": "The issue ordering.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueGrouping",
+            "description": "The issue grouping.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "showCompletedIssues",
+            "description": "Whether to show completed issues.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "ViewPreferences",
         "description": "View preferences.",
         "fields": [
@@ -25747,6 +25842,22 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "preferences",
+            "description": "The view preferences",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ViewPreferencesValues",
                 "ofType": null
               }
             },
@@ -29092,6 +29203,18 @@
                   }
                 }
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "locationRegionCode",
+            "description": "Location region code.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -51588,8 +51711,8 @@
             "name": "filterData",
             "description": "The filter applied to issues in the custom view.",
             "type": {
-              "kind": "SCALAR",
-              "name": "JSONObject",
+              "kind": "INPUT_OBJECT",
+              "name": "IssueFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -51598,8 +51721,8 @@
             "name": "projectFilterData",
             "description": "The project filter applied to issues in the custom view.",
             "type": {
-              "kind": "SCALAR",
-              "name": "JSONObject",
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -51709,8 +51832,8 @@
             "name": "filterData",
             "description": "The filter applied to issues in the custom view.",
             "type": {
-              "kind": "SCALAR",
-              "name": "JSONObject",
+              "kind": "INPUT_OBJECT",
+              "name": "IssueFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -51719,8 +51842,8 @@
             "name": "projectFilterData",
             "description": "The project filter applied to issues in the custom view.",
             "type": {
-              "kind": "SCALAR",
-              "name": "JSONObject",
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -54773,6 +54896,16 @@
         "description": null,
         "fields": null,
         "inputFields": [
+          {
+            "name": "id",
+            "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
           {
             "name": "type",
             "description": "The type of relation of the project to the related project.",
@@ -73493,7 +73626,7 @@
           },
           {
             "name": "projectRelationCreate",
-            "description": "Creates a new project relation.",
+            "description": "[ALPHA] Creates a new project relation.",
             "args": [
               {
                 "name": "input",
@@ -73524,7 +73657,7 @@
           },
           {
             "name": "projectRelationUpdate",
-            "description": "Updates a project relation.",
+            "description": "[ALPHA] Updates a project relation.",
             "args": [
               {
                 "name": "input",
@@ -73569,7 +73702,7 @@
           },
           {
             "name": "projectRelationDelete",
-            "description": "Deletes a project relation.",
+            "description": "[ALPHA] Deletes a project relation.",
             "args": [
               {
                 "name": "id",

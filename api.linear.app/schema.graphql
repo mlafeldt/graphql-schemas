@@ -567,6 +567,9 @@ type AuthenticationSession {
   """Country codes of all seen locations."""
   countryCodes: [String!]!
 
+  """Location region code."""
+  locationRegionCode: String
+
   """Location city name."""
   locationCity: String
 
@@ -616,6 +619,9 @@ type AuthenticationSessionResponse {
 
   """Country codes of all seen locations."""
   countryCodes: [String!]!
+
+  """Location region code."""
+  locationRegionCode: String
 
   """Location city name."""
   locationCity: String
@@ -1501,6 +1507,15 @@ type CustomView implements Node {
     """[INTERNAL] Sort returned issues."""
     sort: [IssueSortInput!]
   ): IssueConnection!
+
+  """The current users view preferences for this custom view."""
+  userViewPreferences: ViewPreferences
+
+  """The organizations default view preferences for this custom view."""
+  organizationViewPreferences: ViewPreferences
+
+  """The calculated view preferences values for this custom view."""
+  viewPreferencesValues: ViewPreferencesValues
 }
 
 type CustomViewConnection {
@@ -1540,10 +1555,10 @@ input CustomViewCreateInput {
   filters: JSONObject
 
   """The filter applied to issues in the custom view."""
-  filterData: JSONObject
+  filterData: IssueFilter
 
   """The project filter applied to issues in the custom view."""
-  projectFilterData: JSONObject
+  projectFilterData: ProjectFilter
 
   """Whether the custom view is shared with everyone in the organization."""
   shared: Boolean
@@ -1674,10 +1689,10 @@ input CustomViewUpdateInput {
   filters: JSONObject
 
   """The filter applied to issues in the custom view."""
-  filterData: JSONObject
+  filterData: IssueFilter
 
   """The project filter applied to issues in the custom view."""
-  projectFilterData: JSONObject
+  projectFilterData: ProjectFilter
 
   """Whether the custom view is shared with everyone in the organization."""
   shared: Boolean
@@ -8459,13 +8474,13 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
-  """Creates a new project relation."""
+  """[ALPHA] Creates a new project relation."""
   projectRelationCreate(
     """The project relation to create."""
     input: ProjectRelationCreateInput!
   ): ProjectRelationPayload!
 
-  """Updates a project relation."""
+  """[ALPHA] Updates a project relation."""
   projectRelationUpdate(
     """The properties of the project relation to update."""
     input: ProjectRelationUpdateInput!
@@ -8474,7 +8489,7 @@ type Mutation {
     id: String!
   ): ProjectRelationPayload!
 
-  """Deletes a project relation."""
+  """[ALPHA] Deletes a project relation."""
   projectRelationDelete(
     """The identifier of the project relation to delete."""
     id: String!
@@ -12012,6 +12027,11 @@ type ProjectRelationConnection {
 }
 
 input ProjectRelationCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
   """The type of relation of the project to the related project."""
   type: String!
 
@@ -17835,6 +17855,9 @@ type ViewPreferences implements Node {
 
   """The view type."""
   viewType: String!
+
+  """The view preferences"""
+  preferences: ViewPreferencesValues!
 }
 
 input ViewPreferencesCreateInput {
@@ -17907,6 +17930,17 @@ input ViewPreferencesUpdateInput {
 
   """The default parameters for the insight on that view."""
   insights: JSONObject
+}
+
+type ViewPreferencesValues {
+  """The issue ordering."""
+  viewOrdering: String
+
+  """The issue grouping."""
+  issueGrouping: String
+
+  """Whether to show completed issues."""
+  showCompletedIssues: String
 }
 
 """The client view this custom view is targeting."""
