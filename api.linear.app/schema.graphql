@@ -2885,6 +2885,97 @@ interface Entity {
   archivedAt: DateTime
 }
 
+"""An external link for an entity like initiative, etc..."""
+type EntityExternalLink implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The link's URL."""
+  url: String!
+
+  """The link's label."""
+  label: String!
+
+  """The order of the item in the resources list."""
+  sortOrder: Float!
+
+  """The user who created the link."""
+  creator: User!
+
+  """The initiative that the link is associated with."""
+  initiative: Initiative!
+}
+
+type EntityExternalLinkConnection {
+  edges: [EntityExternalLinkEdge!]!
+  nodes: [EntityExternalLink!]!
+  pageInfo: PageInfo!
+}
+
+input EntityExternalLinkCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The URL of the link."""
+  url: String!
+
+  """The label for the link."""
+  label: String!
+
+  """Related initiative link."""
+  initiativeId: String!
+
+  """The order of the item in the entities resources list."""
+  sortOrder: Float
+}
+
+type EntityExternalLinkEdge {
+  node: EntityExternalLink!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type EntityExternalLinkPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The link that was created or updated."""
+  entityExternalLink: EntityExternalLink!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input EntityExternalLinkUpdateInput {
+  """The URL of the link."""
+  url: String
+
+  """The label for the link."""
+  label: String
+
+  """The order of the item in the entities resources list."""
+  sortOrder: Float
+}
+
 """Comparator for estimates."""
 input EstimateComparator {
   """Equals constraint."""
@@ -3783,6 +3874,33 @@ type Initiative implements Node {
     """
     orderBy: PaginationOrderBy
   ): ProjectConnection!
+
+  """Links associated with the initiative."""
+  links(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): EntityExternalLinkConnection!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -5530,6 +5648,7 @@ type IssueHistory implements Node {
   [Internal] Serialized JSON representing changes for certain non-relational properties.
   """
   changes: JSONObject
+  triageResponsibilityNotifiedUsers: [User!]
 
   """The bot that performed the action."""
   botActor: ActorBot
@@ -7422,6 +7541,27 @@ type Mutation {
   """Deletes an emoji."""
   emojiDelete(
     """The identifier of the emoji to delete."""
+    id: String!
+  ): DeletePayload!
+
+  """Creates a new entity link."""
+  entityExternalLinkCreate(
+    """The entity link object to create."""
+    input: EntityExternalLinkCreateInput!
+  ): EntityExternalLinkPayload!
+
+  """Updates an entity link."""
+  entityExternalLinkUpdate(
+    """The entity link object to update."""
+    input: EntityExternalLinkUpdateInput!
+
+    """The identifier of the entity link to update."""
+    id: String!
+  ): EntityExternalLinkPayload!
+
+  """Deletes an entity link."""
+  entityExternalLinkDelete(
+    """The identifier of the entity link to delete."""
     id: String!
   ): DeletePayload!
 
@@ -13417,6 +13557,9 @@ type Query {
     """The identifier or the name of the emoji to retrieve."""
     id: String!
   ): Emoji!
+
+  """One specific entity link."""
+  entityExternalLink(id: String!): EntityExternalLink!
 
   """All external users for the organization."""
   externalUsers(
