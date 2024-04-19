@@ -839,6 +839,14 @@ type AuthOrganizationDomain {
   authType: OrganizationDomainAuthType!
 }
 
+type AuthOrganizationExistsPayload {
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """Whether the organization exists."""
+  exists: Boolean!
+}
+
 """An invitation to the organization that has been sent via email."""
 type AuthOrganizationInvite {
   """The unique identifier of the entity."""
@@ -848,6 +856,22 @@ type AuthOrganizationInvite {
   The time at which the invite will be expiring. Null, if the invite shouldn't expire.
   """
   expiresAt: DateTime
+}
+
+type AuthOrganizationPayload {
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The auth organization that was updated."""
+  authOrganization: AuthOrganization!
+}
+
+input AuthOrganizationUpdateInput {
+  """The organization's unique URL key."""
+  urlKey: String
+
+  """The organization's unique invite hash."""
+  inviteHash: String
 }
 
 """
@@ -3816,7 +3840,7 @@ type Initiative implements Node {
   """The name of the initiative."""
   name: String!
 
-  """The description of the initiative."""
+  """[Internal] The description of the initiative."""
   description: String
 
   """The organization of the initiative."""
@@ -3967,7 +3991,7 @@ input InitiativeCreateInput {
   """The name of the initiative."""
   name: String!
 
-  """The description of the initiative."""
+  """[Internal] The description of the initiative."""
   description: String
 
   """The owner of the initiative."""
@@ -4110,7 +4134,7 @@ input InitiativeUpdateInput {
   """The name of the initiative."""
   name: String
 
-  """The description of the initiative."""
+  """[Internal] The description of the initiative."""
   description: String
 
   """The owner of the initiative."""
@@ -17698,6 +17722,8 @@ enum UserFlagType {
   issueMovePromptCompleted
   migrateThemePreference
   listSelectionTip
+  emptyParagraphSlashCommandTip
+  editorSlashCommandUsed
   canPlaySnake
   canPlayTetris
   importBannerDismissed
