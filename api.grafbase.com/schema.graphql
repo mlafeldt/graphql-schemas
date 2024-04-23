@@ -211,7 +211,7 @@ type BranchConnection {
   nodes: [Branch!]!
 }
 
-union BranchDeletePayload = Query | BranchDoesNotExistError
+union BranchDeletePayload = Query | BranchDoesNotExistError | CannotDeleteProductionBranchError
 
 type BranchDoesNotExistError {
   query: Query!
@@ -255,6 +255,10 @@ input BranchUpdateInput {
 union BranchUpdatePayload = Query | ProjectDoesNotExistError
 
 type CannotBeRenamedError {
+  query: Query!
+}
+
+type CannotDeleteProductionBranchError {
   query: Query!
 }
 
