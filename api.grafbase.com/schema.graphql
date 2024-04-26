@@ -428,6 +428,13 @@ type Deployment implements Node {
   diffAgainstLatestProductionDeployment: String
 }
 
+input DeploymentBySlugCreateInput {
+  accountSlug: String!
+  projectSlug: String!
+  archiveFileSize: Int!
+  branch: String
+}
+
 type DeploymentConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
@@ -1024,6 +1031,9 @@ type Mutation {
   without changing the domain name.
   """
   customDomainReplace(input: CustomDomainReplaceInput!): CustomDomainReplacePayload!
+
+  """Create a new deployment for an existing project by slugs."""
+  deploymentCreateBySlug(input: DeploymentBySlugCreateInput!): DeploymentCreatePayload!
 
   """Create a new deployment for an existing project."""
   deploymentCreate(input: DeploymentCreateInput!): DeploymentCreatePayload!
@@ -2028,6 +2038,9 @@ type Query {
 
     """name of the subgraph"""
     subgraphName: String
+
+    """return only versions with changes"""
+    populated: Boolean! = true
     after: String
     before: String
     first: Int
