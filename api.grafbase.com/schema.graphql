@@ -543,6 +543,14 @@ type EmptyDatabaseRegionsError {
   query: Query!
 }
 
+input EnviromentVariableUpsertInput {
+  accountSlug: String!
+  projectSlug: String!
+  name: String!
+  value: String!
+  environments: [BranchEnvironment!]!
+}
+
 type EnvironmentVariable implements Node {
   id: ID!
   name: String!
@@ -1049,6 +1057,9 @@ type Mutation {
 
   """Update an environment variable."""
   environmentVariableUpdate(input: EnvironmentVariableUpdateInput!): EnvironmentVariableUpdatePayload!
+
+  """Create or update an environment variable."""
+  environentVariableUpsert(input: EnviromentVariableUpsertInput!): EnvironmentVariableCreatePayload!
 
   """Delete an environment variable."""
   environmentVariableDelete(input: EnvironmentVariableDeleteInput!): EnvironmentVariableDeletePayload!
