@@ -7523,6 +7523,17 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """
+  Adds a document reminder. Will cause a notification to be sent when the issue reminder time is reached.
+  """
+  documentReminder(
+    """The time when a reminder notification will be sent."""
+    reminderAt: DateTime!
+
+    """The identifier of the document to add a reminder for."""
+    id: String!
+  ): DocumentPayload!
+
   """Creates a new email intake address."""
   emailIntakeAddressCreate(
     """The email intake address object to create."""
@@ -10022,6 +10033,7 @@ input NullableTemplateFilter {
   or: [NullableTemplateFilter!]
 }
 
+"""Comparator for optional timeless dates."""
 input NullableTimelessDateComparator {
   """Equals constraint."""
   eq: TimelessDate
@@ -14904,6 +14916,46 @@ enum ReleaseChannel {
   beta
   preRelease
   public
+}
+
+"""A reminder that can be attached to different entities."""
+type Reminder implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The user that created a reminder."""
+  user: User!
+
+  """The time when a reminder triggers a notification in users inbox."""
+  remindAt: DateTime!
+
+  """The reminder's comment."""
+  comment: String
+
+  """The issue that the reminder is associated with."""
+  issueId: Issue
+
+  """The document that the reminder is associated with."""
+  documentId: Document
+
+  """The project that the reminder is associated with."""
+  projectId: Project
 }
 
 """A roadmap for projects."""
