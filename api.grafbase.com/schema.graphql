@@ -585,10 +585,29 @@ input EnvironmentVariableCreateInput {
   environments: [BranchEnvironment!]!
 }
 
-union EnvironmentVariableCreatePayload = EnvironmentVariableCreateSuccess | NameAlreadyExistsError | NameTooLongError | NameContainsInvalidCharactersError | ValueTooLongError | ReservedPrefixError | ProjectDoesNotExistError
+union EnvironmentVariableCreatePayload = EnvironmentVariableCreateSuccess | NameAlreadyExistsError | NameTooLongError | NameContainsInvalidCharactersError | ValueTooLongError | ReservedPrefixError | NoEnvironmentsSetError | ProjectDoesNotExistError
 
 type EnvironmentVariableCreateSuccess {
   environmentVariable: EnvironmentVariable!
+  query: Query!
+}
+
+input EnvironmentVariableDeleteByValuesInput {
+  projectId: ID!
+  name: String!
+  environments: [BranchEnvironment!]!
+}
+
+union EnvironmentVariableDeleteByValuesPayload = EnvironmentVariableDeleteByValuesSuccess | EnvironmentVariableDoesNotExistError
+
+input EnvironmentVariableDeleteByValuesSlugsInput {
+  accountSlug: String!
+  projectSlug: String!
+  name: String!
+  environments: [BranchEnvironment!]!
+}
+
+type EnvironmentVariableDeleteByValuesSuccess {
   query: Query!
 }
 
@@ -628,7 +647,7 @@ input EnvironmentVariableUpdateInput {
   environments: [BranchEnvironment!]
 }
 
-union EnvironmentVariableUpdatePayload = EnvironmentVariableUpdateSuccess | EnvironmentVariableDoesNotExistError | NameAlreadyExistsError | NameTooLongError | NameContainsInvalidCharactersError | ValueTooLongError | ReservedPrefixError
+union EnvironmentVariableUpdatePayload = EnvironmentVariableUpdateSuccess | EnvironmentVariableDoesNotExistError | NameAlreadyExistsError | NameTooLongError | NameContainsInvalidCharactersError | ValueTooLongError | ReservedPrefixError | NoEnvironmentsSetError
 
 type EnvironmentVariableUpdateSuccess {
   environmentVariable: EnvironmentVariable!
@@ -777,6 +796,7 @@ enum InvalidEnvironmentVariableErrorType {
   VALUE_TOO_LONG
   RESERVED_PREFIX
   DUPLICATE
+  NO_ENVIRONMENTS_SET
 }
 
 type InvalidEnvironmentVariablesError {
@@ -1059,10 +1079,19 @@ type Mutation {
   environmentVariableUpdate(input: EnvironmentVariableUpdateInput!): EnvironmentVariableUpdatePayload!
 
   """Create or update an environment variable."""
-  environentVariableUpsert(input: EnviromentVariableUpsertInput!): EnvironmentVariableCreatePayload!
+  environentVariableUpsert(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
+
+  """Create or update an environment variable."""
+  environentVariableUpsertBySlug(input: EnviromentVariableUpsertInput!): EnvironmentVariableCreatePayload!
 
   """Delete an environment variable."""
   environmentVariableDelete(input: EnvironmentVariableDeleteInput!): EnvironmentVariableDeletePayload!
+
+  """Delete an environment variable with variable values."""
+  environmentVariableDeleteWithValues(input: EnvironmentVariableDeleteByValuesInput!): EnvironmentVariableDeleteByValuesPayload!
+
+  """Delete an environment variable with variable values."""
+  environmentVariableDeleteWithValuesBySlug(input: EnvironmentVariableDeleteByValuesSlugsInput!): EnvironmentVariableDeleteByValuesPayload!
   inviteSend(input: InviteSendInput!): InviteSendPayload!
   inviteCancel(input: InviteCancelInput!): InviteCancelPayload!
   inviteAccept(input: InviteAcceptInput!): InviteAcceptPayload!
@@ -1145,6 +1174,10 @@ type NameTooLongError {
 
 interface Node {
   id: ID!
+}
+
+type NoEnvironmentsSetError {
+  query: Query!
 }
 
 type NotAllowedError {
