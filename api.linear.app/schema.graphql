@@ -1499,6 +1499,36 @@ type CustomView implements Node {
   """The model name of the custom view."""
   modelName: String!
 
+  """Projects associated with the custom view."""
+  projects(
+    """Filter returned projects."""
+    filter: ProjectFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectConnection!
+
   """Issues associated with the custom view."""
   issues(
     """Filter returned issues."""
@@ -2087,36 +2117,36 @@ input CycleUpdateInput {
 """Comparator for dates."""
 input DateComparator {
   """Equals constraint."""
-  eq: DateTime
+  eq: DateTimeOrDuration
 
   """Not-equals constraint."""
-  neq: DateTime
+  neq: DateTimeOrDuration
 
   """In-array constraint."""
-  in: [DateTime!]
+  in: [DateTimeOrDuration!]
 
   """Not-in-array constraint."""
-  nin: [DateTime!]
+  nin: [DateTimeOrDuration!]
 
   """
   Less-than constraint. Matches any values that are less than the given value.
   """
-  lt: DateTime
+  lt: DateTimeOrDuration
 
   """
   Less-than-or-equal constraint. Matches any values that are less than or equal to the given value.
   """
-  lte: DateTime
+  lte: DateTimeOrDuration
 
   """
   Greater-than constraint. Matches any values that are greater than the given value.
   """
-  gt: DateTime
+  gt: DateTimeOrDuration
 
   """
   Greater-than-or-equal constraint. Matches any values that are greater than or equal to the given value.
   """
-  gte: DateTime
+  gte: DateTimeOrDuration
 }
 
 """[INTERNAL] By which resolution is a date defined."""
@@ -2134,6 +2164,14 @@ which are added to the current date to create the represented date (e.g '-P2W1D'
 represents the date that was two weeks and 1 day ago) 
 """
 scalar DateTime
+
+"""
+Represents a date and time in ISO 8601 format. Accepts shortcuts like `2021` to
+represent midnight Fri Jan 01 2021. Also accepts ISO 8601 durations strings
+which are added to the current date to create the represented date (e.g '-P2W1D'
+represents the date that was two weeks and 1 day ago) 
+"""
+scalar DateTimeOrDuration
 
 """The day of the week."""
 enum Day {
@@ -2161,6 +2199,85 @@ type DeletePayload implements ArchivePayload {
 
   """The identifier of the deleted entity."""
   entityId: String!
+}
+
+"""A diary entry"""
+type DiaryEntry implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """[Internal] The entry content as a Prosemirror document."""
+  bodyData: String!
+
+  """The user who the diary belongs to."""
+  user: User!
+
+  """The date for which the entry is created"""
+  date: TimelessDate!
+
+  """The canonical url for the DiaryEntry."""
+  url: String!
+}
+
+type DiaryEntryConnection {
+  edges: [DiaryEntryEdge!]!
+  nodes: [DiaryEntry!]!
+  pageInfo: PageInfo!
+}
+
+input DiaryEntryCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The date for which the entry is created."""
+  date: TimelessDate
+
+  """[Internal] The comment content as a Prosemirror diaryEntry."""
+  bodyData: JSON
+}
+
+type DiaryEntryEdge {
+  node: DiaryEntry!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type DiaryEntryPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The diary entry that was created or updated."""
+  diaryEntry: DiaryEntry!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input DiaryEntryUpdateInput {
+  """[Internal] The comment content as a Prosemirror diaryEntry."""
+  bodyData: JSON
+
+  """The date for which the entry is created."""
+  date: TimelessDate
 }
 
 """A document that can be attached to different entities."""
@@ -5781,6 +5898,15 @@ type IssueImportPayload {
   success: Boolean!
 }
 
+"""Whether an issue import can be synced at the end of an import or not"""
+type IssueImportSyncCheckPayload {
+  """Returns true if the import can be synced, false otherwise"""
+  canSync: Boolean!
+
+  """An error message with a root cause of why the import cannot be synced"""
+  error: String
+}
+
 input IssueImportUpdateInput {
   """The mapping configuration for the import."""
   mapping: JSONObject!
@@ -7500,6 +7626,27 @@ type Mutation {
     input: CycleShiftAllInput!
   ): CyclePayload!
 
+  """Creates a new diary entry."""
+  diaryEntryCreate(
+    """The diary entry to create."""
+    input: DiaryEntryCreateInput!
+  ): DiaryEntryPayload!
+
+  """Updates a diaryEntry."""
+  diaryEntryUpdate(
+    """A partial diary entry object to update the diary entry with."""
+    input: DiaryEntryUpdateInput!
+
+    """The identifier of the diary entry to update."""
+    id: String!
+  ): DiaryEntryPayload!
+
+  """Deletes a diaryEntry."""
+  diaryEntryDelete(
+    """The identifier of the diaryEntry to delete."""
+    id: String!
+  ): DeletePayload!
+
   """Creates a new document."""
   documentCreate(
     """The document to create."""
@@ -8105,6 +8252,9 @@ type Mutation {
 
     """GitHub token to fetch information from the GitHub API."""
     githubToken: String!
+
+    """ID of the Github repository from which we will import data."""
+    githubRepoId: String
 
     """GitHub repository name from which we will import data."""
     githubRepoName: String!
@@ -9537,16 +9687,16 @@ input NullableCycleFilter {
 """Comparator for optional dates."""
 input NullableDateComparator {
   """Equals constraint."""
-  eq: DateTime
+  eq: DateTimeOrDuration
 
   """Not-equals constraint."""
-  neq: DateTime
+  neq: DateTimeOrDuration
 
   """In-array constraint."""
-  in: [DateTime!]
+  in: [DateTimeOrDuration!]
 
   """Not-in-array constraint."""
-  nin: [DateTime!]
+  nin: [DateTimeOrDuration!]
 
   """
   Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.
@@ -9556,22 +9706,22 @@ input NullableDateComparator {
   """
   Less-than constraint. Matches any values that are less than the given value.
   """
-  lt: DateTime
+  lt: DateTimeOrDuration
 
   """
   Less-than-or-equal constraint. Matches any values that are less than or equal to the given value.
   """
-  lte: DateTime
+  lte: DateTimeOrDuration
 
   """
   Greater-than constraint. Matches any values that are greater than the given value.
   """
-  gt: DateTime
+  gt: DateTimeOrDuration
 
   """
   Greater-than-or-equal constraint. Matches any values that are greater than or equal to the given value.
   """
-  gte: DateTime
+  gte: DateTimeOrDuration
 }
 
 """Document content filtering options."""
@@ -10036,16 +10186,16 @@ input NullableTemplateFilter {
 """Comparator for optional timeless dates."""
 input NullableTimelessDateComparator {
   """Equals constraint."""
-  eq: TimelessDate
+  eq: TimelessDateOrDuration
 
   """Not-equals constraint."""
-  neq: TimelessDate
+  neq: TimelessDateOrDuration
 
   """In-array constraint."""
-  in: [TimelessDate!]
+  in: [TimelessDateOrDuration!]
 
   """Not-in-array constraint."""
-  nin: [TimelessDate!]
+  nin: [TimelessDateOrDuration!]
 
   """
   Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.
@@ -10055,22 +10205,22 @@ input NullableTimelessDateComparator {
   """
   Less-than constraint. Matches any values that are less than the given value.
   """
-  lt: TimelessDate
+  lt: TimelessDateOrDuration
 
   """
   Less-than-or-equal constraint. Matches any values that are less than or equal to the given value.
   """
-  lte: TimelessDate
+  lte: TimelessDateOrDuration
 
   """
   Greater-than constraint. Matches any values that are greater than the given value.
   """
-  gt: TimelessDate
+  gt: TimelessDateOrDuration
 
   """
   Greater-than-or-equal constraint. Matches any values that are greater than or equal to the given value.
   """
-  gte: TimelessDate
+  gte: TimelessDateOrDuration
 }
 
 """User filtering options."""
@@ -10468,6 +10618,9 @@ type Organization implements Node {
 
   """Whether member users are allowed to send invites."""
   allowMembersToInvite: Boolean
+
+  """[ALPHA] Theme settings for the organization."""
+  themeSettings: JSONObject
 
   """The feature release channel the organization belongs to."""
   releaseChannel: ReleaseChannel!
@@ -10921,6 +11074,14 @@ input OrganizationInviteUpdateInput {
   teamIds: [String!]!
 }
 
+type OrganizationMeta {
+  """The region the organization is hosted in."""
+  region: String!
+
+  """Allowed authentication providers, empty array means all are allowed."""
+  allowedAuthServices: [String!]!
+}
+
 type OrganizationPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -11009,6 +11170,9 @@ input OrganizationUpdateInput {
 
   """Whether member users are allowed to send invites."""
   allowMembersToInvite: Boolean
+
+  """[ALPHA] Theme settings for the organization."""
+  themeSettings: JSONObject
 }
 
 type PageInfo {
@@ -13528,6 +13692,9 @@ type Query {
   """One specific cycle."""
   cycle(id: String!): Cycle!
 
+  """One specific diary entry."""
+  diaryEntry(id: String!): DiaryEntry!
+
   """A collection of document content history entries."""
   documentContentHistory(id: String!): DocumentContentHistoryPayload!
 
@@ -13840,6 +14007,14 @@ type Query {
     service: String!
   ): IssueImportCheckPayload!
 
+  """
+  Checks whether it will be possible to setup sync for this project or repository at the end of import
+  """
+  issueImportCheckSync(
+    """The ID of the issue import for which to check sync eligibility"""
+    issueImportId: String!
+  ): IssueImportSyncCheckPayload!
+
   """All issue labels."""
   issueLabels(
     """Filter returned issue labels."""
@@ -14127,6 +14302,9 @@ type Query {
 
   """[Internal] All archived teams of the organization."""
   archivedTeams: [Team!]!
+
+  """[INTERNAL] Get organization metadata by urlKey or organization id."""
+  organizationMeta(urlKey: String!): OrganizationMeta
 
   """All links for the project."""
   projectLinks(
@@ -16989,37 +17167,44 @@ scalar TimelessDate
 """Comparator for timeless dates."""
 input TimelessDateComparator {
   """Equals constraint."""
-  eq: TimelessDate
+  eq: TimelessDateOrDuration
 
   """Not-equals constraint."""
-  neq: TimelessDate
+  neq: TimelessDateOrDuration
 
   """In-array constraint."""
-  in: [TimelessDate!]
+  in: [TimelessDateOrDuration!]
 
   """Not-in-array constraint."""
-  nin: [TimelessDate!]
+  nin: [TimelessDateOrDuration!]
 
   """
   Less-than constraint. Matches any values that are less than the given value.
   """
-  lt: TimelessDate
+  lt: TimelessDateOrDuration
 
   """
   Less-than-or-equal constraint. Matches any values that are less than or equal to the given value.
   """
-  lte: TimelessDate
+  lte: TimelessDateOrDuration
 
   """
   Greater-than constraint. Matches any values that are greater than the given value.
   """
-  gt: TimelessDate
+  gt: TimelessDateOrDuration
 
   """
   Greater-than-or-equal constraint. Matches any values that are greater than or equal to the given value.
   """
-  gte: TimelessDate
+  gte: TimelessDateOrDuration
 }
+
+"""
+Represents a date in ISO 8601 format or a duration. Accepts shortcuts like
+`2021` to represent midnight Fri Jan 01 2021. Also accepts ISO 8601 durations
+strings (e.g '-P2W1D'), which are not converted to dates.
+"""
+scalar TimelessDateOrDuration
 
 """A time schedule."""
 type TimeSchedule implements Node {
