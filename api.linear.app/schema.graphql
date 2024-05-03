@@ -11790,6 +11790,25 @@ input ProjectCreateInput {
   sortOrder: Float
 }
 
+input ProjectDetailSuggestionInput {
+  """The name of the project."""
+  name: String!
+
+  """The description for the project."""
+  description: String
+
+  """The content of the project as markdown."""
+  documentContent: String
+}
+
+type ProjectDetailSuggestionPayload {
+  """The suggested project color."""
+  color: String
+
+  """The suggested view icon."""
+  icon: String
+}
+
 type ProjectEdge {
   node: Project!
 
@@ -14436,6 +14455,11 @@ type Query {
   """Suggests filters for a project view based on a text prompt."""
   projectFilterSuggestion(prompt: String!): ProjectFilterSuggestionPayload!
 
+  """
+  [INTERNAL] Suggests icon, color for a project based on its info while composing.
+  """
+  projectDetailsSuggestion(project: ProjectDetailSuggestionInput!): ProjectDetailSuggestionPayload!
+
   """All interactions on project updates."""
   projectUpdateInteractions(
     """A cursor to be used with last for backward pagination."""
@@ -15121,8 +15145,11 @@ type Reminder implements Node {
   """The user that created a reminder."""
   user: User!
 
-  """The time when a reminder triggers a notification in users inbox."""
+  """The time when a reminder triggers a notification in the user's inbox."""
   remindAt: DateTime!
+
+  """Scheduling settings for recurring reminders."""
+  schedule: JSONObject!
 
   """The reminder's comment."""
   comment: String
