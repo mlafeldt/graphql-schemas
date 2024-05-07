@@ -1227,8 +1227,10 @@ type OperationNotAllowedByPlanError {
 
 input OperationRequestAnalyticsFilter {
   branch: String
-  period: ProjectRequestAnalyticsPeriod!
-  now: DateTime!
+  period: ProjectRequestAnalyticsPeriod
+  now: DateTime
+  from: DateTime
+  to: DateTime
   operationName: String
   operationTypes: [OperationType!]
 }
@@ -1659,6 +1661,11 @@ type PersonalAccountUpdateSuccess {
   query: Query!
 }
 
+type PreviousRequestAnalytcs {
+  timeSeries: RequestMetricsTimeSeries!
+  metrics: RequestMetrics!
+}
+
 type Project implements Node {
   id: ID!
   accountSlug: String!
@@ -1925,8 +1932,10 @@ union ProjectOperationCheckConfigurationUpdatePayload = ProjectDoesNotExistError
 
 input ProjectRequestAnalyticsFilter {
   branch: String = null
-  period: ProjectRequestAnalyticsPeriod!
-  now: DateTime!
+  period: ProjectRequestAnalyticsPeriod
+  now: DateTime
+  from: DateTime
+  to: DateTime
   graphqlOperation: String
   operationId: ID
 }
@@ -2113,6 +2122,7 @@ type RequestAnalytics {
   metrics: RequestMetrics!
   periodStart: DateTime!
   periodEnd: DateTime!
+  previousPeriodAnalytics: PreviousRequestAnalytcs
 }
 
 type RequestLogEvent implements LogEvent {
