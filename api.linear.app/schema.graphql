@@ -715,6 +715,9 @@ type AuthOauthClient {
   """The ID of the workspace the OAuth application belongs to."""
   organizationId: String!
 
+  """The resource types to request when creating new webhooks."""
+  webhookResourceTypes: [String!]!
+
   """Webhook URL"""
   webhookUrl: String
   archivedAt: DateTime
@@ -6985,6 +6988,11 @@ type JiraSettings {
 
   """Whether this integration is for Jira Server or not."""
   isJiraServer: Boolean
+
+  """
+  Whether the user needs to provide setup information about the webhook to complete the integration setup.
+  """
+  needsManualSetup: Boolean
 }
 
 input JiraSettingsInput {
@@ -6996,6 +7004,11 @@ input JiraSettingsInput {
 
   """Whether this integration is for Jira Server or not."""
   isJiraServer: Boolean = false
+
+  """
+  Whether the user needs to provide setup information about the webhook to complete the integration setup.
+  """
+  needsManualSetup: Boolean
 }
 
 input JiraUpdateInput {
@@ -7007,6 +7020,12 @@ input JiraUpdateInput {
 
   """Whether to refresh Jira metadata for the integration."""
   updateMetadata: Boolean
+
+  """Whether to delete the current manual webhook configuration."""
+  deleteWebhook: Boolean
+
+  """Webhook secret for a new manual configuration."""
+  webhookSecret: String
 }
 
 input JoinOrganizationInput {
