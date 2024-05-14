@@ -720,6 +720,9 @@ type AuthOauthClient {
 
   """Webhook URL"""
   webhookUrl: String
+
+  """Webhook secret"""
+  webhookSecret: String
   archivedAt: DateTime
 }
 
@@ -4156,6 +4159,62 @@ input InitiativeFilter {
 
   """Compound filters, one of which need to be matched by the initiative."""
   or: [InitiativeFilter!]
+}
+
+"""An initiative related notification."""
+type InitiativeNotification implements Notification & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """Notification type."""
+  type: String!
+
+  """The user that caused the notification."""
+  actor: User
+
+  """The external user that caused the notification."""
+  externalUserActor: ExternalUser
+
+  """The user that received the notification."""
+  user: User!
+
+  """
+  The time at when the user marked the notification as read. Null, if the the user hasn't read the notification
+  """
+  readAt: DateTime
+
+  """
+  The time at when an email reminder for this notification was sent to the user. Null, if no email
+      reminder has been sent.
+  """
+  emailedAt: DateTime
+
+  """
+  The time until a notification will be snoozed. After that it will appear in the inbox again.
+  """
+  snoozedUntilAt: DateTime
+
+  """The time at which a notification was unsnoozed.."""
+  unsnoozedAt: DateTime
+
+  """The bot that caused the notification."""
+  botActor: ActorBot
 }
 
 """[Internal] The payload returned by the initiative mutations."""
@@ -7690,17 +7749,6 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
-  """
-  Adds a document reminder. Will cause a notification to be sent when the issue reminder time is reached.
-  """
-  documentReminder(
-    """The time when a reminder notification will be sent."""
-    reminderAt: DateTime!
-
-    """The identifier of the document to add a reminder for."""
-    id: String!
-  ): DocumentPayload!
-
   """Creates a new email intake address."""
   emailIntakeAddressCreate(
     """The email intake address object to create."""
@@ -9417,6 +9465,9 @@ input NotificationEntityInput {
 
   """The id of the project related to the notification."""
   projectId: String
+
+  """The id of the initiative related to the notification."""
+  initiativeId: String
 
   """The id of the project update related to the notification."""
   projectUpdateId: String
@@ -15165,10 +15216,10 @@ type Reminder implements Node {
   user: User!
 
   """The time when a reminder triggers a notification in the user's inbox."""
-  remindAt: DateTime!
+  remindAt: DateTime
 
   """Scheduling settings for recurring reminders."""
-  schedule: JSONObject!
+  schedule: JSONObject
 
   """The reminder's comment."""
   comment: String
