@@ -4430,6 +4430,7 @@ enum IntegrationService {
   pagerDuty
   slack
   slackAsks
+  slackCustomViewNotifications
   slackOrgProjectUpdatesPost
   slackPersonal
   slackPost
@@ -4446,6 +4447,7 @@ type IntegrationSettings {
   slackAsks: SlackAsksSettings
   slackPost: SlackPostSettings
   slackProjectPost: SlackPostSettings
+  slackCustomViewNotifications: SlackPostSettings
   slackOrgProjectUpdatesPost: SlackPostSettings
   googleSheets: GoogleSheetsSettings
   gitHub: GitHubSettings
@@ -4467,6 +4469,7 @@ input IntegrationSettingsInput {
   slackAsks: SlackAsksSettingsInput
   slackPost: SlackPostSettingsInput
   slackProjectPost: SlackPostSettingsInput
+  slackCustomViewNotifications: SlackPostSettingsInput
   slackOrgProjectUpdatesPost: SlackPostSettingsInput
   googleSheets: GoogleSheetsSettingsInput
   gitHub: GitHubSettingsInput
@@ -5920,6 +5923,9 @@ type IssueImport implements Node {
 
   """Error code and metadata, if one has occurred during the import."""
   errorMetadata: JSONObject
+
+  """Metadata related to import service."""
+  serviceMetadata: JSONObject
 }
 
 type IssueImportCheckPayload {
@@ -7574,6 +7580,20 @@ type Mutation {
     input: GoogleUserAccountAuthInput!
   ): AuthResolverResponse!
 
+  """Starts passkey login process."""
+  passkeyLoginStart(
+    """Random ID to start passkey login with."""
+    authId: String!
+  ): PasskeyLoginStartResponse!
+
+  """Finish passkey login process."""
+  passkeyLoginFinish(
+    response: JSONObject!
+
+    """Random ID to start passkey login with."""
+    authId: String!
+  ): AuthResolverResponse!
+
   """Creates an organization from onboarding."""
   createOrganizationFromOnboarding(
     """Onboarding survey."""
@@ -8185,6 +8205,18 @@ type Mutation {
 
     """Integration's associated project."""
     projectId: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): SlackChannelConnectPayload!
+
+  """Slack integration for custom view notifications."""
+  integrationSlackCustomViewNotifications(
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """Integration's associated custom view."""
+    customViewId: String!
 
     """The Slack OAuth code."""
     code: String!
@@ -11341,6 +11373,28 @@ type PaidSubscription implements Node {
 
   """The date the subscription will be billed next."""
   nextBillingAt: DateTime
+}
+
+"""Registered passkey for authentication."""
+type Passkey {
+  id: String!
+  label: String!
+  aaguid: String!
+
+  """Date when the passkey was last updated."""
+  updatedAt: DateTime!
+  lastUsedSessionId: String
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """The time when the passkey was last used."""
+  lastUsedAt: DateTime!
+}
+
+type PasskeyLoginStartResponse {
+  success: Boolean!
+  options: JSONObject!
 }
 
 """Issue priority sorting options."""
