@@ -1225,6 +1225,22 @@
             "deprecationReason": null
           },
           {
+            "name": "enabled",
+            "description": "Whether the organization is enabled. Used as a superuser tool to lock down the org.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "urlKey",
             "description": "The organization's unique URL key.",
             "args": [],
@@ -1718,6 +1734,22 @@
             "deprecationReason": null
           },
           {
+            "name": "role",
+            "description": "Whether the user is an organization admin or guest on a database level.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "UserRoleType",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "active",
             "description": "Whether the user is active.",
             "args": [],
@@ -1769,6 +1801,35 @@
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "UserRoleType",
+        "description": "The different permission roles available to users on an organization.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "admin",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "guest",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "user",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -12407,6 +12468,12 @@
             "deprecationReason": null
           },
           {
+            "name": "githubImport",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "githubPersonal",
             "description": null,
             "isDeprecated": false,
@@ -15940,35 +16007,6 @@
         "possibleTypes": null
       },
       {
-        "kind": "ENUM",
-        "name": "UserRoleType",
-        "description": "The different permission roles available to users on an organization.",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "admin",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "guest",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "user",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
-      },
-      {
         "kind": "OBJECT",
         "name": "IntercomSettings",
         "description": "Intercom specific settings.",
@@ -16363,6 +16401,124 @@
                   "name": "TeamRepoMapping",
                   "ofType": null
                 }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "orgType",
+            "description": "The type of Github org",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "GithubOrgType",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "GithubOrgType",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "user",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organization",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "GitHubImportSettings",
+        "description": "Metadata and settings for a GitHub import integration.",
+        "fields": [
+          {
+            "name": "orgLogin",
+            "description": "The GitHub organization's name.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "orgAvatarUrl",
+            "description": "The avatar URL for the GitHub organization.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "repositories",
+            "description": "The names of the repositories connected for the GitHub integration.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GitHubRepo",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "orgType",
+            "description": "The type of Github org",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "GithubOrgType",
+                "ofType": null
               }
             },
             "isDeprecated": false,
@@ -16821,8 +16977,20 @@
             "deprecationReason": null
           },
           {
-            "name": "needsManualSetup",
-            "description": "Whether the user needs to provide setup information about the webhook to complete the integration setup.",
+            "name": "setupPending",
+            "description": "Whether the user needs to provide setup information about the webhook to complete the integration setup. Only relevant for integrations that use a manual setup flow",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "manualSetup",
+            "description": "Whether this integration is using a manual setup flow.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -17196,6 +17364,18 @@
             "type": {
               "kind": "OBJECT",
               "name": "GitHubSettings",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "gitHubImport",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "GitHubImportSettings",
               "ofType": null
             },
             "isDeprecated": false,
@@ -32888,171 +33068,6 @@
       },
       {
         "kind": "OBJECT",
-        "name": "GithubRepo",
-        "description": "Relevant information for the GitHub repository.",
-        "fields": [
-          {
-            "name": "id",
-            "description": "The id of the GitHub repository.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "name",
-            "description": "The name of the GitHub repository.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "GithubOrg",
-        "description": "Relevant information for the GitHub organization.",
-        "fields": [
-          {
-            "name": "id",
-            "description": "GitHub organization id.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "login",
-            "description": "The login for the GitHub organization.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "repositories",
-            "description": "Repositories that the organization owns.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "GithubRepo",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "isPersonal",
-            "description": "Whether or not this org is the user's personal repositories.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "GithubOAuthTokenPayload",
-        "description": "GitHub OAuth token, plus information about the organizations the user is a member of.",
-        "fields": [
-          {
-            "name": "token",
-            "description": "The OAuth token if the operation to fetch it was successful.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizations",
-            "description": "A list of the GitHub organizations the user is a member of with attached repositories.",
-            "args": [],
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "GithubOrg",
-                  "ofType": null
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
         "name": "IssueImportSyncCheckPayload",
         "description": "Whether an issue import can be synced at the end of an import or not",
         "fields": [
@@ -43596,6 +43611,91 @@
               }
             },
             "defaultValue": null
+          },
+          {
+            "name": "orgType",
+            "description": "The type of Github org",
+            "type": {
+              "kind": "ENUM",
+              "name": "GithubOrgType",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "GitHubImportSettingsInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "orgLogin",
+            "description": "The GitHub organization's name.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "orgAvatarUrl",
+            "description": "The avatar URL for the GitHub organization.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "repositories",
+            "description": "The names of the repositories connected for the GitHub integration.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "GitHubRepoInput",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "orgType",
+            "description": "The type of Github org",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "GithubOrgType",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -44002,8 +44102,18 @@
             "defaultValue": "false"
           },
           {
-            "name": "needsManualSetup",
-            "description": "Whether the user needs to provide setup information about the webhook to complete the integration setup.",
+            "name": "setupPending",
+            "description": "Whether the user needs to provide setup information about the webhook to complete the integration setup. Only relevant for integrations that use a manual setup flow",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "manualSetup",
+            "description": "Whether this integration is using a manual setup flow.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -44332,6 +44442,16 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "GitHubSettingsInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "gitHubImport",
+            "description": null,
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "GitHubImportSettingsInput",
               "ofType": null
             },
             "defaultValue": null
@@ -55157,10 +55277,20 @@
           },
           {
             "name": "project",
-            "description": "The Jira project keys to scope the integration to.",
+            "description": "[DEPRECATED] The Jira project keys to scope the integration to.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "manualSetup",
+            "description": "Whether this integration will be setup using the manual webhook flow.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
               "ofType": null
             },
             "defaultValue": null
@@ -65383,37 +65513,6 @@
             "deprecationReason": null
           },
           {
-            "name": "issueImportFinishGithubOAuth",
-            "description": "Fetches the GitHub token, completing the OAuth flow.",
-            "args": [
-              {
-                "name": "code",
-                "description": "OAuth code.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "GithubOAuthTokenPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "issueImportCheckCSV",
             "description": "Checks a CSV file validity against a specific import service.",
             "args": [
@@ -72481,6 +72580,37 @@
             "deprecationReason": null
           },
           {
+            "name": "integrationGithubImportConnect",
+            "description": "Connects the organization with the GitHub Import App.",
+            "args": [
+              {
+                "name": "installationId",
+                "description": "The GitHub data to connect with.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IntegrationPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "integrationGitlabConnect",
             "description": "Connects the organization with a GitLab Access Token.",
             "args": [
@@ -74034,21 +74164,7 @@
               },
               {
                 "name": "githubToken",
-                "description": "GitHub token to fetch information from the GitHub API.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "githubRepoId",
-                "description": "ID of the Github repository from which we will import data.",
+                "description": "[DEPRECATED] GitHub token to fetch information from the GitHub API.",
                 "type": {
                   "kind": "SCALAR",
                   "name": "String",
@@ -74058,21 +74174,55 @@
               },
               {
                 "name": "githubRepoName",
-                "description": "GitHub repository name from which we will import data.",
+                "description": "[DEPRECATED] GitHub repository name from which we will import data.",
                 "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
                 },
                 "defaultValue": null
               },
               {
                 "name": "githubRepoOwner",
-                "description": "GitHub owner (user or org) for the repository from which we will import data.",
+                "description": "[DEPRECATED] GitHub owner (user or org) for the repository from which we will import data.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "githubRepoId",
+                "description": "[DEPRECATED] ID of the Github repository from which we will import data.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "githubRepoIds",
+                "description": "IDs of the Github repositories from which we will import data.",
+                "type": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "integrationId",
+                "description": "ID of the Github import integration to use to access issues.",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -74110,16 +74260,6 @@
                 "type": {
                   "kind": "SCALAR",
                   "name": "Boolean",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "id",
-                "description": "ID of issue import. If not provided it will be generated.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
                   "ofType": null
                 },
                 "defaultValue": null
@@ -74545,6 +74685,47 @@
                   "kind": "SCALAR",
                   "name": "Boolean",
                   "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "ID of issue import. If not provided it will be generated.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueImportPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueImportCreateLinearV2",
+            "description": "[INTERNAL] Kicks off a Linear to Linear import job.",
+            "args": [
+              {
+                "name": "linearSourceOrganizationId",
+                "description": "The source organization to import from.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
                 },
                 "defaultValue": null
               },

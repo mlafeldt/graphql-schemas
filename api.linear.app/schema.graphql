@@ -798,6 +798,11 @@ type AuthOrganization {
   """The organization's name."""
   name: String!
 
+  """
+  Whether the organization is enabled. Used as a superuser tool to lock down the org.
+  """
+  enabled: Boolean!
+
   """The organization's unique URL key."""
   urlKey: String!
 
@@ -970,6 +975,11 @@ type AuthUser {
 
   """An URL to the user's avatar image."""
   avatarUrl: String
+
+  """
+  Whether the user is an organization admin or guest on a database level.
+  """
+  role: UserRoleType!
 
   """Whether the user is active."""
   active: Boolean!
@@ -3759,32 +3769,38 @@ type GitHubCommitIntegrationPayload {
   webhookSecret: String!
 }
 
-"""
-GitHub OAuth token, plus information about the organizations the user is a member of.
-"""
-type GithubOAuthTokenPayload {
-  """The OAuth token if the operation to fetch it was successful."""
-  token: String
+"""Metadata and settings for a GitHub import integration."""
+type GitHubImportSettings {
+  """The GitHub organization's name."""
+  orgLogin: String!
 
-  """
-  A list of the GitHub organizations the user is a member of with attached repositories.
-  """
-  organizations: [GithubOrg!]
+  """The avatar URL for the GitHub organization."""
+  orgAvatarUrl: String!
+
+  """The names of the repositories connected for the GitHub integration."""
+  repositories: [GitHubRepo!]!
+
+  """The type of Github org"""
+  orgType: GithubOrgType!
 }
 
-"""Relevant information for the GitHub organization."""
-type GithubOrg {
-  """GitHub organization id."""
-  id: String!
+input GitHubImportSettingsInput {
+  """The GitHub organization's name."""
+  orgLogin: String!
 
-  """The login for the GitHub organization."""
-  login: String!
+  """The avatar URL for the GitHub organization."""
+  orgAvatarUrl: String!
 
-  """Repositories that the organization owns."""
-  repositories: [GithubRepo!]!
+  """The names of the repositories connected for the GitHub integration."""
+  repositories: [GitHubRepoInput!]!
 
-  """Whether or not this org is the user's personal repositories."""
-  isPersonal: Boolean
+  """The type of Github org"""
+  orgType: GithubOrgType!
+}
+
+enum GithubOrgType {
+  user
+  organization
 }
 
 """Metadata and settings for a GitHub Personal integration."""
@@ -3796,15 +3812,6 @@ type GitHubPersonalSettings {
 input GitHubPersonalSettingsInput {
   """The GitHub user's name."""
   login: String!
-}
-
-"""Relevant information for the GitHub repository."""
-type GithubRepo {
-  """The id of the GitHub repository."""
-  id: String!
-
-  """The name of the GitHub repository."""
-  name: String!
 }
 
 """GitHub repos available to sync."""
@@ -3837,6 +3844,9 @@ type GitHubSettings {
 
   """Mapping of team to repository for syncing."""
   repositoriesMapping: [TeamRepoMapping!]
+
+  """The type of Github org"""
+  orgType: GithubOrgType
 }
 
 input GitHubSettingsInput {
@@ -3851,6 +3861,9 @@ input GitHubSettingsInput {
 
   """Mapping of team to repository for syncing."""
   repositoriesMapping: [TeamRepoMappingInput!]
+
+  """The type of Github org"""
+  orgType: GithubOrgType
 }
 
 """Metadata and settings for a GitLab integration."""
@@ -4417,6 +4430,7 @@ enum IntegrationService {
   front
   github
   githubCommit
+  githubImport
   githubPersonal
   gitlab
   googleCalendarPersonal
@@ -4451,6 +4465,7 @@ type IntegrationSettings {
   slackOrgProjectUpdatesPost: SlackPostSettings
   googleSheets: GoogleSheetsSettings
   gitHub: GitHubSettings
+  gitHubImport: GitHubImportSettings
   gitHubPersonal: GitHubPersonalSettings
   gitLab: GitLabSettings
   sentry: SentrySettings
@@ -4473,6 +4488,7 @@ input IntegrationSettingsInput {
   slackOrgProjectUpdatesPost: SlackPostSettingsInput
   googleSheets: GoogleSheetsSettingsInput
   gitHub: GitHubSettingsInput
+  gitHubImport: GitHubImportSettingsInput
   gitHubPersonal: GitHubPersonalSettingsInput
   gitLab: GitLabSettingsInput
   sentry: SentrySettingsInput
@@ -6972,8 +6988,11 @@ input JiraConfigurationInput {
   """The Jira installation hostname."""
   hostname: String!
 
-  """The Jira project keys to scope the integration to."""
+  """[DEPRECATED] The Jira project keys to scope the integration to."""
   project: String
+
+  """Whether this integration will be setup using the manual webhook flow."""
+  manualSetup: Boolean
 }
 
 """Tuple for mapping Jira projects to Linear teams."""
@@ -7055,9 +7074,14 @@ type JiraSettings {
   isJiraServer: Boolean
 
   """
-  Whether the user needs to provide setup information about the webhook to complete the integration setup.
+  Whether the user needs to provide setup information about the webhook to
+  complete the integration setup. Only relevant for integrations that use a
+  manual setup flow
   """
-  needsManualSetup: Boolean
+  setupPending: Boolean
+
+  """Whether this integration is using a manual setup flow."""
+  manualSetup: Boolean
 }
 
 input JiraSettingsInput {
@@ -7071,9 +7095,14 @@ input JiraSettingsInput {
   isJiraServer: Boolean = false
 
   """
-  Whether the user needs to provide setup information about the webhook to complete the integration setup.
+  Whether the user needs to provide setup information about the webhook to
+  complete the integration setup. Only relevant for integrations that use a
+  manual setup flow
   """
-  needsManualSetup: Boolean
+  setupPending: Boolean
+
+  """Whether this integration is using a manual setup flow."""
+  manualSetup: Boolean
 }
 
 input JiraUpdateInput {
@@ -8019,6 +8048,12 @@ type Mutation {
     installationId: String!
   ): IntegrationPayload!
 
+  """Connects the organization with the GitHub Import App."""
+  integrationGithubImportConnect(
+    """The GitHub data to connect with."""
+    installationId: String!
+  ): IntegrationPayload!
+
   """Connects the organization with a GitLab Access Token."""
   integrationGitlabConnect(
     """The URL of the GitLab installation."""
@@ -8350,19 +8385,27 @@ type Mutation {
     """Name of new team. When teamId is not set."""
     teamName: String
 
-    """GitHub token to fetch information from the GitHub API."""
-    githubToken: String!
+    """[DEPRECATED] GitHub token to fetch information from the GitHub API."""
+    githubToken: String
 
-    """ID of the Github repository from which we will import data."""
+    """[DEPRECATED] GitHub repository name from which we will import data."""
+    githubRepoName: String
+
+    """
+    [DEPRECATED] GitHub owner (user or org) for the repository from which we will import data.
+    """
+    githubRepoOwner: String
+
+    """
+    [DEPRECATED] ID of the Github repository from which we will import data.
+    """
     githubRepoId: String
 
-    """GitHub repository name from which we will import data."""
-    githubRepoName: String!
+    """IDs of the Github repositories from which we will import data."""
+    githubRepoIds: [Int!]
 
-    """
-    GitHub owner (user or org) for the repository from which we will import data.
-    """
-    githubRepoOwner: String!
+    """ID of the Github import integration to use to access issues."""
+    integrationId: String!
 
     """Whether or not we should import GitHub organization level projects."""
     githubShouldImportOrgProjects: Boolean
@@ -8374,9 +8417,6 @@ type Mutation {
 
     """Whether or not we should collect the data for closed issues."""
     includeClosedIssues: Boolean
-
-    """ID of issue import. If not provided it will be generated."""
-    id: String
   ): IssueImportPayload!
 
   """Kicks off a Jira import job."""
@@ -8495,6 +8535,15 @@ type Mutation {
 
     """Whether or not we should collect the data for closed issues."""
     includeClosedIssues: Boolean
+
+    """ID of issue import. If not provided it will be generated."""
+    id: String
+  ): IssueImportPayload!
+
+  """[INTERNAL] Kicks off a Linear to Linear import job."""
+  issueImportCreateLinearV2(
+    """The source organization to import from."""
+    linearSourceOrganizationId: String!
 
     """ID of issue import. If not provided it will be generated."""
     id: String
@@ -14135,12 +14184,6 @@ type Query {
 
   """One specific integrationTemplate."""
   integrationTemplate(id: String!): IntegrationTemplate!
-
-  """Fetches the GitHub token, completing the OAuth flow."""
-  issueImportFinishGithubOAuth(
-    """OAuth code."""
-    code: String!
-  ): GithubOAuthTokenPayload!
 
   """Checks a CSV file validity against a specific import service."""
   issueImportCheckCSV(
