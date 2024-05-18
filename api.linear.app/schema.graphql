@@ -847,6 +847,9 @@ type AuthOrganizationDomain {
   name: String!
   verified: Boolean!
   claimed: Boolean
+
+  """Prevent users with this domain to create new workspaces."""
+  disableOrganizationCreation: Boolean
   authType: OrganizationDomainAuthType!
 }
 
@@ -937,6 +940,9 @@ type AuthResolverResponse {
 
   """List of active users that belong to the user account."""
   users: [AuthUser!]!
+
+  """List of locked users that are locked by login restrictions"""
+  lockedUsers: [AuthUser!]!
 
   """
   List of organizations allowing this user account to join automatically.
@@ -8989,6 +8995,19 @@ type Mutation {
     id: String!
   ): ProjectPayload!
 
+  """
+  [INTERNAL] Updates all projects currently assigned to to a project status to a new project status.
+  """
+  projectReassignStatus(
+    """The identifier of the new project status to update the projects to."""
+    newProjectStatusId: String!
+
+    """
+    The identifier of the project status with which projects will be updated.
+    """
+    originalProjectStatusId: String!
+  ): SuccessPayload!
+
   """Deletes (trashes) a project."""
   projectDelete(
     """The identifier of the project to delete."""
@@ -10992,6 +11011,9 @@ type OrganizationDomain implements Node {
   Whether the domains was claimed by the organization through DNS verification.
   """
   claimed: Boolean
+
+  """Prevent users with this domain to create new workspaces."""
+  disableOrganizationCreation: Boolean
 }
 
 """What type of auth is the domain used for."""
@@ -16145,6 +16167,14 @@ input SubTypeComparator {
   Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.
   """
   null: Boolean
+}
+
+type SuccessPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
 }
 
 type SummaryPayload {
