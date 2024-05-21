@@ -3104,7 +3104,10 @@ input EntityExternalLinkCreateInput {
   label: String!
 
   """Related initiative link."""
-  initiativeId: String!
+  initiativeId: String
+
+  """Related project link."""
+  projectId: String
 
   """The order of the item in the entities resources list."""
   sortOrder: Float
@@ -4011,6 +4014,9 @@ type Initiative implements Node {
   """
   targetDateResolution: DateResolutionType
 
+  """The status of the initiative. One of Planned, Active, Completed"""
+  status: InitiativeStatus!
+
   """Projects associated with the initiative."""
   projects(
     """[Internal] Filter returned projects."""
@@ -4144,6 +4150,9 @@ input InitiativeCreateInput {
 
   """The initiative's color."""
   color: String
+
+  """The initiative's status."""
+  status: InitiativeStatus
 }
 
 type InitiativeEdge {
@@ -4248,6 +4257,12 @@ type InitiativePayload {
   success: Boolean!
 }
 
+enum InitiativeStatus {
+  Planned
+  Active
+  Completed
+}
+
 """[INTERNAL] Join table between projects and initiatives."""
 type InitiativeToProject implements Node {
   """The unique identifier of the entity."""
@@ -4346,6 +4361,9 @@ input InitiativeUpdateInput {
 
   """The estimated completion date of the initiative."""
   targetDate: TimelessDate
+
+  """The initiative's status."""
+  status: InitiativeStatus
 }
 
 """An integration with an external service."""
@@ -7462,6 +7480,14 @@ type Mutation {
 
     """The Discord message URL for the message to link."""
     url: String!
+  ): AttachmentPayload!
+
+  """
+  Begin syncing the thread for an existing Slack message attachment with a comment thread on its issue.
+  """
+  attachmentSyncToSlack(
+    """The ID of the Slack attachment to begin syncing."""
+    id: String!
   ): AttachmentPayload!
 
   """Link an existing Slack message to an issue."""

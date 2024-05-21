@@ -13888,6 +13888,22 @@
             "deprecationReason": null
           },
           {
+            "name": "status",
+            "description": "The status of the initiative. One of Planned, Active, Completed",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "InitiativeStatus",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "projects",
             "description": "Projects associated with the initiative.",
             "args": [
@@ -14061,6 +14077,35 @@
           }
         ],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "InitiativeStatus",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "Planned",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "Active",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "Completed",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -54539,13 +54584,19 @@
             "name": "initiativeId",
             "description": "Related initiative link.",
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectId",
+            "description": "Related project link.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "defaultValue": null
           },
@@ -54754,6 +54805,16 @@
               "ofType": null
             },
             "defaultValue": null
+          },
+          {
+            "name": "status",
+            "description": "The initiative's status.",
+            "type": {
+              "kind": "ENUM",
+              "name": "InitiativeStatus",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -54822,6 +54883,16 @@
             "type": {
               "kind": "SCALAR",
               "name": "TimelessDate",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "status",
+            "description": "The initiative's status.",
+            "type": {
+              "kind": "ENUM",
+              "name": "InitiativeStatus",
               "ofType": null
             },
             "defaultValue": null
@@ -69925,6 +69996,37 @@
               {
                 "name": "url",
                 "description": "The Discord message URL for the message to link.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AttachmentPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "attachmentSyncToSlack",
+            "description": "Begin syncing the thread for an existing Slack message attachment with a comment thread on its issue.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The ID of the Slack attachment to begin syncing.",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
