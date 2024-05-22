@@ -3257,8 +3257,8 @@ type ExternalUserEdge {
 }
 
 """
-[ALPHA] A facet. Facets are joins between entities. A facet can tie a custom
-view to a project, or a a project to a roadmap for example.
+A facet. Facets are joins between entities. A facet can tie a custom view to a
+project, or a a project to a roadmap for example.
 """
 type Facet implements Node {
   """The unique identifier of the entity."""
@@ -3933,6 +3933,11 @@ input GoogleUserAccountAuthInput {
   An optional invite link for an organization used to populate available organizations.
   """
   inviteLink: String
+
+  """
+  An optional parameter to disable new user signup and force login. Default: false.
+  """
+  disallowSignup: Boolean
 }
 
 """Comparator for identifiers."""
@@ -4005,6 +4010,9 @@ type Initiative implements Node {
 
   """The initiative's color."""
   color: String
+
+  """The icon of the initiative."""
+  icon: String
 
   """The estimated completion date of the initiative."""
   targetDate: TimelessDate
@@ -4150,6 +4158,9 @@ input InitiativeCreateInput {
 
   """The initiative's color."""
   color: String
+
+  """The initiative's icon."""
+  icon: String
 
   """The initiative's status."""
   status: InitiativeStatus
@@ -4358,6 +4369,9 @@ input InitiativeUpdateInput {
 
   """The initiative's color."""
   color: String
+
+  """The initiative's icon."""
+  icon: String
 
   """The estimated completion date of the initiative."""
   targetDate: TimelessDate
@@ -8638,6 +8652,9 @@ type Mutation {
 
   """Creates a new issue relation."""
   issueRelationCreate(
+    """Used by client undo operations. Should not be set directly."""
+    overrideCreatedAt: DateTime
+
     """The issue relation to create."""
     input: IssueRelationCreateInput!
   ): IssueRelationPayload!
@@ -11487,6 +11504,30 @@ type Passkey {
 
   """The time when the passkey was last used."""
   lastUsedAt: DateTime!
+
+  """Type of application used to create."""
+  clientType: AuthenticationSessionType!
+
+  """Location region code. Only set on creation."""
+  locationRegionCode: String
+
+  """Location city name. Only set on creation."""
+  locationCity: String
+
+  """Creating session's user-agent. Only set on creation."""
+  userAgent: String
+
+  """Used web browser. Only set on creation."""
+  browserType: String
+
+  """IP address. Only set on creation."""
+  ip: String
+
+  """Location country name. Only set on creation."""
+  locationCountry: String
+
+  """Location country code. Only set on creation."""
+  locationCountryCode: String
 }
 
 type PasskeyLoginStartResponse {
