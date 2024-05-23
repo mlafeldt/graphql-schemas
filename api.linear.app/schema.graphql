@@ -8893,6 +8893,15 @@ type Mutation {
     input: OrganizationDomainCreateInput!
   ): OrganizationDomainPayload!
 
+  """[INTERNAL] Updates an organization domain settings."""
+  organizationDomainUpdate(
+    """The organization domain entry to update."""
+    input: OrganizationDomainUpdateInput!
+
+    """The identifier of the domain to update."""
+    id: String!
+  ): OrganizationDomainPayload!
+
   """Deletes a domain."""
   organizationDomainDelete(
     """The identifier of the domain to delete."""
@@ -8949,9 +8958,9 @@ type Mutation {
   organizationCancelDelete: OrganizationCancelDeletePayload!
 
   """
-  Starts a plus trial for the organization. Administrator privileges required.
+  Starts a trial for the organization. Administrator privileges required.
   """
-  organizationStartPlusTrial: OrganizationStartPlusTrialPayload!
+  organizationStartTrial: OrganizationStartTrialPayload!
 
   """Creates a new project link."""
   projectLinkCreate(
@@ -9592,6 +9601,104 @@ type NotificationConnection {
   edges: [NotificationEdge!]!
   nodes: [Notification!]!
   pageInfo: PageInfo!
+}
+
+"""A user's notification delivery preferences."""
+type NotificationDeliveryPreferences {
+  """The delivery preferences for the mobile channel."""
+  mobile: NotificationDeliveryPreferencesChannel
+}
+
+"""A user's notification delivery preferences."""
+type NotificationDeliveryPreferencesChannel {
+  """Whether notifications are enabled for this channel."""
+  notificationsDisabled: Boolean
+
+  """The schedule for notifications on this channel."""
+  schedule: NotificationDeliveryPreferencesSchedule!
+}
+
+input NotificationDeliveryPreferencesChannelInput {
+  """Whether notifications are enabled for this channel."""
+  notificationsDisabled: Boolean
+
+  """The schedule for notifications on this channel."""
+  schedule: NotificationDeliveryPreferencesScheduleInput!
+}
+
+"""A user's notification delivery schedule for a particular day."""
+type NotificationDeliveryPreferencesDay {
+  """The time notifications start."""
+  start: String
+
+  """The time notifications end."""
+  end: String
+}
+
+input NotificationDeliveryPreferencesDayInput {
+  """The time notifications start."""
+  start: String
+
+  """The time notifications end."""
+  end: String
+}
+
+input NotificationDeliveryPreferencesInput {
+  """The delivery preferences for the mobile channel."""
+  mobile: NotificationDeliveryPreferencesChannelInput
+}
+
+"""A user's notification delivery schedule for a particular day."""
+type NotificationDeliveryPreferencesSchedule {
+  """Whether the schedule is disabled."""
+  disabled: Boolean
+
+  """Delivery preferences for Sunday."""
+  sunday: NotificationDeliveryPreferencesDay!
+
+  """Delivery preferences for Monday."""
+  monday: NotificationDeliveryPreferencesDay!
+
+  """Delivery preferences for Tuesday."""
+  tuesday: NotificationDeliveryPreferencesDay!
+
+  """Delivery preferences for Wednesday."""
+  wednesday: NotificationDeliveryPreferencesDay!
+
+  """Delivery preferences for Thursday."""
+  thursday: NotificationDeliveryPreferencesDay!
+
+  """Delivery preferences for Friday."""
+  friday: NotificationDeliveryPreferencesDay!
+
+  """Delivery preferences for Saturday."""
+  saturday: NotificationDeliveryPreferencesDay!
+}
+
+input NotificationDeliveryPreferencesScheduleInput {
+  """Whether the schedule is disabled."""
+  disabled: Boolean
+
+  """Delivery preferences for Sunday."""
+  sunday: NotificationDeliveryPreferencesDayInput!
+
+  """Delivery preferences for Monday."""
+  monday: NotificationDeliveryPreferencesDayInput!
+
+  """Delivery preferences for Tuesday."""
+  tuesday: NotificationDeliveryPreferencesDayInput!
+
+  """Delivery preferences for Wednesday."""
+  wednesday: NotificationDeliveryPreferencesDayInput!
+
+  """Delivery preferences for Thursday."""
+  thursday: NotificationDeliveryPreferencesDayInput!
+
+  """Delivery preferences for Friday."""
+  friday: NotificationDeliveryPreferencesDayInput!
+
+  """Delivery preferences for Saturday."""
+  saturday: NotificationDeliveryPreferencesDayInput!
 }
 
 type NotificationEdge {
@@ -10822,7 +10929,7 @@ type Organization implements Node {
   """The time at which deletion of the organization was requested."""
   deletionRequestedAt: DateTime
 
-  """The time at which the trial of the plus plan will end."""
+  """The time at which the trial will end."""
   trialEndsAt: DateTime
 
   """
@@ -11105,6 +11212,13 @@ type OrganizationDomainSimplePayload {
   success: Boolean!
 }
 
+input OrganizationDomainUpdateInput {
+  """
+  Prevent users with this domain to create new workspaces. Only allowed to set on claimed domains!
+  """
+  disableOrganizationCreation: Boolean
+}
+
 input OrganizationDomainVerificationInput {
   """The identifier in UUID v4 format of the domain being verified."""
   organizationDomainId: String!
@@ -11318,7 +11432,7 @@ type OrganizationRegionResponse {
   region: String
 }
 
-type OrganizationStartPlusTrialPayload {
+type OrganizationStartTrialPayload {
   """Whether the operation was successful."""
   success: Boolean!
 }
@@ -17946,6 +18060,9 @@ type User implements Node {
   """User's profile URL."""
   url: String!
 
+  """[Internal] Text drafts created by the user."""
+  textDrafts: [TextDraft!]!
+
   """Issues assigned to the user."""
   assignedIssues(
     """Filter returned issues."""
@@ -18451,6 +18568,9 @@ type UserSettings implements Node {
   """The notification channel settings the user has selected."""
   notificationPreferences: JSONObject!
 
+  """The notification delivery preferences for the user."""
+  notificationDeliveryPreferences: NotificationDeliveryPreferences!
+
   """The email types the user has unsubscribed from."""
   unsubscribedFrom: [String!]! @deprecated(reason: "Use individual subscription fields instead. This field's value is now outdated.")
 
@@ -18544,6 +18664,9 @@ input UserSettingsUpdateInput {
 
   """The user's notification preferences."""
   notificationPreferences: JSONObject
+
+  """The user's notification delivery preferences."""
+  notificationDeliveryPreferences: NotificationDeliveryPreferencesInput
 
   """[Internal] The user's usage warning history."""
   usageWarningHistory: JSONObject
@@ -18730,6 +18853,9 @@ enum ViewType {
   roadmapBacklog
   initiative
   initiatives
+  initiativesAll
+  initiativesPlanned
+  initiativesCompleted
   projects
   projectsAll
   projectsBacklog
