@@ -5909,11 +5909,22 @@ type IssueHistory implements Node {
   [Internal] Serialized JSON representing changes for certain non-relational properties.
   """
   changes: JSONObject
+
+  """
+  The actors that performed the actions. This field may be empty in the case of integrations or automations.
+  """
+  actors: [User!]!
+
+  """The users that were notified of the issue."""
   triageResponsibilityNotifiedUsers: [User!]
 
   """The bot that performed the action."""
   botActor: ActorBot
+
+  """The labels that were added to the issue."""
   addedLabels: [IssueLabel!]
+
+  """The labels that were removed from the issue."""
   removedLabels: [IssueLabel!]
 }
 
@@ -11472,6 +11483,9 @@ input OrganizationUpdateInput {
 
   """The frequency at which project updates are sent."""
   projectUpdatesReminderFrequency: ProjectUpdateReminderFrequency
+
+  """[ALPHA] The n-weekly frequency at which to prompt for project updates."""
+  projectUpdateReminderFrequencyInWeeks: Float
 
   """The day at which project updates are sent."""
   projectUpdateRemindersDay: Day
@@ -18868,6 +18882,7 @@ enum ViewType {
   allIssues
   customView
   customViews
+  customViewsPersonal
   customRoadmap
   roadmap
   roadmaps
@@ -18889,7 +18904,6 @@ enum ViewType {
   archive
   quickView
   issueIdentifiers
-  myViews
 }
 
 """A webhook used to send HTTP notifications over data updates."""
