@@ -741,6 +741,16 @@ type GithubInstallationInsufficientPermissionsError {
   query: Query!
 }
 
+input GithubUserTokenUpdateInput {
+  code: String!
+}
+
+union GithubUserTokenUpdatePayload = GithubUserTokenUpdateSuccess
+
+type GithubUserTokenUpdateSuccess {
+  query: Query!
+}
+
 enum GitProvider {
   GITHUB
 }
@@ -1157,6 +1167,9 @@ type Mutation {
   slackIntegrationCreate(input: SlackIntegrationCreateInput!): SlackNotificationCreatePayload!
   slackNotificationDelete(id: String!): SlackNotificationDeletePayload!
   trustedDocumentsSubmit(accountSlug: String, projectSlug: String!, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
+
+  """Fetch and attach a GitHub user token to a user using a code"""
+  githubUserTokenUpdate(input: GithubUserTokenUpdateInput!): GithubUserTokenUpdatePayload!
 }
 
 type NameAlreadyExistsError {
