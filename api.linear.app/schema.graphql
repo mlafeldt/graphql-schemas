@@ -3490,6 +3490,148 @@ input FavoriteUpdateInput {
   folderName: String
 }
 
+"""A feature flag for a project."""
+type FeatureFlag implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The unique key as defined by the feature flag provider."""
+  key: String!
+
+  """Url to the feature flag provider's page about the feature flag."""
+  externalUrl: String!
+
+  """The description of the feature flag."""
+  description: String
+
+  """Whether the feature flag is enabled."""
+  isEnabled: Boolean!
+
+  """The status of the feature flag."""
+  status: String!
+
+  """The description of the feature flag."""
+  lastStageUpdatedAt: DateTime
+
+  """The organization of the feature flag."""
+  organization: Organization!
+
+  """The project the feature flag is associated with."""
+  project: Project
+
+  """The integration providing the feature flag."""
+  integration: Integration!
+
+  """
+  The rollout stage of the feature flag, should be defined for all feature flags in use.
+  """
+  rolloutStage: FeatureFlagRolloutStage!
+
+  """The pending rollout stage for the feature flag."""
+  pendingRolloutStage: FeatureFlagRolloutStage
+
+  """The user who last changed the stage of the feature flag."""
+  lastStageUpdatedBy: User
+
+  """The user who created the feature flag."""
+  creator: User
+}
+
+type FeatureFlagConnection {
+  edges: [FeatureFlagEdge!]!
+  nodes: [FeatureFlag!]!
+  pageInfo: PageInfo!
+}
+
+type FeatureFlagEdge {
+  node: FeatureFlag!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""A rollout stage for a feature flag."""
+type FeatureFlagRolloutStage implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The name of the rollout stage."""
+  name: String!
+
+  """The description of the rollout stage."""
+  description: String
+
+  """
+  Which feature flag provider segments this rollout stage is associated with.
+  """
+  segmentKeys: [String!]!
+
+  """The type of the feature flag rollout stage."""
+  type: FeatureFlagRolloutStageType!
+
+  """The order of the rollout stages within an organization."""
+  sortOrder: Float!
+
+  """The organization of the feature flag rollout stage."""
+  organization: Organization!
+
+  """The integration providing the feature flag."""
+  integration: Integration!
+}
+
+type FeatureFlagRolloutStageConnection {
+  edges: [FeatureFlagRolloutStageEdge!]!
+  nodes: [FeatureFlagRolloutStage!]!
+  pageInfo: PageInfo!
+}
+
+type FeatureFlagRolloutStageEdge {
+  node: FeatureFlagRolloutStage!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""The type of a feature flag rollout stage."""
+enum FeatureFlagRolloutStageType {
+  dev
+  internal
+  partial
+  full
+}
+
 type FrontAttachmentPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -4476,6 +4618,7 @@ enum IntegrationService {
   intercom
   jira
   jiraPersonal
+  launchDarkly
   loom
   notion
   opsgenie
@@ -4514,6 +4657,7 @@ type IntegrationSettings {
   notion: NotionSettings
   opsgenie: OpsgenieSettings
   pagerDuty: PagerDutySettings
+  launchDarkly: LaunchDarklySettings
   jiraPersonal: JiraPersonalSettings
 }
 
@@ -4537,6 +4681,7 @@ input IntegrationSettingsInput {
   notion: NotionSettingsInput
   opsgenie: OpsgenieInput
   pagerDuty: PagerDutyInput
+  launchDarkly: LaunchDarklySettingsInput
   jiraPersonal: JiraPersonalSettingsInput
 }
 
@@ -7263,6 +7408,23 @@ input LabelSort {
   order: PaginationSortOrder
 }
 
+"""LaunchDarkly specific settings."""
+type LaunchDarklySettings {
+  """The project key of the LaunchDarkly integration."""
+  projectKey: String!
+
+  """The environment of the LaunchDarkly integration."""
+  environment: String!
+}
+
+input LaunchDarklySettingsInput {
+  """The project key of the LaunchDarkly integration."""
+  projectKey: String!
+
+  """The environment of the LaunchDarkly integration."""
+  environment: String!
+}
+
 type LogoutResponse {
   """Whether the operation was successful."""
   success: Boolean!
@@ -8132,6 +8294,18 @@ type Mutation {
   integrationGoogleCalendarPersonalConnect(
     """[Internal] The Google OAuth code."""
     code: String!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Integrates the organization with LaunchDarkly."""
+  integrationLaunchDarklyConnect(
+    """The LaunchDarkly API key."""
+    apiKey: String!
+
+    """The LaunchDarkly project key."""
+    projectKey: String!
+
+    """The LaunchDarkly environment."""
+    environment: String!
   ): IntegrationPayload!
 
   """
@@ -10311,6 +10485,9 @@ input NullableProjectFilter {
   """Comparator for the project health."""
   health: StringComparator
 
+  """Comparator for the project updates."""
+  projectUpdates: ProjectUpdatesCollectionFilter
+
   """Filters that the projects creator must satisfy."""
   creator: UserFilter
 
@@ -10383,6 +10560,31 @@ input NullableProjectMilestoneFilter {
   Compound filters, one of which need to be matched by the project milestone.
   """
   or: [NullableProjectMilestoneFilter!]
+}
+
+"""Options for filtering projects by project updates."""
+input NullableProjectUpdatesFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
+
+  """
+  Compound filters, all of which need to be matched by the project updates.
+  """
+  and: [NullableProjectUpdatesFilter!]
+
+  """
+  Compound filters, one of which need to be matched by the project updates.
+  """
+  or: [NullableProjectUpdatesFilter!]
 }
 
 """Comparator for optional strings."""
@@ -10942,6 +11144,9 @@ type Organization implements Node {
   """Allowed authentication providers, empty array means all are allowed."""
   allowedAuthServices: [String!]!
 
+  """IP restriction configurations."""
+  ipRestrictions: [OrganizationIpRestriction!]
+
   """The time at which deletion of the organization was requested."""
   deletionRequestedAt: DateTime
 
@@ -11421,6 +11626,35 @@ input OrganizationInviteUpdateInput {
   teamIds: [String!]!
 }
 
+type OrganizationIpRestriction {
+  """IP range in CIDR format."""
+  range: String!
+
+  """Restriction type."""
+  type: String!
+
+  """Optional restriction description."""
+  description: String
+
+  """Whether the restriction is enabled."""
+  enabled: Boolean!
+}
+
+"""[INTERNAL] Organization IP restriction configuration."""
+input OrganizationIpRestrictionInput {
+  """IP range in CIDR format."""
+  range: String!
+
+  """Restriction type."""
+  type: String!
+
+  """Optional restriction description."""
+  description: String
+
+  """Whether the restriction is enabled."""
+  enabled: Boolean!
+}
+
 type OrganizationMeta {
   """The region the organization is hosted in."""
   region: String!
@@ -11520,6 +11754,11 @@ input OrganizationUpdateInput {
 
   """Whether member users are allowed to send invites."""
   allowMembersToInvite: Boolean
+
+  """
+  IP restriction configurations controlling allowed access the workspace.
+  """
+  ipRestrictions: [OrganizationIpRestrictionInput!]
 
   """[ALPHA] Theme settings for the organization."""
   themeSettings: JSONObject
@@ -12075,6 +12314,9 @@ input ProjectCollectionFilter {
   """Comparator for the project health."""
   health: StringComparator
 
+  """Comparator for the project updates."""
+  projectUpdates: ProjectUpdatesCollectionFilter
+
   """Filters that the projects creator must satisfy."""
   creator: UserFilter
 
@@ -12248,6 +12490,9 @@ input ProjectFilter {
 
   """Comparator for the project health."""
   health: StringComparator
+
+  """Comparator for the project updates."""
+  projectUpdates: ProjectUpdatesCollectionFilter
 
   """Filters that the projects creator must satisfy."""
   creator: UserFilter
@@ -13474,7 +13719,7 @@ type ProjectUpdateEdge {
   cursor: String!
 }
 
-"""ProjectUpdate filtering options."""
+"""Options for filtering project updates."""
 input ProjectUpdateFilter {
   """Comparator for the identifier."""
   id: IDComparator
@@ -13670,6 +13915,59 @@ type ProjectUpdateReminderPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""
+Collection filtering options for filtering projects by project updates.
+"""
+input ProjectUpdatesCollectionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """
+  Compound filters, all of which need to be matched by the project update.
+  """
+  and: [ProjectUpdatesCollectionFilter!]
+
+  """Compound filters, one of which need to be matched by the update."""
+  or: [ProjectUpdatesCollectionFilter!]
+
+  """Filters that needs to be matched by some updates."""
+  some: ProjectUpdatesFilter
+
+  """Filters that needs to be matched by all updates."""
+  every: ProjectUpdatesFilter
+
+  """Comparator for the collection length."""
+  length: NumberComparator
+}
+
+"""Options for filtering projects by project updates."""
+input ProjectUpdatesFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """
+  Compound filters, all of which need to be matched by the project updates.
+  """
+  and: [ProjectUpdatesFilter!]
+
+  """
+  Compound filters, one of which need to be matched by the project updates.
+  """
+  or: [ProjectUpdatesFilter!]
 }
 
 input ProjectUpdateUpdateInput {
@@ -16168,7 +16466,6 @@ enum SlaStatus {
   LowRisk
   Completed
   Failed
-  Paused
 }
 
 """Comparator for sla status."""
@@ -18891,7 +19188,6 @@ enum ViewType {
   roadmapBacklog
   initiative
   initiatives
-  initiativesAll
   initiativesPlanned
   initiativesCompleted
   projects
