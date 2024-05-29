@@ -4,6 +4,7 @@ type AccessToken implements Node {
   accountId: ID
   createdAt: DateTime!
   projectScopes: [Project!]!
+  graphScopes: [Graph!]!
 }
 
 type AccessTokenConnection {
@@ -21,10 +22,11 @@ input AccessTokenCreateInput {
   name: String!
   accountId: ID
   kind: AccessTokenKind! = USER
+  graphScopes: [ID!]
   projectScopes: [ID!]
 }
 
-union AccessTokenCreatePayload = AccessTokenCreateSuccess | InvalidAccountError | TokenLimitExceededError | ProjectScopeLimitExceededError | CouldNotFindProjectsError
+union AccessTokenCreatePayload = AccessTokenCreateSuccess | InvalidAccountError | TokenLimitExceededError | GraphScopeLimitExceededError | CouldNotFindGraphsError | ProjectScopeLimitExceededError | CouldNotFindProjectsError
 
 type AccessTokenCreateSuccess {
   token: AccessToken!
@@ -66,6 +68,8 @@ interface Account {
   status: AccountStatus!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
   projectsCountStatus: ResourceStatus!
+  graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
+  graphsCountStatus: ResourceStatus!
   resources: AccountResources!
   usage(filter: AccountResourcesUsageDashboardFilter): DatabaseUsage!
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
@@ -84,6 +88,14 @@ type AccountDoesNotExistError {
   query: Query!
 }
 
+type AccountDopplerIntegration {
+  accessToken: String!
+}
+
+input AccountDopplerIntegrationInput {
+  accessToken: String!
+}
+
 type AccountIntegration {
   accountId: ID!
   createdAt: DateTime!
@@ -92,13 +104,15 @@ type AccountIntegration {
   environments: [BranchEnvironment!]!
   integrationId: ID!
   attributes: AccountIntegrationAttributes!
-  projects: [ProjectIntegration!]!
+  projects: [ProjectIntegration!]! @deprecated(reason: "replaced by graphs")
+  graphs: [GraphIntegration!]!
 }
 
-union AccountIntegrationAttributes = DatadogIntegration
+union AccountIntegrationAttributes = DatadogIntegration | AccountDopplerIntegration
 
 input AccountIntegrationAttributesInput {
   datadog: DatadogIntegrationInput
+  doppler: AccountDopplerIntegrationInput
 }
 
 input AccountIntegrationInput {
@@ -121,7 +135,8 @@ type AccountIntegrationMutationSuccess {
 }
 
 type AccountResources {
-  projects: ResourceStatus!
+  projects: ResourceStatus! @deprecated(reason: "replaced by graphs")
+  graphs: ResourceStatus!
 }
 
 type AccountResourcesStatus {
@@ -153,6 +168,7 @@ where we'll show account limit status (used/limit)
 """
 input AccountResourcesUsageDashboardFilter {
   projectIds: [ID!]
+  graphIds: [ID!]
   limitCycleChoice: LimitCycleChoice
   startDate: DateTime
   endDate: DateTime
@@ -195,6 +211,7 @@ type Branch implements Node {
   latestDeployment: Deployment
   activeDeployment: Deployment
   deployments(after: String, before: String, first: Int, last: Int): DeploymentConnection!
+  graph: Graph!
   project: Project!
   environment: BranchEnvironment!
   schema: String
@@ -234,7 +251,7 @@ enum BranchEnvironment {
   PRODUCTION
 }
 
-union BranchMetricsPayload = BranchMetricsSuccess | ProjectDoesNotExistError
+union BranchMetricsPayload = BranchMetricsSuccess | GraphDoesNotExistError | ProjectDoesNotExistError
 
 type BranchMetricsSuccess {
   latency: Distribution!
@@ -247,7 +264,8 @@ type BranchNotDeployedError {
 
 input BranchUpdateInput {
   accountSlug: String!
-  projectSlug: String!
+  projectSlug: String
+  graphSlug: String
   branchSlug: String!
   trustedDocumentsEnforce: Boolean
   trustedDocumentsBypassHeaderName: String
@@ -272,6 +290,10 @@ type CannotUseInvitationsWithSSO {
 type CompositionCheckError {
   title: String!
   message: String!
+}
+
+type CouldNotFindGraphsError {
+  unknownGraphIds: [ID!]!
 }
 
 type CouldNotFindProjectsError {
@@ -312,7 +334,8 @@ type CustomDomainCreateSuccess {
 }
 
 input CustomDomainDeleteInput {
-  projectId: ID!
+  projectId: ID
+  graphId: ID
   name: String!
 }
 
@@ -328,7 +351,8 @@ type CustomDomainDoesNotExistError {
 }
 
 input CustomDomainReplaceInput {
-  projectId: ID!
+  projectId: ID
+  graphId: ID
   existingName: String!
   branch: String!
   name: String!
@@ -400,7 +424,8 @@ scalar DateTime
 
 input DeleteSubgraphInput {
   accountSlug: String!
-  projectSlug: String!
+  graphSlug: String
+  projectSlug: String
   branch: String!
   subgraph: String!
   dryRun: Boolean!
@@ -435,7 +460,8 @@ type Deployment implements Node {
 
 input DeploymentBySlugCreateInput {
   accountSlug: String!
-  projectSlug: String!
+  graphSlug: String
+  projectSlug: String
   archiveFileSize: Int!
   branch: String
 }
@@ -550,7 +576,8 @@ type EmptyDatabaseRegionsError {
 
 input EnviromentVariableUpsertInput {
   accountSlug: String!
-  projectSlug: String!
+  graphSlug: String
+  projectSlug: String
   name: String!
   value: String!
   environments: [BranchEnvironment!]!
@@ -598,7 +625,8 @@ type EnvironmentVariableCreateSuccess {
 }
 
 input EnvironmentVariableDeleteByValuesInput {
-  projectId: ID!
+  graphId: ID
+  projectId: ID
   name: String!
   environments: [BranchEnvironment!]!
 }
@@ -773,9 +801,271 @@ enum GrafbasePlan {
   ENTERPRISE
 }
 
+type Graph {
+  id: ID!
+  slug: String!
+  projectRootPath: String!
+  projectType: ProjectType
+  graphMode: GraphMode!
+  createdAt: DateTime!
+  canBeRenamed: Boolean!
+  status: GraphStatus!
+  repository: GitRepository
+  branches(after: String, before: String, first: Int, last: Int): BranchConnection!
+  apiKeys(after: String, before: String, first: Int, last: Int): GraphApiKeyConnection!
+  productionBranch: Branch!
+  environmentVariables(after: String, before: String, first: Int, last: Int): EnvironmentVariableConnection!
+  deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
+  customDomains: [CustomDomain!]!
+  schemaChecks(first: Int, after: String, branch: String): SchemaCheckConnection!
+  operationChecksConfiguration: GraphOperationCheckConfiguration!
+  logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
+  requestAnalytics(filter: GraphRequestAnalyticsFilter!): RequestAnalytics
+  operationAnalytics(first: Int, after: String, filter: GraphOperationRequestAnalyticsFilter!): OperationRequestMetricsConnection!
+}
+
+type GraphApiKey {
+  id: ID!
+  key: String!
+  environment: BranchEnvironment!
+  createdAt: DateTime!
+  name: String!
+}
+
+type GraphApiKeyConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [GraphApiKeyEdge!]!
+
+  """A list of nodes."""
+  nodes: [GraphApiKey!]!
+}
+
+"""An edge in a connection."""
+type GraphApiKeyEdge {
+  """The item at the end of the edge"""
+  node: GraphApiKey!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type GraphBranchDoesNotExistError {
+  query: Query!
+}
+
+type GraphConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [GraphEdge!]!
+
+  """A list of nodes."""
+  nodes: [Graph!]!
+}
+
+input GraphCreateFromRepositoryInput {
+  accountId: ID!
+  graphSlug: String!
+  gitRepoUrl: Url!
+  gitAccountId: String!
+  productionBranch: String!
+  environmentVariables: [EnvironmentVariableSpecification!]! = []
+  repoRootPath: String! = "grafbase"
+}
+
+union GraphCreateFromRepositoryPayload = GraphCreateFromRepositorySuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | RepositoryContainsNoBranchesError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError
+
+type GraphCreateFromRepositorySuccess {
+  graph: Graph!
+}
+
+input GraphCreateFromSchemaInput {
+  accountId: ID!
+  graphSlug: String!
+  schema: String!
+  environmentVariables: [EnvironmentVariableSpecification!]! = []
+}
+
+union GraphCreateFromSchemaPayload = GraphCreateFromSchemaSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError
+
+type GraphCreateFromSchemaSuccess {
+  graph: Graph!
+}
+
+input GraphCreateFromTemplateInput {
+  accountId: ID!
+  graphSlug: String!
+  templateGitUrl: Url!
+  gitAccountId: String!
+  repoSlug: String!
+  repoPrivate: Boolean!
+  environmentVariables: [EnvironmentVariableSpecification!]! = []
+  repoRootPath: String! = "grafbase"
+}
+
+union GraphCreateFromTemplatePayload = GraphCreateFromTemplateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | RepositorySlugInUseError | TemplateDoesNotExistError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | GithubInstallationInsufficientPermissionsError
+
+type GraphCreateFromTemplateSuccess {
+  graph: Graph!
+}
+
+input GraphCreateInput {
+  accountId: ID!
+  graphSlug: String!
+  environmentVariables: [EnvironmentVariableSpecification!]! = []
+  repoRootPath: String! = "grafbase"
+  graphMode: GraphMode! = MANAGED
+  graphType: GraphType!
+}
+
+union GraphCreatePayload = GraphCreateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError
+
+type GraphCreateSuccess {
+  graph: Graph!
+}
+
+input GraphDeleteInput {
+  id: ID!
+}
+
+union GraphDeletePayload = GraphDeleteSuccess | GraphDoesNotExistError
+
+type GraphDeleteSuccess {
+  query: Query!
+}
+
+type GraphDoesNotExistError {
+  query: Query!
+}
+
+"""An edge in a connection."""
+type GraphEdge {
+  """The item at the end of the edge"""
+  node: Graph!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type GraphIntegration {
+  accountIntegrationId: ID!
+  createdAt: DateTime!
+  enabled: Boolean!
+  id: ID!
+  graph: Graph!
+}
+
 enum GraphMode {
   MANAGED
   SELF_HOSTED
+}
+
+type GraphOperationCheckConfiguration {
+  """
+  The time range in days to consider for operation checks. Operations older than the specificied
+  number of days are ignored.
+  """
+  timeRangeDays: Int!
+
+  """
+  The request count threshold to consider for operation checks. Operations that have been
+  registered less than the specified number of occurrences are ignored.
+  """
+  requestCountThreshold: Int!
+
+  """The clients to exclude from operation checks."""
+  excludedClients: [String!]!
+
+  """The operations to exclude from operation checks."""
+  excludedOperations: [String!]!
+}
+
+input GraphOperationCheckConfigurationInput {
+  """The graph to update."""
+  graphId: ID!
+
+  """
+  Whether operation checks are enabled for the graph. This is ignored, since
+  operation checks are now only enabled at the branch level.
+  """
+  enabled: Boolean
+
+  """
+  The time range in days to consider for operation checks. Operations older than the specificied
+  number of days are ignored.
+  """
+  timeRangeDays: Int
+
+  """
+  The request count threshold to consider for operation checks. Operations that have been
+  registered less than the specified number of occurrences are ignored.
+  """
+  requestCountThreshold: Int
+
+  """The clients to exclude from operation checks."""
+  excludedClients: [String!]
+
+  """The operations to exclude from operation checks."""
+  excludedOperations: [String!]
+}
+
+union GraphOperationCheckConfigurationUpdatePayload = GraphDoesNotExistError | GraphOperationCheckConfiguration
+
+input GraphOperationRequestAnalyticsFilter {
+  branch: String
+  period: GraphRequestAnalyticsPeriod
+  now: DateTime
+  from: DateTime
+  to: DateTime
+  operationName: String
+  operationTypes: [OperationType!]
+}
+
+input GraphRequestAnalyticsFilter {
+  branch: String = null
+  period: GraphRequestAnalyticsPeriod
+  now: DateTime
+  from: DateTime
+  to: DateTime
+  graphqlOperation: String
+  operationId: ID
+}
+
+enum GraphRequestAnalyticsPeriod {
+  LAST_HOUR
+  LAST_24_HOURS
+  LAST_7_DAYS
+}
+
+type GraphScopeLimitExceededError {
+  query: Query!
+}
+
+enum GraphStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum GraphType {
+  STANDALONE
+  FEDERATED
+}
+
+input GraphUpdateInput {
+  id: ID!
+  graphSlug: String
+  productionBranch: String
+  repoRootPath: String
+}
+
+union GraphUpdatePayload = GraphUpdateSuccess | GraphDoesNotExistError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | CannotBeRenamedError
+
+type GraphUpdateSuccess {
+  graph: Graph!
 }
 
 type HasAlreadyPaymentMethodError {
@@ -819,6 +1109,10 @@ type InvalidEnvironmentVariablesError {
 }
 
 type InvalidProjectRootPathError {
+  query: Query!
+}
+
+type InvalidRepoRootPathError {
   query: Query!
 }
 
@@ -1107,6 +1401,23 @@ type Mutation {
 
   """Delete an environment variable with variable values."""
   environmentVariableDeleteWithValuesBySlug(input: EnvironmentVariableDeleteByValuesSlugsInput!): EnvironmentVariableDeleteByValuesPayload!
+
+  """Create a new graph without any source for an initial deployment."""
+  graphCreate(input: GraphCreateInput!): GraphCreatePayload!
+
+  """Create a new graph from a schema."""
+  graphCreateFromSchema(input: GraphCreateFromSchemaInput!): GraphCreateFromSchemaPayload!
+
+  """Create a new graph from a GitHub repository."""
+  graphCreateFromRepository(input: GraphCreateFromRepositoryInput!): GraphCreateFromRepositoryPayload!
+
+  """
+  Create a new graph from a template in a newly created GitHub repository.
+  """
+  graphCreateFromTemplate(input: GraphCreateFromTemplateInput!): GraphCreateFromTemplatePayload!
+  graphUpdate(input: GraphUpdateInput!): GraphUpdatePayload!
+  graphOperationCheckConfigurationUpdate(input: GraphOperationCheckConfigurationInput!): GraphOperationCheckConfigurationUpdatePayload!
+  graphDelete(input: GraphDeleteInput!): GraphDeletePayload!
   inviteSend(input: InviteSendInput!): InviteSendPayload!
   inviteCancel(input: InviteCancelInput!): InviteCancelPayload!
   inviteAccept(input: InviteAcceptInput!): InviteAcceptPayload!
@@ -1143,6 +1454,9 @@ type Mutation {
   projectUpdate(input: ProjectUpdateInput!): ProjectUpdatePayload!
   projectOperationCheckConfigurationUpdate(input: ProjectOperationCheckConfigurationInput!): ProjectOperationCheckConfigurationUpdatePayload!
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
+  projectIntegrationCreate(accountIntegrationId: ID!, projectId: ID!, input: ProjectIntegrationInput!): ProjectIntegrationMutationPayload!
+  projectIntegrationUpdate(id: ID!, input: ProjectIntegrationInput!): ProjectIntegrationMutationPayload!
+  projectIntegrationDelete(id: ID!): ProjectIntegrationMutationPayload!
 
   """Run checks against the given schema"""
   schemaCheckCreate(input: SchemaCheckCreateInput!): SchemaCheckPayload!
@@ -1158,15 +1472,18 @@ type Mutation {
     """slug of the account"""
     accountSlug: String!
 
+    """slug of the graph"""
+    graphSlug: String
+
     """slug of the project"""
-    projectSlug: String!
+    projectSlug: String
 
     """name of the branch"""
     branchName: String!
   ): BranchDeletePayload!
   slackIntegrationCreate(input: SlackIntegrationCreateInput!): SlackNotificationCreatePayload!
   slackNotificationDelete(id: String!): SlackNotificationDeletePayload!
-  trustedDocumentsSubmit(accountSlug: String, projectSlug: String!, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
+  trustedDocumentsSubmit(accountSlug: String, graphSlug: String, projectSlug: String, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
 
   """Fetch and attach a GitHub user token to a user using a code"""
   githubUserTokenUpdate(input: GithubUserTokenUpdateInput!): GithubUserTokenUpdatePayload!
@@ -1511,9 +1828,11 @@ type Organization implements Account {
   orbCustomer: OrbCustomer
   orbActiveSubscription: OrbSubscription
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
+  graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
   integrations: [AccountIntegration!]!
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
+  graphsCountStatus: ResourceStatus!
   projectsCountStatus: ResourceStatus!
   slackIntegration: SlackIntegration
 
@@ -1645,6 +1964,8 @@ type PersonalAccount implements Account {
   status: AccountStatus!
   plan: GrafbasePlan!
   projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
+  graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
+  graphsCountStatus: ResourceStatus!
   projectsCountStatus: ResourceStatus!
   usage(filter: AccountResourcesUsageDashboardFilter): DatabaseUsage! @deprecated(reason: "Use resources_usage_dashboard")
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
@@ -1865,6 +2186,17 @@ type ProjectDoesNotExistError {
   query: Query!
 }
 
+type ProjectDopplerIntegration {
+  projectName: String!
+  configName: String!
+  automatedRedeploy: Boolean!
+}
+
+input ProjectDopplerIntegrationAttributesInput {
+  projectName: String!
+  configName: String!
+}
+
 """An edge in a connection."""
 type ProjectEdge {
   """The item at the end of the edge"""
@@ -1879,7 +2211,33 @@ type ProjectIntegration {
   createdAt: DateTime!
   enabled: Boolean!
   id: ID!
+  branch: Branch
   project: Project!
+  attributes: ProjectIntegrationAttributes
+}
+
+union ProjectIntegrationAttributes = ProjectDopplerIntegration
+
+input ProjectIntegrationAttributesInput {
+  doppler: ProjectDopplerIntegrationAttributesInput
+}
+
+input ProjectIntegrationInput {
+  enabled: Boolean!
+  attributes: ProjectIntegrationAttributesInput
+  branch: ID
+}
+
+type ProjectIntegrationMutationError {
+  message: String!
+  query: Query!
+}
+
+union ProjectIntegrationMutationPayload = ProjectIntegrationMutationSuccess | ProjectIntegrationMutationError
+
+type ProjectIntegrationMutationSuccess {
+  account: Account!
+  query: Query!
 }
 
 type ProjectNotFederatedError {
@@ -2069,6 +2427,15 @@ type Query {
   """
   schema(url: Url!, branch: String!): String
   invite(id: ID!): Invite
+
+  """Get a graph by account slug and slug of the graph itself."""
+  graphByAccountSlug(
+    """slug of the account"""
+    accountSlug: String!
+
+    """slug of the graph"""
+    graphSlug: String!
+  ): Graph
 
   """Get project by account slug and slug of the project itself."""
   projectByAccountSlug(
@@ -2327,7 +2694,8 @@ type SchemaCheckConnection {
 
 input SchemaCheckCreateInput {
   accountSlug: String!
-  projectSlug: String!
+  projectSlug: String
+  graphSlug: String
   branch: String
   subgraphName: String
   schema: String!
@@ -2366,7 +2734,7 @@ input SchemaCheckGitCommitInput {
   authorAvatarUrl: String
 }
 
-union SchemaCheckPayload = SchemaCheck | ProjectBranchDoesNotExistError | ProjectDoesNotExistError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameProvidedOnStandaloneProjectError | SubgraphNameMissingOnFederatedProjectError
+union SchemaCheckPayload = SchemaCheck | GraphBranchDoesNotExistError | ProjectBranchDoesNotExistError | GraphDoesNotExistError | ProjectDoesNotExistError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameProvidedOnStandaloneProjectError | SubgraphNameMissingOnFederatedProjectError
 
 type SchemaRegistryBranchDoesNotExistError {
   query: Query!
