@@ -761,6 +761,19 @@ type GitCommit {
   authorAvatarUrl: String
 }
 
+type GithubApiError {
+  error: GithubApiErrorKind!
+  query: Query!
+}
+
+enum GithubApiErrorKind {
+  CONNECTION
+  STATUS
+  DECODE
+  ERROR
+  UNKNOWN
+}
+
 type GitHubAuthorizationError {
   query: Query!
 }
@@ -773,7 +786,7 @@ input GithubUserTokenUpdateInput {
   code: String!
 }
 
-union GithubUserTokenUpdatePayload = GithubUserTokenUpdateSuccess
+union GithubUserTokenUpdatePayload = GithubUserTokenUpdateSuccess | GithubApiError
 
 type GithubUserTokenUpdateSuccess {
   query: Query!
@@ -1031,8 +1044,13 @@ input GraphRequestAnalyticsFilter {
   now: DateTime
   from: DateTime
   to: DateTime
+  aggregationStep: Duration
+  approximateNumberOfDataPoints: Int
+  alignPeriodWithAggregationStep: Boolean
   graphqlOperation: String
   operationId: ID
+  clientName: String
+  clientVersion: String
 }
 
 enum GraphRequestAnalyticsPeriod {
@@ -2312,8 +2330,13 @@ input ProjectRequestAnalyticsFilter {
   now: DateTime
   from: DateTime
   to: DateTime
+  aggregationStep: Duration
+  approximateNumberOfDataPoints: Int
+  alignPeriodWithAggregationStep: Boolean
   graphqlOperation: String
   operationId: ID
+  clientName: String
+  clientVersion: String
 }
 
 enum ProjectRequestAnalyticsPeriod {
