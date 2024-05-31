@@ -1061,7 +1061,7 @@ type Comment implements Node {
   editedAt: DateTime
 
   """[Internal] The comment content as a Prosemirror document."""
-  bodyData: String!
+  bodyData: String
 
   """
   The text that this comment references. Only defined for inline comments.
@@ -4306,6 +4306,12 @@ input InitiativeCreateInput {
 
   """The initiative's status."""
   status: InitiativeStatus
+
+  """The estimated completion date of the initiative."""
+  targetDate: TimelessDate
+
+  """The resolution of the initiative's estimated completion date."""
+  targetDateResolution: DateResolutionType
 }
 
 type InitiativeEdge {
@@ -4520,6 +4526,9 @@ input InitiativeUpdateInput {
 
   """The initiative's status."""
   status: InitiativeStatus
+
+  """The resolution of the initiative's estimated completion date."""
+  targetDateResolution: DateResolutionType
 }
 
 """An integration with an external service."""
@@ -18014,7 +18023,7 @@ type TimeSchedule implements Node {
   name: String!
 
   """The schedule entries."""
-  entries: [TimeScheduleEntry!]!
+  entries: [TimeScheduleEntry!]
 
   """The identifier of the external schedule."""
   externalId: String
