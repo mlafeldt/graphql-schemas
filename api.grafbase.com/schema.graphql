@@ -3,7 +3,7 @@ type AccessToken implements Node {
   name: String!
   accountId: ID
   createdAt: DateTime!
-  projectScopes: [Project!]!
+  projectScopes: [Project!]! @deprecated(reason: "replaced by graphScopes")
   graphScopes: [Graph!]!
 }
 
@@ -66,8 +66,8 @@ interface Account {
   plan: GrafbasePlan!
   createdAt: DateTime!
   status: AccountStatus!
-  projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
-  projectsCountStatus: ResourceStatus!
+  projects(after: String, before: String, first: Int, last: Int): ProjectConnection! @deprecated(reason: "replaced by graphs")
+  projectsCountStatus: ResourceStatus! @deprecated(reason: "replaced by graphsCountStatus")
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
   graphsCountStatus: ResourceStatus!
   resources: AccountResources!
@@ -117,6 +117,7 @@ input AccountIntegrationAttributesInput {
 
 input AccountIntegrationInput {
   enabled: Boolean!
+  graphs: [ID!]
   projects: [ID!]
   environments: [BranchEnvironment!]
   attributes: AccountIntegrationAttributesInput!
@@ -212,7 +213,7 @@ type Branch implements Node {
   activeDeployment: Deployment
   deployments(after: String, before: String, first: Int, last: Int): DeploymentConnection!
   graph: Graph!
-  project: Project!
+  project: Project! @deprecated(reason: "replaced by graph")
   environment: BranchEnvironment!
   schema: String
   federatedSchema: String
@@ -273,7 +274,7 @@ input BranchUpdateInput {
   operationChecksEnabled: Boolean
 }
 
-union BranchUpdatePayload = Query | ProjectDoesNotExistError
+union BranchUpdatePayload = Query | ProjectDoesNotExistError | GraphDoesNotExistError
 
 type CannotBeRenamedError {
   query: Query!
@@ -321,12 +322,13 @@ type CustomDomainAlreadyExistsError {
 }
 
 input CustomDomainCreateInput {
-  projectId: ID!
+  projectId: ID
+  graphId: ID
   branch: String!
   name: String!
 }
 
-union CustomDomainCreatePayload = CustomDomainCreateSuccess | ProjectDoesNotExistError | BranchDoesNotExistError | CustomDomainAlreadyExistsError | TooManyCustomDomainsError | BranchNotDeployedError | OperationNotAllowedByPlanError | InvalidDomainError
+union CustomDomainCreatePayload = CustomDomainCreateSuccess | ProjectDoesNotExistError | GraphDoesNotExistError | BranchDoesNotExistError | CustomDomainAlreadyExistsError | TooManyCustomDomainsError | BranchNotDeployedError | OperationNotAllowedByPlanError | InvalidDomainError
 
 type CustomDomainCreateSuccess {
   domain: CustomDomain!
@@ -358,7 +360,7 @@ input CustomDomainReplaceInput {
   name: String!
 }
 
-union CustomDomainReplacePayload = CustomDomainReplaceSuccess | CustomDomainDoesNotExistError | ProjectDoesNotExistError | BranchDoesNotExistError | BranchNotDeployedError | OperationNotAllowedByPlanError | InvalidDomainError
+union CustomDomainReplacePayload = CustomDomainReplaceSuccess | CustomDomainDoesNotExistError | GraphDoesNotExistError | ProjectDoesNotExistError | BranchDoesNotExistError | BranchNotDeployedError | OperationNotAllowedByPlanError | InvalidDomainError
 
 type CustomDomainReplaceSuccess {
   domain: CustomDomain!
@@ -431,7 +433,7 @@ input DeleteSubgraphInput {
   dryRun: Boolean!
 }
 
-union DeleteSubgraphPayload = DeleteSubgraphSuccess | SubgraphNotFoundError | ProjectDoesNotExistError | ProjectNotFederatedError | ProjectBranchDoesNotExistError | FederatedGraphCompositionError
+union DeleteSubgraphPayload = DeleteSubgraphSuccess | SubgraphNotFoundError | ProjectDoesNotExistError | ProjectNotFederatedError | ProjectBranchDoesNotExistError | GraphDoesNotExistError | GraphNotFederatedError | GraphBranchDoesNotExistError | FederatedGraphCompositionError
 
 type DeleteSubgraphSuccess {
   query: Query!
@@ -452,7 +454,8 @@ type Deployment implements Node {
   duration: Int
   status: DeploymentStatus!
   logEntries: [DeploymentLogEntry!]!
-  project: Project!
+  graph: Graph!
+  project: Project! @deprecated(reason: "replaced by graph")
   schema: String
   diffAgainstPreviousBranchDeployment: String
   diffAgainstLatestProductionDeployment: String
@@ -478,12 +481,13 @@ type DeploymentConnection {
 }
 
 input DeploymentCreateInput {
-  projectId: ID!
+  graphId: ID
+  projectId: ID
   archiveFileSize: Int!
   branch: String
 }
 
-union DeploymentCreatePayload = DeploymentCreateSuccess | ProjectDoesNotExistError | ArchiveFileSizeLimitExceededError | DailyDeploymentCountLimitExceededError | ProjectNotManagedError | ProjectNotStandaloneError
+union DeploymentCreatePayload = DeploymentCreateSuccess | ProjectDoesNotExistError | ArchiveFileSizeLimitExceededError | DailyDeploymentCountLimitExceededError | ProjectNotManagedError | ProjectNotStandaloneError | GraphDoesNotExistError | GraphNotManagedError | GraphNotStandaloneError
 
 type DeploymentCreateSuccess {
   deployment: Deployment!
@@ -536,7 +540,8 @@ enum DeploymentStatus {
 }
 
 enum DeploymentTriggerType {
-  PROJECT_CREATION
+  GRAPH_CREATION
+  PROJECT_CREATION @deprecated(reason: "replaced by GraphCreation")
   GIT_PUSH
   CLI
   REDEPLOYMENT
@@ -609,7 +614,8 @@ type EnvironmentVariableCountLimitExceededError {
 }
 
 input EnvironmentVariableCreateInput {
-  projectId: ID!
+  graphId: ID
+  projectId: ID
 
   """Must not be already assigned."""
   name: String!
@@ -617,7 +623,7 @@ input EnvironmentVariableCreateInput {
   environments: [BranchEnvironment!]!
 }
 
-union EnvironmentVariableCreatePayload = EnvironmentVariableCreateSuccess | NameAlreadyExistsError | NameTooLongError | NameContainsInvalidCharactersError | ValueTooLongError | ReservedPrefixError | NoEnvironmentsSetError | ProjectDoesNotExistError
+union EnvironmentVariableCreatePayload = EnvironmentVariableCreateSuccess | NameAlreadyExistsError | NameTooLongError | NameContainsInvalidCharactersError | ValueTooLongError | ReservedPrefixError | NoEnvironmentsSetError | GraphDoesNotExistError | ProjectDoesNotExistError
 
 type EnvironmentVariableCreateSuccess {
   environmentVariable: EnvironmentVariable!
@@ -635,7 +641,8 @@ union EnvironmentVariableDeleteByValuesPayload = EnvironmentVariableDeleteByValu
 
 input EnvironmentVariableDeleteByValuesSlugsInput {
   accountSlug: String!
-  projectSlug: String!
+  graphSlug: String
+  projectSlug: String
   name: String!
   environments: [BranchEnvironment!]!
 }
@@ -814,16 +821,18 @@ enum GrafbasePlan {
   ENTERPRISE
 }
 
-type Graph {
+type Graph implements Node {
   id: ID!
   slug: String!
-  projectRootPath: String!
-  projectType: ProjectType
+  repoRootPath: String!
+  projectType: ProjectType @deprecated(reason: "replaced by graphType")
+  graphType: GraphType
   graphMode: GraphMode!
   createdAt: DateTime!
   canBeRenamed: Boolean!
   status: GraphStatus!
   repository: GitRepository
+  account: Account!
   branches(after: String, before: String, first: Int, last: Int): BranchConnection!
   apiKeys(after: String, before: String, first: Int, last: Int): GraphApiKeyConnection!
   productionBranch: Branch!
@@ -856,6 +865,30 @@ type GraphApiKeyConnection {
   nodes: [GraphApiKey!]!
 }
 
+input GraphApiKeyCreateInput {
+  graphId: ID!
+  environment: BranchEnvironment!
+  name: String!
+}
+
+union GraphApiKeyCreatePayload = GraphApiKeyCreateSuccess | KeyLimitExceededError | GraphDoesNotExistError
+
+type GraphApiKeyCreateSuccess {
+  apiKey: GraphApiKey!
+  query: Query!
+}
+
+input GraphApiKeyDeleteInput {
+  id: ID!
+}
+
+union GraphApiKeyDeletePayload = GraphApiKeyDeleteSuccess | KeyDoesNotExistError | MustLeaveAtLeastOneKeyForEnvironmentError
+
+type GraphApiKeyDeleteSuccess {
+  deletedId: ID!
+  query: Query!
+}
+
 """An edge in a connection."""
 type GraphApiKeyEdge {
   """The item at the end of the edge"""
@@ -863,6 +896,17 @@ type GraphApiKeyEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+input GraphApiKeyUpdateInput {
+  id: ID!
+  name: String!
+}
+
+union GraphApiKeyUpdatePayload = GraphApiKeyUpdateSuccess | KeyDoesNotExistError
+
+type GraphApiKeyUpdateSuccess {
+  query: Query!
 }
 
 type GraphBranchDoesNotExistError {
@@ -894,6 +938,7 @@ union GraphCreateFromRepositoryPayload = GraphCreateFromRepositorySuccess | Slug
 
 type GraphCreateFromRepositorySuccess {
   graph: Graph!
+  query: Query!
 }
 
 input GraphCreateFromSchemaInput {
@@ -907,6 +952,7 @@ union GraphCreateFromSchemaPayload = GraphCreateFromSchemaSuccess | SlugAlreadyE
 
 type GraphCreateFromSchemaSuccess {
   graph: Graph!
+  query: Query!
 }
 
 input GraphCreateFromTemplateInput {
@@ -924,6 +970,7 @@ union GraphCreateFromTemplatePayload = GraphCreateFromTemplateSuccess | SlugAlre
 
 type GraphCreateFromTemplateSuccess {
   graph: Graph!
+  query: Query!
 }
 
 input GraphCreateInput {
@@ -932,13 +979,14 @@ input GraphCreateInput {
   environmentVariables: [EnvironmentVariableSpecification!]! = []
   repoRootPath: String! = "grafbase"
   graphMode: GraphMode! = MANAGED
-  graphType: GraphType!
+  graphType: GraphType
 }
 
 union GraphCreatePayload = GraphCreateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError
 
 type GraphCreateSuccess {
   graph: Graph!
+  query: Query!
 }
 
 input GraphDeleteInput {
@@ -953,6 +1001,11 @@ type GraphDeleteSuccess {
 
 type GraphDoesNotExistError {
   query: Query!
+}
+
+input GraphDopplerIntegrationAttributesInput {
+  projectName: String!
+  configName: String!
 }
 
 """An edge in a connection."""
@@ -972,9 +1025,43 @@ type GraphIntegration {
   graph: Graph!
 }
 
+input GraphIntegrationAttributesInput {
+  doppler: GraphDopplerIntegrationAttributesInput
+}
+
+input GraphIntegrationInput {
+  enabled: Boolean!
+  attributes: GraphIntegrationAttributesInput
+  branch: ID
+}
+
+type GraphIntegrationMutationError {
+  message: String!
+  query: Query!
+}
+
+union GraphIntegrationMutationPayload = GraphIntegrationMutationSuccess | GraphIntegrationMutationError
+
+type GraphIntegrationMutationSuccess {
+  account: Account!
+  query: Query!
+}
+
 enum GraphMode {
   MANAGED
   SELF_HOSTED
+}
+
+type GraphNotFederatedError {
+  query: Query!
+}
+
+type GraphNotManagedError {
+  query: Query!
+}
+
+type GraphNotStandaloneError {
+  query: Query!
 }
 
 type GraphOperationCheckConfiguration {
@@ -1357,6 +1444,9 @@ type Mutation {
 
   """Delete a given access token."""
   accessTokenDelete(input: AccessTokenDeleteInput!): AccessTokenDeletePayload!
+  accountIntegrationCreate(accountId: ID!, input: AccountIntegrationInput!): AccountIntegrationMutationPayload!
+  accountIntegrationUpdate(id: ID!, input: AccountIntegrationInput!): AccountIntegrationMutationPayload!
+  accountIntegrationDelete(id: ID!): AccountIntegrationMutationPayload!
 
   """
   Create new organization account owned by the current user. Slug must be unique.
@@ -1370,9 +1460,20 @@ type Mutation {
   personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
-  accountIntegrationCreate(accountId: ID!, input: AccountIntegrationInput!): AccountIntegrationMutationPayload!
-  accountIntegrationUpdate(id: ID!, input: AccountIntegrationInput!): AccountIntegrationMutationPayload!
-  accountIntegrationDelete(id: ID!): AccountIntegrationMutationPayload!
+  branchUpdate(input: BranchUpdateInput!): BranchUpdatePayload!
+  branchDelete(
+    """slug of the account"""
+    accountSlug: String!
+
+    """slug of the graph"""
+    graphSlug: String
+
+    """slug of the project"""
+    projectSlug: String
+
+    """name of the branch"""
+    branchName: String!
+  ): BranchDeletePayload!
 
   """Add a new custom domain."""
   customDomainCreate(input: CustomDomainCreateInput!): CustomDomainCreatePayload!
@@ -1387,13 +1488,13 @@ type Mutation {
   """
   customDomainReplace(input: CustomDomainReplaceInput!): CustomDomainReplacePayload!
 
-  """Create a new deployment for an existing project by slugs."""
+  """Create a new deployment for an existing graph by slugs."""
   deploymentCreateBySlug(input: DeploymentBySlugCreateInput!): DeploymentCreatePayload!
 
-  """Create a new deployment for an existing project."""
+  """Create a new deployment for an existing graph."""
   deploymentCreate(input: DeploymentCreateInput!): DeploymentCreatePayload!
 
-  """Create a new deployment for an existing project."""
+  """Create a new deployment for an existing graph."""
   deploymentRedeploy(
     """ID of the deployment"""
     id: ID!
@@ -1419,6 +1520,18 @@ type Mutation {
 
   """Delete an environment variable with variable values."""
   environmentVariableDeleteWithValuesBySlug(input: EnvironmentVariableDeleteByValuesSlugsInput!): EnvironmentVariableDeleteByValuesPayload!
+
+  """Create a new graph API key."""
+  graphApiKeyCreate(input: GraphApiKeyCreateInput!): GraphApiKeyCreatePayload!
+
+  """Update a given API key with a new name."""
+  graphApiKeyUpdate(input: GraphApiKeyUpdateInput!): GraphApiKeyUpdatePayload!
+
+  """Delete a given API key."""
+  graphApiKeyDelete(input: GraphApiKeyDeleteInput!): GraphApiKeyDeletePayload!
+  graphIntegrationCreate(accountIntegrationId: ID!, graphId: ID!, input: GraphIntegrationInput!): GraphIntegrationMutationPayload!
+  graphIntegrationUpdate(id: ID!, input: GraphIntegrationInput!): GraphIntegrationMutationPayload!
+  graphIntegrationDelete(id: ID!): GraphIntegrationMutationPayload!
 
   """Create a new graph without any source for an initial deployment."""
   graphCreate(input: GraphCreateInput!): GraphCreatePayload!
@@ -1448,33 +1561,33 @@ type Mutation {
   memberDelete(input: MemberDeleteInput!): MemberDeletePayload!
 
   """Create a new project API key."""
-  projectApiKeyCreate(input: ProjectApiKeyCreateInput!): ProjectApiKeyCreatePayload!
+  projectApiKeyCreate(input: ProjectApiKeyCreateInput!): ProjectApiKeyCreatePayload! @deprecated(reason: "replaced by graphApiKeyCreate")
 
   """Update a given API key with a new name."""
-  projectApiKeyUpdate(input: ProjectApiKeyUpdateInput!): ProjectApiKeyUpdatePayload!
+  projectApiKeyUpdate(input: ProjectApiKeyUpdateInput!): ProjectApiKeyUpdatePayload! @deprecated(reason: "replaced by graphApiKeyUpdate")
 
   """Delete a given API key."""
-  projectApiKeyDelete(input: ProjectApiKeyDeleteInput!): ProjectApiKeyDeletePayload!
+  projectApiKeyDelete(input: ProjectApiKeyDeleteInput!): ProjectApiKeyDeletePayload! @deprecated(reason: "replaced by graphApiKeyDelete")
+  projectIntegrationCreate(accountIntegrationId: ID!, projectId: ID!, input: ProjectIntegrationInput!): ProjectIntegrationMutationPayload! @deprecated(reason: "replaced by graphIntegrationCreate")
+  projectIntegrationUpdate(id: ID!, input: ProjectIntegrationInput!): ProjectIntegrationMutationPayload! @deprecated(reason: "replaced by graphIntegrationUpdate")
+  projectIntegrationDelete(id: ID!): ProjectIntegrationMutationPayload! @deprecated(reason: "replaced by graphIntegrationDelete")
 
   """Create a new project without any source for an initial deployment."""
-  projectCreate(input: ProjectCreateInput!): ProjectCreatePayload!
+  projectCreate(input: ProjectCreateInput!): ProjectCreatePayload! @deprecated(reason: "replaced by graphCreate")
 
   """Create a new project from a GitHub repository."""
-  projectCreateFromSchema(input: ProjectCreateFromSchemaInput!): ProjectCreateFromSchemaPayload!
+  projectCreateFromSchema(input: ProjectCreateFromSchemaInput!): ProjectCreateFromSchemaPayload! @deprecated(reason: "replaced by graphCreateFromSchema")
 
   """Create a new project from a GitHub repository."""
-  projectCreateFromRepository(input: ProjectCreateFromRepositoryInput!): ProjectCreateFromRepositoryPayload!
+  projectCreateFromRepository(input: ProjectCreateFromRepositoryInput!): ProjectCreateFromRepositoryPayload! @deprecated(reason: "replaced by graphCreateFromRepository")
 
   """
   Create a new project from a template in a newly created GitHub repository.
   """
-  projectCreateFromTemplate(input: ProjectCreateFromTemplateInput!): ProjectCreateFromTemplatePayload!
-  projectUpdate(input: ProjectUpdateInput!): ProjectUpdatePayload!
-  projectOperationCheckConfigurationUpdate(input: ProjectOperationCheckConfigurationInput!): ProjectOperationCheckConfigurationUpdatePayload!
+  projectCreateFromTemplate(input: ProjectCreateFromTemplateInput!): ProjectCreateFromTemplatePayload! @deprecated(reason: "replaced by graphCreateFromTemplate")
+  projectUpdate(input: ProjectUpdateInput!): ProjectUpdatePayload! @deprecated(reason: "replaced by graphUpdate")
+  projectOperationCheckConfigurationUpdate(input: ProjectOperationCheckConfigurationInput!): ProjectOperationCheckConfigurationUpdatePayload! @deprecated(reason: "replaced by graphOperationChecksConfigurationUpdate")
   projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
-  projectIntegrationCreate(accountIntegrationId: ID!, projectId: ID!, input: ProjectIntegrationInput!): ProjectIntegrationMutationPayload!
-  projectIntegrationUpdate(id: ID!, input: ProjectIntegrationInput!): ProjectIntegrationMutationPayload!
-  projectIntegrationDelete(id: ID!): ProjectIntegrationMutationPayload!
 
   """Run checks against the given schema"""
   schemaCheckCreate(input: SchemaCheckCreateInput!): SchemaCheckPayload!
@@ -1484,23 +1597,9 @@ type Mutation {
 
   """Delete a subgraph"""
   deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
-  stripeSetupIntentCreate: StripeSetupIntentCreatePayload!
-  branchUpdate(input: BranchUpdateInput!): BranchUpdatePayload!
-  branchDelete(
-    """slug of the account"""
-    accountSlug: String!
-
-    """slug of the graph"""
-    graphSlug: String
-
-    """slug of the project"""
-    projectSlug: String
-
-    """name of the branch"""
-    branchName: String!
-  ): BranchDeletePayload!
   slackIntegrationCreate(input: SlackIntegrationCreateInput!): SlackNotificationCreatePayload!
   slackNotificationDelete(id: String!): SlackNotificationDeletePayload!
+  stripeSetupIntentCreate: StripeSetupIntentCreatePayload!
   trustedDocumentsSubmit(accountSlug: String, graphSlug: String, projectSlug: String, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
 
   """Fetch and attach a GitHub user token to a user using a code"""
@@ -1845,13 +1944,13 @@ type Organization implements Account {
   stripeCustomer: StripeCustomer
   orbCustomer: OrbCustomer
   orbActiveSubscription: OrbSubscription
-  projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
+  projects(after: String, before: String, first: Int, last: Int): ProjectConnection! @deprecated(reason: "replaced by graphs")
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
   integrations: [AccountIntegration!]!
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
   graphsCountStatus: ResourceStatus!
-  projectsCountStatus: ResourceStatus!
+  projectsCountStatus: ResourceStatus! @deprecated(reason: "replaced by graphCountStatus")
   slackIntegration: SlackIntegration
 
   """
@@ -1981,10 +2080,10 @@ type PersonalAccount implements Account {
   createdAt: DateTime!
   status: AccountStatus!
   plan: GrafbasePlan!
-  projects(after: String, before: String, first: Int, last: Int): ProjectConnection!
+  projects(after: String, before: String, first: Int, last: Int): ProjectConnection! @deprecated(reason: "replaced by graphs")
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
   graphsCountStatus: ResourceStatus!
-  projectsCountStatus: ResourceStatus!
+  projectsCountStatus: ResourceStatus! @deprecated(reason: "replaced by graphCountStatus")
   usage(filter: AccountResourcesUsageDashboardFilter): DatabaseUsage! @deprecated(reason: "Use resources_usage_dashboard")
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
   resources: AccountResources! @deprecated(reason: "use projects_count_status")
@@ -2402,8 +2501,11 @@ type Query {
     """slug of the account"""
     accountSlug: String!
 
+    """slug of the graph"""
+    graphSlug: String
+
     """slug of the project"""
-    projectSlug: String!
+    projectSlug: String
 
     """name of the branch"""
     name: String!
@@ -2482,7 +2584,10 @@ type Query {
     accountSlug: String!
 
     """project slug"""
-    projectSlug: String!
+    projectSlug: String
+
+    """graph slug"""
+    graphSlug: String
 
     """name of the branch"""
     branch: String
@@ -2496,7 +2601,10 @@ type Query {
     accountSlug: String!
 
     """project slug"""
-    projectSlug: String!
+    projectSlug: String
+
+    """graph slug"""
+    graphSlug: String
 
     """name of the branch"""
     branch: String
@@ -2757,7 +2865,7 @@ input SchemaCheckGitCommitInput {
   authorAvatarUrl: String
 }
 
-union SchemaCheckPayload = SchemaCheck | GraphBranchDoesNotExistError | ProjectBranchDoesNotExistError | GraphDoesNotExistError | ProjectDoesNotExistError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameProvidedOnStandaloneProjectError | SubgraphNameMissingOnFederatedProjectError
+union SchemaCheckPayload = SchemaCheck | GraphBranchDoesNotExistError | ProjectBranchDoesNotExistError | GraphDoesNotExistError | ProjectDoesNotExistError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameProvidedOnStandaloneProjectError | SubgraphNameProvidedOnStandaloneGraphError | SubgraphNameMissingOnFederatedProjectError | SubgraphNameMissingOnFederatedGraphError
 
 type SchemaRegistryBranchDoesNotExistError {
   query: Query!
@@ -2964,12 +3072,20 @@ type Subgraph {
   updatedAt: DateTime!
 }
 
+type SubgraphNameMissingOnFederatedGraphError {
+  query: Query!
+}
+
 type SubgraphNameMissingOnFederatedProjectError {
   query: Query!
 }
 
 type SubgraphNameProvidedOnSingleProjectError {
   query: Query! @deprecated(reason: "Type renamed to SubgraphNameProvidedOnStandaloneProjectError")
+}
+
+type SubgraphNameProvidedOnStandaloneGraphError {
+  query: Query!
 }
 
 type SubgraphNameProvidedOnStandaloneProjectError {
@@ -3028,7 +3144,7 @@ input TrustedDocumentInput {
   documentText: String!
 }
 
-union TrustedDocumentsSubmitPayload = TrustedDocumentsSubmitSuccess | ReusedIds | ProjectDoesNotExistError | OldAccessTokenError
+union TrustedDocumentsSubmitPayload = TrustedDocumentsSubmitSuccess | ReusedIds | GraphDoesNotExistError | ProjectDoesNotExistError | OldAccessTokenError
 
 type TrustedDocumentsSubmitSuccess {
   count: Int!
