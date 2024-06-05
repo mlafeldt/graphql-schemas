@@ -71,7 +71,6 @@ interface Account {
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
   graphsCountStatus: ResourceStatus!
   resources: AccountResources!
-  usage(filter: AccountResourcesUsageDashboardFilter): DatabaseUsage!
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
   accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
 }
@@ -252,13 +251,6 @@ enum BranchEnvironment {
   PRODUCTION
 }
 
-union BranchMetricsPayload = BranchMetricsSuccess | GraphDoesNotExistError | ProjectDoesNotExistError
-
-type BranchMetricsSuccess {
-  latency: Distribution!
-  request: Distribution!
-}
-
 type BranchNotDeployedError {
   query: Query!
 }
@@ -376,24 +368,6 @@ enum CustomDomainStatus {
 type DailyDeploymentCountLimitExceededError {
   query: Query!
   limit: Int!
-}
-
-type DatabaseUsage {
-  requestCount: Distribution!
-  dbReads: Distribution!
-  dbWrites: Distribution!
-  dbSize: Distribution!
-  buildDuration: Distribution!
-  execUnits: Distribution!
-  udfRequestCount: Distribution!
-  granularity: DatabaseUsageGranularity!
-}
-
-enum DatabaseUsageGranularity {
-  HOURLY
-  DAILY
-  WEEKLY
-  MONTHLY
 }
 
 type DatadogIntegration {
@@ -551,16 +525,6 @@ enum DeploymentTriggerType {
 
 type DisabledAccountError {
   query: Query!
-}
-
-type Distribution {
-  unit: UnitType!
-  values: [DistributionValue!]!
-}
-
-type DistributionValue {
-  bucket: DateTime!
-  value: Int!
 }
 
 type DuplicateDatabaseRegionsError {
@@ -842,8 +806,84 @@ type Graph implements Node {
   schemaChecks(first: Int, after: String, branch: String): SchemaCheckConnection!
   operationChecksConfiguration: GraphOperationCheckConfiguration!
   logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
+  analytics(filters: GraphAnalyticsFilters!): GraphAnalytics
   requestAnalytics(filter: GraphRequestAnalyticsFilter!): RequestAnalytics
   operationAnalytics(first: Int, after: String, filter: GraphOperationRequestAnalyticsFilter!): OperationRequestMetricsConnection!
+}
+
+type GraphAnalytics {
+  periodStart: DateTime!
+  periodEnd: DateTime!
+  requestMetrics(
+    """Latency percentiles to retrieve. Ex: [0.5, 0.95, 0.99]"""
+    latencyPercentiles: [Float!]!
+  ): RequestMetricsTimeSeriesV2
+  topOperations(
+    """If not provided, top operations by latency won't be provided. Ex: 0.95"""
+    latencyPercentile: Float
+
+    """Detauls to 10, Max 100"""
+    limit: Int
+
+    """Search over the opeartion names"""
+    searchQuery: String
+  ): TopOperations
+  topClients(
+    """If not provided, top clients by latency won't be provided. Ex: 0.95"""
+    latencyPercentile: Float
+
+    """Detauls to 10, Max 100"""
+    limit: Int
+
+    """Search over the client names & versions"""
+    searchQuery: String
+  ): TopClients
+}
+
+input GraphAnalyticsFilters {
+  """Overrides branch_name if provided."""
+  branchId: ID
+
+  """Defaults to production branch"""
+  branchName: String
+  from: DateTime!
+  to: DateTime!
+
+  """
+  If specified, overrides approximateNumberOfPoints. Must be in whole minutes.
+  At most 150 points can be returned.
+  The API guarantees:
+  - the time series will contain the expected number of points N = (from - to) / aggregationStep
+  - to <= periodEnd: periodEnd will be higher if `to` contains :XX seconds typically.
+  """
+  aggregationStep: Duration
+
+  """
+  Defaults to 100, Must be <= 150.
+  The API guarantees:
+  - periodStart <= to AND from <= periodEnd
+  - a decent aggregation step will be chosen to have roughly `approximateNumberOfPoints` points.
+  """
+  approximateNumberOfDataPoints: Int
+
+  """
+  Defaults to true
+  Example: for an aggregationStep of 15 min:
+  - if true, only times with 00, 15, 30 and 45 minutes will appear in the time series
+  - if false, times in the time series will be adjusted to start from the periodStart (~from).
+  So if from = 15:32:00, times will end in 02, 17, 32 and 47.
+  I'll always align to the aggregation step used to store the data though, which
+  is currently in minutes. So cannot have 15:10:20, 15:11:20, etc. for example.
+  """
+  alignPeriodWithAggregationStep: Boolean
+  operationName: String
+
+  """Only used if operation name is specified."""
+  operationNormalizedQueryHash: OperationNormalizedQueryHash
+  clientName: String
+
+  """Only used if client name is specified."""
+  clientVersion: String
 }
 
 type GraphApiKey {
@@ -1673,6 +1713,8 @@ type OperationCheckError {
   severity: SchemaCheckErrorSeverity!
 }
 
+scalar OperationNormalizedQueryHash
+
 type OperationNotAllowedByPlanError {
   query: Query!
 }
@@ -1959,7 +2001,6 @@ type Organization implements Account {
   account id of the authenticated user.
   """
   addToSlackLink: String!
-  usage(filter: AccountResourcesUsageDashboardFilter): DatabaseUsage! @deprecated(reason: "Use resources_usage_dashboard")
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
   accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
   resources: AccountResources! @deprecated(reason: "Not relevant for organizations")
@@ -2084,7 +2125,6 @@ type PersonalAccount implements Account {
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
   graphsCountStatus: ResourceStatus!
   projectsCountStatus: ResourceStatus! @deprecated(reason: "replaced by graphCountStatus")
-  usage(filter: AccountResourcesUsageDashboardFilter): DatabaseUsage! @deprecated(reason: "Use resources_usage_dashboard")
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
   resources: AccountResources! @deprecated(reason: "use projects_count_status")
   accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
@@ -2494,7 +2534,6 @@ type Query {
     slug: String!
   ): Account
   accountCreationValidate(input: AccountCreationValidateInput!): AccountCreationValidatePayload!
-  metricsByBranch(accountSlug: String!, projectSlug: String!, branch: String!, startDate: DateTime!, endDate: DateTime!): BranchMetricsPayload!
 
   """Get branch by account slug, project slug and the name of the branch."""
   branch(
@@ -2686,6 +2725,35 @@ type RequestMetricsTimeSeriesDataPoint {
   errorGraphqlCount: Int!
   latencyMsP95: Int
   latencyMsP99: Int
+}
+
+type RequestMetricsTimeSeriesDataPointV2 {
+  dateTime: DateTime!
+  count: Int!
+  cacheHitCount: Int!
+  cacheMissCount: Int!
+  cachePassCount: Int!
+  error4XxCount: Int!
+  error5XxCount: Int!
+  errorGraphqlCount: Int!
+  latencyMsPercentiles: [Int!]!
+}
+
+type RequestMetricsTimeSeriesV2 {
+  overall: RequestMetricsV2!
+  points: [RequestMetricsTimeSeriesDataPointV2!]!
+  previousPeriod: RequestMetricsTimeSeriesV2
+}
+
+type RequestMetricsV2 {
+  count: Int!
+  cacheHitCount: Int!
+  cacheMissCount: Int!
+  cachePassCount: Int!
+  error4XxCount: Int!
+  error5XxCount: Int!
+  errorGraphqlCount: Int!
+  latencyMsPercentiles: [Int!]!
 }
 
 type ReservedPrefixError {
@@ -3132,6 +3200,110 @@ type TokenLimitExceededError {
 
 type TooManyCustomDomainsError {
   query: Query!
+}
+
+type TopClients {
+  byName: TopClientsByName!
+  byNameAndVersion: TopClientsByNameAndVersion!
+}
+
+type TopClientsByName {
+  orderedByLatency: [TopClientsByNameOrderedByLatency!]!
+  orderedByCount: [TopClientsByNameOrderedByCount!]!
+  orderedByErrorRatio: [TopClientsByNameOrderedByErrorRatio!]!
+}
+
+type TopClientsByNameAndVersion {
+  orderedByLatency: [TopClientsByNameAndVersionOrderedByLatency!]!
+  orderedByCount: [TopClientsByNameAndVersionOrderedByCount!]!
+  orderedByErrorRatio: [TopClientsByNameAndVersionOrderedByErrorRatio!]!
+}
+
+type TopClientsByNameAndVersionOrderedByCount {
+  name: String!
+  version: String!
+  count: Int!
+}
+
+type TopClientsByNameAndVersionOrderedByErrorRatio {
+  name: String!
+  version: String!
+  count: Int!
+  errorCount: Int!
+}
+
+type TopClientsByNameAndVersionOrderedByLatency {
+  name: String!
+  version: String!
+  latencyMs: Int!
+}
+
+type TopClientsByNameOrderedByCount {
+  name: String!
+  count: Int!
+}
+
+type TopClientsByNameOrderedByErrorRatio {
+  name: String!
+  count: Int!
+  errorCount: Int!
+}
+
+type TopClientsByNameOrderedByLatency {
+  name: String!
+  latencyMs: Int!
+}
+
+type TopOperationByNameAndHashOrderedByHighestCount {
+  name: String!
+  normalizedQueryHash: String!
+  count: Int!
+}
+
+type TopOperationByNameAndHashOrderedByHighestErrorRatio {
+  name: String!
+  normalizedQueryHash: String!
+  count: Int!
+  errorCount: Int!
+}
+
+type TopOperationByNameAndHashOrderedByHighestLatency {
+  name: String!
+  normalizedQueryHash: String!
+  latencyMs: Int!
+}
+
+type TopOperationByNameOrderedByHighestCount {
+  name: String!
+  count: Int!
+}
+
+type TopOperationByNameOrderedByHighestErrorRatio {
+  name: String!
+  count: Int!
+  errorCount: Int!
+}
+
+type TopOperationByNameOrderedByHighestLatency {
+  name: String!
+  latencyMs: Int!
+}
+
+type TopOperations {
+  byName: TopOperationsByName!
+  byNameAndHash: TopOperationsByNameAndHash!
+}
+
+type TopOperationsByName {
+  orderedByHighestLatency: [TopOperationByNameOrderedByHighestLatency!]!
+  orderedByHighestCount: [TopOperationByNameOrderedByHighestCount!]!
+  orderedByHighestErrorRatio: [TopOperationByNameOrderedByHighestErrorRatio!]!
+}
+
+type TopOperationsByNameAndHash {
+  orderedByHighestLatency: [TopOperationByNameAndHashOrderedByHighestLatency!]!
+  orderedByHighestCount: [TopOperationByNameAndHashOrderedByHighestCount!]!
+  orderedByHighestErrorRatio: [TopOperationByNameAndHashOrderedByHighestErrorRatio!]!
 }
 
 type TrustedDocument {
