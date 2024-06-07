@@ -816,7 +816,7 @@ type GraphAnalytics {
   periodEnd: DateTime!
   requestMetrics(
     """Latency percentiles to retrieve. Ex: [0.5, 0.95, 0.99]"""
-    latencyPercentiles: [Float!]!
+    latencyPercentiles: [Float!]
   ): RequestMetricsTimeSeriesV2
   topOperations(
     """If not provided, top operations by latency won't be provided. Ex: 0.95"""
@@ -841,29 +841,27 @@ type GraphAnalytics {
 }
 
 input GraphAnalyticsFilters {
-  """Overrides branch_name if provided."""
-  branchId: ID
-
   """Defaults to production branch"""
   branchName: String
-  from: DateTime!
+  range: Duration
+  from: DateTime
   to: DateTime!
+
+  """
+  Defines how exactly the period should be treated. When specified as a custom range the API
+  will guarantee the following: periodStart <= to AND from <= periodEnd
+  Otherwise, the API guarantees that the returned data will respect the provided period duration
+  as much as possible depending on the aggregation step. Defaults to true if range isn't set.
+  """
+  isCustomRange: Boolean
 
   """
   If specified, overrides approximateNumberOfPoints. Must be in whole minutes.
   At most 150 points can be returned.
-  The API guarantees:
-  - the time series will contain the expected number of points N = (from - to) / aggregationStep
-  - to <= periodEnd: periodEnd will be higher if `to` contains :XX seconds typically.
   """
   aggregationStep: Duration
 
-  """
-  Defaults to 100, Must be <= 150.
-  The API guarantees:
-  - periodStart <= to AND from <= periodEnd
-  - a decent aggregation step will be chosen to have roughly `approximateNumberOfPoints` points.
-  """
+  """Defaults to 100, at most 150 points can be returned."""
   approximateNumberOfDataPoints: Int
 
   """
@@ -873,7 +871,7 @@ input GraphAnalyticsFilters {
   - if false, times in the time series will be adjusted to start from the periodStart (~from).
   So if from = 15:32:00, times will end in 02, 17, 32 and 47.
   I'll always align to the aggregation step used to store the data though, which
-  is currently in minutes. So cannot have 15:10:20, 15:11:20, etc. for example.
+  is currently in minutes. So cannot have 15:10:20, 15:11:20, etc.
   """
   alignPeriodWithAggregationStep: Boolean
   operationName: String
@@ -3202,74 +3200,74 @@ type TooManyCustomDomainsError {
   query: Query!
 }
 
+type TopClientByNameAndVersionOrderedByHighestCount {
+  name: String!
+  version: String!
+  count: Int!
+}
+
+type TopClientByNameAndVersionOrderedByHighestErrorRatio {
+  name: String!
+  version: String!
+  count: Int!
+  errorCount: Int!
+}
+
+type TopClientByNameAndVersionOrderedByHighestLatency {
+  name: String!
+  version: String!
+  latencyMs: Int!
+}
+
+type TopClientByNameOrderedByHighestCount {
+  name: String!
+  count: Int!
+}
+
+type TopClientByNameOrderedByHighestErrorRatio {
+  name: String!
+  count: Int!
+  errorCount: Int!
+}
+
+type TopClientByNameOrderedByHighestLatency {
+  name: String!
+  latencyMs: Int!
+}
+
 type TopClients {
   byName: TopClientsByName!
   byNameAndVersion: TopClientsByNameAndVersion!
 }
 
 type TopClientsByName {
-  orderedByLatency: [TopClientsByNameOrderedByLatency!]!
-  orderedByCount: [TopClientsByNameOrderedByCount!]!
-  orderedByErrorRatio: [TopClientsByNameOrderedByErrorRatio!]!
+  orderedByHighestLatency: [TopClientByNameOrderedByHighestLatency!]!
+  orderedByHighestCount: [TopClientByNameOrderedByHighestCount!]!
+  orderedByHighestErrorRatio: [TopClientByNameOrderedByHighestErrorRatio!]!
 }
 
 type TopClientsByNameAndVersion {
-  orderedByLatency: [TopClientsByNameAndVersionOrderedByLatency!]!
-  orderedByCount: [TopClientsByNameAndVersionOrderedByCount!]!
-  orderedByErrorRatio: [TopClientsByNameAndVersionOrderedByErrorRatio!]!
-}
-
-type TopClientsByNameAndVersionOrderedByCount {
-  name: String!
-  version: String!
-  count: Int!
-}
-
-type TopClientsByNameAndVersionOrderedByErrorRatio {
-  name: String!
-  version: String!
-  count: Int!
-  errorCount: Int!
-}
-
-type TopClientsByNameAndVersionOrderedByLatency {
-  name: String!
-  version: String!
-  latencyMs: Int!
-}
-
-type TopClientsByNameOrderedByCount {
-  name: String!
-  count: Int!
-}
-
-type TopClientsByNameOrderedByErrorRatio {
-  name: String!
-  count: Int!
-  errorCount: Int!
-}
-
-type TopClientsByNameOrderedByLatency {
-  name: String!
-  latencyMs: Int!
+  orderedByHighestLatency: [TopClientByNameAndVersionOrderedByHighestLatency!]!
+  orderedByHighestCount: [TopClientByNameAndVersionOrderedByHighestCount!]!
+  orderedByHighestErrorRatio: [TopClientByNameAndVersionOrderedByHighestErrorRatio!]!
 }
 
 type TopOperationByNameAndHashOrderedByHighestCount {
   name: String!
-  normalizedQueryHash: String!
+  normalizedQueryHash: OperationNormalizedQueryHash!
   count: Int!
 }
 
 type TopOperationByNameAndHashOrderedByHighestErrorRatio {
   name: String!
-  normalizedQueryHash: String!
+  normalizedQueryHash: OperationNormalizedQueryHash!
   count: Int!
   errorCount: Int!
 }
 
 type TopOperationByNameAndHashOrderedByHighestLatency {
   name: String!
-  normalizedQueryHash: String!
+  normalizedQueryHash: OperationNormalizedQueryHash!
   latencyMs: Int!
 }
 
