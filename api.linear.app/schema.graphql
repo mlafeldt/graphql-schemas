@@ -3287,6 +3287,24 @@ type Facet implements Node {
 
   """The sort order of the facet."""
   sortOrder: Float!
+
+  """The owning organization."""
+  sourceOrganization: Organization
+
+  """The owning team."""
+  sourceTeam: Team
+
+  """The owning project."""
+  sourceProject: Project
+
+  """The owning initiative."""
+  sourceInitiative: Initiative
+
+  """The owning page."""
+  sourcePage: FacetPageSource
+
+  """The targeted custom view."""
+  targetCustomView: CustomView
 }
 
 type FacetConnection {
@@ -3300,6 +3318,10 @@ type FacetEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+enum FacetPageSource {
+  projects
 }
 
 """User favorites presented in the sidebar."""
@@ -3377,6 +3399,9 @@ type Favorite implements Node {
   """The favorited project."""
   project: Project
 
+  """[INTERNAL] The favorited facet."""
+  facet: Facet
+
   """The favorited team of the project."""
   projectTeam: Team
 
@@ -3421,7 +3446,7 @@ input FavoriteCreateInput {
   """The identifier of the issue to favorite."""
   issueId: String
 
-  """[INTERNAL] The identifier of the facet to favorite."""
+  """The identifier of the facet to favorite."""
   facetId: String
 
   """The identifier of the project to favorite."""
