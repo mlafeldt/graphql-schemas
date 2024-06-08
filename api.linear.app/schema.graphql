@@ -4761,6 +4761,11 @@ type IntegrationsSettings implements Node {
   slackIssueStatusChangedDone: Boolean
 
   """
+  Whether to send a Slack message when an issue is added to the custom view.
+  """
+  slackIssueAddedToView: Boolean
+
+  """
   Whether to send a Slack message when any of the project or team's issues has a change in status.
   """
   slackIssueStatusChangedAll: Boolean
@@ -5945,11 +5950,6 @@ type IssueHistory implements Node {
   issue: Issue!
 
   """
-  The user who made these changes. If null, possibly means that the change made by an integration.
-  """
-  actor: User
-
-  """
   The id of user who made these changes. If null, possibly means that the change made by an integration.
   """
   actorId: String
@@ -5963,14 +5963,8 @@ type IssueHistory implements Node {
   """What the title was changed to."""
   toTitle: String
 
-  """The user from whom the issue was re-assigned from."""
-  fromAssignee: User
-
   """The id of user from whom the issue was re-assigned from."""
   fromAssigneeId: String
-
-  """The user to whom the issue was assigned to."""
-  toAssignee: User
 
   """The id of user to whom the issue was assigned to."""
   toAssigneeId: String
@@ -5981,68 +5975,35 @@ type IssueHistory implements Node {
   """What the priority was changed to."""
   toPriority: Float
 
-  """The team from which the issue was moved from."""
-  fromTeam: Team
-
   """The id of team from which the issue was moved from."""
   fromTeamId: String
-
-  """The team to which the issue was moved to."""
-  toTeam: Team
 
   """The id of team to which the issue was moved to."""
   toTeamId: String
 
-  """The previous parent of the issue."""
-  fromParent: Issue
-
   """The id of previous parent of the issue."""
   fromParentId: String
-
-  """The new parent of the issue."""
-  toParent: Issue
 
   """The id of new parent of the issue."""
   toParentId: String
 
-  """The previous workflow state of the issue."""
-  fromState: WorkflowState
-
   """The id of previous workflow state of the issue."""
   fromStateId: String
-
-  """The new workflow state of the issue."""
-  toState: WorkflowState
 
   """The id of new workflow state of the issue."""
   toStateId: String
 
-  """The previous cycle of the issue."""
-  fromCycle: Cycle
-
   """The id of previous cycle of the issue."""
   fromCycleId: String
-
-  """The new cycle of the issue."""
-  toCycle: Cycle
 
   """The id of new cycle of the issue."""
   toCycleId: String
 
-  """The new project created from the issue."""
-  toConvertedProject: Project
-
   """The id of new project created from the issue."""
   toConvertedProjectId: String
 
-  """The previous project of the issue."""
-  fromProject: Project
-
   """The id of previous project of the issue."""
   fromProjectId: String
-
-  """The new project of the issue."""
-  toProject: Project
 
   """The id of new project of the issue."""
   toProjectId: String
@@ -6058,12 +6019,6 @@ type IssueHistory implements Node {
 
   """Whether the issue was trashed or un-trashed."""
   trashed: Boolean
-
-  """The import record."""
-  issueImport: IssueImport
-
-  """The linked attachment."""
-  attachment: Attachment
 
   """The id of linked attachment."""
   attachmentId: String
@@ -6095,9 +6050,59 @@ type IssueHistory implements Node {
   changes: JSONObject
 
   """
+  The actor that performed the actions. This field may be empty in the case of integrations or automations.
+  """
+  actor: User @deprecated(reason: "Use actors instead.")
+
+  """
   The actors that performed the actions. This field may be empty in the case of integrations or automations.
   """
   actors: [User!]!
+
+  """The user that was unassigned from the issue."""
+  fromAssignee: User
+
+  """The user that was assigned to the issue."""
+  toAssignee: User
+
+  """The cycle that the issue was moved from."""
+  fromCycle: Cycle
+
+  """The cycle that the issue was moved to."""
+  toCycle: Cycle
+
+  """The new project created from the issue."""
+  toConvertedProject: Project
+
+  """The project that the issue was moved from."""
+  fromProject: Project
+
+  """The project that the issue was moved to."""
+  toProject: Project
+
+  """The state that the issue was moved from."""
+  fromState: WorkflowState
+
+  """The state that the issue was moved to."""
+  toState: WorkflowState
+
+  """The team that the issue was moved from."""
+  fromTeam: Team
+
+  """The team that the issue was moved to."""
+  toTeam: Team
+
+  """The parent issue that the issue was moved from."""
+  fromParent: Issue
+
+  """The parent issue that the issue was moved to."""
+  toParent: Issue
+
+  """The linked attachment."""
+  attachment: Attachment
+
+  """The import record."""
+  issueImport: IssueImport
 
   """The users that were notified of the issue."""
   triageResponsibilityNotifiedUsers: [User!]
@@ -6272,9 +6277,6 @@ type IssueLabel implements Node {
   """The parent label."""
   parent: IssueLabel
 
-  """Whether this label is considered to be a group."""
-  isGroup: Boolean!
-
   """Issues associated with the label."""
   issues(
     """Filter returned issues."""
@@ -6334,6 +6336,9 @@ type IssueLabel implements Node {
     """
     orderBy: PaginationOrderBy
   ): IssueLabelConnection!
+
+  """Whether this label is considered to be a group."""
+  isGroup: Boolean!
 }
 
 """Issue label filtering options."""
