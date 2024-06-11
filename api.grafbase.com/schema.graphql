@@ -815,24 +815,24 @@ type GraphAnalytics {
   periodStart: DateTime!
   periodEnd: DateTime!
   requestMetrics(
-    """Latency percentiles to retrieve. Ex: [0.5, 0.95, 0.99]"""
+    """Latency percentiles to retrieve. Ex: [50, 99, 99.9]"""
     latencyPercentiles: [Float!]
   ): RequestMetricsTimeSeriesV2
   topOperations(
-    """If not provided, top operations by latency won't be provided. Ex: 0.95"""
+    """If not specified, top operations by latency will be empty. Ex: 95"""
     latencyPercentile: Float
 
-    """Detauls to 10, Max 100"""
+    """Detaults to 10, Max 100"""
     limit: Int
 
     """Search over the opeartion names"""
     searchQuery: String
   ): TopOperations
   topClients(
-    """If not provided, top clients by latency won't be provided. Ex: 0.95"""
+    """If not specified, top clients by latency will be empty. Ex: 95"""
     latencyPercentile: Float
 
-    """Detauls to 10, Max 100"""
+    """Detaults to 10, Max 100"""
     limit: Int
 
     """Search over the client names & versions"""
@@ -843,15 +843,25 @@ type GraphAnalytics {
 input GraphAnalyticsFilters {
   """Defaults to production branch"""
   branchName: String
+
+  """
+  Use this if you really care about having a specific duration like 1 hour, 7 days, etc.
+  """
   range: Duration
+
+  """
+  Use this if you *at least* the data between `from` and `to` to be provided. You may get
+  more, but never less.
+  """
   from: DateTime
+
+  """To be used in conjunction with with either `range` or `from`."""
   to: DateTime!
 
   """
-  Defines how exactly the period should be treated. When specified as a custom range the API
-  will guarantee the following: periodStart <= to AND from <= periodEnd
-  Otherwise, the API guarantees that the returned data will respect the provided period duration
-  as much as possible depending on the aggregation step. Defaults to true if range isn't set.
+  If explicitly to false, specifying both `from` and `to` will be treated as if `range: (to - from)`
+  had been specified instead. Meaning only the duration between `from` and `to` matters, not
+  necessarily having a data point for `from` itself.
   """
   isCustomRange: Boolean
 

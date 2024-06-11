@@ -8144,7 +8144,7 @@
             "args": [
               {
                 "name": "latencyPercentiles",
-                "description": "Latency percentiles to retrieve. Ex: [0.5, 0.95, 0.99]",
+                "description": "Latency percentiles to retrieve. Ex: [50, 99, 99.9]",
                 "type": {
                   "kind": "LIST",
                   "name": null,
@@ -8175,7 +8175,7 @@
             "args": [
               {
                 "name": "latencyPercentile",
-                "description": "If not provided, top operations by latency won't be provided. Ex: 0.95",
+                "description": "If not specified, top operations by latency will be empty. Ex: 95",
                 "type": {
                   "kind": "SCALAR",
                   "name": "Float",
@@ -8185,7 +8185,7 @@
               },
               {
                 "name": "limit",
-                "description": "Detauls to 10, Max 100",
+                "description": "Detaults to 10, Max 100",
                 "type": {
                   "kind": "SCALAR",
                   "name": "Int",
@@ -8218,7 +8218,7 @@
             "args": [
               {
                 "name": "latencyPercentile",
-                "description": "If not provided, top clients by latency won't be provided. Ex: 0.95",
+                "description": "If not specified, top clients by latency will be empty. Ex: 95",
                 "type": {
                   "kind": "SCALAR",
                   "name": "Float",
@@ -8228,7 +8228,7 @@
               },
               {
                 "name": "limit",
-                "description": "Detauls to 10, Max 100",
+                "description": "Detaults to 10, Max 100",
                 "type": {
                   "kind": "SCALAR",
                   "name": "Int",
@@ -8279,7 +8279,7 @@
           },
           {
             "name": "range",
-            "description": null,
+            "description": "Use this if you really care about having a specific duration like 1 hour, 7 days, etc.",
             "type": {
               "kind": "SCALAR",
               "name": "Duration",
@@ -8289,7 +8289,7 @@
           },
           {
             "name": "from",
-            "description": null,
+            "description": "Use this if you *at least* the data between `from` and `to` to be provided. You may get\nmore, but never less.",
             "type": {
               "kind": "SCALAR",
               "name": "DateTime",
@@ -8299,7 +8299,7 @@
           },
           {
             "name": "to",
-            "description": null,
+            "description": "To be used in conjunction with with either `range` or `from`.",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -8313,7 +8313,7 @@
           },
           {
             "name": "isCustomRange",
-            "description": "Defines how exactly the period should be treated. When specified as a custom range the API\nwill guarantee the following: periodStart <= to AND from <= periodEnd\nOtherwise, the API guarantees that the returned data will respect the provided period duration\nas much as possible depending on the aggregation step. Defaults to true if range isn't set.",
+            "description": "If explicitly to false, specifying both `from` and `to` will be treated as if `range: (to - from)`\nhad been specified instead. Meaning only the duration between `from` and `to` matters, not\nnecessarily having a data point for `from` itself.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
