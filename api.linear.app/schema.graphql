@@ -1117,6 +1117,9 @@ type Comment implements Node {
 
   """The bot that created the comment."""
   botActor: ActorBot
+
+  """Reactions associated with the comment."""
+  reactions: [Reaction!]!
 }
 
 """Comment filtering options."""
@@ -1147,6 +1150,9 @@ input CommentCollectionFilter {
 
   """Filters that the comments document content must satisfy."""
   documentContent: DocumentContentFilter
+
+  """Filters that the comments reactions must satisfy."""
+  reactions: ReactionCollectionFilter
 
   """Compound filters, all of which need to be matched by the comment."""
   and: [CommentCollectionFilter!]
@@ -1228,6 +1234,11 @@ input CommentCreateInput {
   The text that this comment references. Only defined for inline comments.
   """
   quotedText: String
+
+  """
+  [INTERNAL] The identifiers of the users subscribing to this comment thread.
+  """
+  subscriberIds: [String!]
 }
 
 type CommentEdge {
@@ -1266,6 +1277,9 @@ input CommentFilter {
   """Filters that the comments document content must satisfy."""
   documentContent: DocumentContentFilter
 
+  """Filters that the comments reactions must satisfy."""
+  reactions: ReactionCollectionFilter
+
   """Compound filters, all of which need to be matched by the comment."""
   and: [CommentFilter!]
 
@@ -1301,6 +1315,14 @@ input CommentUpdateInput {
   The text that this comment references. Only defined for inline comments.
   """
   quotedText: String
+
+  """[INTERNAL] The identifiers of the users subscribing to this comment."""
+  subscriberIds: [String!]
+
+  """
+  [INTERNAL] Flag to prevent auto subscription to the issue the comment is updated on.
+  """
+  doNotSubscribeToIssue: Boolean
 }
 
 """A company related to issue's origin."""
@@ -4189,6 +4211,9 @@ type Initiative implements Node {
   """The icon of the initiative."""
   icon: String
 
+  """A flag that indicates whether the initiative is in the trash bin."""
+  trashed: Boolean
+
   """The estimated completion date of the initiative."""
   targetDate: TimelessDate
 
@@ -5179,6 +5204,9 @@ type Issue implements Node {
   """
   subIssueSortOrder: Float
 
+  """Emoji reaction summary, grouped by emoji type."""
+  reactionData: JSONObject!
+
   """Label for the priority."""
   priorityLabel: String!
 
@@ -5453,6 +5481,9 @@ type Issue implements Node {
 
   """[Internal] The issue's description content as YJS state."""
   descriptionState: String
+
+  """Reactions associated with the issue."""
+  reactions: [Reaction!]!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -5593,6 +5624,9 @@ input IssueCollectionFilter {
 
   """Comparator for the issues sla status."""
   slaStatus: SlaStatusComparator
+
+  """Filters that the issues reactions must satisfy."""
+  reactions: ReactionCollectionFilter
 
   """Compound filters, all of which need to be matched by the issue."""
   and: [IssueCollectionFilter!]
@@ -5921,6 +5955,9 @@ input IssueFilter {
 
   """Comparator for the issues sla status."""
   slaStatus: SlaStatusComparator
+
+  """Filters that the issues reactions must satisfy."""
+  reactions: ReactionCollectionFilter
 
   """Compound filters, all of which need to be matched by the issue."""
   and: [IssueFilter!]
@@ -6804,6 +6841,9 @@ type IssueSearchResult implements Node {
   """
   subIssueSortOrder: Float
 
+  """Emoji reaction summary, grouped by emoji type."""
+  reactionData: JSONObject!
+
   """Label for the priority."""
   priorityLabel: String!
 
@@ -7078,6 +7118,9 @@ type IssueSearchResult implements Node {
 
   """[Internal] The issue's description content as YJS state."""
   descriptionState: String
+
+  """Reactions associated with the issue."""
+  reactions: [Reaction!]!
 
   """Metadata related to search result."""
   metadata: JSONObject!
@@ -8184,7 +8227,7 @@ type Mutation {
     id: String!
   ): InitiativeArchivePayload!
 
-  """[Internal] Deletes a initiative."""
+  """[Internal] Deletes (trashes) an initiative."""
   initiativeDelete(
     """The identifier of the initiative to delete."""
     id: String!
@@ -10171,6 +10214,9 @@ input NullableCommentFilter {
   """Filters that the comments document content must satisfy."""
   documentContent: DocumentContentFilter
 
+  """Filters that the comments reactions must satisfy."""
+  reactions: ReactionCollectionFilter
+
   """Filter based on the existence of the relation."""
   null: Boolean
 
@@ -10450,6 +10496,9 @@ input NullableIssueFilter {
   """Comparator for the issues sla status."""
   slaStatus: SlaStatusComparator
 
+  """Filters that the issues reactions must satisfy."""
+  reactions: ReactionCollectionFilter
+
   """Filter based on the existence of the relation."""
   null: Boolean
 
@@ -10653,6 +10702,33 @@ input NullableProjectUpdatesFilter {
   Compound filters, one of which need to be matched by the project updates.
   """
   or: [NullableProjectUpdatesFilter!]
+}
+
+"""Reaction filtering options."""
+input NullableReactionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the reactions emoji."""
+  emoji: StringComparator
+
+  """Comparator for the reactions custom emoji."""
+  customEmojiId: IDComparator
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
+
+  """Compound filters, all of which need to be matched by the reaction."""
+  and: [NullableReactionFilter!]
+
+  """Compound filters, one of which need to be matched by the reaction."""
+  or: [NullableReactionFilter!]
 }
 
 """Comparator for optional strings."""
@@ -13729,6 +13805,9 @@ type ProjectUpdate implements Node {
   """
   diffMarkdown: String
 
+  """Reactions associated with the project update."""
+  reactions: [Reaction!]!
+
   """Comments associated with the project update."""
   comments(
     """Filter returned comments."""
@@ -13813,6 +13892,9 @@ input ProjectUpdateFilter {
 
   """Filters that the project update project must satisfy."""
   project: ProjectFilter
+
+  """Filters that the project updates reactions must satisfy."""
+  reactions: ReactionCollectionFilter
 
   """
   Compound filters, all of which need to be matched by the ProjectUpdate.
@@ -15825,6 +15907,39 @@ type Reaction implements Node {
   user: User
 }
 
+"""Reaction filtering options."""
+input ReactionCollectionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the reactions emoji."""
+  emoji: StringComparator
+
+  """Comparator for the reactions custom emoji."""
+  customEmojiId: IDComparator
+
+  """Compound filters, all of which need to be matched by the reaction."""
+  and: [ReactionCollectionFilter!]
+
+  """Compound filters, one of which need to be matched by the reaction."""
+  or: [ReactionCollectionFilter!]
+
+  """Filters that needs to be matched by some reactions."""
+  some: ReactionFilter
+
+  """Filters that needs to be matched by all reactions."""
+  every: ReactionFilter
+
+  """Comparator for the collection length."""
+  length: NumberComparator
+}
+
 type ReactionConnection {
   edges: [ReactionEdge!]!
   nodes: [Reaction!]!
@@ -15855,6 +15970,30 @@ type ReactionEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Reaction filtering options."""
+input ReactionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the reactions emoji."""
+  emoji: StringComparator
+
+  """Comparator for the reactions custom emoji."""
+  customEmojiId: IDComparator
+
+  """Compound filters, all of which need to be matched by the reaction."""
+  and: [ReactionFilter!]
+
+  """Compound filters, one of which need to be matched by the reaction."""
+  or: [ReactionFilter!]
 }
 
 type ReactionPayload {
@@ -19260,6 +19399,7 @@ enum ViewType {
   roadmapClosed
   roadmapBacklog
   initiative
+  initiativeOverview
   initiatives
   initiativesPlanned
   initiativesCompleted
