@@ -2385,6 +2385,9 @@ type Document implements Node {
   """
   hiddenAt: DateTime
 
+  """A flag that indicates whether the document is in the trash bin."""
+  trashed: Boolean
+
   """The order of the item in the resources list."""
   sortOrder: Float!
 
@@ -2399,6 +2402,18 @@ type Document implements Node {
 
   """[Internal] The documents content as a Prosemirror document."""
   contentData: JSON @deprecated(reason: "Use content instead.")
+}
+
+"""A generic payload return from entity archive mutations."""
+type DocumentArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: Document
 }
 
 """Document filtering options."""
@@ -2784,6 +2799,9 @@ type DocumentSearchResult implements Node {
   The time at which the document was hidden. Null if the entity has not been hidden.
   """
   hiddenAt: DateTime
+
+  """A flag that indicates whether the document is in the trash bin."""
+  trashed: Boolean
 
   """The order of the item in the resources list."""
   sortOrder: Float!
@@ -8107,11 +8125,17 @@ type Mutation {
     id: String!
   ): DocumentPayload!
 
-  """Deletes a document."""
+  """Deletes (trashes) a document."""
   documentDelete(
     """The identifier of the document to delete."""
     id: String!
-  ): DeletePayload!
+  ): DocumentArchivePayload!
+
+  """Restores a document."""
+  documentUnarchive(
+    """The identifier of the document to restore."""
+    id: String!
+  ): DocumentArchivePayload!
 
   """Creates a new email intake address."""
   emailIntakeAddressCreate(
@@ -19391,7 +19415,6 @@ enum ViewType {
   allIssues
   customView
   customViews
-  customViewsPersonal
   customRoadmap
   roadmap
   roadmaps

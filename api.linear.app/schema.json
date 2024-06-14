@@ -7947,6 +7947,18 @@
             "deprecationReason": null
           },
           {
+            "name": "trashed",
+            "description": "A flag that indicates whether the document is in the trash bin.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "sortOrder",
             "description": "The order of the item in the resources list.",
             "args": [],
@@ -33216,6 +33228,67 @@
       },
       {
         "kind": "OBJECT",
+        "name": "DocumentArchivePayload",
+        "description": "A generic payload return from entity archive mutations.",
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "The identifier of the last sync operation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "entity",
+            "description": "The archived/unarchived entity. Null if entity was deleted.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Document",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "ArchivePayload",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "EmailIntakeAddressPayload",
         "description": null,
         "fields": [
@@ -39159,6 +39232,18 @@
             "deprecationReason": null
           },
           {
+            "name": "trashed",
+            "description": "A flag that indicates whether the document is in the trash bin.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "sortOrder",
             "description": "The order of the item in the resources list.",
             "args": [],
@@ -42955,6 +43040,11 @@
           {
             "kind": "OBJECT",
             "name": "CycleArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "DocumentArchivePayload",
             "ofType": null
           },
           {
@@ -63177,12 +63267,6 @@
             "deprecationReason": null
           },
           {
-            "name": "customViewsPersonal",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "customRoadmap",
             "description": null,
             "isDeprecated": false,
@@ -74417,7 +74501,7 @@
           },
           {
             "name": "documentDelete",
-            "description": "Deletes a document.",
+            "description": "Deletes (trashes) a document.",
             "args": [
               {
                 "name": "id",
@@ -74439,7 +74523,38 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "DeletePayload",
+                "name": "DocumentArchivePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentUnarchive",
+            "description": "Restores a document.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The identifier of the document to restore.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DocumentArchivePayload",
                 "ofType": null
               }
             },
