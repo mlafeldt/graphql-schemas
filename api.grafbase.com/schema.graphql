@@ -541,6 +541,15 @@ type DisabledAccountError {
   query: Query!
 }
 
+type DopplerConfig {
+  name: String!
+  projectName: String!
+}
+
+type DopplerProject {
+  name: String!
+}
+
 type DuplicateDatabaseRegionsError {
   duplicates: [String!]!
   query: Query!
@@ -1245,6 +1254,12 @@ type HasAlreadyPaymentMethodError {
 enum InArrearsCause {
   NEVER_PAID
   UNPAID_INVOICE
+}
+
+type Integration {
+  id: ID!
+  name: String!
+  createdAt: DateTime!
 }
 
 type InvalidAccountError {
@@ -2687,6 +2702,9 @@ type Query {
   """Give the actual connected user."""
   viewer: User
   node(id: ID!): Node
+  integrations: [Integration!]!
+  dopplerProjects(accountIntegrationId: ID!): [DopplerProject!]!
+  dopplerConfigs(accountIntegrationId: ID!, dopplerProjectName: String!): [DopplerConfig!]!
 }
 
 type RepositoryContainsNoBranchesError {
