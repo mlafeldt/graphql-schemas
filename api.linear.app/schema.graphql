@@ -2275,7 +2275,7 @@ type DiaryEntry implements Node {
   archivedAt: DateTime
 
   """[Internal] The entry content as a Prosemirror document."""
-  bodyData: String!
+  bodyData: String
 
   """The user who the diary belongs to."""
   user: User!
@@ -2300,7 +2300,7 @@ input DiaryEntryCreateInput {
   id: String
 
   """The date for which the entry is created."""
-  date: TimelessDate
+  date: TimelessDate!
 
   """[Internal] The comment content as a Prosemirror diaryEntry."""
   bodyData: JSON
@@ -2568,7 +2568,7 @@ type DocumentContentHistory implements Node {
 
 type DocumentContentHistoryPayload {
   """The document content history entries."""
-  history: [DocumentContentHistoryType!]
+  history: [DocumentContentHistoryType!]!
 
   """Whether the operation was successful."""
   success: Boolean!
@@ -2590,7 +2590,7 @@ type DocumentContentHistoryType {
   contentDataSnapshotAt: DateTime!
 
   """[Internal] The document content as Prosemirror document."""
-  contentData: JSON!
+  contentData: JSON
 
   """The ID of the author of the change."""
   actorIds: [String!]
@@ -4118,14 +4118,14 @@ type GoogleSheetsSettings {
   spreadsheetId: String!
   spreadsheetUrl: String!
   sheetId: Float!
-  updatedIssuesAt: DateTime!
+  updatedIssuesAt: DateTime
 }
 
 input GoogleSheetsSettingsInput {
   spreadsheetId: String!
   spreadsheetUrl: String!
   sheetId: Float!
-  updatedIssuesAt: DateTime!
+  updatedIssuesAt: DateTime
 }
 
 input GoogleUserAccountAuthInput {
@@ -5848,7 +5848,7 @@ type IssueDraft implements Node {
   descriptionData: JSON
 
   """Serialized array of JSONs representing attachments."""
-  attachments: JSONObject!
+  attachments: JSONObject
 }
 
 type IssueEdge {
@@ -9546,7 +9546,7 @@ type Mutation {
   Creates a new team. The user who creates the team will automatically be added as a member to the newly created team.
   """
   teamCreate(
-    """The team id to copy settings from."""
+    """The team id to copy settings from, if any."""
     copySettingsFromTeamId: String
 
     """The team object to create."""
@@ -9731,12 +9731,6 @@ type Mutation {
     id: String!
   ): UserSettingsPayload!
 
-  """[Deprecated] Updates a user's settings flag."""
-  userSettingsFlagIncrement(
-    """Flag to increment."""
-    flag: String!
-  ): UserSettingsFlagPayload!
-
   """Resets user's setting flags."""
   userSettingsFlagsReset(
     """The flags to reset. If not provided all flags will be reset."""
@@ -9920,7 +9914,7 @@ type NotificationDeliveryPreferencesChannel {
   notificationsDisabled: Boolean
 
   """The schedule for notifications on this channel."""
-  schedule: NotificationDeliveryPreferencesSchedule!
+  schedule: NotificationDeliveryPreferencesSchedule
 }
 
 input NotificationDeliveryPreferencesChannelInput {
@@ -9928,7 +9922,7 @@ input NotificationDeliveryPreferencesChannelInput {
   notificationsDisabled: Boolean
 
   """The schedule for notifications on this channel."""
-  schedule: NotificationDeliveryPreferencesScheduleInput!
+  schedule: NotificationDeliveryPreferencesScheduleInput
 }
 
 """A user's notification delivery schedule for a particular day."""
@@ -11221,13 +11215,13 @@ input OnboardingCustomerSurvey {
 
 input OpsgenieInput {
   """The date when the Opsgenie API failed with an unauthorized error."""
-  apiFailedWithUnauthorizedErrorAt: DateTime!
+  apiFailedWithUnauthorizedErrorAt: DateTime
 }
 
 """Opsgenie specific settings."""
 type OpsgenieSettings {
   """The date when the Opsgenie API failed with an unauthorized error."""
-  apiFailedWithUnauthorizedErrorAt: DateTime!
+  apiFailedWithUnauthorizedErrorAt: DateTime
 }
 
 """
@@ -11665,7 +11659,7 @@ type OrganizationInvite implements Node {
   expiresAt: DateTime
 
   """Extra metadata associated with the organization invite."""
-  metadata: JSONObject!
+  metadata: JSONObject
 
   """The user who created the invitation."""
   inviter: User!
@@ -11948,13 +11942,13 @@ type PageInfo {
 
 input PagerDutyInput {
   """The date when the PagerDuty API failed with an unauthorized error."""
-  apiFailedWithUnauthorizedErrorAt: DateTime!
+  apiFailedWithUnauthorizedErrorAt: DateTime
 }
 
 """PagerDuty specific settings."""
 type PagerDutySettings {
   """The date when the PagerDuty API failed with an unauthorized error."""
-  apiFailedWithUnauthorizedErrorAt: DateTime!
+  apiFailedWithUnauthorizedErrorAt: DateTime
 }
 
 """How to treat NULL values, whether they should appear first or last"""
@@ -12017,7 +12011,7 @@ type PaidSubscription implements Node {
   """
   The collection method for this subscription, either automatically charged or invoiced.
   """
-  collectionMethod: String
+  collectionMethod: String!
 
   """The date the subscription was canceled, if any."""
   canceledAt: DateTime
@@ -15012,6 +15006,9 @@ type Query {
     """Filter returned issues."""
     filter: IssueFilter
 
+    """[Deprecated] Search string to look for."""
+    query: String
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -15035,9 +15032,6 @@ type Query {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
-
-    """[Deprecated] Search string to look for."""
-    query: String
   ): IssueConnection!
 
   """Find issue based on the VCS branch name."""
@@ -15977,7 +15971,7 @@ input ReactionCreateInput {
   id: String
 
   """The emoji the user reacted with."""
-  emoji: String
+  emoji: String!
 
   """The comment to associate the reaction with."""
   commentId: String
@@ -17674,7 +17668,7 @@ type TeamMembership implements Node {
   team: Team!
 
   """Whether the user is the owner of the team."""
-  owner: Boolean
+  owner: Boolean!
 
   """The order of the item in the users team list."""
   sortOrder: Float!
@@ -19178,10 +19172,10 @@ type UserSettingsFlagPayload {
   lastSyncId: Float!
 
   """The flag key which was updated."""
-  flag: String!
+  flag: String
 
   """The flag value after update."""
-  value: Int!
+  value: Int
 
   """Whether the operation was successful."""
   success: Boolean!
@@ -19670,7 +19664,7 @@ type WorkflowDefinition implements Node {
   triggerType: WorkflowTriggerType!
 
   """The conditions that need to be match for the workflow to be triggered."""
-  conditions: JSONObject!
+  conditions: JSONObject
   enabled: Boolean!
 
   """
