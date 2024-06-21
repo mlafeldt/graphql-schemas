@@ -2865,6 +2865,9 @@ input DocumentUpdateInput {
 
   """The order of the item in the resources list."""
   sortOrder: Float
+
+  """Whether the document has been trashed."""
+  trashed: Boolean
 }
 
 """Issue due date sorting options."""
@@ -4184,7 +4187,7 @@ type ImageUploadFromUrlPayload {
   success: Boolean!
 }
 
-"""[INTERNAL] An initiative to group projects."""
+"""An initiative to group projects."""
 type Initiative implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -4208,7 +4211,7 @@ type Initiative implements Node {
   """The name of the initiative."""
   name: String!
 
-  """[Internal] The description of the initiative."""
+  """The description of the initiative."""
   description: String
 
   """The organization of the initiative."""
@@ -4238,9 +4241,7 @@ type Initiative implements Node {
   """The estimated completion date of the initiative."""
   targetDate: TimelessDate
 
-  """
-  [INTERNAL] The resolution of the initiative's estimated completion date.
-  """
+  """The resolution of the initiative's estimated completion date."""
   targetDateResolution: DateResolutionType
 
   """The status of the initiative. One of Planned, Active, Completed"""
@@ -4248,7 +4249,7 @@ type Initiative implements Node {
 
   """Projects associated with the initiative."""
   projects(
-    """[Internal] Filter returned projects."""
+    """Filter returned projects."""
     filter: ProjectFilter
 
     """A cursor to be used with last for backward pagination."""
@@ -4358,7 +4359,7 @@ type InitiativeConnection {
   pageInfo: PageInfo!
 }
 
-"""[Internal] The properties of the initiative to create."""
+"""The properties of the initiative to create."""
 input InitiativeCreateInput {
   """
   The identifier in UUID v4 format. If none is provided, the backend will generate one.
@@ -4368,7 +4369,7 @@ input InitiativeCreateInput {
   """The name of the initiative."""
   name: String!
 
-  """[Internal] The description of the initiative."""
+  """The description of the initiative."""
   description: String
 
   """The owner of the initiative."""
@@ -4483,7 +4484,7 @@ type InitiativeNotification implements Notification & Entity & Node {
   botActor: ActorBot
 }
 
-"""[Internal] The payload returned by the initiative mutations."""
+"""The payload returned by the initiative mutations."""
 type InitiativePayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -4501,7 +4502,7 @@ enum InitiativeStatus {
   Completed
 }
 
-"""[INTERNAL] Join table between projects and initiatives."""
+"""Join table between projects and initiatives."""
 type InitiativeToProject implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -4538,7 +4539,7 @@ type InitiativeToProjectConnection {
   pageInfo: PageInfo!
 }
 
-"""[INTERNAL] The properties of the initiativeToProject to create."""
+"""The properties of the initiativeToProject to create."""
 input InitiativeToProjectCreateInput {
   """
   The identifier in UUID v4 format. If none is provided, the backend will generate one.
@@ -4562,7 +4563,7 @@ type InitiativeToProjectEdge {
   cursor: String!
 }
 
-"""[INTERNAL] The result of a initiativeToProject mutation."""
+"""The result of a initiativeToProject mutation."""
 type InitiativeToProjectPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -4574,18 +4575,18 @@ type InitiativeToProjectPayload {
   success: Boolean!
 }
 
-"""[INTERNAL] The properties of the initiativeToProject to update."""
+"""The properties of the initiativeToProject to update."""
 input InitiativeToProjectUpdateInput {
   """The sort order for the project within its organization."""
   sortOrder: Float
 }
 
-"""[Internal] The properties of the initiative to update."""
+"""The properties of the initiative to update."""
 input InitiativeUpdateInput {
   """The name of the initiative."""
   name: String
 
-  """[Internal] The description of the initiative."""
+  """The description of the initiative."""
   description: String
 
   """The owner of the initiative."""
@@ -4608,6 +4609,9 @@ input InitiativeUpdateInput {
 
   """The resolution of the initiative's estimated completion date."""
   targetDateResolution: DateResolutionType
+
+  """Whether the initiative has been trashed."""
+  trashed: Boolean
 }
 
 """An integration with an external service."""
@@ -8206,13 +8210,13 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
-  """[INTERNAL] Creates a new initiativeToProject join."""
+  """Creates a new initiativeToProject join."""
   initiativeToProjectCreate(
     """The properties of the initiativeToProject to create."""
     input: InitiativeToProjectCreateInput!
   ): InitiativeToProjectPayload!
 
-  """[INTERNAL] Updates a initiativeToProject."""
+  """Updates a initiativeToProject."""
   initiativeToProjectUpdate(
     """The properties of the initiativeToProject to update."""
     input: InitiativeToProjectUpdateInput!
@@ -8221,19 +8225,19 @@ type Mutation {
     id: String!
   ): InitiativeToProjectPayload!
 
-  """[INTERNAL] Deletes a initiativeToProject."""
+  """Deletes a initiativeToProject."""
   initiativeToProjectDelete(
     """The identifier of the initiativeToProject to delete."""
     id: String!
   ): DeletePayload!
 
-  """[Internal] Creates a new initiative."""
+  """Creates a new initiative."""
   initiativeCreate(
     """The properties of the initiative to create."""
     input: InitiativeCreateInput!
   ): InitiativePayload!
 
-  """[Internal] Updates a initiative."""
+  """Updates a initiative."""
   initiativeUpdate(
     """The properties of the initiative to update."""
     input: InitiativeUpdateInput!
@@ -8242,19 +8246,19 @@ type Mutation {
     id: String!
   ): InitiativePayload!
 
-  """[Internal] Archives a initiative."""
+  """Archives a initiative."""
   initiativeArchive(
     """The identifier of the initiative to archive."""
     id: String!
   ): InitiativeArchivePayload!
 
-  """[Internal] Unarchives a initiative."""
+  """Unarchives a initiative."""
   initiativeUnarchive(
     """The identifier of the initiative to unarchive."""
     id: String!
   ): InitiativeArchivePayload!
 
-  """[Internal] Deletes (trashes) an initiative."""
+  """Deletes (trashes) an initiative."""
   initiativeDelete(
     """The identifier of the initiative to delete."""
     id: String!
@@ -13998,6 +14002,9 @@ input ProjectUpdateInput {
 
   """The sort order for the project in shared views."""
   sortOrder: Float
+
+  """Whether the project has been trashed."""
+  trashed: Boolean
 }
 
 """
@@ -14691,7 +14698,7 @@ type Query {
     id: String!
   ): ExternalUser!
 
-  """[INTERNAL] returns a list of initiative to project entities."""
+  """returns a list of initiative to project entities."""
   initiativeToProjects(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -14718,10 +14725,10 @@ type Query {
     orderBy: PaginationOrderBy
   ): InitiativeToProjectConnection!
 
-  """[INTERNAL] One specific initiativeToProject."""
+  """One specific initiativeToProject."""
   initiativeToProject(id: String!): InitiativeToProject!
 
-  """[Internal] All initiatives in the workspace."""
+  """All initiatives in the workspace."""
   initiatives(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -14748,7 +14755,7 @@ type Query {
     orderBy: PaginationOrderBy
   ): InitiativeConnection!
 
-  """[Internal] One specific initiative."""
+  """One specific initiative."""
   initiative(id: String!): Initiative!
 
   """The user's favorites."""
