@@ -1287,6 +1287,19 @@ input CommentFilter {
   or: [CommentFilter!]
 }
 
+"""A comment related notification."""
+type CommentNotification {
+  """
+  Related comment ID. Null if the notification is not related to a comment.
+  """
+  commentId: String
+
+  """
+  Related parent comment ID. Null if the notification is not related to a comment.
+  """
+  parentCommentId: String
+}
+
 type CommentPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -1651,8 +1664,11 @@ input CustomViewCreateInput {
   """The id of the team associated with the custom view."""
   teamId: String
 
-  """[Internal] The id of the project associated with the custom view."""
+  """The id of the project associated with the custom view."""
   projectId: String
+
+  """The id of the initiative associated with the custom view."""
+  initiativeId: String
 
   """The owner of the custom view."""
   ownerId: String
@@ -1787,6 +1803,9 @@ input CustomViewUpdateInput {
 
   """[Internal] The id of the project associated with the custom view."""
   projectId: String
+
+  """[Internal] The id of the initiative associated with the custom view."""
+  initiativeId: String
 
   """The owner of the custom view."""
   ownerId: String
@@ -2669,6 +2688,16 @@ input DocumentFilter {
 
 """A document related notification."""
 type DocumentNotification implements Notification & Entity & Node {
+  """
+  Related comment ID. Null if the notification is not related to a comment.
+  """
+  commentId: String
+
+  """
+  Related parent comment ID. Null if the notification is not related to a comment.
+  """
+  parentCommentId: String
+
   """The unique identifier of the entity."""
   id: ID!
 
@@ -4430,6 +4459,16 @@ input InitiativeFilter {
 
 """An initiative related notification."""
 type InitiativeNotification implements Notification & Entity & Node {
+  """
+  Related comment ID. Null if the notification is not related to a comment.
+  """
+  commentId: String
+
+  """
+  Related parent comment ID. Null if the notification is not related to a comment.
+  """
+  parentCommentId: String
+
   """The unique identifier of the entity."""
   id: ID!
 
@@ -6545,6 +6584,16 @@ input IssueLabelUpdateInput {
 
 """An issue related notification."""
 type IssueNotification implements Notification & Entity & Node {
+  """
+  Related comment ID. Null if the notification is not related to a comment.
+  """
+  commentId: String
+
+  """
+  Related parent comment ID. Null if the notification is not related to a comment.
+  """
+  parentCommentId: String
+
   """The unique identifier of the entity."""
   id: ID!
 
@@ -6606,6 +6655,11 @@ type IssueNotification implements Notification & Entity & Node {
 
   """The comment related to the notification."""
   comment: Comment
+
+  """
+  The parent comment related to the notification, if a notification is a reply comment notification.
+  """
+  parentComment: Comment
 
   """The team related to the issue notification."""
   team: Team!
@@ -9027,6 +9081,11 @@ type Mutation {
 
   """Deletes (trashes) an issue."""
   issueDelete(
+    """
+    Whether to permanently delete the issue and skip the grace period of 30 days. Available only to admins!
+    """
+    permanentlyDelete: Boolean
+
     """The identifier of the issue to delete."""
     id: String!
   ): IssueArchivePayload!
@@ -13017,6 +13076,16 @@ input ProjectMilestoneUpdateInput {
 
 """A project related notification."""
 type ProjectNotification implements Notification & Entity & Node {
+  """
+  Related comment ID. Null if the notification is not related to a comment.
+  """
+  commentId: String
+
+  """
+  Related parent comment ID. Null if the notification is not related to a comment.
+  """
+  parentCommentId: String
+
   """The unique identifier of the entity."""
   id: ID!
 
@@ -14185,7 +14254,7 @@ type ProjectUpdateWithInteractionPayload {
   interaction: ProjectUpdateInteraction!
 }
 
-"""A user's web browser push notification subscription."""
+"""A user's web or mobile push notification subscription."""
 type PushSubscription implements Node {
   """The unique identifier of the entity."""
   id: ID!
