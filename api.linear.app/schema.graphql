@@ -3484,6 +3484,9 @@ type Favorite implements Node {
   """The type of favorited predefined view."""
   predefinedViewType: String
 
+  """The targeted tab of the initiative."""
+  initiativeTab: InitiativeTab
+
   """The owner of the favorite."""
   owner: User!
 
@@ -3582,9 +3585,6 @@ input FavoriteCreateInput {
   """The tab of the project to favorite."""
   projectTab: ProjectTab
 
-  """The identifier of the project team to favorite."""
-  projectTeamId: String
-
   """The type of the predefined view to favorite."""
   predefinedViewType: String
 
@@ -3605,6 +3605,9 @@ input FavoriteCreateInput {
 
   """[INTERNAL] The identifier of the initiative to favorite."""
   initiativeId: String
+
+  """The tab of the initiative to favorite."""
+  initiativeTab: InitiativeTab
 
   """The identifier of the label to favorite."""
   labelId: String
@@ -4605,6 +4608,12 @@ enum InitiativeStatus {
   Planned
   Active
   Completed
+}
+
+"""Different tabs available inside an initiative."""
+enum InitiativeTab {
+  overview
+  projects
 }
 
 """Join table between projects and initiatives."""
@@ -6357,6 +6366,9 @@ type IssueImport implements Node {
 
   """Metadata related to import service."""
   serviceMetadata: JSONObject
+
+  """The display name of the import service."""
+  displayName: String!
 }
 
 type IssueImportCheckPayload {
@@ -8889,8 +8901,10 @@ type Mutation {
     """IDs of the Github repositories from which we will import data."""
     githubRepoIds: [Int!]
 
-    """ID of the Github import integration to use to access issues."""
-    integrationId: String!
+    """
+    [DEPRECATED] ID of the Github import integration to use to access issues.
+    """
+    integrationId: String
 
     """Whether or not we should import GitHub organization level projects."""
     githubShouldImportOrgProjects: Boolean
