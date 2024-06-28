@@ -10914,7 +10914,7 @@ input NullableProjectFilter {
   lead: NullableUserFilter
 
   """Filters that the projects members must satisfy."""
-  members: UserFilter
+  members: UserCollectionFilter
 
   """Filters that the projects issues must satisfy."""
   issues: IssueCollectionFilter
@@ -12814,7 +12814,7 @@ input ProjectCollectionFilter {
   lead: NullableUserFilter
 
   """Filters that the projects members must satisfy."""
-  members: UserFilter
+  members: UserCollectionFilter
 
   """Filters that the projects issues must satisfy."""
   issues: IssueCollectionFilter
@@ -12987,7 +12987,7 @@ input ProjectFilter {
   lead: NullableUserFilter
 
   """Filters that the projects members must satisfy."""
-  members: UserFilter
+  members: UserCollectionFilter
 
   """Filters that the projects issues must satisfy."""
   issues: IssueCollectionFilter
@@ -13557,6 +13557,9 @@ type ProjectRelation implements Node {
 
   """The type of anchor on the relatedProject end of the relation."""
   relatedAnchorType: String!
+
+  """The last user who created or modified the relation."""
+  user: User
 }
 
 type ProjectRelationConnection {
@@ -14174,6 +14177,9 @@ type ProjectUpdate implements Node {
   [Internal] The content of the project update as a Prosemirror document.
   """
   bodyData: String!
+
+  """[INTERNAL] The project update's unique URL slug."""
+  slugId: String
 
   """The URL to the project update."""
   url: String!
