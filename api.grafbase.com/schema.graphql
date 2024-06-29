@@ -1685,6 +1685,7 @@ type Mutation {
   teamDelete(teamId: ID!): TeamDeletePayload!
   teamAddMember(teamId: ID!, memberId: ID!): TeamAddMemberPayload!
   teamRemoveMember(teamId: ID!, memberId: ID!): TeamRemoveMemberPayload!
+  teamAssignRole(teamId: ID!, memberId: ID!, role: TeamRole!): TeamAssignRolePayload!
   trustedDocumentsSubmit(accountSlug: String, graphSlug: String, projectSlug: String, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
 
   """Fetch and attach a GitHub user token to a user using a code"""
@@ -3232,6 +3233,12 @@ type TeamAddMemberSuccess {
   query: Query!
 }
 
+union TeamAssignRolePayload = TeamAssignRoleSuccess | TeamDoesNotExistError
+
+type TeamAssignRoleSuccess {
+  query: Query!
+}
+
 type TeamConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
@@ -3268,6 +3275,14 @@ union TeamRemoveMemberPayload = TeamRemoveMemberSuccess | TeamDoesNotExistError
 
 type TeamRemoveMemberSuccess {
   query: Query!
+}
+
+enum TeamRole {
+  """__Team__ admin"""
+  ADMIN
+
+  """Regular non-admin member."""
+  MEMBER
 }
 
 type TemplateDoesNotExistError {
@@ -3467,6 +3482,7 @@ type UserConnection {
 type UserEdge {
   """The item at the end of the edge"""
   node: User!
+  role: TeamRole!
 
   """A cursor for use in pagination"""
   cursor: String!
