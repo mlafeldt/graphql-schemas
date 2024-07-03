@@ -1344,62 +1344,6 @@ input CommentUpdateInput {
   doNotSubscribeToIssue: Boolean
 }
 
-"""A company related to issue's origin."""
-type Company implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
-      for which updates should not produce an update to updatedAt (see
-  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """Company name."""
-  name: String!
-
-  """Company ID in an external system."""
-  externalId: String!
-
-  """Company website URL."""
-  websiteUrl: String
-
-  """Company logo URL."""
-  logoUrl: String
-
-  """The user who added the company."""
-  creator: User!
-
-  """The organization of the customer."""
-  organization: Organization!
-
-  """Custom company properties."""
-  companyProperties: JSONObject!
-}
-
-type CompanyConnection {
-  edges: [CompanyEdge!]!
-  nodes: [Company!]!
-  pageInfo: PageInfo!
-}
-
-type CompanyEdge {
-  node: Company!
-
-  """Used in `before` and `after` args"""
-  cursor: String!
-}
-
 """Issue completion date sorting options."""
 input CompletedAtSort {
   """Whether nulls should be sorted first or last"""
@@ -1505,6 +1449,59 @@ input CreateOrganizationInput {
 type CreateOrJoinOrganizationResponse {
   organization: AuthOrganization!
   user: AuthUser!
+}
+
+"""[ALPHA] A customer whose needs will be tied to issues or projects."""
+type Customer implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The customer's name."""
+  name: String!
+
+  """The customer's logo URL."""
+  logoUrl: String
+
+  """The domains associated with this customer."""
+  domains: [String!]!
+
+  """The ids of the customers in external systems."""
+  externalIds: [String!]!
+
+  """The ID of the Slack channel used to interact with the customer."""
+  slackChannelId: String
+
+  """The user who owns the customer."""
+  owner: User!
+}
+
+type CustomerConnection {
+  edges: [CustomerEdge!]!
+  nodes: [Customer!]!
+  pageInfo: PageInfo!
+}
+
+type CustomerEdge {
+  node: Customer!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
 }
 
 """A custom view that has been saved by a user."""
@@ -2653,6 +2650,9 @@ input DocumentCreateInput {
 
   """The order of the item in the resources list."""
   sortOrder: Float
+
+  """[INTERNAL] The identifiers of the users subscribing to this document."""
+  subscriberIds: [String!]
 }
 
 type DocumentEdge {
@@ -2944,6 +2944,9 @@ input DocumentUpdateInput {
 
   """Whether the document has been trashed."""
   trashed: Boolean
+
+  """[INTERNAL] The identifiers of the users subscribing to this document."""
+  subscriberIds: [String!]
 }
 
 """A general purpose draft. Used for comments, project updates, etc."""
@@ -4487,6 +4490,9 @@ input InitiativeCollectionFilter {
   """Comparator for the initiative slug ID."""
   slugId: StringComparator
 
+  """Comparator for the initiative status."""
+  status: StringComparator
+
   """Filters that the initiative creator must satisfy."""
   creator: UserFilter
 
@@ -4570,6 +4576,9 @@ input InitiativeFilter {
 
   """Comparator for the initiative slug ID."""
   slugId: StringComparator
+
+  """Comparator for the initiative status."""
+  status: StringComparator
 
   """Filters that the initiative creator must satisfy."""
   creator: UserFilter
@@ -7555,9 +7564,6 @@ input IssueUpdateInput {
 
   """The identifier of the user who snoozed the issue."""
   snoozedById: String
-
-  """The identifiers of the companies associated with this ticket."""
-  companyIds: [String!]
 }
 
 input JiraConfigurationInput {
