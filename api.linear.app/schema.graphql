@@ -1504,6 +1504,58 @@ type CustomerEdge {
   cursor: String!
 }
 
+"""
+[ALPHA] A customer need, expressed through a reference to an issue, project, or comment.
+"""
+type CustomerNeed implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The customer that this need is attached to."""
+  customer: Customer!
+
+  """The issue this need is referencing."""
+  issue: Issue
+
+  """The project this need is referencing."""
+  project: Project
+
+  """The comment this need is referencing."""
+  comment: Comment
+
+  """The priority of the need."""
+  priority: Float
+}
+
+type CustomerNeedConnection {
+  edges: [CustomerNeedEdge!]!
+  nodes: [CustomerNeed!]!
+  pageInfo: PageInfo!
+}
+
+type CustomerNeedEdge {
+  node: CustomerNeed!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
 """A custom view that has been saved by a user."""
 type CustomView implements Node {
   """The unique identifier of the entity."""
@@ -1889,6 +1941,9 @@ type Cycle implements Node {
 
   """The team that the cycle is associated with."""
   team: Team!
+
+  """[Internal] The progress history of the cycle."""
+  progressHistory: JSONObject!
 
   """Issues associated with the cycle."""
   issues(
@@ -12548,6 +12603,9 @@ type Project implements Node {
   """The number of in progress estimation points after each week."""
   inProgressScopeHistory: [Float!]!
 
+  """[Internal] The progress history of the project."""
+  progressHistory: JSONObject!
+
   """Whether to send new issue notifications to Slack."""
   slackNewIssue: Boolean!
 
@@ -13818,6 +13876,9 @@ type ProjectSearchResult implements Node {
 
   """The number of in progress estimation points after each week."""
   inProgressScopeHistory: [Float!]!
+
+  """[Internal] The progress history of the project."""
+  progressHistory: JSONObject!
 
   """Whether to send new issue notifications to Slack."""
   slackNewIssue: Boolean!
@@ -17513,6 +17574,9 @@ type Team implements Node {
 
   """Whether the team is managed by SCIM integration."""
   scimManaged: Boolean!
+
+  """[Internal] The progress history of the team."""
+  progressHistory: JSONObject!
 
   """
   The workflow state into which issues are moved when a PR has been opened as draft.
