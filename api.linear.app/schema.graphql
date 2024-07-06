@@ -1556,6 +1556,88 @@ type CustomerNeedEdge {
   cursor: String!
 }
 
+"""[ALPHA] A customer schema."""
+type CustomerSchema implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The schema display name."""
+  displayName: String!
+}
+
+type CustomerSchemaConnection {
+  edges: [CustomerSchemaEdge!]!
+  nodes: [CustomerSchema!]!
+  pageInfo: PageInfo!
+}
+
+type CustomerSchemaEdge {
+  node: CustomerSchema!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""[ALPHA] A customer schema field."""
+type CustomerSchemaField implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The name of the field in the schema."""
+  name: String!
+
+  """The type of the field in the schema."""
+  type: SchemaFieldType!
+
+  """Whether this field is enabled to be used as a custom attribute."""
+  enabled: Boolean!
+}
+
+type CustomerSchemaFieldConnection {
+  edges: [CustomerSchemaFieldEdge!]!
+  nodes: [CustomerSchemaField!]!
+  pageInfo: PageInfo!
+}
+
+type CustomerSchemaFieldEdge {
+  node: CustomerSchemaField!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
 """A custom view that has been saved by a user."""
 type CustomView implements Node {
   """The unique identifier of the entity."""
@@ -11701,11 +11783,8 @@ type Organization implements Node {
   """Whether the organization is using a roadmap."""
   roadmapEnabled: Boolean!
 
-  """The frequency at which to prompt for project updates."""
-  projectUpdatesReminderFrequency: ProjectUpdateReminderFrequency!
-
   """
-  [ALPHA] The n-weekly frequency at which to prompt for project updates. When not set, reminders are off.
+  The n-weekly frequency at which to prompt for project updates. When not set, reminders are off.
   """
   projectUpdateReminderFrequencyInWeeks: Float
 
@@ -11758,6 +11837,9 @@ type Organization implements Node {
 
   """The organization's project statuses."""
   projectStatuses: [ProjectStatus!]!
+
+  """[DEPRECATED] The frequency at which to prompt for project updates."""
+  projectUpdatesReminderFrequency: ProjectUpdateReminderFrequency! @deprecated(reason: "Use organization.projectUpdatesReminderFrequencyInWeeks instead")
 
   """Users associated with the organization."""
   users(
@@ -12301,10 +12383,7 @@ input OrganizationUpdateInput {
   """Whether the organization is using roadmap."""
   roadmapEnabled: Boolean
 
-  """[DEPRECATED] The frequency at which project updates are sent."""
-  projectUpdatesReminderFrequency: ProjectUpdateReminderFrequency
-
-  """[ALPHA] The n-weekly frequency at which to prompt for project updates."""
+  """The n-weekly frequency at which to prompt for project updates."""
   projectUpdateReminderFrequencyInWeeks: Float
 
   """The day at which project updates are sent."""
@@ -16878,6 +16957,13 @@ input RoadmapUpdateInput {
 
   """The roadmap's color."""
   color: String
+}
+
+enum SchemaFieldType {
+  stringType
+  numberType
+  booleanType
+  dateType
 }
 
 enum SendStrategy {
