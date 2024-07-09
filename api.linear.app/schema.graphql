@@ -1451,6 +1451,53 @@ type CreateOrJoinOrganizationResponse {
   user: AuthUser!
 }
 
+"""[ALPHA] A custom attribute on a Customer entity."""
+type CustomAttribute implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The customer that this custom attribute is attached to."""
+  customer: Customer!
+
+  """The field that is defining this custom attribute."""
+  field: CustomerSchemaField!
+
+  """The type of the value stored by the attribute."""
+  type: SchemaFieldType!
+
+  """The value of the custom attribute."""
+  value: JSON!
+}
+
+type CustomAttributeConnection {
+  edges: [CustomAttributeEdge!]!
+  nodes: [CustomAttribute!]!
+  pageInfo: PageInfo!
+}
+
+type CustomAttributeEdge {
+  node: CustomAttribute!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
 """[ALPHA] A customer whose needs will be tied to issues or projects."""
 type Customer implements Node {
   """The unique identifier of the entity."""
@@ -1495,6 +1542,28 @@ type CustomerConnection {
   edges: [CustomerEdge!]!
   nodes: [Customer!]!
   pageInfo: PageInfo!
+}
+
+input CustomerCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The name of the customer."""
+  name: String!
+
+  """The domains associated with this customer."""
+  domains: [String!] = []
+
+  """The ids of the customers in external systems."""
+  externalIds: [String!] = []
+
+  """The ID of the Slack channel used to interact with the customer."""
+  slackChannelId: String
+
+  """The user who owns the customer."""
+  ownerId: String
 }
 
 type CustomerEdge {
@@ -1549,11 +1618,65 @@ type CustomerNeedConnection {
   pageInfo: PageInfo!
 }
 
+input CustomerNeedCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The uuid of the customer the need belongs to."""
+  customerId: String!
+
+  """The issue this need is referencing."""
+  issueId: String
+
+  """The project this need is referencing."""
+  projectId: String
+
+  """The comment this need is referencing."""
+  commentId: String
+
+  """The priority of the need."""
+  priority: Float
+}
+
 type CustomerNeedEdge {
   node: CustomerNeed!
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+type CustomerNeedPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The customer need that was created or updated."""
+  need: CustomerNeed!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input CustomerNeedUpdateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The priority of the need."""
+  priority: Float
+}
+
+type CustomerPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The customer that was created or updated."""
+  customer: Customer!
+
+  """Whether the operation was successful."""
+  success: Boolean!
 }
 
 """[ALPHA] A customer schema."""
@@ -1636,6 +1759,23 @@ type CustomerSchemaFieldEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+input CustomerUpdateInput {
+  """The name of the customer."""
+  name: String
+
+  """The domains associated with this customer."""
+  domains: [String!]
+
+  """The ids of the customers in external systems."""
+  externalIds: [String!]
+
+  """The ID of the Slack channel used to interact with the customer."""
+  slackChannelId: String
+
+  """The user who owns the customer."""
+  ownerId: String
 }
 
 """A custom view that has been saved by a user."""
@@ -2925,7 +3065,7 @@ type DocumentNotification implements Notification & Entity & Node {
   projectUpdateHealth: String
 
   """
-  [ALPHA] Notifications with the same grouping key will be grouped together in the UI.
+  [Internal] Notifications with the same grouping key will be grouped together in the UI.
   """
   groupingKey: String!
 
@@ -4823,7 +4963,7 @@ type InitiativeNotification implements Notification & Entity & Node {
   projectUpdateHealth: String
 
   """
-  [ALPHA] Notifications with the same grouping key will be grouped together in the UI.
+  [Internal] Notifications with the same grouping key will be grouped together in the UI.
   """
   groupingKey: String!
 
@@ -6999,7 +7139,7 @@ type IssueNotification implements Notification & Entity & Node {
   projectUpdateHealth: String
 
   """
-  [ALPHA] Notifications with the same grouping key will be grouped together in the UI.
+  [Internal] Notifications with the same grouping key will be grouped together in the UI.
   """
   groupingKey: String!
 
@@ -8456,6 +8596,48 @@ type Mutation {
     input: ContactSalesCreateInput!
   ): ContactPayload!
 
+  """[ALPHA] Creates a new customer need."""
+  customerNeedCreate(
+    """The customer need to create."""
+    input: CustomerNeedCreateInput!
+  ): CustomerNeedPayload!
+
+  """[ALPHA] Updates a customer need"""
+  customerNeedUpdate(
+    """The properties of the customer need to update."""
+    input: CustomerNeedUpdateInput!
+
+    """The identifier of the customer need to update."""
+    id: String!
+  ): CustomerNeedPayload!
+
+  """[ALPHA] Deletes a customer need."""
+  customerNeedDelete(
+    """The identifier of the customer need to delete."""
+    id: String!
+  ): DeletePayload!
+
+  """[ALPHA] Creates a new customer."""
+  customerCreate(
+    """The customer to create."""
+    input: CustomerCreateInput!
+  ): CustomerPayload!
+
+  """[ALPHA] Updates a customer"""
+  customerUpdate(
+    """The properties of the customer to update."""
+    input: CustomerUpdateInput!
+
+    """The identifier of the customer to update."""
+    id: String!
+  ): CustomerPayload!
+
+  """[ALPHA] Deletes a customer."""
+  customerDelete(
+    """The identifier of the customer to delete."""
+    id: String!
+  ): DeletePayload!
+
   """Creates a new custom view."""
   customViewCreate(
     """The properties of the custom view to create."""
@@ -9526,7 +9708,7 @@ type Mutation {
     id: String!
   ): NotificationPayload!
 
-  """Marks all past notifications for the associated entity as read."""
+  """Marks notification and all related notifications as read."""
   notificationMarkReadAll(
     """The time when notification was marked as read."""
     readAt: DateTime!
@@ -9535,15 +9717,13 @@ type Mutation {
     input: NotificationEntityInput!
   ): NotificationBatchActionPayload!
 
-  """Marks all past notifications for the associated entity as unread."""
+  """Marks notification and all related notifications as unread."""
   notificationMarkUnreadAll(
     """The type and id of the entity to archive notifications for."""
     input: NotificationEntityInput!
   ): NotificationBatchActionPayload!
 
-  """
-  Snoozes a notification and all past notifications for the associated entity.
-  """
+  """Snoozes a notification and all related notifications."""
   notificationSnoozeAll(
     """
     The time until a notification will be snoozed. After that it will appear in the inbox again.
@@ -9554,9 +9734,7 @@ type Mutation {
     input: NotificationEntityInput!
   ): NotificationBatchActionPayload!
 
-  """
-  Unsnoozes a notification and all past notifications for the associated entity.
-  """
+  """Unsnoozes a notification and all related notifications."""
   notificationUnsnoozeAll(
     """The time when the notification was unsnoozed."""
     unsnoozedAt: DateTime!
@@ -9571,9 +9749,7 @@ type Mutation {
     id: String!
   ): NotificationArchivePayload!
 
-  """
-  Archives all of the user's past notifications for the associated entity.
-  """
+  """Archives a notification and all related notifications."""
   notificationArchiveAll(
     """The type and id of the entity to archive notifications for."""
     input: NotificationEntityInput!
@@ -10333,7 +10509,7 @@ interface Notification {
   projectUpdateHealth: String
 
   """
-  [ALPHA] Notifications with the same grouping key will be grouped together in the UI.
+  [Internal] Notifications with the same grouping key will be grouped together in the UI.
   """
   groupingKey: String!
 
@@ -10480,7 +10656,7 @@ input NotificationEntityInput {
   """The id of the issue related to the notification."""
   issueId: String
 
-  """The id of the project related to the notification."""
+  """[DEPRECATED] The id of the project related to the notification."""
   projectId: String
 
   """The id of the initiative related to the notification."""
@@ -10491,6 +10667,9 @@ input NotificationEntityInput {
 
   """The id of the OAuth client approval related to the notification."""
   oauthClientApprovalId: String
+
+  """The id of the notification."""
+  id: String
 }
 
 type NotificationPayload {
@@ -11659,7 +11838,7 @@ type OauthClientApprovalNotification implements Notification & Entity & Node {
   projectUpdateHealth: String
 
   """
-  [ALPHA] Notifications with the same grouping key will be grouped together in the UI.
+  [Internal] Notifications with the same grouping key will be grouped together in the UI.
   """
   groupingKey: String!
 
@@ -12667,6 +12846,11 @@ type Project implements Node {
   """The last template that was applied to this project."""
   lastAppliedTemplate: Template
 
+  """
+  The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  """
+  priority: Int!
+
   """The total number of issues in the project after each week."""
   issueCountHistory: [Float!]!
 
@@ -13105,6 +13289,11 @@ input ProjectCreateInput {
 
   """The sort order for the project within shared views."""
   sortOrder: Float
+
+  """
+  The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  """
+  priority: Int
 }
 
 type ProjectEdge {
@@ -13610,7 +13799,7 @@ type ProjectNotification implements Notification & Entity & Node {
   projectUpdateHealth: String
 
   """
-  [ALPHA] Notifications with the same grouping key will be grouped together in the UI.
+  [Internal] Notifications with the same grouping key will be grouped together in the UI.
   """
   groupingKey: String!
 
@@ -13940,6 +14129,11 @@ type ProjectSearchResult implements Node {
 
   """The last template that was applied to this project."""
   lastAppliedTemplate: Template
+
+  """
+  The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  """
+  priority: Int!
 
   """The total number of issues in the project after each week."""
   issueCountHistory: [Float!]!
@@ -14578,6 +14772,11 @@ input ProjectUpdateInput {
 
   """Whether the project has been trashed."""
   trashed: Boolean
+
+  """
+  The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  """
+  priority: Int
 }
 
 """
@@ -15088,6 +15287,66 @@ type Query {
     """The hash of the comment to retrieve."""
     hash: String
   ): Comment!
+
+  """All customer needs."""
+  customerNeeds(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CustomerNeedConnection!
+
+  """One specific customer need"""
+  customerNeed(id: String!): CustomerNeed!
+
+  """All customers."""
+  customers(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CustomerConnection!
+
+  """One specific customer."""
+  customer(id: String!): Customer!
 
   """Custom views for the user."""
   customViews(
