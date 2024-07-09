@@ -131,7 +131,6 @@ input AccountIntegrationAttributesInput {
 input AccountIntegrationInput {
   enabled: Boolean!
   graphs: [ID!]
-  projects: [ID!]
   environments: [BranchEnvironment!]
   attributes: AccountIntegrationAttributesInput!
 }
@@ -396,7 +395,6 @@ type DatadogIntegration {
 input DatadogIntegrationInput {
   apiKey: String!
   region: DatadogRegion!
-  environments: [BranchEnvironment!]!
   sampling: Int!
 }
 
@@ -1096,8 +1094,12 @@ type GraphIntegration {
   createdAt: DateTime!
   enabled: Boolean!
   id: ID!
+  branch: Branch
   graph: Graph!
+  attributes: GraphIntegrationAttributes
 }
+
+union GraphIntegrationAttributes = ProjectDopplerIntegration
 
 input GraphIntegrationAttributesInput {
   doppler: GraphDopplerIntegrationAttributesInput
@@ -2021,7 +2023,7 @@ type OrbValidationError {
   query: Query!
 }
 
-type Organization implements Account {
+type Organization implements Account & Node {
   id: ID!
   slug: String!
   name: String!
@@ -3229,6 +3231,7 @@ type Team implements Node {
 
   """The teams that are part of the team"""
   subteams(after: String, first: Int): TeamConnection!
+  query: Query!
 }
 
 union TeamAddMemberPayload = TeamAddMemberSuccess | TeamDoesNotExistError
