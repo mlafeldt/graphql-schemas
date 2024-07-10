@@ -1157,6 +1157,9 @@ input CommentCollectionFilter {
   """Filters that the comments reactions must satisfy."""
   reactions: ReactionCollectionFilter
 
+  """Filters that the comment's customer needs must satisfy."""
+  needs: CustomerNeedCollectionFilter
+
   """Compound filters, all of which need to be matched by the comment."""
   and: [CommentCollectionFilter!]
 
@@ -1282,6 +1285,9 @@ input CommentFilter {
 
   """Filters that the comments reactions must satisfy."""
   reactions: ReactionCollectionFilter
+
+  """Filters that the comment's customer needs must satisfy."""
+  needs: CustomerNeedCollectionFilter
 
   """Compound filters, all of which need to be matched by the comment."""
   and: [CommentFilter!]
@@ -1538,6 +1544,51 @@ type Customer implements Node {
   owner: User!
 }
 
+"""Customer filtering options."""
+input CustomerCollectionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the customer name."""
+  name: StringComparator
+
+  """Comparator for the customer slack channel ID."""
+  slackChannelId: StringComparator
+
+  """Comparator for the customer's domains."""
+  domains: StringArrayComparator
+
+  """Comparator for the customer's external IDs."""
+  externalIds: StringArrayComparator
+
+  """Filters that the customer owner must satisfy."""
+  owner: UserFilter
+
+  """Filters that the customer's needs must satisfy."""
+  needs: CustomerNeedCollectionFilter
+
+  """Compound filters, all of which need to be matched by the customer."""
+  and: [CustomerCollectionFilter!]
+
+  """Compound filters, one of which need to be matched by the customer."""
+  or: [CustomerCollectionFilter!]
+
+  """Filters that needs to be matched by some customers."""
+  some: CustomerFilter
+
+  """Filters that needs to be matched by all customers."""
+  every: CustomerFilter
+
+  """Comparator for the collection length."""
+  length: NumberComparator
+}
+
 type CustomerConnection {
   edges: [CustomerEdge!]!
   nodes: [Customer!]!
@@ -1571,6 +1622,42 @@ type CustomerEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Customer filtering options."""
+input CustomerFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the customer name."""
+  name: StringComparator
+
+  """Comparator for the customer slack channel ID."""
+  slackChannelId: StringComparator
+
+  """Comparator for the customer's domains."""
+  domains: StringArrayComparator
+
+  """Comparator for the customer's external IDs."""
+  externalIds: StringArrayComparator
+
+  """Filters that the customer owner must satisfy."""
+  owner: UserFilter
+
+  """Filters that the customer's needs must satisfy."""
+  needs: CustomerNeedCollectionFilter
+
+  """Compound filters, all of which need to be matched by the customer."""
+  and: [CustomerFilter!]
+
+  """Compound filters, one of which need to be matched by the customer."""
+  or: [CustomerFilter!]
 }
 
 """
@@ -1612,6 +1699,52 @@ type CustomerNeed implements Node {
   priority: Float
 }
 
+"""Customer needs filtering options."""
+input CustomerNeedCollectionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the customer need priority."""
+  priority: NumberComparator
+
+  """Filters that the need's project must satisfy."""
+  project: NullableProjectFilter
+
+  """Filters that the need's issue must satisfy."""
+  issue: NullableIssueFilter
+
+  """Filters that the need's comment must satisfy."""
+  comment: NullableCommentFilter
+
+  """Filters that the need's customer must satisfy."""
+  customer: CustomerFilter
+
+  """
+  Compound filters, all of which need to be matched by the customer needs.
+  """
+  and: [CustomerNeedCollectionFilter!]
+
+  """
+  Compound filters, one of which need to be matched by the customer needs.
+  """
+  or: [CustomerNeedCollectionFilter!]
+
+  """Filters that needs to be matched by some customer needs."""
+  some: CustomerNeedFilter
+
+  """Filters that needs to be matched by all customer needs."""
+  every: CustomerNeedFilter
+
+  """Comparator for the collection length."""
+  length: NumberComparator
+}
+
 type CustomerNeedConnection {
   edges: [CustomerNeedEdge!]!
   nodes: [CustomerNeed!]!
@@ -1645,6 +1778,43 @@ type CustomerNeedEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Customer filtering options."""
+input CustomerNeedFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the customer need priority."""
+  priority: NumberComparator
+
+  """Filters that the need's project must satisfy."""
+  project: NullableProjectFilter
+
+  """Filters that the need's issue must satisfy."""
+  issue: NullableIssueFilter
+
+  """Filters that the need's comment must satisfy."""
+  comment: NullableCommentFilter
+
+  """Filters that the need's customer must satisfy."""
+  customer: CustomerFilter
+
+  """
+  Compound filters, all of which need to be matched by the customer need.
+  """
+  and: [CustomerNeedFilter!]
+
+  """
+  Compound filters, one of which need to be matched by the customer need.
+  """
+  or: [CustomerNeedFilter!]
 }
 
 type CustomerNeedPayload {
@@ -6150,6 +6320,9 @@ input IssueCollectionFilter {
   """Filters that the issues reactions must satisfy."""
   reactions: ReactionCollectionFilter
 
+  """Filters that the issue's customer needs must satisfy."""
+  needs: CustomerNeedFilter
+
   """Compound filters, all of which need to be matched by the issue."""
   and: [IssueCollectionFilter!]
 
@@ -6480,6 +6653,9 @@ input IssueFilter {
 
   """Filters that the issues reactions must satisfy."""
   reactions: ReactionCollectionFilter
+
+  """Filters that the issue's customer needs must satisfy."""
+  needs: CustomerNeedFilter
 
   """Compound filters, all of which need to be matched by the issue."""
   and: [IssueFilter!]
@@ -10672,6 +10848,27 @@ input NotificationEntityInput {
   id: String
 }
 
+"""Notification filtering options."""
+input NotificationFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the notification type."""
+  type: StringComparator
+
+  """Compound filters, all of which need to be matched by the notification."""
+  and: [NotificationFilter!]
+
+  """Compound filters, one of which need to be matched by the notification."""
+  or: [NotificationFilter!]
+}
+
 type NotificationPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -10881,6 +11078,9 @@ input NullableCommentFilter {
 
   """Filters that the comments reactions must satisfy."""
   reactions: ReactionCollectionFilter
+
+  """Filters that the comment's customer needs must satisfy."""
+  needs: CustomerNeedCollectionFilter
 
   """Filter based on the existence of the relation."""
   null: Boolean
@@ -11164,6 +11364,9 @@ input NullableIssueFilter {
   """Filters that the issues reactions must satisfy."""
   reactions: ReactionCollectionFilter
 
+  """Filters that the issue's customer needs must satisfy."""
+  needs: CustomerNeedFilter
+
   """Filter based on the existence of the relation."""
   null: Boolean
 
@@ -11237,6 +11440,9 @@ input NullableProjectFilter {
   """Filters that the project's status must satisfy."""
   status: ProjectStatusFilter
 
+  """[ALPHA] Comparator for the projects priority."""
+  priority: NullableNumberComparator
+
   """[Internal] Comparator for the project's content."""
   searchableContent: ContentComparator
 
@@ -11302,6 +11508,9 @@ input NullableProjectFilter {
 
   """Filters that the last applied template must satisfy."""
   lastAppliedTemplate: NullableTemplateFilter
+
+  """Filters that the project's customer needs must satisfy."""
+  needs: CustomerNeedCollectionFilter
 
   """Filter based on the existence of the relation."""
   null: Boolean
@@ -13148,6 +13357,9 @@ input ProjectCollectionFilter {
   """Filters that the project's status must satisfy."""
   status: ProjectStatusFilter
 
+  """[ALPHA] Comparator for the projects priority."""
+  priority: NullableNumberComparator
+
   """[Internal] Comparator for the project's content."""
   searchableContent: ContentComparator
 
@@ -13213,6 +13425,9 @@ input ProjectCollectionFilter {
 
   """Filters that the last applied template must satisfy."""
   lastAppliedTemplate: NullableTemplateFilter
+
+  """Filters that the project's customer needs must satisfy."""
+  needs: CustomerNeedCollectionFilter
 
   """Compound filters, all of which need to be matched by the project."""
   and: [ProjectCollectionFilter!]
@@ -13326,6 +13541,9 @@ input ProjectFilter {
   """Filters that the project's status must satisfy."""
   status: ProjectStatusFilter
 
+  """[ALPHA] Comparator for the projects priority."""
+  priority: NullableNumberComparator
+
   """[Internal] Comparator for the project's content."""
   searchableContent: ContentComparator
 
@@ -13391,6 +13609,9 @@ input ProjectFilter {
 
   """Filters that the last applied template must satisfy."""
   lastAppliedTemplate: NullableTemplateFilter
+
+  """Filters that the project's customer needs must satisfy."""
+  needs: CustomerNeedCollectionFilter
 
   """Compound filters, all of which need to be matched by the project."""
   and: [ProjectFilter!]
@@ -15290,6 +15511,9 @@ type Query {
 
   """All customer needs."""
   customerNeeds(
+    """Filter returned customers needs."""
+    filter: CustomerNeedFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -15320,6 +15544,9 @@ type Query {
 
   """All customers."""
   customers(
+    """Filter returned customers."""
+    filter: CustomerFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -15926,6 +16153,9 @@ type Query {
 
   """All notifications."""
   notifications(
+    """Filters returned notifications."""
+    filter: NotificationFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -17678,7 +17908,87 @@ type SsoUrlFromEmailResponse {
 }
 
 """Comparator for strings."""
+input StringArrayComparator {
+  """Length of the array. Matches any values that have the given length."""
+  length: NumberComparator
+
+  """Compound filters, all of which need to be matched."""
+  every: [StringItemComparator!]
+
+  """Compound filters, one of which needs to be matched."""
+  some: [StringItemComparator!]
+}
+
+"""Comparator for strings."""
 input StringComparator {
+  """Equals constraint."""
+  eq: String
+
+  """Not-equals constraint."""
+  neq: String
+
+  """In-array constraint."""
+  in: [String!]
+
+  """Not-in-array constraint."""
+  nin: [String!]
+
+  """
+  Equals case insensitive. Matches any values that matches the given string case insensitive.
+  """
+  eqIgnoreCase: String
+
+  """
+  Not-equals case insensitive. Matches any values that don't match the given string case insensitive.
+  """
+  neqIgnoreCase: String
+
+  """
+  Starts with constraint. Matches any values that start with the given string.
+  """
+  startsWith: String
+
+  """
+  Starts with case insensitive constraint. Matches any values that start with the given string.
+  """
+  startsWithIgnoreCase: String
+
+  """
+  Doesn't start with constraint. Matches any values that don't start with the given string.
+  """
+  notStartsWith: String
+
+  """
+  Ends with constraint. Matches any values that end with the given string.
+  """
+  endsWith: String
+
+  """
+  Doesn't end with constraint. Matches any values that don't end with the given string.
+  """
+  notEndsWith: String
+
+  """Contains constraint. Matches any values that contain the given string."""
+  contains: String
+
+  """
+  Contains case insensitive constraint. Matches any values that contain the given string case insensitive.
+  """
+  containsIgnoreCase: String
+
+  """
+  Doesn't contain constraint. Matches any values that don't contain the given string.
+  """
+  notContains: String
+
+  """
+  Doesn't contain case insensitive constraint. Matches any values that don't contain the given string case insensitive.
+  """
+  notContainsIgnoreCase: String
+}
+
+"""Comparator for strings in arrays."""
+input StringItemComparator {
   """Equals constraint."""
   eq: String
 
