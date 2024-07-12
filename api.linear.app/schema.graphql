@@ -5815,6 +5815,11 @@ type Issue implements Node {
   """The order of the item in relation to other items in the organization."""
   sortOrder: Float!
 
+  """
+  [ALPHA] The order of the item in relation to other items in the organization, when ordered by priority.
+  """
+  prioritySortOrder: Float!
+
   """The time at which the issue was moved into started state."""
   startedAt: DateTime
 
@@ -6380,7 +6385,7 @@ input IssueCreateInput {
   """The identifiers of the issue labels associated with this ticket."""
   labelIds: [String!]
 
-  """The identifier or key of the team associated with the issue."""
+  """The identifier of the team associated with the issue."""
   teamId: String!
 
   """The cycle associated with the issue."""
@@ -7514,6 +7519,11 @@ type IssueSearchResult implements Node {
   """The order of the item in relation to other items in the organization."""
   sortOrder: Float!
 
+  """
+  [ALPHA] The order of the item in relation to other items in the organization, when ordered by priority.
+  """
+  prioritySortOrder: Float!
+
   """The time at which the issue was moved into started state."""
   startedAt: DateTime
 
@@ -7974,7 +7984,7 @@ input IssueUpdateInput {
   """The identifiers of the issue labels associated with this ticket."""
   labelIds: [String!]
 
-  """The identifier or key of the team associated with the issue."""
+  """The identifier of the team associated with the issue."""
   teamId: String
 
   """The cycle associated with the issue."""
@@ -10862,6 +10872,9 @@ input NotificationFilter {
   """Comparator for the notification type."""
   type: StringComparator
 
+  """Comparator for the archived at date."""
+  archivedAt: DateComparator
+
   """Compound filters, all of which need to be matched by the notification."""
   and: [NotificationFilter!]
 
@@ -13049,6 +13062,11 @@ type Project implements Node {
   """The sort order for the project within the organization."""
   sortOrder: Float!
 
+  """
+  [ALPHA] The sort order for the project within the organization, when ordered by priority.
+  """
+  prioritySortOrder: Float!
+
   """The project was created based on this issue."""
   convertedFromIssue: Issue
 
@@ -13273,7 +13291,7 @@ type Project implements Node {
     orderBy: PaginationOrderBy
   ): IssueConnection!
 
-  """Links associated with the project."""
+  """[DEPRECATED] Links associated with the project."""
   links(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -13298,7 +13316,34 @@ type Project implements Node {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
-  ): ProjectLinkConnection!
+  ): ProjectLinkConnection! @deprecated(reason: "Use externalLinks instead")
+
+  """External links associated with the project."""
+  externalLinks(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): EntityExternalLink!
 
   """
   The overall progress of the project. This is the (completed estimate points +
@@ -14345,6 +14390,11 @@ type ProjectSearchResult implements Node {
   """The sort order for the project within the organization."""
   sortOrder: Float!
 
+  """
+  [ALPHA] The sort order for the project within the organization, when ordered by priority.
+  """
+  prioritySortOrder: Float!
+
   """The project was created based on this issue."""
   convertedFromIssue: Issue
 
@@ -14569,7 +14619,7 @@ type ProjectSearchResult implements Node {
     orderBy: PaginationOrderBy
   ): IssueConnection!
 
-  """Links associated with the project."""
+  """[DEPRECATED] Links associated with the project."""
   links(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -14594,7 +14644,34 @@ type ProjectSearchResult implements Node {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
-  ): ProjectLinkConnection!
+  ): ProjectLinkConnection! @deprecated(reason: "Use externalLinks instead")
+
+  """External links associated with the project."""
+  externalLinks(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): EntityExternalLink!
 
   """
   The overall progress of the project. This is the (completed estimate points +
