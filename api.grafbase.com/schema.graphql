@@ -1685,6 +1685,12 @@ type Mutation {
   slackIntegrationCreate(input: SlackIntegrationCreateInput!): SlackNotificationCreatePayload!
   slackNotificationDelete(id: String!): SlackNotificationDeletePayload!
   stripeSetupIntentCreate: StripeSetupIntentCreatePayload!
+
+  """Assign a team as the owner of a subgraph"""
+  subgraphAddOwner(branchId: ID!, subgraphName: String!, owner: ID!): SubgraphAddOwnerPayload!
+
+  """Unassign a team's ownership of a subgraph"""
+  subgraphRemoveOwner(branchId: ID!, subgraphName: String!): SubgraphRemoveOwnerPayload!
   teamCreate(organizationId: ID!, name: String!): TeamCreatePayload!
   teamDelete(teamId: ID!): TeamDeletePayload!
   teamAddMember(teamId: ID!, memberId: ID!): TeamAddMemberPayload!
@@ -2567,6 +2573,10 @@ type ProjectUpdateSuccess {
   query: Query!
 }
 
+type PublishForbidden {
+  query: Query!
+}
+
 input PublishInput {
   accountSlug: String!
   projectSlug: String!
@@ -2576,7 +2586,7 @@ input PublishInput {
   schema: String!
 }
 
-union PublishPayload = PublishSuccess | ProjectDoesNotExistError | ProjectNotFederatedError | FederatedGraphCompositionError | SchemaRegistryBranchDoesNotExistError
+union PublishPayload = PublishSuccess | ProjectDoesNotExistError | ProjectNotFederatedError | FederatedGraphCompositionError | SchemaRegistryBranchDoesNotExistError | PublishForbidden
 
 type PublishSuccess {
   query: Query!
@@ -3200,6 +3210,12 @@ type Subgraph {
   updatedAt: DateTime!
 }
 
+union SubgraphAddOwnerPayload = SubgraphAddOwnerSuccess
+
+type SubgraphAddOwnerSuccess {
+  query: Query!
+}
+
 type SubgraphNameMissingOnFederatedGraphError {
   query: Query!
 }
@@ -3221,6 +3237,12 @@ type SubgraphNameProvidedOnStandaloneProjectError {
 }
 
 type SubgraphNotFoundError {
+  query: Query!
+}
+
+union SubgraphRemoveOwnerPayload = SubgraphRemoveOwnerSuccess
+
+type SubgraphRemoveOwnerSuccess {
   query: Query!
 }
 
