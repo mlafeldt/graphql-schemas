@@ -1542,6 +1542,9 @@ type Customer implements Node {
 
   """The user who owns the customer."""
   owner: User!
+
+  """The current status of the customer."""
+  status: CustomerStatus!
 }
 
 """Customer filtering options."""
@@ -1615,6 +1618,9 @@ input CustomerCreateInput {
 
   """The user who owns the customer."""
   ownerId: String
+
+  """The status of the customer."""
+  statusId: String
 }
 
 type CustomerEdge {
@@ -1931,6 +1937,112 @@ type CustomerSchemaFieldEdge {
   cursor: String!
 }
 
+"""[ALPHA] A customer status."""
+type CustomerStatus implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The name of the status."""
+  name: String!
+
+  """The UI color of the status as a HEX string."""
+  color: String!
+
+  """The type of the customer status."""
+  type: CustomerStatusType!
+
+  """Description of the status."""
+  description: String
+
+  """The position of the status in the workspace's customers flow."""
+  position: Float!
+}
+
+type CustomerStatusConnection {
+  edges: [CustomerStatusEdge!]!
+  nodes: [CustomerStatus!]!
+  pageInfo: PageInfo!
+}
+
+input CustomerStatusCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The name of the status."""
+  name: String!
+
+  """The UI color of the status as a HEX string."""
+  color: String!
+
+  """Description of the status."""
+  description: String
+
+  """The position of the status in the workspace's customer flow."""
+  position: Float!
+
+  """The type of the customer status."""
+  type: CustomerStatusType!
+}
+
+type CustomerStatusEdge {
+  node: CustomerStatus!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type CustomerStatusPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The customer status that was created or updated."""
+  status: CustomerStatus!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+"""A type of customer status."""
+enum CustomerStatusType {
+  active
+  inactive
+}
+
+input CustomerStatusUpdateInput {
+  """The name of the status."""
+  name: String
+
+  """The UI color of the status as a HEX string."""
+  color: String
+
+  """Description of the status."""
+  description: String
+
+  """The position of the status in the workspace's customer flow."""
+  position: Float
+
+  """The type of the customer status."""
+  type: CustomerStatusType
+}
+
 input CustomerUpdateInput {
   """The name of the customer."""
   name: String
@@ -1946,6 +2058,9 @@ input CustomerUpdateInput {
 
   """The user who owns the customer."""
   ownerId: String
+
+  """The status of the customer."""
+  statusId: String
 }
 
 """A custom view that has been saved by a user."""
@@ -2186,6 +2301,11 @@ type CustomViewNotificationSubscription implements NotificationSubscription & En
   The contextual project view associated with the notification subscription.
   """
   project: Project
+
+  """
+  The contextual initiative view associated with the notification subscription.
+  """
+  initiative: Initiative
 
   """The team associated with the notification subscription."""
   team: Team
@@ -2556,6 +2676,11 @@ type CycleNotificationSubscription implements NotificationSubscription & Entity 
   The contextual project view associated with the notification subscription.
   """
   project: Project
+
+  """
+  The contextual initiative view associated with the notification subscription.
+  """
+  initiative: Initiative
 
   """The team associated with the notification subscription."""
   team: Team
@@ -5153,6 +5278,76 @@ type InitiativeNotification implements Notification & Entity & Node {
   initiativeId: String!
 }
 
+"""An initiative notification subscription."""
+type InitiativeNotificationSubscription implements NotificationSubscription & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see
+  skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The user that subscribed to receive notifications."""
+  subscriber: User!
+
+  """
+  The contextual custom view associated with the notification subscription.
+  """
+  customView: CustomView
+
+  """
+  The contextual cycle view associated with the notification subscription.
+  """
+  cycle: Cycle
+
+  """
+  The contextual label view associated with the notification subscription.
+  """
+  label: IssueLabel
+
+  """
+  The contextual project view associated with the notification subscription.
+  """
+  project: Project
+
+  """The initiative subscribed to."""
+  initiative: Initiative!
+
+  """The team associated with the notification subscription."""
+  team: Team
+
+  """The user view associated with the notification subscription."""
+  user: User
+
+  """
+  The type of view to which the notification subscription context is associated with.
+  """
+  contextViewType: ContextViewType
+
+  """
+  The type of user view to which the notification subscription context is associated with.
+  """
+  userContextViewType: UserContextViewType
+
+  """Whether the subscription is active or not."""
+  active: Boolean!
+
+  """The type of subscription."""
+  notificationSubscriptionTypes: [String!]!
+}
+
 """The payload returned by the initiative mutations."""
 type InitiativePayload {
   """The identifier of the last sync operation."""
@@ -6820,7 +7015,7 @@ type IssueHistory implements Node {
   """
   The actors that performed the actions. This field may be empty in the case of integrations or automations.
   """
-  actors: [User!]!
+  actors: [User!]
 
   """The user that was unassigned from the issue."""
   fromAssignee: User
@@ -8252,6 +8447,11 @@ type LabelNotificationSubscription implements NotificationSubscription & Entity 
   """
   project: Project
 
+  """
+  The contextual initiative view associated with the notification subscription.
+  """
+  initiative: Initiative
+
   """The team associated with the notification subscription."""
   team: Team
 
@@ -8840,6 +9040,27 @@ type Mutation {
   """[ALPHA] Deletes a customer."""
   customerDelete(
     """The identifier of the customer to delete."""
+    id: String!
+  ): DeletePayload!
+
+  """[ALPHA] Creates a new customer status."""
+  customerStatusCreate(
+    """The CustomerStatus object to create."""
+    input: CustomerStatusCreateInput!
+  ): CustomerStatusPayload!
+
+  """[ALPHA] Updates a customer status."""
+  customerStatusUpdate(
+    """A partial CustomerStatus object to update the CustomerStatus with."""
+    input: CustomerStatusUpdateInput!
+
+    """The identifier of the customer status to update."""
+    id: String!
+  ): CustomerStatusPayload!
+
+  """[ALPHA] Deletes a customer status."""
+  customerStatusDelete(
+    """The identifier of the customer status to delete."""
     id: String!
   ): DeletePayload!
 
@@ -10956,6 +11177,11 @@ interface NotificationSubscription {
   """
   project: Project
 
+  """
+  The contextual initiative view associated with the notification subscription.
+  """
+  initiative: Initiative
+
   """The team associated with the notification subscription."""
   team: Team
 
@@ -11005,6 +11231,9 @@ input NotificationSubscriptionCreateInput {
 
   """The identifier of the user to subscribe to."""
   userId: String
+
+  """The identifier of the initiative to subscribe to."""
+  initiativeId: String
 
   """
   The type of view to which the notification subscription context is associated with.
@@ -11598,6 +11827,9 @@ input NullableProjectUpdatesFilter {
 
   """Comparator for the updated at date."""
   updatedAt: DateComparator
+
+  """Comparator for the project update health."""
+  health: StringComparator
 
   """Filter based on the existence of the relation."""
   null: Boolean
@@ -14168,6 +14400,11 @@ type ProjectNotificationSubscription implements NotificationSubscription & Entit
   """The project subscribed to."""
   project: Project!
 
+  """
+  The contextual initiative view associated with the notification subscription.
+  """
+  initiative: Initiative
+
   """The team associated with the notification subscription."""
   team: Team
 
@@ -15223,6 +15460,9 @@ input ProjectUpdatesCollectionFilter {
   """Comparator for the updated at date."""
   updatedAt: DateComparator
 
+  """Comparator for the project update health."""
+  health: StringComparator
+
   """
   Compound filters, all of which need to be matched by the project update.
   """
@@ -15251,6 +15491,9 @@ input ProjectUpdatesFilter {
 
   """Comparator for the updated at date."""
   updatedAt: DateComparator
+
+  """Comparator for the project update health."""
+  health: StringComparator
 
   """
   Compound filters, all of which need to be matched by the project updates.
@@ -15689,6 +15932,36 @@ type Query {
 
   """One specific customer."""
   customer(id: String!): Customer!
+
+  """All customer statuses."""
+  customerStatuses(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CustomerStatusConnection!
+
+  """One specific customer status."""
+  customerStatus(id: String!): CustomerStatus!
 
   """Custom views for the user."""
   customViews(
@@ -19060,6 +19333,11 @@ type TeamNotificationSubscription implements NotificationSubscription & Entity &
   """
   project: Project
 
+  """
+  The contextual initiative view associated with the notification subscription.
+  """
+  initiative: Initiative
+
   """The team subscribed to."""
   team: Team!
 
@@ -20368,6 +20646,11 @@ type UserNotificationSubscription implements NotificationSubscription & Entity &
   """
   project: Project
 
+  """
+  The contextual initiative view associated with the notification subscription.
+  """
+  initiative: Initiative
+
   """The team associated with the notification subscription."""
   team: Team
 
@@ -20823,6 +21106,32 @@ type WebhookEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Entity representing a webhook execution failure."""
+type WebhookFailureEvent {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """The webhook that this failure event is associated with."""
+  webhook: Webhook!
+
+  """The URL that the webhook was trying to push to."""
+  url: String!
+
+  """The HTTP status code returned by the recipient."""
+  httpStatus: Float
+
+  """The HTTP response body returned by the recipient or error occured."""
+  responseOrError: String
+
+  """
+  The unique execution ID of the webhook push. This is retained between retries of the same push.
+  """
+  executionId: String!
 }
 
 type WebhookPayload {
