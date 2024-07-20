@@ -475,7 +475,7 @@ input DeploymentCreateInput {
   branch: String
 }
 
-union DeploymentCreatePayload = DeploymentCreateSuccess | ProjectDoesNotExistError | ArchiveFileSizeLimitExceededError | DailyDeploymentCountLimitExceededError | ProjectNotManagedError | ProjectNotStandaloneError | GraphDoesNotExistError | GraphNotManagedError | GraphNotStandaloneError
+union DeploymentCreatePayload = DeploymentCreateSuccess | ProjectDoesNotExistError | ArchiveFileSizeLimitExceededError | DailyDeploymentCountLimitExceededError | ProjectNotManagedError | ProjectNotStandaloneError | GraphDoesNotExistError | GraphNotManagedError | GraphNotStandaloneError | NotAllowedError
 
 type DeploymentCreateSuccess {
   deployment: Deployment!
@@ -513,7 +513,7 @@ enum DeploymentLogLevel {
   INFO
 }
 
-union DeploymentRedeployPayload = DeploymentRedeploySuccess | DeploymentDoesNotExistError | DailyDeploymentCountLimitExceededError
+union DeploymentRedeployPayload = DeploymentRedeploySuccess | DeploymentDoesNotExistError | DailyDeploymentCountLimitExceededError | NotAllowedError
 
 type DeploymentRedeploySuccess {
   deployment: Deployment!
@@ -845,6 +845,12 @@ type Graph implements Node {
   analytics(filters: GraphAnalyticsFilters!): GraphAnalytics
   requestAnalytics(filter: GraphRequestAnalyticsFilter!): RequestAnalytics
   operationAnalytics(first: Int, after: String, filter: GraphOperationRequestAnalyticsFilter!): OperationRequestMetricsConnection!
+}
+
+union GraphAddOwnerPayload = GraphAddOwnerSuccess | GraphDoesNotExistError | NotAllowedError
+
+type GraphAddOwnerSuccess {
+  query: Query!
 }
 
 type GraphAnalytics {
@@ -1201,7 +1207,7 @@ input GraphOperationCheckConfigurationInput {
   excludedOperations: [String!]
 }
 
-union GraphOperationCheckConfigurationUpdatePayload = GraphDoesNotExistError | GraphOperationCheckConfiguration
+union GraphOperationCheckConfigurationUpdatePayload = GraphDoesNotExistError | GraphOperationCheckConfiguration | NotAllowedError
 
 input GraphOperationRequestAnalyticsFilter {
   branch: String
@@ -1211,6 +1217,12 @@ input GraphOperationRequestAnalyticsFilter {
   to: DateTime
   operationName: String
   operationTypes: [OperationType!]
+}
+
+union GraphRemoveOwnerPayload = GraphRemoveOwnerSuccess | GraphDoesNotExistError | NotAllowedError
+
+type GraphRemoveOwnerSuccess {
+  query: Query!
 }
 
 input GraphRequestAnalyticsFilter {
@@ -1255,7 +1267,7 @@ input GraphUpdateInput {
   repoRootPath: String
 }
 
-union GraphUpdatePayload = GraphUpdateSuccess | GraphDoesNotExistError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | CannotBeRenamedError
+union GraphUpdatePayload = GraphUpdateSuccess | GraphDoesNotExistError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | CannotBeRenamedError | NotAllowedError
 
 type GraphUpdateSuccess {
   graph: Graph!
@@ -1644,6 +1656,8 @@ type Mutation {
   graphUpdate(input: GraphUpdateInput!): GraphUpdatePayload!
   graphOperationCheckConfigurationUpdate(input: GraphOperationCheckConfigurationInput!): GraphOperationCheckConfigurationUpdatePayload!
   graphDelete(input: GraphDeleteInput!): GraphDeletePayload!
+  graphAddOwner(graphId: ID!, ownerId: ID!): GraphAddOwnerPayload!
+  graphRemoveOwner(graphId: ID!, ownerId: ID!): GraphRemoveOwnerPayload!
   inviteSend(input: InviteSendInput!): InviteSendPayload!
   inviteCancel(input: InviteCancelInput!): InviteCancelPayload!
   inviteAccept(input: InviteAcceptInput!): InviteAcceptPayload!
@@ -2533,7 +2547,7 @@ input ProjectOperationCheckConfigurationInput {
   excludedOperations: [String!]
 }
 
-union ProjectOperationCheckConfigurationUpdatePayload = ProjectDoesNotExistError | ProjectOperationCheckConfiguration
+union ProjectOperationCheckConfigurationUpdatePayload = ProjectDoesNotExistError | ProjectOperationCheckConfiguration | NotAllowedError
 
 input ProjectRequestAnalyticsFilter {
   branch: String = null
@@ -2577,7 +2591,7 @@ input ProjectUpdateInput {
   projectRootPath: String
 }
 
-union ProjectUpdatePayload = ProjectUpdateSuccess | ProjectDoesNotExistError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | CannotBeRenamedError
+union ProjectUpdatePayload = ProjectUpdateSuccess | ProjectDoesNotExistError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | CannotBeRenamedError | NotAllowedError
 
 type ProjectUpdateSuccess {
   project: Project!
