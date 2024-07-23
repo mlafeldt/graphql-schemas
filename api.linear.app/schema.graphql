@@ -2985,6 +2985,36 @@ type Document implements Node {
   """The order of the item in the resources list."""
   sortOrder: Float!
 
+  """Comments associated with the document."""
+  comments(
+    """Filter returned comments."""
+    filter: CommentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CommentConnection!
+
   """The documents content in markdown format."""
   content: String
 
@@ -3459,6 +3489,36 @@ type DocumentSearchResult implements Node {
 
   """The order of the item in the resources list."""
   sortOrder: Float!
+
+  """Comments associated with the document."""
+  comments(
+    """Filter returned comments."""
+    filter: CommentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CommentConnection!
 
   """The documents content in markdown format."""
   content: String
@@ -4747,6 +4807,9 @@ type GitHubImportSettings {
   """The names of the repositories connected for the GitHub integration."""
   repositories: [GitHubRepo!]!
 
+  """A map storing all available issue labels per repository"""
+  labels: JSONObject
+
   """The type of Github org"""
   orgType: GithubOrgType!
 }
@@ -4760,6 +4823,9 @@ input GitHubImportSettingsInput {
 
   """The names of the repositories connected for the GitHub integration."""
   repositories: [GitHubRepoInput!]!
+
+  """A map storing all available issue labels per repository"""
+  labels: JSONObject
 
   """The type of Github org"""
   orgType: GithubOrgType!
@@ -9770,24 +9836,13 @@ type Mutation {
     """Name of new team. When teamId is not set."""
     teamName: String
 
-    """[DEPRECATED] GitHub token to fetch information from the GitHub API."""
-    githubToken: String
-
-    """[DEPRECATED] GitHub repository name from which we will import data."""
-    githubRepoName: String
-
-    """
-    [DEPRECATED] GitHub owner (user or org) for the repository from which we will import data.
-    """
-    githubRepoOwner: String
-
-    """
-    [DEPRECATED] ID of the Github repository from which we will import data.
-    """
-    githubRepoId: String
-
     """IDs of the Github repositories from which we will import data."""
     githubRepoIds: [Int!]
+
+    """
+    Labels to use to filter the import data. Only issues matching any of these filters will be imported.
+    """
+    githubLabels: [String!]
 
     """
     [DEPRECATED] ID of the Github import integration to use to access issues.
@@ -16279,36 +16334,6 @@ type Query {
     integrationId: String!
   ): IntegrationHasScopesPayload!
 
-  """All project updates."""
-  projectUpdates(
-    """Filter returned project updates."""
-    filter: ProjectUpdateFilter
-
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): ProjectUpdateConnection!
-
   """One specific set of settings."""
   integrationsSettings(id: String!): IntegrationsSettings!
 
@@ -16817,6 +16842,36 @@ type Query {
     """The identifier of the project update interaction to retrieve."""
     id: String!
   ): ProjectUpdateInteraction!
+
+  """All project updates."""
+  projectUpdates(
+    """Filter returned project updates."""
+    filter: ProjectUpdateFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectUpdateConnection!
 
   """A specific project update."""
   projectUpdate(
@@ -21014,6 +21069,7 @@ enum ViewType {
   archive
   quickView
   issueIdentifiers
+  customers
 }
 
 """A webhook used to send HTTP notifications over data updates."""
