@@ -1701,8 +1701,10 @@ type CustomerNeed implements Node {
   """The comment this need is referencing."""
   comment: Comment
 
-  """The priority of the need."""
-  priority: Float
+  """
+  The priority of the customer need. 0 = No priority, 1 = Critical, 2 = Important, 3 = Nice to have.
+  """
+  priority: Float!
 }
 
 """Customer needs filtering options."""
@@ -1775,7 +1777,9 @@ input CustomerNeedCreateInput {
   """The comment this need is referencing."""
   commentId: String
 
-  """The priority of the need."""
+  """
+  The priority of the customer need. 0 = No priority, 1 = Critical, 2 = Important, 3 = Nice to have.
+  """
   priority: Float
 }
 
@@ -1840,7 +1844,9 @@ input CustomerNeedUpdateInput {
   """
   id: String
 
-  """The priority of the need."""
+  """
+  The priority of the customer need. 0 = No priority, 1 = Critical, 2 = Important, 3 = Nice to have.
+  """
   priority: Float
 }
 
@@ -2717,13 +2723,13 @@ type CyclePayload {
 }
 
 """
-[DEPRECATED] Input for shifting all cycles by a certain number of days. Mutation is now deprecated.
+Input for shifting all cycles from a certain cycle onwards by a certain number of days
 """
 input CycleShiftAllInput {
-  """[DEPRECATED] The cycle id at which to start the shift."""
+  """The cycle ID at which to start the shift."""
   id: String!
 
-  """[DEPRECATED] The number of days to shift the cycles by."""
+  """The number of days to shift the cycles by."""
   daysToShift: Float!
 }
 
@@ -9193,7 +9199,9 @@ type Mutation {
     id: String!
   ): CycleArchivePayload!
 
-  """[DEPRECATED] Shifts all cycles starts by a certain number of weeks."""
+  """
+  Shifts all cycles starts and ends by a certain number of days, starting from the provided cycle onwards.
+  """
   cycleShiftAll(
     """A partial cycle object to update the cycle with."""
     input: CycleShiftAllInput!
