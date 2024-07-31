@@ -689,6 +689,34 @@ type FederatedGraphCompositionError {
   messages: [String!]!
 }
 
+type FieldAnalytics {
+  metrics: FieldMetricsTimeSeries
+
+  """Neither latencies nor errors will be populated"""
+  topClients(
+    """Detaults to 10, Max 100"""
+    limit: Int
+
+    """Search over the client names & versions"""
+    searchQuery: String
+  ): TopClients
+}
+
+type FieldMetrics {
+  count: Int!
+}
+
+type FieldMetricsTimeSeries {
+  overall: FieldMetrics!
+  points: [FieldMetricsTimeSeriesDataPoint!]!
+  previousPeriod: FieldMetricsTimeSeries
+}
+
+type FieldMetricsTimeSeriesDataPoint {
+  dateTime: DateTime!
+  count: Int!
+}
+
 enum FunctionKind {
   AUTHORIZER
   RESOLVER
@@ -832,6 +860,7 @@ type Graph implements Node {
   canBeRenamed: Boolean!
   status: GraphStatus!
   repository: GitRepository
+  owners: [Team!]!
   account: Account!
   branches(after: String, before: String, first: Int, last: Int): BranchConnection!
   apiKeys(after: String, before: String, first: Int, last: Int): GraphApiKeyConnection!
@@ -856,6 +885,10 @@ type GraphAddOwnerSuccess {
 type GraphAnalytics {
   periodStart: DateTime!
   periodEnd: DateTime!
+  forField(
+    """Schema path defined as: '<parent-type-name>.<name>'"""
+    schemaPath: String!
+  ): FieldAnalytics!
   requestMetrics(
     """Latency percentiles to retrieve. Ex: [50, 99, 99.9]"""
     latencyPercentiles: [Float!]
@@ -3233,6 +3266,7 @@ type Subgraph {
   schema: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+  owners: [Team!]!
 }
 
 union SubgraphAddOwnerPayload = SubgraphAddOwnerSuccess
