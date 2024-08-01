@@ -691,15 +691,13 @@ type FederatedGraphCompositionError {
 
 type FieldAnalytics {
   metrics: FieldMetricsTimeSeries
-
-  """Neither latencies nor errors will be populated"""
   topClients(
     """Detaults to 10, Max 100"""
     limit: Int
 
-    """Search over the client names & versions"""
+    """Search over the client names/versions"""
     searchQuery: String
-  ): TopClients
+  ): TopClientsForField
 }
 
 type FieldMetrics {
@@ -883,8 +881,6 @@ type GraphAddOwnerSuccess {
 }
 
 type GraphAnalytics {
-  periodStart: DateTime!
-  periodEnd: DateTime!
   forField(
     """Schema path defined as: '<parent-type-name>.<name>'"""
     schemaPath: String!
@@ -910,7 +906,7 @@ type GraphAnalytics {
     """Detaults to 10, Max 100"""
     limit: Int
 
-    """Search over the client names & versions"""
+    """Search over the client names/versions"""
     searchQuery: String
   ): TopClients
 }
@@ -3472,6 +3468,19 @@ type TopClientsByNameAndVersion {
   orderedByHighestLatency: [TopClientByNameAndVersionOrderedByHighestLatency!]!
   orderedByHighestCount: [TopClientByNameAndVersionOrderedByHighestCount!]!
   orderedByHighestErrorRatio: [TopClientByNameAndVersionOrderedByHighestErrorRatio!]!
+}
+
+type TopClientsForField {
+  byName: TopClientsForFieldByName!
+  byNameAndVersion: TopClientsForFieldByNameAndVersion!
+}
+
+type TopClientsForFieldByName {
+  orderedByHighestCount: [TopClientByNameOrderedByHighestCount!]!
+}
+
+type TopClientsForFieldByNameAndVersion {
+  orderedByHighestCount: [TopClientByNameAndVersionOrderedByHighestCount!]!
 }
 
 type TopOperationByNameAndHashOrderedByHighestCount {
