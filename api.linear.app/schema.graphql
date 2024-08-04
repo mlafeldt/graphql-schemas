@@ -8957,11 +8957,30 @@ type Mutation {
 
   """Link an existing Jira issue to an issue."""
   attachmentLinkJiraIssue(
+    """
+    Create attachment as a user with the provided name. This option is only
+    available to OAuth applications creating attachments in `actor=application` mode.
+    """
+    createAsUser: String
+
+    """
+    Provide an external user avatar URL. Can only be used in conjunction with
+    the `createAsUser` options. This option is only available to OAuth
+    applications creating comments in `actor=application` mode.
+    """
+    displayIconUrl: String
+
+    """The title to use for the attachment."""
+    title: String
+
     """The issue for which to link the Jira issue."""
     issueId: String!
 
     """The Jira issue key or ID to link."""
     jiraIssueId: String!
+
+    """Optional attachment ID that may be provided through the API."""
+    id: String
   ): AttachmentPayload!
 
   """[DEPRECATED] Archives an issue attachment."""
