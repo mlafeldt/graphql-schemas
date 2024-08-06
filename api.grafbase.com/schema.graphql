@@ -870,8 +870,7 @@ type Graph implements Node {
   operationChecksConfiguration: GraphOperationCheckConfiguration!
   logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
   analytics(filters: GraphAnalyticsFilters!): GraphAnalytics
-  requestAnalytics(filter: GraphRequestAnalyticsFilter!): RequestAnalytics
-  operationAnalytics(first: Int, after: String, filter: GraphOperationRequestAnalyticsFilter!): OperationRequestMetricsConnection!
+  requestAnalytics(filter: GraphRequestAnalyticsFilter!): RequestAnalytics @deprecated(reason: "Use `analytics` instead")
 }
 
 union GraphAddOwnerPayload = GraphAddOwnerSuccess | GraphDoesNotExistError | NotAllowedError
@@ -1237,16 +1236,6 @@ input GraphOperationCheckConfigurationInput {
 }
 
 union GraphOperationCheckConfigurationUpdatePayload = GraphDoesNotExistError | GraphOperationCheckConfiguration | NotAllowedError
-
-input GraphOperationRequestAnalyticsFilter {
-  branch: String
-  period: GraphRequestAnalyticsPeriod
-  now: DateTime
-  from: DateTime
-  to: DateTime
-  operationName: String
-  operationTypes: [OperationType!]
-}
 
 union GraphRemoveOwnerPayload = GraphRemoveOwnerSuccess | GraphDoesNotExistError | NotAllowedError
 
@@ -1829,43 +1818,6 @@ type OperationNotAllowedByPlanError {
   query: Query!
 }
 
-input OperationRequestAnalyticsFilter {
-  branch: String
-  period: ProjectRequestAnalyticsPeriod
-  now: DateTime
-  from: DateTime
-  to: DateTime
-  operationName: String
-  operationTypes: [OperationType!]
-}
-
-type OperationRequestMetrics {
-  operationType: OperationType!
-  operationName: String!
-  operationId: ID!
-  requestCount: Int!
-}
-
-type OperationRequestMetricsConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
-  edges: [OperationRequestMetricsEdge!]!
-
-  """A list of nodes."""
-  nodes: [OperationRequestMetrics!]!
-}
-
-"""An edge in a connection."""
-type OperationRequestMetricsEdge {
-  """The item at the end of the edge"""
-  node: OperationRequestMetrics!
-
-  """A cursor for use in pagination"""
-  cursor: String!
-}
-
 enum OperationType {
   QUERY
   MUTATION
@@ -2295,7 +2247,6 @@ type Project implements Node {
   status: ProjectStatus!
   customDomains: [CustomDomain!]!
   requestAnalytics(filter: ProjectRequestAnalyticsFilter!): RequestAnalytics
-  operationAnalytics(first: Int, after: String, filter: OperationRequestAnalyticsFilter!): OperationRequestMetricsConnection!
   schemaChecks(first: Int, after: String, branch: String): SchemaCheckConnection!
   operationChecksConfiguration: ProjectOperationCheckConfiguration!
   logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
@@ -3584,6 +3535,7 @@ type UserConnection {
 
   """A list of nodes."""
   nodes: [User!]!
+  totalCount: Int!
 }
 
 """An edge in a connection."""
