@@ -3921,7 +3921,7 @@ type EntityExternalLink implements Node {
   creator: User!
 
   """The initiative that the link is associated with."""
-  initiative: Initiative!
+  initiative: Initiative
 }
 
 type EntityExternalLinkConnection {
@@ -4886,6 +4886,41 @@ input GitHubRepoInput {
   id: Float!
 }
 
+"""Mapping of Linear teams to GitHub repos."""
+type GitHubRepoMapping {
+  """The Linear team id to map to the given project."""
+  linearTeamId: String!
+
+  """The GitHub repo id."""
+  gitHubRepoId: Float!
+
+  """Labels to filter incoming GitHub issue creation by."""
+  gitHubLabels: [String!]
+
+  """Whether the sync for this mapping is bidirectional."""
+  bidirectional: Boolean
+
+  """Whether this mapping is the default one for issue creation."""
+  default: Boolean
+}
+
+input GitHubRepoMappingInput {
+  """The Linear team id to map to the given project."""
+  linearTeamId: String!
+
+  """The GitHub repo id."""
+  gitHubRepoId: Float!
+
+  """Labels to filter incoming GitHub issue creation by."""
+  gitHubLabels: [String!]
+
+  """Whether the sync for this mapping is bidirectional."""
+  bidirectional: Boolean
+
+  """Whether this mapping is the default one for issue creation."""
+  default: Boolean
+}
+
 """Metadata and settings for a GitHub integration."""
 type GitHubSettings {
   """The avatar URL for the GitHub organization."""
@@ -4898,7 +4933,7 @@ type GitHubSettings {
   repositories: [GitHubRepo!]
 
   """Mapping of team to repository for syncing."""
-  repositoriesMapping: [TeamRepoMapping!]
+  repositoriesMapping: [GitHubRepoMapping!]
 
   """The type of Github org"""
   orgType: GithubOrgType
@@ -4915,7 +4950,7 @@ input GitHubSettingsInput {
   repositories: [GitHubRepoInput!]
 
   """Mapping of team to repository for syncing."""
-  repositoriesMapping: [TeamRepoMappingInput!]
+  repositoriesMapping: [GitHubRepoMappingInput!]
 
   """The type of Github org"""
   orgType: GithubOrgType
@@ -9669,15 +9704,6 @@ type Mutation {
   """[INTERNAL] Refresh PagerDuty schedule mappings."""
   integrationPagerDutyRefreshScheduleMappings: IntegrationPayload!
 
-  """Updates the organization's Slack integration."""
-  integrationUpdateSlack(
-    """The Slack OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Slack OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
   """Integrates the organization with Slack."""
   integrationSlack(
     """
@@ -13389,6 +13415,9 @@ type Project implements Node {
   """The project's description."""
   description: String!
 
+  """The content of the project description."""
+  documentContent: DocumentContent
+
   """The project's unique URL slug."""
   slugId: String!
 
@@ -14176,6 +14205,9 @@ type ProjectMilestone implements Node {
   """The name of the project milestone."""
   name: String!
 
+  """The content of the project milestone description."""
+  documentContent: DocumentContent
+
   """The planned completion date of the milestone."""
   targetDate: TimelessDate
 
@@ -14739,6 +14771,9 @@ type ProjectSearchResult implements Node {
 
   """The project's description."""
   description: String!
+
+  """The content of the project description."""
+  documentContent: DocumentContent
 
   """The project's unique URL slug."""
   slugId: String!
@@ -17527,6 +17562,9 @@ type Reaction implements Node {
 
   """The user that created the reaction."""
   user: User
+
+  """The external user that created the reaction."""
+  externalUser: ExternalUser
 }
 
 """Reaction filtering options."""
@@ -19512,35 +19550,6 @@ type TeamPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
-}
-
-"""Mapping of Linear teams to GitHub repos."""
-type TeamRepoMapping {
-  """The Linear team id to map to the given project."""
-  linearTeamId: String!
-
-  """The GitHub repo id."""
-  gitHubRepoId: Float!
-
-  """Whether the sync for this mapping is bidirectional."""
-  bidirectional: Boolean
-
-  """Whether this mapping is the default one for issue creation."""
-  default: Boolean
-}
-
-input TeamRepoMappingInput {
-  """The Linear team id to map to the given project."""
-  linearTeamId: String!
-
-  """The GitHub repo id."""
-  gitHubRepoId: Float!
-
-  """Whether the sync for this mapping is bidirectional."""
-  bidirectional: Boolean
-
-  """Whether this mapping is the default one for issue creation."""
-  default: Boolean
 }
 
 """Issue team sorting options."""
