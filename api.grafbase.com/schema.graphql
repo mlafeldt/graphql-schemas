@@ -235,6 +235,10 @@ type Branch implements Node {
   subgraphs: [Subgraph!]!
 }
 
+type BranchAlreadyExistsError {
+  query: Query!
+}
+
 type BranchConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
@@ -245,6 +249,14 @@ type BranchConnection {
   """A list of nodes."""
   nodes: [Branch!]!
 }
+
+input BranchCreateInput {
+  accountSlug: String!
+  graphSlug: String!
+  branchName: String!
+}
+
+union BranchCreatePayload = Query | BranchAlreadyExistsError | GraphDoesNotExistError | GraphNotSelfHostedError
 
 union BranchDeletePayload = Query | BranchDoesNotExistError | CannotDeleteProductionBranchError
 
@@ -1182,6 +1194,10 @@ type GraphNotManagedError {
   query: Query!
 }
 
+type GraphNotSelfHostedError {
+  query: Query!
+}
+
 type GraphNotStandaloneError {
   query: Query!
 }
@@ -1585,6 +1601,7 @@ type Mutation {
   personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
+  branchCreate(input: BranchCreateInput!): BranchCreatePayload!
   branchUpdate(input: BranchUpdateInput!): BranchUpdatePayload!
   branchDelete(
     """slug of the account"""
