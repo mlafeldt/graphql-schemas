@@ -2107,6 +2107,9 @@ type CustomView implements Node {
   """Whether the custom view is shared with everyone in the organization."""
   shared: Boolean!
 
+  """The custom view's unique URL slug."""
+  slugId: String
+
   """The model name of the custom view."""
   modelName: String!
 
@@ -4892,6 +4895,20 @@ input GitHubSettingsInput {
   orgType: GithubOrgType
 }
 
+type GitLabIntegrationCreatePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The integration that was created or updated."""
+  integration: Integration
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The webhook secret to provide to GitLab."""
+  webhookSecret: String!
+}
+
 """Metadata and settings for a GitLab integration."""
 type GitLabSettings {
   """The self-hosted URL of the GitLab instance."""
@@ -6107,6 +6124,12 @@ type Issue implements Node {
 
   """The time at which the issue's SLA will breach."""
   slaBreachesAt: DateTime
+
+  """The time at which the issue was added to a project."""
+  addedToProjectAt: DateTime
+
+  """The time at which the issue was added to a cycle."""
+  addedToCycleAt: DateTime
 
   """A flag that indicates whether the issue is in the trash bin."""
   trashed: Boolean
@@ -7817,6 +7840,12 @@ type IssueSearchResult implements Node {
   """The time at which the issue's SLA will breach."""
   slaBreachesAt: DateTime
 
+  """The time at which the issue was added to a project."""
+  addedToProjectAt: DateTime
+
+  """The time at which the issue was added to a cycle."""
+  addedToCycleAt: DateTime
+
   """A flag that indicates whether the issue is in the trash bin."""
   trashed: Boolean
 
@@ -9503,7 +9532,7 @@ type Mutation {
 
     """The GitLab Access Token to connect with."""
     accessToken: String!
-  ): IntegrationPayload!
+  ): GitLabIntegrationCreatePayload!
 
   """Creates an integration api key for Airbyte to connect with Linear."""
   airbyteIntegrationConnect(
@@ -11777,10 +11806,12 @@ input NullableProjectFilter {
   """Comparator for filtering projects with relations."""
   hasRelatedRelations: RelationExistsComparator
 
-  """Comparator for filtering projects which this is depended on by."""
+  """
+  [Deprecated] Comparator for filtering projects which this is depended on by.
+  """
   hasDependedOnByRelations: RelationExistsComparator
 
-  """Comparator for filtering projects which this depends on."""
+  """[Deprecated]Comparator for filtering projects which this depends on."""
   hasDependsOnRelations: RelationExistsComparator
 
   """Comparator for filtering projects which are blocked."""
@@ -11788,6 +11819,9 @@ input NullableProjectFilter {
 
   """Comparator for filtering projects which are blocking."""
   hasBlockingRelations: RelationExistsComparator
+
+  """Comparator for filtering projects with violated dependencies."""
+  hasViolatedRelations: RelationExistsComparator
 
   """Comparator for the project updates."""
   projectUpdates: ProjectUpdatesCollectionFilter
@@ -13756,10 +13790,12 @@ input ProjectCollectionFilter {
   """Comparator for filtering projects with relations."""
   hasRelatedRelations: RelationExistsComparator
 
-  """Comparator for filtering projects which this is depended on by."""
+  """
+  [Deprecated] Comparator for filtering projects which this is depended on by.
+  """
   hasDependedOnByRelations: RelationExistsComparator
 
-  """Comparator for filtering projects which this depends on."""
+  """[Deprecated]Comparator for filtering projects which this depends on."""
   hasDependsOnRelations: RelationExistsComparator
 
   """Comparator for filtering projects which are blocked."""
@@ -13767,6 +13803,9 @@ input ProjectCollectionFilter {
 
   """Comparator for filtering projects which are blocking."""
   hasBlockingRelations: RelationExistsComparator
+
+  """Comparator for filtering projects with violated dependencies."""
+  hasViolatedRelations: RelationExistsComparator
 
   """Comparator for the project updates."""
   projectUpdates: ProjectUpdatesCollectionFilter
@@ -13945,10 +13984,12 @@ input ProjectFilter {
   """Comparator for filtering projects with relations."""
   hasRelatedRelations: RelationExistsComparator
 
-  """Comparator for filtering projects which this is depended on by."""
+  """
+  [Deprecated] Comparator for filtering projects which this is depended on by.
+  """
   hasDependedOnByRelations: RelationExistsComparator
 
-  """Comparator for filtering projects which this depends on."""
+  """[Deprecated]Comparator for filtering projects which this depends on."""
   hasDependsOnRelations: RelationExistsComparator
 
   """Comparator for filtering projects which are blocked."""
@@ -13956,6 +13997,9 @@ input ProjectFilter {
 
   """Comparator for filtering projects which are blocking."""
   hasBlockingRelations: RelationExistsComparator
+
+  """Comparator for filtering projects with violated dependencies."""
+  hasViolatedRelations: RelationExistsComparator
 
   """Comparator for the project updates."""
   projectUpdates: ProjectUpdatesCollectionFilter
