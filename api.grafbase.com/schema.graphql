@@ -879,6 +879,7 @@ type Graph implements Node {
   deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
   customDomains: [CustomDomain!]!
   schemaChecks(first: Int, after: String, branch: String): SchemaCheckConnection!
+  schemaProposals(cursor: String, first: Int): SchemaProposalConnection!
   operationChecksConfiguration: GraphOperationCheckConfiguration!
   logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
   analytics(filters: GraphAnalyticsFilters!): GraphAnalytics
@@ -1735,6 +1736,7 @@ type Mutation {
 
   """Run checks against the given schema"""
   schemaCheckCreate(input: SchemaCheckCreateInput!): SchemaCheckPayload!
+  schemaProposalCreate(input: SchemaProposalCreateInput!): SchemaProposalCreatePayload!
 
   """Publish a new subgraph."""
   publish(input: PublishInput!): PublishPayload!
@@ -2703,6 +2705,7 @@ type Query {
     id: ID!
   ): Project @deprecated(reason: "use the top-level `node` query")
   schemaCheck(id: ID!): SchemaCheck
+  schemaProposal(id: ID!): SchemaProposal
 
   """Get subgraph."""
   subgraph(
@@ -3026,6 +3029,43 @@ input SchemaCheckGitCommitInput {
 }
 
 union SchemaCheckPayload = SchemaCheck | GraphBranchDoesNotExistError | ProjectBranchDoesNotExistError | GraphDoesNotExistError | ProjectDoesNotExistError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameProvidedOnStandaloneProjectError | SubgraphNameProvidedOnStandaloneGraphError | SubgraphNameMissingOnFederatedProjectError | SubgraphNameMissingOnFederatedGraphError
+
+type SchemaProposal {
+  id: ID!
+  author: User
+}
+
+type SchemaProposalConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [SchemaProposalEdge!]!
+
+  """A list of nodes."""
+  nodes: [SchemaProposal!]!
+}
+
+input SchemaProposalCreateInput {
+  title: String!
+  branchId: ID!
+  description: String
+}
+
+union SchemaProposalCreatePayload = SchemaProposalCreateSuccess
+
+type SchemaProposalCreateSuccess {
+  query: Query!
+}
+
+"""An edge in a connection."""
+type SchemaProposalEdge {
+  """The item at the end of the edge"""
+  node: SchemaProposal!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
 
 type SchemaRegistryBranchDoesNotExistError {
   query: Query!
