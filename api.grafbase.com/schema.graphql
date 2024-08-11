@@ -232,6 +232,7 @@ type Branch implements Node {
   schema: String
   federatedSchema: String
   operationChecksEnabled: Boolean!
+  schemaProposals(first: Int, after: String): SchemaProposalConnection!
   subgraphs: [Subgraph!]!
 }
 
@@ -879,7 +880,7 @@ type Graph implements Node {
   deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
   customDomains: [CustomDomain!]!
   schemaChecks(first: Int, after: String, branch: String): SchemaCheckConnection!
-  schemaProposals(cursor: String, first: Int): SchemaProposalConnection!
+  schemaProposals(after: String, first: Int): SchemaProposalConnection!
   operationChecksConfiguration: GraphOperationCheckConfiguration!
   logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
   analytics(filters: GraphAnalyticsFilters!): GraphAnalytics
@@ -3032,7 +3033,11 @@ union SchemaCheckPayload = SchemaCheck | GraphBranchDoesNotExistError | ProjectB
 
 type SchemaProposal {
   id: ID!
+  title: String!
   author: User
+  description: String
+  status: SchemaProposalStatus!
+  createdAt: DateTime!
 }
 
 type SchemaProposalConnection {
@@ -3055,6 +3060,7 @@ input SchemaProposalCreateInput {
 union SchemaProposalCreatePayload = SchemaProposalCreateSuccess
 
 type SchemaProposalCreateSuccess {
+  schemaProposal: SchemaProposal!
   query: Query!
 }
 
@@ -3065,6 +3071,14 @@ type SchemaProposalEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+enum SchemaProposalStatus {
+  APPROVED
+  DRAFT
+  IMPLEMENTED
+  REJECTED
+  REVIEW_REQUESTED
 }
 
 type SchemaRegistryBranchDoesNotExistError {
