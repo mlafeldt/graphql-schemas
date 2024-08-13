@@ -2083,9 +2083,6 @@ type CustomView implements Node {
   """The organization of the custom view."""
   organization: Organization!
 
-  """The team associated with the custom view."""
-  team: Team
-
   """The user who created the custom view."""
   creator: User!
 
@@ -2112,6 +2109,9 @@ type CustomView implements Node {
 
   """The model name of the custom view."""
   modelName: String!
+
+  """The team associated with the custom view."""
+  team: Team
 
   """Projects associated with the custom view."""
   projects(
@@ -4215,6 +4215,26 @@ type Favorite implements Node {
 
   """URL of the favorited entity. Folders return 'null' value."""
   url: String
+
+  """
+  [Internal] Favorite's title text (name of the favorite'd object or folder).
+  """
+  title: String!
+
+  """
+  [Internal] Detail text for favorite's `title` (e.g. team's name for a project).
+  """
+  detail: String
+
+  """
+  [Internal] Returns the color of the favorite's icon. Unavailable for avatars and views with fixed icons (e.g. cycle).
+  """
+  color: String
+
+  """
+  [Internal] Name of the favorite's icon. Unavailable for standard views, issues, and avatars
+  """
+  icon: String
 }
 
 type FavoriteConnection {
@@ -11803,6 +11823,9 @@ input NullableProjectFilter {
   """Comparator for the project health."""
   health: StringComparator
 
+  """Comparator for the project health (with age)."""
+  healthWithAge: StringComparator
+
   """Comparator for filtering projects with relations."""
   hasRelatedRelations: RelationExistsComparator
 
@@ -13787,6 +13810,9 @@ input ProjectCollectionFilter {
   """Comparator for the project health."""
   health: StringComparator
 
+  """Comparator for the project health (with age)."""
+  healthWithAge: StringComparator
+
   """Comparator for filtering projects with relations."""
   hasRelatedRelations: RelationExistsComparator
 
@@ -13980,6 +14006,9 @@ input ProjectFilter {
 
   """Comparator for the project health."""
   health: StringComparator
+
+  """Comparator for the project health (with age)."""
+  healthWithAge: StringComparator
 
   """Comparator for filtering projects with relations."""
   hasRelatedRelations: RelationExistsComparator
