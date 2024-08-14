@@ -18868,6 +18868,12 @@ type Team implements Node {
   autoArchivePeriod: Float!
 
   """
+  Whether parent issues should automatically close when all child issues are
+  closed, and child issues should automatically close when the parent issue is closed.
+  """
+  autoCloseParentAndChildIssues: Boolean
+
+  """
   The workflow state into which issues are moved when they are marked as a
   duplicate of another issue. Defaults to the first canceled state.
   """
@@ -19699,6 +19705,11 @@ input TeamUpdateInput {
 
   """The canceled workflow state which auto closed issues will be set to."""
   autoCloseStateId: String
+
+  """
+  [INTERNAL] Whether to automatically close a parent issue in this team if all its sub-issues are closed, and vice versa.
+  """
+  autoCloseParentAndChildIssues: Boolean
 
   """
   Period after which closed and completed issues are automatically archived, in months.
