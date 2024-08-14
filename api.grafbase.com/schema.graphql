@@ -1305,6 +1305,7 @@ union GraphUpdatePayload = GraphUpdateSuccess | GraphDoesNotExistError | SlugAlr
 
 type GraphUpdateSuccess {
   graph: Graph!
+  query: Query!
 }
 
 type HasAlreadyPaymentMethodError {
@@ -1351,10 +1352,6 @@ enum InvalidEnvironmentVariableErrorType {
 
 type InvalidEnvironmentVariablesError {
   errors: [InvalidEnvironmentVariableError!]!
-}
-
-type InvalidProjectRootPathError {
-  query: Query!
 }
 
 type InvalidRepoRootPathError {
@@ -1703,35 +1700,6 @@ type Mutation {
 
   """Remove member from an organization"""
   memberDelete(input: MemberDeleteInput!): MemberDeletePayload!
-
-  """Create a new project API key."""
-  projectApiKeyCreate(input: ProjectApiKeyCreateInput!): ProjectApiKeyCreatePayload! @deprecated(reason: "replaced by graphApiKeyCreate")
-
-  """Update a given API key with a new name."""
-  projectApiKeyUpdate(input: ProjectApiKeyUpdateInput!): ProjectApiKeyUpdatePayload! @deprecated(reason: "replaced by graphApiKeyUpdate")
-
-  """Delete a given API key."""
-  projectApiKeyDelete(input: ProjectApiKeyDeleteInput!): ProjectApiKeyDeletePayload! @deprecated(reason: "replaced by graphApiKeyDelete")
-  projectIntegrationCreate(accountIntegrationId: ID!, projectId: ID!, input: ProjectIntegrationInput!): ProjectIntegrationMutationPayload! @deprecated(reason: "replaced by graphIntegrationCreate")
-  projectIntegrationUpdate(id: ID!, input: ProjectIntegrationInput!): ProjectIntegrationMutationPayload! @deprecated(reason: "replaced by graphIntegrationUpdate")
-  projectIntegrationDelete(id: ID!): ProjectIntegrationMutationPayload! @deprecated(reason: "replaced by graphIntegrationDelete")
-
-  """Create a new project without any source for an initial deployment."""
-  projectCreate(input: ProjectCreateInput!): ProjectCreatePayload! @deprecated(reason: "replaced by graphCreate")
-
-  """Create a new project from a GitHub repository."""
-  projectCreateFromSchema(input: ProjectCreateFromSchemaInput!): ProjectCreateFromSchemaPayload! @deprecated(reason: "replaced by graphCreateFromSchema")
-
-  """Create a new project from a GitHub repository."""
-  projectCreateFromRepository(input: ProjectCreateFromRepositoryInput!): ProjectCreateFromRepositoryPayload! @deprecated(reason: "replaced by graphCreateFromRepository")
-
-  """
-  Create a new project from a template in a newly created GitHub repository.
-  """
-  projectCreateFromTemplate(input: ProjectCreateFromTemplateInput!): ProjectCreateFromTemplatePayload! @deprecated(reason: "replaced by graphCreateFromTemplate")
-  projectUpdate(input: ProjectUpdateInput!): ProjectUpdatePayload! @deprecated(reason: "replaced by graphUpdate")
-  projectOperationCheckConfigurationUpdate(input: ProjectOperationCheckConfigurationInput!): ProjectOperationCheckConfigurationUpdatePayload! @deprecated(reason: "replaced by graphOperationChecksConfigurationUpdate")
-  projectDelete(input: ProjectDeleteInput!): ProjectDeletePayload!
 
   """Run checks against the given schema"""
   schemaCheckCreate(input: SchemaCheckCreateInput!): SchemaCheckPayload!
@@ -2285,30 +2253,6 @@ type ProjectApiKeyConnection {
   nodes: [ProjectApiKey!]!
 }
 
-input ProjectApiKeyCreateInput {
-  projectId: ID!
-  environment: BranchEnvironment!
-  name: String!
-}
-
-union ProjectApiKeyCreatePayload = ProjectApiKeyCreateSuccess | KeyLimitExceededError | ProjectDoesNotExistError
-
-type ProjectApiKeyCreateSuccess {
-  apiKey: ProjectApiKey!
-  query: Query!
-}
-
-input ProjectApiKeyDeleteInput {
-  id: ID!
-}
-
-union ProjectApiKeyDeletePayload = ProjectApiKeyDeleteSuccess | KeyDoesNotExistError | MustLeaveAtLeastOneKeyForEnvironmentError
-
-type ProjectApiKeyDeleteSuccess {
-  deletedId: ID!
-  query: Query!
-}
-
 """An edge in a connection."""
 type ProjectApiKeyEdge {
   """The item at the end of the edge"""
@@ -2316,17 +2260,6 @@ type ProjectApiKeyEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
-}
-
-input ProjectApiKeyUpdateInput {
-  id: ID!
-  name: String!
-}
-
-union ProjectApiKeyUpdatePayload = ProjectApiKeyUpdateSuccess | KeyDoesNotExistError
-
-type ProjectApiKeyUpdateSuccess {
-  query: Query!
 }
 
 type ProjectBranchDoesNotExistError {
@@ -2344,81 +2277,6 @@ type ProjectConnection {
   nodes: [Project!]!
 }
 
-input ProjectCreateFromRepositoryInput {
-  accountId: ID!
-  projectSlug: String!
-  gitRepoUrl: Url!
-  gitAccountId: String!
-  productionBranch: String!
-  environmentVariables: [EnvironmentVariableSpecification!]! = []
-  projectRootPath: String! = "grafbase"
-}
-
-union ProjectCreateFromRepositoryPayload = ProjectCreateFromRepositorySuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | RepositoryContainsNoBranchesError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidProjectRootPathError
-
-type ProjectCreateFromRepositorySuccess {
-  project: Project!
-  query: Query!
-}
-
-input ProjectCreateFromSchemaInput {
-  accountId: ID!
-  projectSlug: String!
-  schema: String!
-  environmentVariables: [EnvironmentVariableSpecification!]! = []
-}
-
-union ProjectCreateFromSchemaPayload = ProjectCreateFromSchemaSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError
-
-type ProjectCreateFromSchemaSuccess {
-  project: Project!
-  query: Query!
-}
-
-input ProjectCreateFromTemplateInput {
-  accountId: ID!
-  projectSlug: String!
-  templateGitUrl: Url!
-  gitAccountId: String!
-  repoSlug: String!
-  repoPrivate: Boolean!
-  environmentVariables: [EnvironmentVariableSpecification!]! = []
-  projectRootPath: String! = "grafbase"
-}
-
-union ProjectCreateFromTemplatePayload = ProjectCreateFromTemplateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | RepositorySlugInUseError | TemplateDoesNotExistError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidProjectRootPathError | GithubInstallationInsufficientPermissionsError
-
-type ProjectCreateFromTemplateSuccess {
-  project: Project!
-  query: Query!
-}
-
-input ProjectCreateInput {
-  accountId: ID!
-  projectSlug: String!
-  environmentVariables: [EnvironmentVariableSpecification!]! = []
-  projectRootPath: String! = "grafbase"
-  graphMode: GraphMode! = MANAGED
-  projectType: ProjectType
-}
-
-union ProjectCreatePayload = ProjectCreateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidProjectRootPathError
-
-type ProjectCreateSuccess {
-  project: Project!
-  query: Query!
-}
-
-input ProjectDeleteInput {
-  id: ID!
-}
-
-union ProjectDeletePayload = ProjectDeleteSuccess | ProjectDoesNotExistError
-
-type ProjectDeleteSuccess {
-  query: Query!
-}
-
 type ProjectDoesNotExistError {
   query: Query!
 }
@@ -2427,11 +2285,6 @@ type ProjectDopplerIntegration {
   projectName: String!
   configName: String!
   automatedRedeploy: Boolean!
-}
-
-input ProjectDopplerIntegrationAttributesInput {
-  projectName: String!
-  configName: String!
 }
 
 """An edge in a connection."""
@@ -2454,28 +2307,6 @@ type ProjectIntegration {
 }
 
 union ProjectIntegrationAttributes = ProjectDopplerIntegration
-
-input ProjectIntegrationAttributesInput {
-  doppler: ProjectDopplerIntegrationAttributesInput
-}
-
-input ProjectIntegrationInput {
-  enabled: Boolean!
-  attributes: ProjectIntegrationAttributesInput
-  branch: ID
-}
-
-type ProjectIntegrationMutationError {
-  message: String!
-  query: Query!
-}
-
-union ProjectIntegrationMutationPayload = ProjectIntegrationMutationSuccess | ProjectIntegrationMutationError
-
-type ProjectIntegrationMutationSuccess {
-  account: Account!
-  query: Query!
-}
 
 type ProjectNotFederatedError {
   query: Query!
@@ -2512,37 +2343,6 @@ type ProjectOperationCheckConfiguration {
   excludedOperations: [String!]!
 }
 
-input ProjectOperationCheckConfigurationInput {
-  """The project to update."""
-  projectId: ID!
-
-  """
-  Whether operation checks are enabled for the project. This is ignored, since
-  operation checks are now only enabled at the branch level.
-  """
-  enabled: Boolean
-
-  """
-  The time range in days to consider for operation checks. Operations older than the specificied
-  number of days are ignored.
-  """
-  timeRangeDays: Int
-
-  """
-  The request count threshold to consider for operation checks. Operations that have been
-  registered less than the specified number of occurrences are ignored.
-  """
-  requestCountThreshold: Int
-
-  """The clients to exclude from operation checks."""
-  excludedClients: [String!]
-
-  """The operations to exclude from operation checks."""
-  excludedOperations: [String!]
-}
-
-union ProjectOperationCheckConfigurationUpdatePayload = ProjectDoesNotExistError | ProjectOperationCheckConfiguration | NotAllowedError
-
 input ProjectRequestAnalyticsFilter {
   branch: String = null
   period: ProjectRequestAnalyticsPeriod
@@ -2578,27 +2378,14 @@ enum ProjectType {
   FEDERATED
 }
 
-input ProjectUpdateInput {
-  id: ID!
-  projectSlug: String
-  productionBranch: String
-  projectRootPath: String
-}
-
-union ProjectUpdatePayload = ProjectUpdateSuccess | ProjectDoesNotExistError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | CannotBeRenamedError | NotAllowedError
-
-type ProjectUpdateSuccess {
-  project: Project!
-  query: Query!
-}
-
 type PublishForbidden {
   query: Query!
 }
 
 input PublishInput {
   accountSlug: String!
-  projectSlug: String!
+  graphSlug: String
+  projectSlug: String
   branch: String
   subgraph: String!
   url: String!
@@ -2643,7 +2430,10 @@ type Query {
   """Get custom domain by project id and name."""
   customDomainByName(
     """id of the project"""
-    projectId: ID!
+    graphId: ID
+
+    """id of the project"""
+    projectId: ID
 
     """name of the domain"""
     name: String!
@@ -2684,21 +2474,6 @@ type Query {
     """slug of the graph"""
     graphSlug: String!
   ): Graph
-
-  """Get project by account slug and slug of the project itself."""
-  projectByAccountSlug(
-    """slug of the account"""
-    accountSlug: String!
-
-    """slug of the project"""
-    projectSlug: String!
-  ): Project
-
-  """Get project by ID."""
-  projectById(
-    """ID of the project"""
-    id: ID!
-  ): Project @deprecated(reason: "use the top-level `node` query")
   schemaCheck(id: ID!): SchemaCheck
   schemaProposal(id: ID!): SchemaProposal
 
