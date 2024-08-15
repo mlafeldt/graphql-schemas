@@ -117,7 +117,6 @@ type AccountIntegration {
   environments: [BranchEnvironment!]!
   integrationId: ID!
   attributes: AccountIntegrationAttributes!
-  projects: [ProjectIntegration!]! @deprecated(reason: "replaced by graphs")
   graphs: [GraphIntegration!]!
 }
 
@@ -976,7 +975,7 @@ input GraphAnalyticsFilters {
   clientVersion: String
 }
 
-type GraphApiKey {
+type GraphApiKey implements Node {
   id: ID!
   key: String!
   environment: BranchEnvironment!
@@ -1704,6 +1703,10 @@ type Mutation {
   """Run checks against the given schema"""
   schemaCheckCreate(input: SchemaCheckCreateInput!): SchemaCheckPayload!
   schemaProposalCreate(input: SchemaProposalCreateInput!): SchemaProposalCreatePayload!
+  schemaProposalRequestReview(input: SchemaProposalRequestReviewInput!): SchemaProposalRequestReviewPayload!
+  schemaProposalApprove(input: SchemaProposalApproveInput!): SchemaProposalApprovePayload!
+  schemaProposalReject(input: SchemaProposalRejectInput!): SchemaProposalRejectPayload!
+  schemaRequestChanges(input: SchemaProposalRequestChangesInput!): SchemaProposalRequestChangesPayload!
 
   """Publish a new subgraph."""
   publish(input: PublishInput!): PublishPayload!
@@ -2222,7 +2225,6 @@ type Project implements Node {
   canBeRenamed: Boolean!
   repository: GitRepository
   branches(after: String, before: String, first: Int, last: Int): BranchConnection!
-  apiKeys(after: String, before: String, first: Int, last: Int): ProjectApiKeyConnection!
   productionBranch: Branch!
   environmentVariables(after: String, before: String, first: Int, last: Int): EnvironmentVariableConnection!
   deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
@@ -2232,34 +2234,6 @@ type Project implements Node {
   schemaChecks(first: Int, after: String, branch: String): SchemaCheckConnection!
   operationChecksConfiguration: ProjectOperationCheckConfiguration!
   logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
-}
-
-type ProjectApiKey implements Node {
-  id: ID!
-  key: String!
-  environment: BranchEnvironment!
-  createdAt: DateTime!
-  name: String!
-}
-
-type ProjectApiKeyConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
-  edges: [ProjectApiKeyEdge!]!
-
-  """A list of nodes."""
-  nodes: [ProjectApiKey!]!
-}
-
-"""An edge in a connection."""
-type ProjectApiKeyEdge {
-  """The item at the end of the edge"""
-  node: ProjectApiKey!
-
-  """A cursor for use in pagination"""
-  cursor: String!
 }
 
 type ProjectBranchDoesNotExistError {
@@ -2295,18 +2269,6 @@ type ProjectEdge {
   """A cursor for use in pagination"""
   cursor: String!
 }
-
-type ProjectIntegration {
-  accountIntegrationId: ID!
-  createdAt: DateTime!
-  enabled: Boolean!
-  id: ID!
-  branch: Branch
-  project: Project!
-  attributes: ProjectIntegrationAttributes
-}
-
-union ProjectIntegrationAttributes = ProjectDopplerIntegration
 
 type ProjectNotFederatedError {
   query: Query!
@@ -2809,6 +2771,16 @@ type SchemaProposal {
   createdAt: DateTime!
 }
 
+input SchemaProposalApproveInput {
+  id: ID!
+}
+
+union SchemaProposalApprovePayload = SchemaProposalApproveSuccess
+
+type SchemaProposalApproveSuccess {
+  query: Query!
+}
+
 type SchemaProposalConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
@@ -2842,12 +2814,43 @@ type SchemaProposalEdge {
   cursor: String!
 }
 
+input SchemaProposalRejectInput {
+  id: ID!
+}
+
+union SchemaProposalRejectPayload = SchemaProposalRejectSuccess
+
+type SchemaProposalRejectSuccess {
+  query: Query!
+}
+
+input SchemaProposalRequestChangesInput {
+  id: ID!
+}
+
+union SchemaProposalRequestChangesPayload = SchemaProposalRequestChangesSuccess
+
+type SchemaProposalRequestChangesSuccess {
+  query: Query!
+}
+
+input SchemaProposalRequestReviewInput {
+  id: ID!
+}
+
+union SchemaProposalRequestReviewPayload = SchemaProposalRequestReviewSuccess
+
+type SchemaProposalRequestReviewSuccess {
+  query: Query!
+}
+
 enum SchemaProposalStatus {
   APPROVED
   DRAFT
   IMPLEMENTED
   REJECTED
   REVIEW_REQUESTED
+  CHANGES_REQUESTED
 }
 
 type SchemaRegistryBranchDoesNotExistError {
