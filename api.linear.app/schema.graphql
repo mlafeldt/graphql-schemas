@@ -9230,6 +9230,16 @@ type Mutation {
     input: CycleShiftAllInput!
   ): CyclePayload!
 
+  """
+  Shifts all cycles starts and ends by a certain number of days, starting from the provided cycle onwards.
+  """
+  cycleStartUpcomingCycleToday(
+    """
+    The identifier of the cycle to start as of midnight today. Must be the upcoming cycle.
+    """
+    id: String!
+  ): CyclePayload!
+
   """Creates a new diary entry."""
   diaryEntryCreate(
     """The diary entry to create."""
@@ -13435,6 +13445,9 @@ type Project implements Node {
   """
   priority: Int!
 
+  """The time at which the project health was updated."""
+  healthUpdatedAt: DateTime
+
   """The total number of issues in the project after each week."""
   issueCountHistory: [Float!]!
 
@@ -14822,6 +14835,9 @@ type ProjectSearchResult implements Node {
   The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
   """
   priority: Int!
+
+  """The time at which the project health was updated."""
+  healthUpdatedAt: DateTime
 
   """The total number of issues in the project after each week."""
   issueCountHistory: [Float!]!
@@ -19359,6 +19375,9 @@ input TeamCreateInput {
   The workflow state into which issues are moved when they are marked as a duplicate of another issue.
   """
   markedAsDuplicateWorkflowStateId: String
+
+  """The parent team ID."""
+  parentId: String
 }
 
 type TeamEdge {
@@ -19730,6 +19749,9 @@ input TeamUpdateInput {
   Whether the team is managed by SCIM integration. Mutation restricted to workspace admins and only unsetting is allowed!
   """
   scimManaged: Boolean
+
+  """The parent team ID."""
+  parentId: String
 }
 
 """A template object used for creating entities faster."""
