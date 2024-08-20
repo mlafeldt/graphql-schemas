@@ -1694,6 +1694,12 @@ type CustomerNeed implements Node {
   The priority of the customer need. 0 = No priority, 1 = Critical, 2 = Important, 3 = Nice to have.
   """
   priority: Float!
+
+  """The need content in markdown format."""
+  body: String
+
+  """[Internal] The content of the need as a Prosemirror document."""
+  bodyData: String
 }
 
 """Customer needs filtering options."""
@@ -1766,10 +1772,19 @@ input CustomerNeedCreateInput {
   """The comment this need is referencing."""
   commentId: String
 
+  """The attachment this need is referencing."""
+  attachmentId: String
+
   """
   The priority of the customer need. 0 = No priority, 1 = Critical, 2 = Important, 3 = Nice to have.
   """
   priority: Float
+
+  """The content of the need in markdown format."""
+  body: String
+
+  """[Internal] The content of the need as a Prosemirror document."""
+  bodyData: JSON
 }
 
 type CustomerNeedEdge {
@@ -1837,6 +1852,12 @@ input CustomerNeedUpdateInput {
   The priority of the customer need. 0 = No priority, 1 = Critical, 2 = Important, 3 = Nice to have.
   """
   priority: Float
+
+  """The content of the need in markdown format."""
+  body: String
+
+  """[Internal] The content of the need as a Prosemirror document."""
+  bodyData: JSON
 }
 
 type CustomerPayload {
@@ -3843,6 +3864,15 @@ interface Entity {
   The time at which the entity was archived. Null if the entity has not been archived.
   """
   archivedAt: DateTime
+}
+
+"""
+Contains either the full serialized state of the application or delta packets
+that the requester can apply to the local data set in order to be up-to-date.
+"""
+type EntityCountResponse {
+  """Entity counts keyed by the entity name."""
+  counts: JSONObject!
 }
 
 """An external link for an entity like initiative, etc..."""
@@ -13748,6 +13778,33 @@ type Project implements Node {
     orderBy: PaginationOrderBy
   ): EntityExternalLinkConnection!
 
+  """History entries associated with the project."""
+  history(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectHistoryConnection!
+
   """
   The overall progress of the project. This is the (completed estimate points +
   0.25 * in progress estimate points) / total estimate points.
@@ -14095,6 +14152,45 @@ input ProjectFilter {
 type ProjectFilterSuggestionPayload {
   """The json filter that is suggested."""
   filter: JSONObject
+}
+
+"""An history associated with a project."""
+type ProjectHistory implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The project that the history is associated with."""
+  project: Project!
+
+  """The events that happened while recording that history."""
+  entries: JSONObject!
+}
+
+type ProjectHistoryConnection {
+  edges: [ProjectHistoryEdge!]!
+  nodes: [ProjectHistory!]!
+  pageInfo: PageInfo!
+}
+
+type ProjectHistoryEdge {
+  node: ProjectHistory!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
 }
 
 """An external link for a project."""
@@ -15139,6 +15235,33 @@ type ProjectSearchResult implements Node {
     orderBy: PaginationOrderBy
   ): EntityExternalLinkConnection!
 
+  """History entries associated with the project."""
+  history(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectHistoryConnection!
+
   """
   The overall progress of the project. This is the (completed estimate points +
   0.25 * in progress estimate points) / total estimate points.
@@ -15293,7 +15416,7 @@ enum ProjectTab {
   issues
 }
 
-"""A update associated with an project."""
+"""An update associated with a project."""
 type ProjectUpdate implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -15805,6 +15928,48 @@ enum PushSubscriptionType {
 }
 
 type Query {
+  """Retrieves how many entities the user has access to."""
+  syncEntityCount: EntityCountResponse!
+
+  """Fetches an archived model."""
+  archivedModelSync(
+    """
+    The identifier of the model to load. What an identifier is specific to the model class.
+    """
+    identifier: String!
+
+    """The class name of the model to load."""
+    modelClass: String!
+  ): ArchiveResponse! @deprecated(reason: "Use streaming endpoint instead.")
+
+  """Fetches archived models."""
+  archivedModelsSync(
+    """The class name of the models to load."""
+    modelClass: String!
+
+    """The teamId for which to load archived models."""
+    teamId: String!
+
+    """The filter to apply to archived models."""
+    issueFilter: IssueFilter
+
+    """
+    How trashed issues should be loaded. Defaults to TrashOptionType.excludeTrash
+    """
+    trashOption: TrashOptionType
+
+    """Retrieve issues that have been archived before this date."""
+    before: DateTime
+
+    """
+    To proper page through entities with same "archivedAt" date we also need last id
+    """
+    beforeId: String
+
+    """The number of issues to load."""
+    last: Int
+  ): ArchiveResponse! @deprecated(reason: "Use streaming endpoint instead.")
+
   """All API keys for the user."""
   apiKeys(
     """A cursor to be used with last for backward pagination."""
@@ -20091,6 +20256,13 @@ input TokenUserAccountAuthInput {
 
   """An optional invite link for an organization."""
   inviteLink: String
+}
+
+"""How trashed models should be loaded."""
+enum TrashOptionType {
+  includeTrash
+  excludeTrash
+  trashOnly
 }
 
 """A team's triage responsibility."""
