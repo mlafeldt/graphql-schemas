@@ -1529,7 +1529,7 @@ type Customer implements Node {
   slackChannelId: String
 
   """The user who owns the customer."""
-  owner: User!
+  owner: User
 
   """The current status of the customer."""
   status: CustomerStatus!
@@ -1700,6 +1700,9 @@ type CustomerNeed implements Node {
 
   """[Internal] The content of the need as a Prosemirror document."""
   bodyData: String
+
+  """The creator of the customer need."""
+  creator: User
 }
 
 """Customer needs filtering options."""
@@ -1847,6 +1850,9 @@ input CustomerNeedUpdateInput {
   The identifier in UUID v4 format. If none is provided, the backend will generate one.
   """
   id: String
+
+  """The uuid of the customer the need belongs to."""
+  customerId: String
 
   """
   The priority of the customer need. 0 = No priority, 1 = Critical, 2 = Important, 3 = Nice to have.
@@ -5905,6 +5911,9 @@ input IntegrationsSettingsCreateInput {
 
   """The identifier of the project to create settings for."""
   projectId: String
+
+  """The identifier of the custom view to create settings for."""
+  customViewId: String
 }
 
 type IntegrationsSettingsEdge {
@@ -9748,7 +9757,7 @@ type Mutation {
     code: String!
   ): AsksChannelConnectPayload!
 
-  """Slack webhook integration."""
+  """Slack integration for team notifications."""
   integrationSlackPost(
     """
     [DEPRECATED] Whether or not v2 of Slack OAuth should be used. No longer used.
