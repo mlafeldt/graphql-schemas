@@ -80,8 +80,6 @@ interface Account {
   plan: GrafbasePlan!
   createdAt: DateTime!
   status: AccountStatus!
-  projects(after: String, before: String, first: Int, last: Int): ProjectConnection! @deprecated(reason: "replaced by graphs")
-  projectsCountStatus: ResourceStatus! @deprecated(reason: "replaced by graphsCountStatus")
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
   graphsCountStatus: ResourceStatus!
   resources: AccountResources!
@@ -2037,13 +2035,11 @@ type Organization implements Account & Node {
   stripeCustomer: StripeCustomer
   orbCustomer: OrbCustomer
   orbActiveSubscription: OrbSubscription
-  projects(after: String, before: String, first: Int, last: Int): ProjectConnection! @deprecated(reason: "replaced by graphs")
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
   integrations: [AccountIntegration!]!
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
   graphsCountStatus: ResourceStatus!
-  projectsCountStatus: ResourceStatus! @deprecated(reason: "replaced by graphCountStatus")
   slackIntegration: SlackIntegration
 
   """
@@ -2173,12 +2169,10 @@ type PersonalAccount implements Account {
   createdAt: DateTime!
   status: AccountStatus!
   plan: GrafbasePlan!
-  projects(after: String, before: String, first: Int, last: Int): ProjectConnection! @deprecated(reason: "replaced by graphs")
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
   graphsCountStatus: ResourceStatus!
-  projectsCountStatus: ResourceStatus! @deprecated(reason: "replaced by graphCountStatus")
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
-  resources: AccountResources! @deprecated(reason: "use projects_count_status")
+  resources: AccountResources! @deprecated(reason: "use graphs_count_status")
   accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
 }
 
@@ -2232,23 +2226,11 @@ type Project implements Node {
   customDomains: [CustomDomain!]!
   requestAnalytics(filter: ProjectRequestAnalyticsFilter!): RequestAnalytics
   schemaChecks(first: Int, after: String, branch: String): SchemaCheckConnection!
-  operationChecksConfiguration: ProjectOperationCheckConfiguration!
   logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
 }
 
 type ProjectBranchDoesNotExistError {
   query: Query!
-}
-
-type ProjectConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
-  edges: [ProjectEdge!]!
-
-  """A list of nodes."""
-  nodes: [Project!]!
 }
 
 type ProjectDoesNotExistError {
@@ -2261,15 +2243,6 @@ type ProjectDopplerIntegration {
   automatedRedeploy: Boolean!
 }
 
-"""An edge in a connection."""
-type ProjectEdge {
-  """The item at the end of the edge"""
-  node: Project!
-
-  """A cursor for use in pagination"""
-  cursor: String!
-}
-
 type ProjectNotFederatedError {
   query: Query!
 }
@@ -2280,29 +2253,6 @@ type ProjectNotManagedError {
 
 type ProjectNotStandaloneError {
   query: Query!
-}
-
-type ProjectOperationCheckConfiguration {
-  """Whether operation checks are enabled for the project."""
-  enabled: Boolean! @deprecated(reason: "Operation checks are now enabled exclusively at the branch level")
-
-  """
-  The time range in days to consider for operation checks. Operations older than the specificied
-  number of days are ignored.
-  """
-  timeRangeDays: Int!
-
-  """
-  The request count threshold to consider for operation checks. Operations that have been
-  registered less than the specified number of occurrences are ignored.
-  """
-  requestCountThreshold: Int!
-
-  """The clients to exclude from operation checks."""
-  excludedClients: [String!]!
-
-  """The operations to exclude from operation checks."""
-  excludedOperations: [String!]!
 }
 
 input ProjectRequestAnalyticsFilter {
@@ -3366,7 +3316,6 @@ type User implements Node {
   organizations(after: String, before: String, first: Int, last: Int): OrganizationConnection!
   organizationMemberships: [Member!]!
   personalAccount: PersonalAccount
-  limits: ViewerLimits! @deprecated(reason: "Moved to account level")
 }
 
 type UserConnection {
@@ -3398,10 +3347,5 @@ type ValidationCheckError {
 
 type ValueTooLongError {
   query: Query!
-}
-
-type ViewerLimits {
-  remainingProjects: Int
-  totalProjects: Int
 }
 
