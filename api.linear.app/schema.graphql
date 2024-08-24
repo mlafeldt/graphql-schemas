@@ -6915,6 +6915,153 @@ type IssueDraft implements Node {
   attachments: JSONObject
 }
 
+"""A generic payload return from entity archive mutations."""
+type IssueDraftArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: IssueDraft
+}
+
+type IssueDraftConnection {
+  edges: [IssueDraftEdge!]!
+  nodes: [IssueDraft!]!
+  pageInfo: PageInfo!
+}
+
+input IssueDraftCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The title of the draft."""
+  title: String!
+
+  """The draft description in markdown format."""
+  description: String
+
+  """[Internal] The draft description as a Prosemirror document."""
+  descriptionData: JSON
+
+  """The identifier of the user to assign the draft to."""
+  assigneeId: String
+
+  """The identifier of the parent draft."""
+  parentId: String
+
+  """The identifier of the parent issue."""
+  parentIssueId: String
+
+  """The priority of the draft."""
+  priority: Int
+
+  """The estimated complexity of the draft."""
+  estimate: Int
+
+  """The identifiers of the issue labels associated with this draft."""
+  labelIds: [String!]
+
+  """The identifier or key of the team associated with the draft."""
+  teamId: String!
+
+  """The cycle associated with the draft."""
+  cycleId: String
+
+  """The project associated with the draft."""
+  projectId: String
+
+  """The project milestone associated with the draft."""
+  projectMilestoneId: String
+
+  """The team state of the draft."""
+  stateId: String
+
+  """The position of the draft in parent draft's sub-draft list."""
+  subIssueSortOrder: Float
+
+  """The date at which the draft is due."""
+  dueDate: TimelessDate
+
+  """The attachments associated with this draft."""
+  attachments: JSONObject
+}
+
+type IssueDraftEdge {
+  node: IssueDraft!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type IssueDraftPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The draft that was created or updated."""
+  issueDraft: IssueDraft!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input IssueDraftUpdateInput {
+  """The title of the draft."""
+  title: String
+
+  """The draft description in markdown format."""
+  description: String
+
+  """The draft description as a Prosemirror document."""
+  descriptionData: JSON
+
+  """The identifier of the user to assign the draft to."""
+  assigneeId: String
+
+  """The identifier of the parent draft."""
+  parentId: String
+
+  """The identifier of the parent issue."""
+  parentIssueId: String
+
+  """The priority of the draft."""
+  priority: Int
+
+  """The estimated complexity of the draft."""
+  estimate: Int
+
+  """The identifiers of the issue labels associated with this draft."""
+  labelIds: [String!]
+
+  """The identifier or key of the team associated with the draft."""
+  teamId: String
+
+  """The cycle associated with the draft."""
+  cycleId: String
+
+  """The project associated with the draft."""
+  projectId: String
+
+  """The project milestone associated with the draft."""
+  projectMilestoneId: String
+
+  """The team state of the draft."""
+  stateId: String
+
+  """The position of the draft in parent draft's sub-draft list."""
+  subIssueSortOrder: Float
+
+  """The date at which the draft is due."""
+  dueDate: TimelessDate
+
+  """The attachments associated with this draft."""
+  attachments: JSONObject
+}
+
 type IssueEdge {
   node: Issue!
 
@@ -10889,6 +11036,33 @@ type Mutation {
     """The identifier of the triage responsibility to delete."""
     id: String!
   ): DeletePayload!
+
+  """Creates a new draft."""
+  issueDraftCreate(
+    """The issue draft to create."""
+    input: IssueDraftCreateInput!
+  ): IssueDraftPayload!
+
+  """Updates a draft."""
+  issueDraftUpdate(
+    """The fields to update."""
+    input: IssueDraftUpdateInput!
+
+    """The ID of the issue draft to update."""
+    id: String!
+  ): IssueDraftPayload!
+
+  """Deletes a draft."""
+  issueDraftDelete(
+    """The identifier of the draft to delete."""
+    id: String!
+  ): DeletePayload!
+
+  """Archives a draft."""
+  issueDraftArchive(
+    """The identifier of the draft to archive."""
+    id: String!
+  ): IssueDraftArchivePayload!
 
   """
   Updates a user. Only available to organization admins and the user themselves.
@@ -20695,6 +20869,33 @@ type User implements Node {
 
   """Whether the user account is active or disabled (suspended)."""
   active: Boolean!
+
+  """The user's issue drafts"""
+  issueDrafts(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueDraftConnection!
 
   """User's profile URL."""
   url: String!
