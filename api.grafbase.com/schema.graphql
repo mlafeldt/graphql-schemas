@@ -221,7 +221,6 @@ type Branch implements Node {
   activeDeployment: Deployment
   deployments(after: String, before: String, first: Int, last: Int): DeploymentConnection!
   graph: Graph!
-  project: Project! @deprecated(reason: "replaced by graph")
   environment: BranchEnvironment!
   schema: String
   federatedSchema: String
@@ -450,7 +449,6 @@ type Deployment implements Node {
   status: DeploymentStatus!
   logEntries: [DeploymentLogEntry!]!
   graph: Graph!
-  project: Project! @deprecated(reason: "replaced by graph")
   schema: String
   diffAgainstPreviousBranchDeployment: String
   diffAgainstLatestProductionDeployment: String
@@ -2207,27 +2205,6 @@ type PreviousRequestAnalytcs {
   metrics: RequestMetrics!
 }
 
-type Project implements Node {
-  id: ID!
-  accountSlug: String! @deprecated(reason: "Use Account.slug instead")
-  slug: String!
-  projectRootPath: String!
-  projectType: ProjectType
-  graphMode: GraphMode!
-  createdAt: DateTime!
-  canBeRenamed: Boolean!
-  repository: GitRepository
-  branches(after: String, before: String, first: Int, last: Int): BranchConnection!
-  productionBranch: Branch!
-  environmentVariables(after: String, before: String, first: Int, last: Int): EnvironmentVariableConnection!
-  deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
-  status: ProjectStatus!
-  customDomains: [CustomDomain!]!
-  requestAnalytics(filter: ProjectRequestAnalyticsFilter!): RequestAnalytics
-  schemaChecks(first: Int, after: String, branch: String): SchemaCheckConnection!
-  logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
-}
-
 type ProjectBranchDoesNotExistError {
   query: Query!
 }
@@ -2254,34 +2231,8 @@ type ProjectNotStandaloneError {
   query: Query!
 }
 
-input ProjectRequestAnalyticsFilter {
-  branch: String = null
-  period: ProjectRequestAnalyticsPeriod
-  now: DateTime
-  from: DateTime
-  to: DateTime
-  aggregationStep: Duration
-  approximateNumberOfDataPoints: Int
-  alignPeriodWithAggregationStep: Boolean
-  graphqlOperation: String
-  operationId: ID
-  clientName: String
-  clientVersion: String
-}
-
-enum ProjectRequestAnalyticsPeriod {
-  LAST_HOUR
-  LAST_24_HOURS
-  LAST_7_DAYS
-}
-
 type ProjectScopeLimitExceededError {
   query: Query!
-}
-
-enum ProjectStatus {
-  ACTIVE
-  INACTIVE
 }
 
 enum ProjectType {
