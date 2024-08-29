@@ -2015,16 +2015,16 @@ input CustomerSortInput {
   createdAt: CustomerCreatedAtSort
 
   """Sort by owner name"""
-  owner: CustomerCreatedAtSort
+  owner: OwnerSort
 
   """Sort by customer status"""
   status: CustomerStatusSort
 
   """Sort by customer generated revenue"""
-  revenue: CustomerStatusSort
+  revenue: RevenueSort
 
   """Sort by customer size"""
-  size: CustomerStatusSort
+  size: SizeSort
 
   """Sort by customer tier"""
   tier: TierSort
@@ -2087,7 +2087,7 @@ input CustomerStatusCreateInput {
   description: String
 
   """The position of the status in the workspace's customer flow."""
-  position: Float!
+  position: Float
 
   """The type of the customer status."""
   type: CustomerStatusType!
@@ -2218,6 +2218,25 @@ type CustomerTierConnection {
   pageInfo: PageInfo!
 }
 
+input CustomerTierCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The name of the tier."""
+  name: String!
+
+  """The UI color of the tier as a HEX string."""
+  color: String!
+
+  """Description of the tier."""
+  description: String
+
+  """The position of the tier in the workspace's customer flow."""
+  position: Float
+}
+
 type CustomerTierEdge {
   node: CustomerTier!
 
@@ -2257,6 +2276,31 @@ input CustomerTierFilter {
   Compound filters, one of which needs to be matched by the customer tier.
   """
   or: [CustomerTierFilter!]
+}
+
+type CustomerTierPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The customer tier that was created or updated."""
+  tier: CustomerTier!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input CustomerTierUpdateInput {
+  """The name of the tier."""
+  name: String
+
+  """The UI color of the tier as a HEX string."""
+  color: String
+
+  """Description of the tier."""
+  description: String
+
+  """The position of the tier in the workspace's customer flow."""
+  position: Float
 }
 
 input CustomerUpdateInput {
@@ -4612,7 +4656,7 @@ type FeatureFlag implements Node {
   """The status of the feature flag."""
   status: String!
 
-  """The description of the feature flag."""
+  """Date when the stage was last changed."""
   lastStageUpdatedAt: DateTime
 
   """The organization of the feature flag."""
@@ -4624,9 +4668,7 @@ type FeatureFlag implements Node {
   """The integration providing the feature flag."""
   integration: Integration!
 
-  """
-  The rollout stage of the feature flag, should be defined for all feature flags in use.
-  """
+  """The rollout stage of the feature flag."""
   rolloutStage: FeatureFlagRolloutStage!
 
   """The pending rollout stage for the feature flag."""
@@ -9575,6 +9617,27 @@ type Mutation {
   """[ALPHA] Deletes a customer status."""
   customerStatusDelete(
     """The identifier of the customer status to delete."""
+    id: String!
+  ): DeletePayload!
+
+  """[ALPHA] Creates a new customer tier."""
+  customerTierCreate(
+    """The CustomerTier object to create."""
+    input: CustomerTierCreateInput!
+  ): CustomerTierPayload!
+
+  """[ALPHA] Updates a customer tier."""
+  customerTierUpdate(
+    """A partial CustomerTier object to update the CustomerTier with."""
+    input: CustomerTierUpdateInput!
+
+    """The identifier of the customer tier to update."""
+    id: String!
+  ): CustomerTierPayload!
+
+  """[ALPHA] Deletes a customer tier."""
+  customerTierDelete(
+    """The identifier of the customer tier to delete."""
     id: String!
   ): DeletePayload!
 
@@ -16855,6 +16918,36 @@ type Query {
 
   """One specific customer status."""
   customerStatus(id: String!): CustomerStatus!
+
+  """All customer tiers."""
+  customerTiers(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CustomerTierConnection!
+
+  """One specific customer tier."""
+  customerTier(id: String!): CustomerTier!
 
   """Custom views for the user."""
   customViews(
