@@ -855,12 +855,12 @@ type Graph implements Node {
   id: ID!
   slug: String!
   repoRootPath: String!
-  projectType: ProjectType @deprecated(reason: "replaced by graphType")
   graphType: GraphType
   graphMode: GraphMode!
   createdAt: DateTime!
   canBeRenamed: Boolean!
   status: GraphStatus!
+  customDomains: [CustomDomain!]!
   repository: GitRepository
   owners: [Team!]!
   account: Account!
@@ -869,7 +869,6 @@ type Graph implements Node {
   productionBranch: Branch!
   environmentVariables(after: String, before: String, first: Int, last: Int): EnvironmentVariableConnection!
   deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
-  customDomains: [CustomDomain!]!
   schemaChecks(first: Int, after: String, branch: String): SchemaCheckConnection!
   schemaProposals(after: String, first: Int): SchemaProposalConnection!
   operationChecksConfiguration: GraphOperationCheckConfiguration!
@@ -2232,11 +2231,6 @@ type ProjectNotStandaloneError {
 
 type ProjectScopeLimitExceededError {
   query: Query!
-}
-
-enum ProjectType {
-  STANDALONE
-  FEDERATED
 }
 
 type PublishForbidden {
