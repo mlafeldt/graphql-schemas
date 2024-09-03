@@ -1699,7 +1699,7 @@ type Mutation {
   schemaProposalRequestReview(input: SchemaProposalRequestReviewInput!): SchemaProposalRequestReviewPayload!
   schemaProposalApprove(input: SchemaProposalApproveInput!): SchemaProposalApprovePayload!
   schemaProposalReject(input: SchemaProposalRejectInput!): SchemaProposalRejectPayload!
-  schemaRequestChanges(input: SchemaProposalRequestChangesInput!): SchemaProposalRequestChangesPayload!
+  schemaProposalDelete(id: ID!): SchemaProposalDeletePayload!
 
   """Publish a new subgraph."""
   publish(input: PublishInput!): PublishPayload!
@@ -2698,6 +2698,16 @@ type SchemaProposalCreateSuccess {
   query: Query!
 }
 
+union SchemaProposalDeletePayload = SchemaProposalDeleteSuccess | SchemaProposalDoesNotExistError
+
+type SchemaProposalDeleteSuccess {
+  query: Query!
+}
+
+type SchemaProposalDoesNotExistError {
+  query: Query!
+}
+
 """An edge in a connection."""
 type SchemaProposalEdge {
   """The item at the end of the edge"""
@@ -2717,16 +2727,6 @@ type SchemaProposalRejectSuccess {
   query: Query!
 }
 
-input SchemaProposalRequestChangesInput {
-  id: ID!
-}
-
-union SchemaProposalRequestChangesPayload = SchemaProposalRequestChangesSuccess
-
-type SchemaProposalRequestChangesSuccess {
-  query: Query!
-}
-
 input SchemaProposalRequestReviewInput {
   id: ID!
 }
@@ -2742,8 +2742,7 @@ enum SchemaProposalStatus {
   DRAFT
   IMPLEMENTED
   REJECTED
-  REVIEW_REQUESTED
-  CHANGES_REQUESTED
+  IN_REVIEW
 }
 
 type SchemaRegistryBranchDoesNotExistError {
