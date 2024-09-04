@@ -2373,7 +2373,7 @@ type CustomView implements Node {
   owner: User!
 
   """The user who last updated the custom view."""
-  updatedBy: User!
+  updatedBy: User
 
   """The filters applied to issues in the custom view."""
   filters: JSONObject! @deprecated(reason: "Will be replaced by `filterData` in a future update")
@@ -3220,10 +3220,10 @@ type Document implements Node {
   color: String
 
   """The user who created the document."""
-  creator: User!
+  creator: User
 
   """The user who last updated the document."""
-  updatedBy: User!
+  updatedBy: User
 
   """The project that the document is associated with."""
   project: Project
@@ -3647,7 +3647,7 @@ type DocumentNotification implements Notification & Entity & Node {
   actorInitials: String
 
   """[Internal] Notification actor initials if avatar is not available."""
-  actorAvatarColor: String
+  actorAvatarColor: String!
 
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
@@ -3727,10 +3727,10 @@ type DocumentSearchResult implements Node {
   color: String
 
   """The user who created the document."""
-  creator: User!
+  creator: User
 
   """The user who last updated the document."""
-  updatedBy: User!
+  updatedBy: User
 
   """The project that the document is associated with."""
   project: Project
@@ -3940,7 +3940,7 @@ type EmailIntakeAddress implements Node {
   template: Template
 
   """The team that the email address is associated with."""
-  team: Team!
+  team: Team
 
   """The organization that the email address is associated with."""
   organization: Organization!
@@ -4062,7 +4062,7 @@ type Emoji implements Node {
   source: String!
 
   """The user who created the emoji."""
-  creator: User!
+  creator: User
 
   """The organization that the emoji belongs to."""
   organization: Organization!
@@ -4663,7 +4663,7 @@ type FeatureFlag implements Node {
   organization: Organization!
 
   """The project the feature flag is associated with."""
-  project: Project
+  project: Project!
 
   """The integration providing the feature flag."""
   integration: Integration!
@@ -5640,7 +5640,7 @@ type InitiativeNotification implements Notification & Entity & Node {
   actorInitials: String
 
   """[Internal] Notification actor initials if avatar is not available."""
-  actorAvatarColor: String
+  actorAvatarColor: String!
 
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
@@ -8060,7 +8060,7 @@ type IssueNotification implements Notification & Entity & Node {
   actorInitials: String
 
   """[Internal] Notification actor initials if avatar is not available."""
-  actorAvatarColor: String
+  actorAvatarColor: String!
 
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
@@ -11553,7 +11553,7 @@ interface Notification {
   actorInitials: String
 
   """[Internal] Notification actor initials if avatar is not available."""
-  actorAvatarColor: String
+  actorAvatarColor: String!
 
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
@@ -12942,7 +12942,7 @@ type OauthClientApprovalNotification implements Notification & Entity & Node {
   actorInitials: String
 
   """[Internal] Notification actor initials if avatar is not available."""
-  actorAvatarColor: String
+  actorAvatarColor: String!
 
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
@@ -15183,7 +15183,7 @@ type ProjectNotification implements Notification & Entity & Node {
   actorInitials: String
 
   """[Internal] Notification actor initials if avatar is not available."""
-  actorAvatarColor: String
+  actorAvatarColor: String!
 
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
@@ -16626,11 +16626,11 @@ type Query {
   Get information for an application and whether a user has approved it for the given scopes.
   """
   applicationWithAuthorization(
-    """Actor mode used for the authorization."""
-    actor: String = "user"
-
     """Redirect URI for the application."""
     redirectUri: String
+
+    """Actor mode used for the authorization."""
+    actor: String = "user"
 
     """Scopes being requested by the application."""
     scope: [String!]!
@@ -18582,7 +18582,7 @@ type Roadmap implements Node {
   creator: User!
 
   """The user who owns the roadmap."""
-  owner: User!
+  owner: User
 
   """The roadmap's unique URL slug."""
   slugId: String!
@@ -20626,7 +20626,7 @@ type Template implements Node {
   """
   The organization that the template is associated with. If null, the template is associated with a particular team.
   """
-  organization: Organization
+  organization: Organization!
 
   """
   The team that the template is associated with. If null, the template is global to the workspace.
@@ -22300,6 +22300,9 @@ type WorkflowDefinition implements Node {
 
   """The contextual project view associated with the workflow."""
   project: Project
+
+  """The contextual initiative view associated with the workflow."""
+  initiative: Initiative
 
   """The context custom view associated with the workflow."""
   customView: CustomView
