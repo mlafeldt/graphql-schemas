@@ -1319,7 +1319,7 @@ input CommentUpdateInput {
   """The comment content."""
   body: String
 
-  """The comment content as a Prosemirror document."""
+  """[Internal] The comment content as a Prosemirror document."""
   bodyData: JSON
 
   """[INTERNAL] The user who resolved this thread."""
@@ -3141,9 +3141,6 @@ type DiaryEntry implements Node {
 
   """The date for which the entry is created"""
   date: TimelessDate!
-
-  """The canonical url for the DiaryEntry."""
-  url: String!
 }
 
 type DiaryEntryConnection {
@@ -3152,43 +3149,11 @@ type DiaryEntryConnection {
   pageInfo: PageInfo!
 }
 
-input DiaryEntryCreateInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
-  """The date for which the entry is created."""
-  date: TimelessDate!
-
-  """[Internal] The comment content as a Prosemirror diaryEntry."""
-  bodyData: JSON
-}
-
 type DiaryEntryEdge {
   node: DiaryEntry!
 
   """Used in `before` and `after` args"""
   cursor: String!
-}
-
-type DiaryEntryPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The diary entry that was created or updated."""
-  diaryEntry: DiaryEntry!
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-input DiaryEntryUpdateInput {
-  """[Internal] The comment content as a Prosemirror diaryEntry."""
-  bodyData: JSON
-
-  """The date for which the entry is created."""
-  date: TimelessDate
 }
 
 """A document that can be attached to different entities."""
@@ -4505,6 +4470,9 @@ type Favorite implements Node {
   """The favorited user."""
   user: User
 
+  """The favorited customer."""
+  customer: Customer
+
   """URL of the favorited entity. Folders return 'null' value."""
   url: String
 
@@ -4589,6 +4557,9 @@ input FavoriteCreateInput {
 
   """The position of the item in the favorites list."""
   sortOrder: Float
+
+  """The identifier of the customer to favorite."""
+  customerId: String
 }
 
 type FavoriteEdge {
@@ -9739,27 +9710,6 @@ type Mutation {
     """
     id: String!
   ): CyclePayload!
-
-  """Creates a new diary entry."""
-  diaryEntryCreate(
-    """The diary entry to create."""
-    input: DiaryEntryCreateInput!
-  ): DiaryEntryPayload!
-
-  """Updates a diaryEntry."""
-  diaryEntryUpdate(
-    """A partial diary entry object to update the diary entry with."""
-    input: DiaryEntryUpdateInput!
-
-    """The identifier of the diary entry to update."""
-    id: String!
-  ): DiaryEntryPayload!
-
-  """Deletes a diaryEntry."""
-  diaryEntryDelete(
-    """The identifier of the diaryEntry to delete."""
-    id: String!
-  ): DeletePayload!
 
   """Creates a new document."""
   documentCreate(
@@ -17191,9 +17141,6 @@ type Query {
 
   """One specific cycle."""
   cycle(id: String!): Cycle!
-
-  """One specific diary entry."""
-  diaryEntry(id: String!): DiaryEntry!
 
   """A collection of document content history entries."""
   documentContentHistory(id: String!): DocumentContentHistoryPayload!
