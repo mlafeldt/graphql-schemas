@@ -1701,6 +1701,13 @@ type Mutation {
   schemaProposalReject(input: SchemaProposalRejectInput!): SchemaProposalRejectPayload!
   schemaProposalDelete(id: ID!): SchemaProposalDeletePayload!
 
+  """
+  Edit the contents of a proposal.
+  
+  All new and edited subgraphs should be included in every call to edit.
+  """
+  schemaProposalEdit(input: SchemaProposalEditInput!): SchemaProposalEditPayload!
+
   """Publish a new subgraph."""
   publish(input: PublishInput!): PublishPayload!
 
@@ -2662,6 +2669,8 @@ type SchemaProposal {
   description: String
   status: SchemaProposalStatus!
   createdAt: DateTime!
+  subgraph(subgraphName: String!): SchemaProposalSubgraph
+  subgraphs: [SchemaProposalSubgraph!]!
 }
 
 input SchemaProposalApproveInput {
@@ -2717,6 +2726,22 @@ type SchemaProposalEdge {
   cursor: String!
 }
 
+input SchemaProposalEditInput {
+  schemaProposalId: ID!
+  subgraphs: [SchemaProposalEditSubgraph!]!
+}
+
+union SchemaProposalEditPayload = SchemaProposalEditSuccess | SchemaProposalDoesNotExistError
+
+input SchemaProposalEditSubgraph {
+  name: String!
+  schema: String!
+}
+
+type SchemaProposalEditSuccess {
+  query: Query!
+}
+
 input SchemaProposalRejectInput {
   id: ID!
 }
@@ -2743,6 +2768,17 @@ enum SchemaProposalStatus {
   IMPLEMENTED
   REJECTED
   IN_REVIEW
+}
+
+type SchemaProposalSubgraph {
+  sdl: String
+  status: SchemaProposalSubgraphStatus!
+}
+
+enum SchemaProposalSubgraphStatus {
+  CREATED
+  EDITED
+  UNCHANGED
 }
 
 type SchemaRegistryBranchDoesNotExistError {
