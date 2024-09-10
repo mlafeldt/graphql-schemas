@@ -1742,7 +1742,7 @@ type CustomerNeed implements Node {
   attachment: Attachment
 
   """
-  The priority of the customer need. 0 = No priority, 1 = Critical, 2 = Important, 3 = Nice to have.
+  The urgency of the customer need. 0 = No urgency, 1 = Critical, 2 = Important, 3 = Nice to have.
   """
   priority: Float!
 
@@ -1830,7 +1830,7 @@ input CustomerNeedCreateInput {
   attachmentId: String
 
   """
-  The priority of the customer need. 0 = No priority, 1 = Critical, 2 = Important, 3 = Nice to have.
+  The urgency of the customer need. 0 = No urgency, 1 = Critical, 2 = Important, 3 = Nice to have.
   """
   priority: Float
 
@@ -1906,7 +1906,7 @@ input CustomerNeedUpdateInput {
   customerId: String
 
   """
-  The priority of the customer need. 0 = No priority, 1 = Critical, 2 = Important, 3 = Nice to have.
+  The urgency of the customer need. 0 = No urgency, 1 = Critical, 2 = Important, 3 = Nice to have.
   """
   priority: Float
 
@@ -13957,6 +13957,9 @@ type Project implements Node {
   """
   priority: Int!
 
+  """The health of the project."""
+  health: ProjectUpdateHealthType
+
   """The time at which the project health was updated."""
   healthUpdatedAt: DateTime
 
@@ -14289,9 +14292,6 @@ type Project implements Node {
   0.25 * in progress estimate points) / total estimate points.
   """
   progress: Float!
-
-  """The health of the project based on the last project update."""
-  health: ProjectUpdateHealthType
 
   """The overall scope (total estimate points) of the project."""
   scope: Float!
@@ -15521,6 +15521,9 @@ type ProjectSearchResult implements Node {
   """
   priority: Int!
 
+  """The health of the project."""
+  health: ProjectUpdateHealthType
+
   """The time at which the project health was updated."""
   healthUpdatedAt: DateTime
 
@@ -15853,9 +15856,6 @@ type ProjectSearchResult implements Node {
   0.25 * in progress estimate points) / total estimate points.
   """
   progress: Float!
-
-  """The health of the project based on the last project update."""
-  health: ProjectUpdateHealthType
 
   """The overall scope (total estimate points) of the project."""
   scope: Float!
@@ -22124,6 +22124,8 @@ enum ViewType {
   quickView
   issueIdentifiers
   customers
+  pullRequests
+  myPullRequests
 }
 
 """A webhook used to send HTTP notifications over data updates."""
