@@ -149,9 +149,6 @@ type AccountResources {
 
 type AccountResourcesStatus {
   requestCount: ResourceStatus!
-  dbReads: ResourceStatus!
-  dbWrites: ResourceStatus!
-  dbSize: ResourceStatus!
   buildDuration: ResourceStatus!
   udfRequestCount: ResourceStatus!
   udfExecUnits: ResourceStatus!
@@ -160,12 +157,11 @@ type AccountResourcesStatus {
 
 type AccountResourcesUsage {
   requestCount: TimeSeries!
-  dbReads: TimeSeries!
-  dbWrites: TimeSeries!
-  dbSize: TimeSeries!
   buildDuration: TimeSeries!
   udfExecUnits: TimeSeries!
   udfRequestCount: TimeSeries!
+  serverlessFunctionInvocationCount: TimeSeries!
+  serverlessFunctionDuration: TimeSeries!
   granularity: TimeAggregationGranularity!
   execUnits: TimeSeries!
 }
@@ -224,7 +220,7 @@ type Branch implements Node {
   schema: String
   federatedSchema: String
   operationChecksEnabled: Boolean!
-  schemaProposals(first: Int, after: String): SchemaProposalConnection!
+  schemaProposals(first: Int, after: String, filter: SchemaProposalFilter!): SchemaProposalConnection!
   subgraphs: [Subgraph!]!
 }
 
@@ -2740,6 +2736,10 @@ input SchemaProposalEditSubgraph {
 
 type SchemaProposalEditSuccess {
   query: Query!
+}
+
+input SchemaProposalFilter {
+  status: SchemaProposalStatus
 }
 
 input SchemaProposalRejectInput {
