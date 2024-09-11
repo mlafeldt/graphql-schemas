@@ -4090,15 +4090,6 @@ interface Entity {
   archivedAt: DateTime
 }
 
-"""
-Contains either the full serialized state of the application or delta packets
-that the requester can apply to the local data set in order to be up-to-date.
-"""
-type EntityCountResponse {
-  """Entity counts keyed by the entity name."""
-  counts: JSONObject!
-}
-
 """An external link for an entity like initiative, etc..."""
 type EntityExternalLink implements Node {
   """The unique identifier of the entity."""
@@ -10124,6 +10115,18 @@ type Mutation {
   """[INTERNAL] Refresh PagerDuty schedule mappings."""
   integrationPagerDutyRefreshScheduleMappings: IntegrationPayload!
 
+  """[Internal] Updates existing Slack integration scopes."""
+  updateIntegrationSlackScopes(
+    """The ID of the existing Slack integration"""
+    integrationId: String!
+
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
   """Integrates the organization with Slack."""
   integrationSlack(
     """
@@ -10996,6 +10999,33 @@ type Mutation {
     """
     id: String!
   ): ProjectArchivePayload!
+
+  """Creates a new project status."""
+  projectStatusCreate(
+    """The ProjectStatus object to create."""
+    input: ProjectStatusCreateInput!
+  ): ProjectStatusPayload!
+
+  """Updates a project status."""
+  projectStatusUpdate(
+    """A partial ProjectStatus object to update the ProjectStatus with."""
+    input: ProjectStatusUpdateInput!
+
+    """The identifier of the project status to update."""
+    id: String!
+  ): ProjectStatusPayload!
+
+  """Archives a project status."""
+  projectStatusArchive(
+    """The identifier of the project status to archive."""
+    id: String!
+  ): ProjectStatusArchivePayload!
+
+  """Unarchives a project status."""
+  projectStatusUnarchive(
+    """The identifier of the project status to unarchive."""
+    id: String!
+  ): ProjectStatusArchivePayload!
 
   """Creates a new interaction on a project update."""
   projectUpdateInteractionCreate(
@@ -13269,6 +13299,9 @@ type Organization implements Node {
     """
     orderBy: PaginationOrderBy
   ): IssueLabelConnection!
+
+  """[ALPHA] Number of customers in the organization."""
+  customerCount: Int!
 }
 
 type OrganizationAcceptedOrExpiredInviteDetailsPayload {
@@ -15936,10 +15969,52 @@ type ProjectStatus implements Node {
   indefinite: Boolean!
 }
 
+"""A generic payload return from entity archive mutations."""
+type ProjectStatusArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: ProjectStatus
+}
+
 type ProjectStatusConnection {
   edges: [ProjectStatusEdge!]!
   nodes: [ProjectStatus!]!
   pageInfo: PageInfo!
+}
+
+type ProjectStatusCountPayload {
+  """Number of projects using this project status."""
+  count: Float!
+}
+
+input ProjectStatusCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The name of the status."""
+  name: String!
+
+  """The UI color of the status as a HEX string."""
+  color: String!
+
+  """Description of the status."""
+  description: String
+
+  """The position of the status in the workspace's project flow."""
+  position: Float!
+
+  """The type of the project status."""
+  type: ProjectStatusType!
+
+  """Whether or not a project can be in this status indefinitely."""
+  indefinite: Boolean = false
 }
 
 type ProjectStatusEdge {
@@ -15986,6 +16061,17 @@ input ProjectStatusFilter {
   or: [ProjectStatusFilter!]
 }
 
+type ProjectStatusPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The project status that was created or updated."""
+  status: ProjectStatus!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
 """A type of project status."""
 enum ProjectStatusType {
   backlog
@@ -15994,6 +16080,26 @@ enum ProjectStatusType {
   paused
   completed
   canceled
+}
+
+input ProjectStatusUpdateInput {
+  """The name of the status."""
+  name: String
+
+  """The UI color of the status as a HEX string."""
+  color: String
+
+  """Description of the status."""
+  description: String
+
+  """The position of the status in the workspace's project flow."""
+  position: Float
+
+  """The type of the project status."""
+  type: ProjectStatusType
+
+  """Whether or not a project can be in this status indefinitely."""
+  indefinite: Boolean
 }
 
 """Different tabs available inside a project."""
@@ -16644,48 +16750,6 @@ enum PushSubscriptionType {
 }
 
 type Query {
-  """Retrieves how many entities the user has access to."""
-  syncEntityCount: EntityCountResponse!
-
-  """Fetches an archived model."""
-  archivedModelSync(
-    """
-    The identifier of the model to load. What an identifier is specific to the model class.
-    """
-    identifier: String!
-
-    """The class name of the model to load."""
-    modelClass: String!
-  ): ArchiveResponse! @deprecated(reason: "Use streaming endpoint instead.")
-
-  """Fetches archived models."""
-  archivedModelsSync(
-    """The class name of the models to load."""
-    modelClass: String!
-
-    """The teamId for which to load archived models."""
-    teamId: String!
-
-    """The filter to apply to archived models."""
-    issueFilter: IssueFilter
-
-    """
-    How trashed issues should be loaded. Defaults to TrashOptionType.excludeTrash
-    """
-    trashOption: TrashOptionType
-
-    """Retrieve issues that have been archived before this date."""
-    before: DateTime
-
-    """
-    To proper page through entities with same "archivedAt" date we also need last id
-    """
-    beforeId: String
-
-    """The number of issues to load."""
-    last: Int
-  ): ArchiveResponse! @deprecated(reason: "Use streaming endpoint instead.")
-
   """All API keys for the user."""
   apiKeys(
     """A cursor to be used with last for backward pagination."""
@@ -17856,6 +17920,44 @@ type Query {
 
   """Suggests filters for a project view based on a text prompt."""
   projectFilterSuggestion(prompt: String!): ProjectFilterSuggestionPayload!
+
+  """All project statuses."""
+  projectStatuses(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectStatusConnection!
+
+  """
+  [INTERNAL] Count of projects using this project status across the organization.
+  """
+  projectStatusProjectCount(
+    """The identifier of the project status to find the project count for."""
+    id: String!
+  ): ProjectStatusCountPayload!
+
+  """One specific project status."""
+  projectStatus(id: String!): ProjectStatus!
 
   """All interactions on project updates."""
   projectUpdateInteractions(
@@ -19163,6 +19265,11 @@ type SlackChannelNameMapping {
   Whether or not synced Slack threads should be updated with a message when their Ask is accepted from triage.
   """
   postAcceptedFromTriageUpdates: Boolean
+
+  """
+  Whether or not to use AI to generate titles for Asks created in this channel.
+  """
+  aiTitles: Boolean
 }
 
 input SlackChannelNameMappingInput {
@@ -19221,6 +19328,11 @@ input SlackChannelNameMappingInput {
   Whether or not synced Slack threads should be updated with a message when their Ask is accepted from triage.
   """
   postAcceptedFromTriageUpdates: Boolean
+
+  """
+  Whether or not to use AI to generate titles for Asks created in this channel.
+  """
+  aiTitles: Boolean
 }
 
 enum SlackChannelType {
@@ -21038,13 +21150,6 @@ input TokenUserAccountAuthInput {
 
   """An optional invite link for an organization."""
   inviteLink: String
-}
-
-"""How trashed models should be loaded."""
-enum TrashOptionType {
-  includeTrash
-  excludeTrash
-  trashOnly
 }
 
 """A team's triage responsibility."""
