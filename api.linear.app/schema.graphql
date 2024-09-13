@@ -1568,7 +1568,7 @@ input CustomerCollectionFilter {
   externalIds: StringArrayComparator
 
   """Filters that the customer owner must satisfy."""
-  owner: UserFilter
+  owner: NullableUserFilter
 
   """Filters that the customer's needs must satisfy."""
   needs: CustomerNeedCollectionFilter
@@ -1681,7 +1681,7 @@ input CustomerFilter {
   externalIds: StringArrayComparator
 
   """Filters that the customer owner must satisfy."""
-  owner: UserFilter
+  owner: NullableUserFilter
 
   """Filters that the customer's needs must satisfy."""
   needs: CustomerNeedCollectionFilter
@@ -7138,6 +7138,31 @@ type IssueDraft implements Node {
 
   """Serialized array of JSONs representing attachments."""
   attachments: JSONObject
+  labels(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueLabelConnection!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -7698,6 +7723,22 @@ type IssueImportDeletePayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""Whether a custom JQL query is valid or not"""
+type IssueImportJqlCheckPayload {
+  """
+  Returns true if the JQL query has been validated successfully, false otherwise
+  """
+  success: Boolean!
+
+  """
+  Returns an approximate number of issues matching the JQL query, if available
+  """
+  count: Float
+
+  """An error message returned by Jira when validating the JQL query."""
+  error: String
 }
 
 """Issue import mapping input."""
@@ -10027,8 +10068,8 @@ type Mutation {
 
   """[INTERNAL] Integrates the organization with LaunchDarkly."""
   integrationLaunchDarklyConnect(
-    """The LaunchDarkly API key."""
-    apiKey: String!
+    """The LaunchDarkly OAuth code."""
+    code: String!
 
     """The LaunchDarkly project key."""
     projectKey: String!
@@ -10395,6 +10436,9 @@ type Mutation {
 
     """Jira installation or cloud hostname."""
     jiraHostname: String!
+
+    """A custom JQL query to filter issues being imported"""
+    jql: String
 
     """
     Whether to instantly process the import with the default configuration mapping.
@@ -17500,6 +17544,26 @@ type Query {
     """The ID of the issue import for which to check sync eligibility"""
     issueImportId: String!
   ): IssueImportSyncCheckPayload!
+
+  """
+  Checks whether a custom JQL query is valid and can be used to filter issues of a Jira import
+  """
+  issueImportJqlCheck(
+    """Jira installation or cloud hostname."""
+    jiraHostname: String!
+
+    """Jira personal access token to access Jira REST API."""
+    jiraToken: String!
+
+    """Jira user account email."""
+    jiraEmail: String!
+
+    """Jira project key to use as the base filter of the query."""
+    jiraProject: String!
+
+    """The JQL query to validate."""
+    jql: String!
+  ): IssueImportJqlCheckPayload!
 
   """All issue labels."""
   issueLabels(
