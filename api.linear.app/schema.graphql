@@ -5962,6 +5962,7 @@ enum IntegrationService {
   jira
   jiraPersonal
   launchDarkly
+  launchDarklyPersonal
   loom
   notion
   opsgenie
@@ -10076,6 +10077,12 @@ type Mutation {
 
     """The LaunchDarkly environment."""
     environment: String!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Integrates your personal account with LaunchDarkly."""
+  integrationLaunchDarklyPersonalConnect(
+    """The LaunchDarkly OAuth code."""
+    code: String!
   ): IntegrationPayload!
 
   """
@@ -14388,6 +14395,36 @@ type Project implements Node {
   """[Internal] The project's content as YJS state."""
   contentState: String
 
+  """Comments associated with the project overview."""
+  comments(
+    """Filter returned comments."""
+    filter: CommentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CommentConnection!
+
   """[DEPRECATED] The type of the state."""
   state: String! @deprecated(reason: "Use project.status instead")
 }
@@ -14555,6 +14592,9 @@ input ProjectCreateInput {
 
   """The description for the project."""
   description: String
+
+  """The project content as markdown."""
+  content: String
 
   """The identifiers of the teams this project is associated with."""
   teamIds: [String!]!
@@ -15952,6 +15992,36 @@ type ProjectSearchResult implements Node {
   """[Internal] The project's content as YJS state."""
   contentState: String
 
+  """Comments associated with the project overview."""
+  comments(
+    """Filter returned comments."""
+    filter: CommentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CommentConnection!
+
   """[DEPRECATED] The type of the state."""
   state: String! @deprecated(reason: "Use project.status instead")
 
@@ -16344,6 +16414,9 @@ input ProjectUpdateInput {
   """The description for the project."""
   description: String
 
+  """The project content as markdown."""
+  content: String
+
   """The ID of the issue from which that project is created."""
   convertedFromIssueId: String
 
@@ -16720,6 +16793,8 @@ input PullRequestReviewerInput {
 enum PullRequestStatus {
   draft
   open
+  inReview
+  approved
   merged
   closed
 }
