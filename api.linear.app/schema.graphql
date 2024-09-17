@@ -7579,12 +7579,15 @@ type IssueHistory implements Node {
   """
   The actor that performed the actions. This field may be empty in the case of integrations or automations.
   """
-  actor: User @deprecated(reason: "Use actors instead.")
+  actor: User
 
   """
   The actors that performed the actions. This field may be empty in the case of integrations or automations.
   """
-  actors: [User!]
+  actors: [User!] @deprecated(reason: "Use `actor` and `descriptionUpdatedBy` instead.")
+
+  """The actors that edited the description of the issue, if any."""
+  descriptionUpdatedBy: [User!]
 
   """The user that was unassigned from the issue."""
   fromAssignee: User
@@ -11105,11 +11108,23 @@ type Mutation {
     id: String!
   ): ProjectUpdatePayload!
 
+  """Archives a project update."""
+  projectUpdateArchive(
+    """The identifier of the project update to archive."""
+    id: String!
+  ): ProjectUpdateArchivePayload!
+
+  """Unarchives a project update."""
+  projectUpdateUnarchive(
+    """The identifier of the project update to unarchive."""
+    id: String!
+  ): ProjectUpdateArchivePayload!
+
   """Deletes a project update."""
   projectUpdateDelete(
     """The identifier of the project update to delete."""
     id: String!
-  ): DeletePayload!
+  ): DeletePayload! @deprecated(reason: "Use `projectUpdateArchive` instead.")
 
   """Mark a project update as read."""
   projectUpdateMarkAsRead(
@@ -16324,6 +16339,18 @@ type ProjectUpdate implements Node {
     """
     orderBy: PaginationOrderBy
   ): CommentConnection!
+}
+
+"""A generic payload return from entity archive mutations."""
+type ProjectUpdateArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: ProjectUpdate
 }
 
 type ProjectUpdateConnection {
