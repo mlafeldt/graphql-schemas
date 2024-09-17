@@ -2737,7 +2737,18 @@ input SchemaProposalEditInput {
   description: String
 }
 
-union SchemaProposalEditPayload = SchemaProposalEditSuccess | SchemaProposalDoesNotExistError
+type SchemaProposalEditParserError {
+  subgraphName: String!
+  error: String!
+  spanStart: Int!
+  spanEnd: Int!
+}
+
+type SchemaProposalEditParserErrors {
+  errors: [SchemaProposalEditParserError!]!
+}
+
+union SchemaProposalEditPayload = SchemaProposalEditSuccess | SchemaProposalDoesNotExistError | SchemaProposalEditParserErrors
 
 input SchemaProposalEditSubgraph {
   name: String!
