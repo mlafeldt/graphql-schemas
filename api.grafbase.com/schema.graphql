@@ -222,6 +222,7 @@ type Branch implements Node {
   operationChecksEnabled: Boolean!
   schemaProposals(first: Int, after: String, filter: SchemaProposalFilter!): SchemaProposalConnection!
   subgraphs: [Subgraph!]!
+  endpointConfig: EndpointConfig
 }
 
 type BranchAlreadyExistsError {
@@ -574,6 +575,23 @@ scalar Duration
 type EmptyDatabaseRegionsError {
   query: Query!
 }
+
+type EndpointConfig {
+  url: String!
+}
+
+input EndpointConfigInput {
+  url: String!
+}
+
+input EndpointConfigUpdateInput {
+  accountSlug: String!
+  graphSlug: String!
+  branchSlug: String!
+  endpointConfig: EndpointConfigInput!
+}
+
+union EndpointConfigUpdatePayload = Query | GraphDoesNotExistError
 
 input EnviromentVariableUpsertInput {
   accountSlug: String!
@@ -1610,6 +1628,7 @@ type Mutation {
     """name of the branch"""
     branchName: String!
   ): BranchDeletePayload!
+  endpointConfigUpdate(input: EndpointConfigUpdateInput!): EndpointConfigUpdatePayload!
 
   """Add a new custom domain."""
   customDomainCreate(input: CustomDomainCreateInput!): CustomDomainCreatePayload!
