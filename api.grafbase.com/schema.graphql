@@ -572,6 +572,13 @@ The input/output is a string in ISO8601 format.
 """
 scalar Duration
 
+input DurationFilter {
+  lt: Duration
+  lte: Duration
+  gt: Duration
+  gte: Duration
+}
+
 type EmptyDatabaseRegionsError {
   query: Query!
 }
@@ -709,6 +716,11 @@ union EnvironmentVariableUpdatePayload = EnvironmentVariableUpdateSuccess | Envi
 type EnvironmentVariableUpdateSuccess {
   environmentVariable: EnvironmentVariable!
   query: Query!
+}
+
+type ErrorCountByCode {
+  code: String!
+  count: Int!
 }
 
 type FederatedGraphCompositionError {
@@ -897,6 +909,22 @@ type Graph implements Node {
   operationChecksConfiguration: GraphOperationCheckConfiguration!
   logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
   analytics(filters: GraphAnalyticsFilters!): GraphAnalytics
+  requests(first: Int, after: String, filters: RequestFilters!): RequestConnection
+  traceForRequest(
+    branchName: String
+
+    """Cursor used in the requests connection."""
+    cursor: String!
+  ): Trace
+  trace(
+    branchName: String
+
+    """
+    Approximate time for the trace. It's expected to be a few minutes around the real timestamp.
+    """
+    approximateTimestamp: DateTime!
+    traceId: ID!
+  ): Trace
   requestAnalytics(filter: GraphRequestAnalyticsFilter!): RequestAnalytics @deprecated(reason: "Use `analytics` instead")
 }
 
@@ -1458,6 +1486,9 @@ enum InviteStatus {
   PENDING
   EXPIRED
 }
+
+"""A scalar that can represent any JSON value."""
+scalar JSON
 
 type KeyDoesNotExistError {
   query: Query!
@@ -2423,12 +2454,74 @@ type RepositorySlugInUseError {
   query: Query!
 }
 
+type Request {
+  traceId: ID!
+  rootSpanId: ID!
+  startedAt: DateTime!
+  endedAt: DateTime!
+  httpRequestMethod: String!
+  urlPath: String!
+  userAgent: String!
+  clientName: String!
+  clientVersion: String!
+  errorCount: Int!
+  errorCountByCode: [ErrorCountByCode!]!
+  operations: [RequestOperation!]!
+}
+
 type RequestAnalytics {
   timeSeries: RequestMetricsTimeSeries!
   metrics: RequestMetrics!
   periodStart: DateTime!
   periodEnd: DateTime!
   previousPeriodAnalytics: PreviousRequestAnalytcs
+}
+
+type RequestConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [RequestEdge!]!
+
+  """A list of nodes."""
+  nodes: [Request!]!
+}
+
+"""An edge in a connection."""
+type RequestEdge {
+  """The item at the end of the edge"""
+  node: Request!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+input RequestFilters {
+  """Defaults to production branch"""
+  branchName: String
+
+  """
+  Use this if you really care about having a specific duration like 1 hour, 7 days, etc.
+  """
+  range: Duration
+
+  """
+  Use this if you *at least* the data between `from` and `to` to be provided. You may get
+  more, but never less.
+  """
+  from: DateTime
+
+  """To be used in conjunction with with either `range` or `from`."""
+  to: DateTime!
+  operationName: [String!]
+  clientName: [String!]
+
+  """Only used if client name is specified."""
+  clientVersion: [String!]
+  traceId: [String!]
+  duration: DurationFilter
+  httpStatusCode: [Int!]
 }
 
 type RequestLogEvent implements LogEvent {
@@ -2505,6 +2598,11 @@ type RequestMetricsV2 {
   error5XxCount: Int!
   errorGraphqlCount: Int!
   latencyMsPercentiles: [Int!]!
+}
+
+type RequestOperation {
+  name: String!
+  operationType: OperationType!
 }
 
 type ReservedPrefixError {
@@ -3297,6 +3395,30 @@ type TopOperationsByNameAndHash {
   orderedByHighestLatency: [TopOperationByNameAndHashOrderedByHighestLatency!]!
   orderedByHighestCount: [TopOperationByNameAndHashOrderedByHighestCount!]!
   orderedByHighestErrorRatio: [TopOperationByNameAndHashOrderedByHighestErrorRatio!]!
+}
+
+type Trace {
+  spans: [TraceSpan!]!
+}
+
+type TraceSpan {
+  id: ID!
+  parentId: ID
+  name: String!
+  startedAt: DateTime!
+  endedAt: DateTime!
+  statusCode: TraceSpanStatusCode
+
+  """
+  Attributes are key-value pairs that represent additional information about the span.
+  It's always a map of strings to strings.
+  """
+  attributes: JSON!
+}
+
+enum TraceSpanStatusCode {
+  OK
+  ERROR
 }
 
 type TrustedDocument {
