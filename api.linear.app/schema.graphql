@@ -11250,6 +11250,9 @@ type Mutation {
 
   """Deletes a team membership."""
   teamMembershipDelete(
+    """Whether to leave the parent teams."""
+    alsoLeaveParentTeams: Boolean
+
     """The identifier of the team membership to delete."""
     id: String!
   ): DeletePayload!
@@ -16697,92 +16700,6 @@ type ProjectUpdateWithInteractionPayload {
   interaction: ProjectUpdateInteraction!
 }
 
-"""[ALPHA] A pull request in a version control system."""
-type PullRequest implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The title of the pull request."""
-  title: String!
-
-  """The description of the pull request."""
-  description: String
-
-  """The source branch of the pull request."""
-  sourceBranch: String!
-
-  """The target branch of the pull request."""
-  targetBranch: String!
-
-  """The URL of the pull request."""
-  url: String!
-
-  """The status of the pull request."""
-  status: PullRequestStatus!
-
-  """The date when the pull request was opened."""
-  openedAt: DateTime!
-
-  """The date when the pull request was closed."""
-  closedAt: DateTime
-
-  """The date when the pull request was merged."""
-  mergedAt: DateTime
-
-  """The reviewers of the pull request."""
-  reviewers: [PullRequestReviewer!]!
-
-  """Links between the pull request and issues."""
-  issueLinks: [PullRequestIssueLink!]!
-
-  """The organization of the pull request."""
-  organization: Organization!
-
-  """The user who created the pull request."""
-  creator: User
-
-  """The external user who created the pull request."""
-  externalCreator: ExternalUser
-}
-
-"""[ALPHA] A link between a pull request and an issue."""
-type PullRequestIssueLink {
-  """The ID Of the linked issue."""
-  issueId: String!
-
-  """The type of link between the pull request & issue."""
-  type: PullRequestIssueLinkType!
-}
-
-input PullRequestIssueLinkInput {
-  """The ID Of the linked issue."""
-  issueId: String!
-
-  """The type of link between the pull request & issue."""
-  type: PullRequestIssueLinkType!
-}
-
-"""[ALPHA] The type of link between the pull request & issue."""
-enum PullRequestIssueLinkType {
-  closes
-  contributes
-  links
-}
-
 """[ALPHA] A pull request reviewer."""
 type PullRequestReviewer {
   """The ID of the user who reviewed the pull request."""
@@ -16817,16 +16734,6 @@ input PullRequestReviewerInput {
 
   """The date when the pull request was last reviewed."""
   lastReviewedAt: DateTime
-}
-
-"""[ALPHA] The status of a pull request."""
-enum PullRequestStatus {
-  draft
-  open
-  inReview
-  approved
-  merged
-  closed
 }
 
 """A user's web or mobile push notification subscription."""
