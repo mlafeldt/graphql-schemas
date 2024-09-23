@@ -1042,6 +1042,9 @@ type Comment implements Node {
   """The project update that the comment is associated with."""
   projectUpdate: ProjectUpdate
 
+  """The post that the comment is associated with."""
+  post: Post
+
   """The parent comment under which the current comment is nested."""
   parent: Comment
 
@@ -3869,6 +3872,9 @@ type Draft implements Node {
   """The project update for which this is a draft comment."""
   projectUpdate: ProjectUpdate
 
+  """The post for which this is a draft comment."""
+  post: Post
+
   """The comment for which this is a draft comment reply."""
   parentComment: Comment
 
@@ -4753,6 +4759,9 @@ type FeedItem implements Node {
 
   """The project update that is in the feed."""
   projectUpdate: ProjectUpdate
+
+  """The post that is in the feed."""
+  post: Post
 
   """The time at which the user saw the feed item."""
   seenAt: DateTime
@@ -13959,6 +13968,53 @@ type PasskeyLoginStartResponse {
   options: JSONObject!
 }
 
+"""[Internal] A generic post."""
+type Post implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The update content in markdown format."""
+  body: String!
+
+  """[Internal] The content of the post as a Prosemirror document."""
+  bodyData: String!
+
+  """The user who wrote the post."""
+  creator: User
+
+  """The time the post was edited."""
+  editedAt: DateTime
+
+  """Emoji reaction summary, grouped by emoji type."""
+  reactionData: JSONObject!
+
+  """A URL of the TTL (text-to-language) for the body."""
+  ttlUrl: String
+
+  """The user that the post is associated with."""
+  user: User
+
+  """The project that the post is associated with."""
+  project: Project
+
+  """The team that the post is associated with."""
+  team: Team
+}
+
 """Issue priority sorting options."""
 input PrioritySort {
   """Whether nulls should be sorted first or last"""
@@ -18669,6 +18725,9 @@ type Reaction implements Node {
 
   """The project update that the reaction is associated with."""
   projectUpdate: ProjectUpdate
+
+  """The post that the reaction is associated with."""
+  post: Post
 
   """The user that created the reaction."""
   user: User
