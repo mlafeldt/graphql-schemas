@@ -4368,6 +4368,7 @@ type FacetEdge {
 
 enum FacetPageSource {
   projects
+  teamIssues
 }
 
 """User favorites presented in the sidebar."""
@@ -22370,8 +22371,8 @@ enum ViewType {
   quickView
   issueIdentifiers
   customers
-  pullRequests
-  myPullRequests
+  reviews
+  myReviews
 }
 
 """A webhook used to send HTTP notifications over data updates."""
@@ -22421,6 +22422,11 @@ type Webhook implements Node {
 
   """The resource types this webhook is subscribed to."""
   resourceTypes: [String!]!
+
+  """
+  [INTERNAL] Webhook failure events associated with the webhook (last 50).
+  """
+  failures: [WebhookFailureEvent!]!
 }
 
 type WebhookConnection {
@@ -22488,6 +22494,19 @@ type WebhookFailureEvent {
   The unique execution ID of the webhook push. This is retained between retries of the same push.
   """
   executionId: String!
+}
+
+type WebhookFailureEventConnection {
+  edges: [WebhookFailureEventEdge!]!
+  nodes: [WebhookFailureEvent!]!
+  pageInfo: PageInfo!
+}
+
+type WebhookFailureEventEdge {
+  node: WebhookFailureEvent!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
 }
 
 type WebhookPayload {
