@@ -910,21 +910,15 @@ type Graph implements Node {
   logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
   analytics(filters: GraphAnalyticsFilters!): GraphAnalytics
   requests(first: Int, after: String, filters: RequestFilters!): RequestConnection
-  traceForRequest(
-    branchName: String
-
-    """Cursor used in the requests connection."""
-    cursor: String!
-  ): Trace
-  trace(
+  request(
     branchName: String
 
     """
-    Approximate time for the trace. It's expected to be a few minutes around the real timestamp.
+    The approximate timestamp of the request, within a few minutes of the actual request.
     """
     approximateTimestamp: DateTime!
     traceId: ID!
-  ): Trace
+  ): Request
   requestAnalytics(filter: GraphRequestAnalyticsFilter!): RequestAnalytics @deprecated(reason: "Use `analytics` instead")
 }
 
@@ -1107,7 +1101,7 @@ input GraphCreateFromRepositoryInput {
   repoRootPath: String! = "grafbase"
 }
 
-union GraphCreateFromRepositoryPayload = GraphCreateFromRepositorySuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | RepositoryContainsNoBranchesError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError
+union GraphCreateFromRepositoryPayload = GraphCreateFromRepositorySuccess | AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | RepositoryContainsNoBranchesError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
 
 type GraphCreateFromRepositorySuccess {
   graph: Graph!
@@ -1139,7 +1133,7 @@ input GraphCreateFromTemplateInput {
   repoRootPath: String! = "grafbase"
 }
 
-union GraphCreateFromTemplatePayload = GraphCreateFromTemplateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | RepositorySlugInUseError | TemplateDoesNotExistError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | GithubInstallationInsufficientPermissionsError
+union GraphCreateFromTemplatePayload = GraphCreateFromTemplateSuccess | AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | GithubInstallationInsufficientPermissionsError | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | RepositorySlugInUseError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | TemplateDoesNotExistError
 
 type GraphCreateFromTemplateSuccess {
   graph: Graph!
@@ -1155,7 +1149,7 @@ input GraphCreateInput {
   graphType: GraphType
 }
 
-union GraphCreatePayload = GraphCreateSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError
+union GraphCreatePayload = GraphCreateSuccess | AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | StandaloneGraphsNoLongerSupportedError
 
 type GraphCreateSuccess {
   graph: Graph!
@@ -1344,7 +1338,7 @@ input GraphUpdateInput {
   repoRootPath: String
 }
 
-union GraphUpdatePayload = GraphUpdateSuccess | GraphDoesNotExistError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | CannotBeRenamedError | NotAllowedError
+union GraphUpdatePayload = GraphUpdateSuccess | CannotBeRenamedError | GraphDoesNotExistError | NotAllowedError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
 
 type GraphUpdateSuccess {
   graph: Graph!
@@ -2455,11 +2449,12 @@ type RepositorySlugInUseError {
 }
 
 type Request {
-  traceId: ID!
+  trace: Trace!
   rootSpanId: ID!
   startedAt: DateTime!
   endedAt: DateTime!
   httpRequestMethod: String!
+  httpStatusCode: Int!
   urlPath: String!
   userAgent: String!
   clientName: String!
@@ -2602,7 +2597,7 @@ type RequestMetricsV2 {
 
 type RequestOperation {
   name: String!
-  operationType: OperationType!
+  type: OperationType!
 }
 
 type ReservedPrefixError {
@@ -3049,6 +3044,10 @@ type SlugTooLongError {
   query: Query!
 }
 
+type StandaloneGraphsNoLongerSupportedError {
+  query: Query!
+}
+
 type StripeCard {
   brand: String!
   funding: String!
@@ -3398,6 +3397,8 @@ type TopOperationsByNameAndHash {
 }
 
 type Trace {
+  id: ID!
+  rootSpanId: ID!
   spans: [TraceSpan!]!
 }
 
