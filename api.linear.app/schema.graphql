@@ -7136,6 +7136,9 @@ type IssueDraft implements Node {
   """The parent draft of the draft."""
   parent: IssueDraft
 
+  """The ID of the comment that the draft was created from."""
+  sourceCommentId: String
+
   """The parent issue of the draft."""
   parentIssue: Issue
 
@@ -7220,6 +7223,9 @@ input IssueDraftCreateInput {
 
   """The identifier of the parent issue."""
   parentIssueId: String
+
+  """The identifier of the source comment."""
+  sourceCommentId: String
 
   """The priority of the draft."""
   priority: Int
@@ -12538,7 +12544,7 @@ input NullableProjectMilestoneFilter {
   updatedAt: DateComparator
 
   """Comparator for the project milestone name."""
-  name: StringComparator
+  name: NullableStringComparator
 
   """Comparator for the project milestone target date."""
   targetDate: NullableDateComparator
@@ -15058,7 +15064,7 @@ input ProjectMilestoneCollectionFilter {
   updatedAt: DateComparator
 
   """Comparator for the project milestone name."""
-  name: StringComparator
+  name: NullableStringComparator
 
   """Comparator for the project milestone target date."""
   targetDate: NullableDateComparator
@@ -15131,7 +15137,7 @@ input ProjectMilestoneFilter {
   updatedAt: DateComparator
 
   """Comparator for the project milestone name."""
-  name: StringComparator
+  name: NullableStringComparator
 
   """Comparator for the project milestone target date."""
   targetDate: NullableDateComparator
@@ -21412,6 +21418,64 @@ input TriageResponsibilityUpdateInput {
   timeScheduleId: String
 }
 
+"""An update for project/initiative"""
+type Update implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The update content in markdown format."""
+  body: String!
+
+  """The project that the update is associated with."""
+  project: Project
+
+  """The initiative that the update is associated with."""
+  initiative: Initiative
+
+  """The health at the time of the update."""
+  health: UpdateHealthType!
+
+  """The user who wrote the update."""
+  user: User!
+
+  """The time the update was edited."""
+  editedAt: DateTime
+
+  """
+  [Internal] Serialized JSON representing current state of the project/initiative properties when posting the update.
+  """
+  infoSnapshot: JSONObject
+
+  """Whether update diff should be hidden."""
+  isDiffHidden: Boolean!
+
+  """[Internal] The content of the update as a Prosemirror document."""
+  bodyData: String!
+
+  """The update's unique URL slug."""
+  slugId: String!
+}
+
+type UpdateConnection {
+  edges: [UpdateEdge!]!
+  nodes: [Update!]!
+  pageInfo: PageInfo!
+}
+
 """Issue update date sorting options."""
 input UpdatedAtSort {
   """Whether nulls should be sorted first or last"""
@@ -21419,6 +21483,20 @@ input UpdatedAtSort {
 
   """The order for the individual sort"""
   order: PaginationSortOrder
+}
+
+type UpdateEdge {
+  node: Update!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""The health type when the update is created."""
+enum UpdateHealthType {
+  onTrack
+  atRisk
+  offTrack
 }
 
 """Object representing Google Cloud upload policy, plus additional data."""
