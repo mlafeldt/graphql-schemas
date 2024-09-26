@@ -3933,13 +3933,33 @@
             "description": "The user that will see this feed item.",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "User",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "User",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "team",
+            "description": "The team that will see this feed item.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Team",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organization",
+            "description": "The organization that will see this feed item.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Organization",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -5330,6 +5350,18 @@
             "type": {
               "kind": "OBJECT",
               "name": "ActorBot",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "externalThread",
+            "description": "The external thread that the comment is synced with.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "SyncedExternalThread",
               "ofType": null
             },
             "isDeprecated": false,
@@ -8333,7 +8365,7 @@
       {
         "kind": "ENUM",
         "name": "ProjectUpdateHealthType",
-        "description": "The health type of a project when the update is created.",
+        "description": "The health type when the project update is created.",
         "fields": null,
         "inputFields": null,
         "interfaces": null,
@@ -8547,13 +8579,9 @@
             "description": "The customer that this need is attached to.",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Customer",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "Customer",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -19100,6 +19128,18 @@
                 "name": "EntityExternalLinkConnection",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "content",
+            "description": "The initiative's content in markdown format.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -36822,6 +36862,93 @@
       },
       {
         "kind": "OBJECT",
+        "name": "SyncedExternalThread",
+        "description": "A comment thread that is synced with an external source.",
+        "fields": [
+          {
+            "name": "id",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "type",
+            "description": "The type of the external source.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "subType",
+            "description": "The sub type of the external source.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": "The display name of the source.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "displayName",
+            "description": "The display name of the thread.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "url",
+            "description": "The external url of the thread.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "CommentPayload",
         "description": null,
         "fields": [
@@ -54242,7 +54369,7 @@
             "description": "Filters that the comments document content must satisfy.",
             "type": {
               "kind": "INPUT_OBJECT",
-              "name": "DocumentContentFilter",
+              "name": "NullableDocumentContentFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -54399,7 +54526,7 @@
             "description": "Filters that the comments document content must satisfy.",
             "type": {
               "kind": "INPUT_OBJECT",
-              "name": "DocumentContentFilter",
+              "name": "NullableDocumentContentFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -54566,7 +54693,7 @@
             "description": "Filters that the comments document content must satisfy.",
             "type": {
               "kind": "INPUT_OBJECT",
-              "name": "DocumentContentFilter",
+              "name": "NullableDocumentContentFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -60180,6 +60307,52 @@
               "ofType": null
             },
             "defaultValue": null
+          },
+          {
+            "name": "null",
+            "description": "Filter based on the existence of the relation.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the user.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "NullableDocumentContentFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the user.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "NullableDocumentContentFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -63545,13 +63718,9 @@
             "name": "customerId",
             "description": "The uuid of the customer the need belongs to.",
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "defaultValue": null
           },
@@ -66854,6 +67023,16 @@
               "ofType": null
             },
             "defaultValue": null
+          },
+          {
+            "name": "content",
+            "description": "The initiative's content in markdown format.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -66962,6 +67141,16 @@
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "content",
+            "description": "The initiative's content in markdown format.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "defaultValue": null

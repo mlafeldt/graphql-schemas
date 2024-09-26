@@ -1116,6 +1116,9 @@ type Comment implements Node {
   """The bot that created the comment."""
   botActor: ActorBot
 
+  """The external thread that the comment is synced with."""
+  externalThread: SyncedExternalThread
+
   """Reactions associated with the comment."""
   reactions: [Reaction!]!
 }
@@ -1147,7 +1150,7 @@ input CommentCollectionFilter {
   parent: NullableCommentFilter
 
   """Filters that the comments document content must satisfy."""
-  documentContent: DocumentContentFilter
+  documentContent: NullableDocumentContentFilter
 
   """Filters that the comments reactions must satisfy."""
   reactions: ReactionCollectionFilter
@@ -1276,7 +1279,7 @@ input CommentFilter {
   parent: NullableCommentFilter
 
   """Filters that the comments document content must satisfy."""
-  documentContent: DocumentContentFilter
+  documentContent: NullableDocumentContentFilter
 
   """Filters that the comments reactions must satisfy."""
   reactions: ReactionCollectionFilter
@@ -1730,7 +1733,7 @@ type CustomerNeed implements Node {
   archivedAt: DateTime
 
   """The customer that this need is attached to."""
-  customer: Customer!
+  customer: Customer
 
   """The issue this need is referencing."""
   issue: Issue
@@ -1818,7 +1821,7 @@ input CustomerNeedCreateInput {
   id: String
 
   """The uuid of the customer the need belongs to."""
-  customerId: String!
+  customerId: String
 
   """The issue this need is referencing."""
   issueId: String
@@ -4756,7 +4759,13 @@ type FeedItem implements Node {
   archivedAt: DateTime
 
   """The user that will see this feed item."""
-  user: User!
+  user: User
+
+  """The team that will see this feed item."""
+  team: Team
+
+  """The organization that will see this feed item."""
+  organization: Organization
 
   """The project update that is in the feed."""
   projectUpdate: ProjectUpdate
@@ -5434,6 +5443,9 @@ type Initiative implements Node {
     """
     orderBy: PaginationOrderBy
   ): EntityExternalLinkConnection!
+
+  """The initiative's content in markdown format."""
+  content: String
 }
 
 """A generic payload return from entity archive mutations."""
@@ -5526,6 +5538,9 @@ input InitiativeCreateInput {
 
   """The resolution of the initiative's estimated completion date."""
   targetDateResolution: DateResolutionType
+
+  """The initiative's content in markdown format."""
+  content: String
 }
 
 type InitiativeEdge {
@@ -5877,6 +5892,9 @@ input InitiativeUpdateInput {
 
   """Whether the initiative has been trashed."""
   trashed: Boolean
+
+  """The initiative's content in markdown format."""
+  content: String
 }
 
 """An integration with an external service."""
@@ -12070,7 +12088,7 @@ input NullableCommentFilter {
   parent: NullableCommentFilter
 
   """Filters that the comments document content must satisfy."""
-  documentContent: DocumentContentFilter
+  documentContent: NullableDocumentContentFilter
 
   """Filters that the comments reactions must satisfy."""
   reactions: ReactionCollectionFilter
@@ -12206,6 +12224,15 @@ input NullableDocumentContentFilter {
 
   """Filters that the document content document must satisfy."""
   document: DocumentFilter
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
+
+  """Compound filters, all of which need to be matched by the user."""
+  and: [NullableDocumentContentFilter!]
+
+  """Compound filters, one of which need to be matched by the user."""
+  or: [NullableDocumentContentFilter!]
 }
 
 """Document filtering options."""
@@ -16490,7 +16517,7 @@ input ProjectUpdateFilter {
   or: [ProjectUpdateFilter!]
 }
 
-"""The health type of a project when the update is created."""
+"""The health type when the project update is created."""
 enum ProjectUpdateHealthType {
   onTrack
   atRisk
@@ -19872,6 +19899,26 @@ type SuccessPayload {
 type SummaryPayload {
   """Summary for project updates."""
   summary: String!
+}
+
+"""A comment thread that is synced with an external source."""
+type SyncedExternalThread {
+  id: ID
+
+  """The type of the external source."""
+  type: String!
+
+  """The sub type of the external source."""
+  subType: String
+
+  """The display name of the source."""
+  name: String
+
+  """The display name of the thread."""
+  displayName: String
+
+  """The external url of the thread."""
+  url: String
 }
 
 type SynchronizedPayload {
