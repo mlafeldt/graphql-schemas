@@ -1134,25 +1134,25 @@ input CommentCollectionFilter {
   """Comparator for the updated at date."""
   updatedAt: DateComparator
 
-  """Comparator for the comments body."""
+  """Comparator for the comment's body."""
   body: StringComparator
 
-  """Filters that the comments creator must satisfy."""
+  """Filters that the comment's creator must satisfy."""
   user: UserFilter
 
-  """Filters that the comments issue must satisfy."""
+  """Filters that the comment's issue must satisfy."""
   issue: NullableIssueFilter
 
-  """Filters that the comments project update must satisfy."""
-  projectUpdate: ProjectUpdateFilter
+  """Filters that the comment's project update must satisfy."""
+  projectUpdate: NullableProjectUpdateFilter
 
   """Filters that the comment parent must satisfy."""
   parent: NullableCommentFilter
 
-  """Filters that the comments document content must satisfy."""
+  """Filters that the comment's document content must satisfy."""
   documentContent: NullableDocumentContentFilter
 
-  """Filters that the comments reactions must satisfy."""
+  """Filters that the comment's reactions must satisfy."""
   reactions: ReactionCollectionFilter
 
   """Filters that the comment's customer needs must satisfy."""
@@ -1263,25 +1263,25 @@ input CommentFilter {
   """Comparator for the updated at date."""
   updatedAt: DateComparator
 
-  """Comparator for the comments body."""
+  """Comparator for the comment's body."""
   body: StringComparator
 
-  """Filters that the comments creator must satisfy."""
+  """Filters that the comment's creator must satisfy."""
   user: UserFilter
 
-  """Filters that the comments issue must satisfy."""
+  """Filters that the comment's issue must satisfy."""
   issue: NullableIssueFilter
 
-  """Filters that the comments project update must satisfy."""
-  projectUpdate: ProjectUpdateFilter
+  """Filters that the comment's project update must satisfy."""
+  projectUpdate: NullableProjectUpdateFilter
 
   """Filters that the comment parent must satisfy."""
   parent: NullableCommentFilter
 
-  """Filters that the comments document content must satisfy."""
+  """Filters that the comment's document content must satisfy."""
   documentContent: NullableDocumentContentFilter
 
-  """Filters that the comments reactions must satisfy."""
+  """Filters that the comment's reactions must satisfy."""
   reactions: ReactionCollectionFilter
 
   """Filters that the comment's customer needs must satisfy."""
@@ -4758,23 +4758,20 @@ type FeedItem implements Node {
   """
   archivedAt: DateTime
 
+  """The organization that will see this feed item."""
+  organization: Organization!
+
   """The user that will see this feed item."""
   user: User
 
   """The team that will see this feed item."""
   team: Team
 
-  """The organization that will see this feed item."""
-  organization: Organization
-
   """The project update that is in the feed."""
   projectUpdate: ProjectUpdate
 
   """The post that is in the feed."""
   post: Post
-
-  """The time at which the user saw the feed item."""
-  seenAt: DateTime
 }
 
 type FrontAttachmentPayload {
@@ -12072,25 +12069,25 @@ input NullableCommentFilter {
   """Comparator for the updated at date."""
   updatedAt: DateComparator
 
-  """Comparator for the comments body."""
+  """Comparator for the comment's body."""
   body: StringComparator
 
-  """Filters that the comments creator must satisfy."""
+  """Filters that the comment's creator must satisfy."""
   user: UserFilter
 
-  """Filters that the comments issue must satisfy."""
+  """Filters that the comment's issue must satisfy."""
   issue: NullableIssueFilter
 
-  """Filters that the comments project update must satisfy."""
-  projectUpdate: ProjectUpdateFilter
+  """Filters that the comment's project update must satisfy."""
+  projectUpdate: NullableProjectUpdateFilter
 
   """Filters that the comment parent must satisfy."""
   parent: NullableCommentFilter
 
-  """Filters that the comments document content must satisfy."""
+  """Filters that the comment's document content must satisfy."""
   documentContent: NullableDocumentContentFilter
 
-  """Filters that the comments reactions must satisfy."""
+  """Filters that the comment's reactions must satisfy."""
   reactions: ReactionCollectionFilter
 
   """Filters that the comment's customer needs must satisfy."""
@@ -12588,6 +12585,40 @@ input NullableProjectMilestoneFilter {
   Compound filters, one of which need to be matched by the project milestone.
   """
   or: [NullableProjectMilestoneFilter!]
+}
+
+"""Nullable project update filtering options."""
+input NullableProjectUpdateFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Filters that the project update creator must satisfy."""
+  user: UserFilter
+
+  """Filters that the project update project must satisfy."""
+  project: ProjectFilter
+
+  """Filters that the project updates reactions must satisfy."""
+  reactions: ReactionCollectionFilter
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
+
+  """
+  Compound filters, all of which need to be matched by the project update.
+  """
+  and: [NullableProjectUpdateFilter!]
+
+  """
+  Compound filters, one of which need to be matched by the project update.
+  """
+  or: [NullableProjectUpdateFilter!]
 }
 
 """Options for filtering projects by project updates."""
