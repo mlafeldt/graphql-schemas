@@ -5858,6 +5858,63 @@ input InitiativeToProjectUpdateInput {
   sortOrder: Float
 }
 
+"""An initiative update."""
+type InitiativeUpdate implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The update content in markdown format."""
+  body: String!
+
+  """The time the update was edited."""
+  editedAt: DateTime
+
+  """Emoji reaction summary, grouped by emoji type."""
+  reactionData: JSONObject!
+
+  """[Internal] The content of the update as a Prosemirror document."""
+  bodyData: String!
+
+  """The update's unique URL slug."""
+  slugId: String!
+
+  """The initiative that the update is associated with."""
+  initiative: Initiative!
+
+  """The user who wrote the update."""
+  user: User!
+
+  """The health at the time of the update."""
+  health: UpdateHealthType!
+}
+
+type InitiativeUpdateConnection {
+  edges: [InitiativeUpdateEdge!]!
+  nodes: [InitiativeUpdate!]!
+  pageInfo: PageInfo!
+}
+
+type InitiativeUpdateEdge {
+  node: InitiativeUpdate!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
 """The properties of the initiative to update."""
 input InitiativeUpdateInput {
   """The name of the initiative."""
@@ -16392,6 +16449,18 @@ type ProjectUpdate implements Node {
   """The update content in markdown format."""
   body: String!
 
+  """The time the update was edited."""
+  editedAt: DateTime
+
+  """Emoji reaction summary, grouped by emoji type."""
+  reactionData: JSONObject!
+
+  """[Internal] The content of the update as a Prosemirror document."""
+  bodyData: String!
+
+  """The update's unique URL slug."""
+  slugId: String!
+
   """The project that the update is associated with."""
   project: Project!
 
@@ -16401,12 +16470,6 @@ type ProjectUpdate implements Node {
   """The user who wrote the update."""
   user: User!
 
-  """The time the project update was edited."""
-  editedAt: DateTime
-
-  """Emoji reaction summary, grouped by emoji type."""
-  reactionData: JSONObject!
-
   """
   [Internal] Serialized JSON representing current state of the project properties when posting the project update.
   """
@@ -16414,14 +16477,6 @@ type ProjectUpdate implements Node {
 
   """Whether project update diff should be hidden."""
   isDiffHidden: Boolean!
-
-  """
-  [Internal] The content of the project update as a Prosemirror document.
-  """
-  bodyData: String!
-
-  """The project update's unique URL slug."""
-  slugId: String!
 
   """The URL to the project update."""
   url: String!
