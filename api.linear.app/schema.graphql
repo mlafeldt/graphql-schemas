@@ -1752,6 +1752,11 @@ type CustomerNeed implements Node {
   """
   priority: Float!
 
+  """
+  Optional URL to the source of the customer need. Used when manually creating a need.
+  """
+  url: String
+
   """The need content in markdown format."""
   body: String
 
@@ -1845,6 +1850,9 @@ input CustomerNeedCreateInput {
 
   """[Internal] The content of the need as a Prosemirror document."""
   bodyData: JSON
+
+  """Optional URL to the source of the customer need."""
+  url: String
 }
 
 type CustomerNeedEdge {
@@ -1927,6 +1935,9 @@ input CustomerNeedUpdateInput {
 
   """[Internal] The content of the need as a Prosemirror document."""
   bodyData: JSON
+
+  """Optional URL to the source of the customer need."""
+  url: String
 }
 
 type CustomerPayload {
@@ -5136,23 +5147,26 @@ input GitHubPersonalSettingsInput {
 
 """GitHub repos available to sync."""
 type GitHubRepo {
-  """The full name of the repository."""
-  fullName: String!
-
   """The GitHub repo id."""
   id: Float!
+
+  """The full name of the repository."""
+  fullName: String!
 }
 
 input GitHubRepoInput {
-  """The full name of the repository."""
-  fullName: String!
-
   """The GitHub repo id."""
   id: Float!
+
+  """The full name of the repository."""
+  fullName: String!
 }
 
 """Mapping of Linear teams to GitHub repos."""
 type GitHubRepoMapping {
+  """The unique identifier for this mapping."""
+  id: String
+
   """The Linear team id to map to the given project."""
   linearTeamId: String!
 
@@ -5170,6 +5184,9 @@ type GitHubRepoMapping {
 }
 
 input GitHubRepoMappingInput {
+  """The unique identifier for this mapping."""
+  id: String
+
   """The Linear team id to map to the given project."""
   linearTeamId: String!
 
