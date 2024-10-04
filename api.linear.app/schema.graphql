@@ -117,6 +117,15 @@ type Application {
   imageUrl: String
 }
 
+"""Customer approximate need count sorting options."""
+input ApproximateNeedCountSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 """A generic payload return from entity archive or deletion mutations."""
 interface ArchivePayload {
   """The identifier of the last sync operation."""
@@ -2054,6 +2063,9 @@ input CustomerSortInput {
 
   """Sort by customer tier"""
   tier: TierSort
+
+  """Sort by approximate customer need count"""
+  approximateNeedCount: ApproximateNeedCountSort
 }
 
 """[ALPHA] A customer status."""
@@ -5404,6 +5416,12 @@ type Initiative implements Node {
   """The status of the initiative. One of Planned, Active, Completed"""
   status: InitiativeStatus!
 
+  """The health of the initiative."""
+  health: InitiativeUpdateHealthType
+
+  """The time at which the initiative health was updated."""
+  healthUpdatedAt: DateTime
+
   """Projects associated with the initiative."""
   projects(
     """Filter returned projects."""
@@ -6557,6 +6575,9 @@ type Issue implements Node {
 
   """The time at which the issue's SLA will breach."""
   slaBreachesAt: DateTime
+
+  """The type of SLA set on the issue. Calendar days or business days."""
+  slaType: String
 
   """The time at which the issue was added to a project."""
   addedToProjectAt: DateTime
@@ -8469,6 +8490,9 @@ type IssueSearchResult implements Node {
 
   """The time at which the issue's SLA will breach."""
   slaBreachesAt: DateTime
+
+  """The type of SLA set on the issue. Calendar days or business days."""
+  slaType: String
 
   """The time at which the issue was added to a project."""
   addedToProjectAt: DateTime
@@ -18873,6 +18897,9 @@ type Reaction implements Node {
   """The project update that the reaction is associated with."""
   projectUpdate: ProjectUpdate
 
+  """[Internal] The initiative update that the reaction is associated with."""
+  initiativeUpdate: InitiativeUpdate
+
   """The post that the reaction is associated with."""
   post: Post
 
@@ -18936,6 +18963,9 @@ input ReactionCreateInput {
 
   """The project update to associate the reaction with."""
   projectUpdateId: String
+
+  """[Internal] The update to associate the reaction with."""
+  initiativeUpdateId: String
 
   """The issue to associate the reaction with."""
   issueId: String
