@@ -5180,7 +5180,7 @@ input GitHubRepoInput {
 """Mapping of Linear teams to GitHub repos."""
 type GitHubRepoMapping {
   """The unique identifier for this mapping."""
-  id: String
+  id: String!
 
   """The Linear team id to map to the given project."""
   linearTeamId: String!
@@ -5200,7 +5200,7 @@ type GitHubRepoMapping {
 
 input GitHubRepoMappingInput {
   """The unique identifier for this mapping."""
-  id: String
+  id: String!
 
   """The Linear team id to map to the given project."""
   linearTeamId: String!
@@ -9690,7 +9690,10 @@ type Mutation {
   ): CreateOrJoinOrganizationResponse!
 
   """Logout the client."""
-  logout: LogoutResponse!
+  logout(
+    """The reason for logging out."""
+    reason: String
+  ): LogoutResponse!
 
   """Logout an individual session with its ID."""
   logoutSession(
@@ -9699,10 +9702,16 @@ type Mutation {
   ): LogoutResponse!
 
   """Logout all of user's sessions including the active one."""
-  logoutAllSessions: LogoutResponse!
+  logoutAllSessions(
+    """The reason for logging out."""
+    reason: String
+  ): LogoutResponse!
 
   """Logout all of user's sessions excluding the current one."""
-  logoutOtherSessions: LogoutResponse!
+  logoutOtherSessions(
+    """The reason for logging out."""
+    reason: String
+  ): LogoutResponse!
 
   """Creates a new comment."""
   commentCreate(
