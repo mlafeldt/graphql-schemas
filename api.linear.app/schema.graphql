@@ -7202,6 +7202,11 @@ input IssueCreateInput {
   an incompatible workflow state.
   """
   completedAt: DateTime
+
+  """
+  The SLA day count type for the issue. Whether SLA should be business days only or calendar days (default).
+  """
+  slaType: SLADayCountType
 }
 
 """[Internal] A draft issue."""
@@ -8980,6 +8985,11 @@ input IssueUpdateInput {
 
   """The identifier of the user who snoozed the issue."""
   snoozedById: String
+
+  """
+  The SLA day count type for the issue. Whether SLA should be business days only or calendar days (default).
+  """
+  slaType: SLADayCountType
 }
 
 input JiraConfigurationInput {
@@ -18981,6 +18991,9 @@ input ReactionCreateInput {
 
   """The issue to associate the reaction with."""
   issueId: String
+
+  """[Internal] The post to associate the reaction with."""
+  postId: String
 }
 
 type ReactionEdge {
@@ -19732,7 +19745,6 @@ input SlackSettingsInput {
   linkOnIssueIdMention: Boolean!
 }
 
-"""Which day count to use for SLA calculations."""
 enum SLADayCountType {
   all
   onlyBusinessDays
