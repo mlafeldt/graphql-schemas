@@ -1213,6 +1213,9 @@ input CommentCreateInput {
   """The initiative update to associate the comment with."""
   initiativeUpdateId: String
 
+  """The post to associate the comment with."""
+  postId: String
+
   """The document content to associate the comment with."""
   documentContentId: String
 
@@ -1809,7 +1812,7 @@ input CustomerNeedCollectionFilter {
   comment: NullableCommentFilter
 
   """Filters that the need's customer must satisfy."""
-  customer: CustomerFilter
+  customer: NullableCustomerFilter
 
   """
   Compound filters, all of which need to be matched by the customer needs.
@@ -1904,7 +1907,7 @@ input CustomerNeedFilter {
   comment: NullableCommentFilter
 
   """Filters that the need's customer must satisfy."""
-  customer: CustomerFilter
+  customer: NullableCustomerFilter
 
   """
   Compound filters, all of which need to be matched by the customer need.
@@ -12236,6 +12239,57 @@ input NullableCommentFilter {
   or: [NullableCommentFilter!]
 }
 
+"""Customer filtering options."""
+input NullableCustomerFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the customer name."""
+  name: StringComparator
+
+  """Comparator for the customer slack channel ID."""
+  slackChannelId: StringComparator
+
+  """Comparator for the customer's domains."""
+  domains: StringArrayComparator
+
+  """Comparator for the customer's external IDs."""
+  externalIds: StringArrayComparator
+
+  """Filters that the customer owner must satisfy."""
+  owner: NullableUserFilter
+
+  """Filters that the customer's needs must satisfy."""
+  needs: CustomerNeedCollectionFilter
+
+  """Comparator for the customer generated revenue."""
+  revenue: NumberComparator
+
+  """Comparator for the customer size."""
+  size: NumberComparator
+
+  """Filters that the customer's status must satisfy."""
+  status: CustomerStatusFilter
+
+  """Filters that the customer's tier must satisfy."""
+  tier: CustomerTierFilter
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
+
+  """Compound filters, all of which need to be matched by the customer."""
+  and: [NullableCustomerFilter!]
+
+  """Compound filters, one of which need to be matched by the customer."""
+  or: [NullableCustomerFilter!]
+}
+
 """Cycle filtering options."""
 input NullableCycleFilter {
   """Comparator for the identifier."""
@@ -14208,6 +14262,14 @@ type Post implements Node {
 
   """The team that the post is associated with."""
   team: Team
+
+  """The type of the post."""
+  type: PostType
+}
+
+"""Type of Post"""
+enum PostType {
+  summary
 }
 
 """Issue priority sorting options."""
