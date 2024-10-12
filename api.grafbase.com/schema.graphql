@@ -1,50 +1,31 @@
-"""
-Indicates that an Input Object is a OneOf Input Object (and thus requires
-                        exactly one of its field be provided)
-"""
-directive @oneOf on INPUT_OBJECT
-
-"""
-Provides a scalar specification URL for specifying the behavior of custom scalar types.
-"""
-directive @specifiedBy(
-  """URL that specifies the behavior of this scalar."""
-  url: String!
-) on SCALAR
-
 type AccessToken implements Node {
-  id: ID!
-  name: String!
   accountId: ID
   createdAt: DateTime!
   graphScopes: [Graph!]!
+  id: ID!
+  name: String!
 }
 
 type AccessTokenConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [AccessTokenEdge!]!
-
-  """A list of nodes."""
   nodes: [AccessToken!]!
+  pageInfo: PageInfo!
 }
 
 input AccessTokenCreateInput {
   name: String!
   accountId: ID
-  kind: AccessTokenKind! = USER
   graphScopes: [ID!]
+  kind: AccessTokenKind! = USER
   projectScopes: [ID!]
 }
 
-union AccessTokenCreatePayload = AccessTokenCreateSuccess | InvalidAccountError | TokenLimitExceededError | GraphScopeLimitExceededError | CouldNotFindGraphsError | ProjectScopeLimitExceededError | CouldNotFindProjectsError
+union AccessTokenCreatePayload = AccessTokenCreateSuccess | CouldNotFindGraphsError | CouldNotFindProjectsError | GraphScopeLimitExceededError | InvalidAccountError | ProjectScopeLimitExceededError | TokenLimitExceededError
 
 type AccessTokenCreateSuccess {
-  token: AccessToken!
   jwt: String!
   query: Query!
+  token: AccessToken!
 }
 
 input AccessTokenDeleteInput {
@@ -58,13 +39,9 @@ type AccessTokenDeleteSuccess {
   query: Query!
 }
 
-"""An edge in a connection."""
 type AccessTokenEdge {
-  """The item at the end of the edge"""
-  node: AccessToken!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: AccessToken!
 }
 
 enum AccessTokenKind {
@@ -73,17 +50,17 @@ enum AccessTokenKind {
 }
 
 interface Account {
-  id: ID!
-  slug: String!
-  name: String!
-  plan: GrafbasePlan!
+  accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
   createdAt: DateTime!
-  status: AccountStatus!
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
   graphsCountStatus: ResourceStatus!
+  id: ID!
+  name: String!
+  plan: GrafbasePlan!
   resources: AccountResources!
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
-  accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
+  slug: String!
+  status: AccountStatus!
 }
 
 input AccountCreationValidateInput {
@@ -108,16 +85,16 @@ input AccountDopplerIntegrationInput {
 
 type AccountIntegration {
   accountId: ID!
+  attributes: AccountIntegrationAttributes!
   createdAt: DateTime!
   enabled: Boolean!
-  id: ID!
   environments: [BranchEnvironment!]!
-  integrationId: ID!
-  attributes: AccountIntegrationAttributes!
   graphs: [GraphIntegration!]!
+  id: ID!
+  integrationId: ID!
 }
 
-union AccountIntegrationAttributes = DatadogIntegration | AccountDopplerIntegration
+union AccountIntegrationAttributes = AccountDopplerIntegration | DatadogIntegration
 
 input AccountIntegrationAttributesInput {
   datadog: DatadogIntegrationInput
@@ -125,8 +102,8 @@ input AccountIntegrationAttributesInput {
 }
 
 input AccountIntegrationInput {
-  enabled: Boolean!
   graphs: [ID!]
+  enabled: Boolean!
   environments: [BranchEnvironment!]
   attributes: AccountIntegrationAttributesInput!
 }
@@ -136,7 +113,7 @@ type AccountIntegrationMutationError {
   query: Query!
 }
 
-union AccountIntegrationMutationPayload = AccountIntegrationMutationSuccess | AccountIntegrationMutationError
+union AccountIntegrationMutationPayload = AccountIntegrationMutationError | AccountIntegrationMutationSuccess
 
 type AccountIntegrationMutationSuccess {
   account: Account!
@@ -148,27 +125,29 @@ type AccountResources {
 }
 
 type AccountResourcesStatus {
-  requestCount: ResourceStatus!
   buildDuration: ResourceStatus!
-  udfRequestCount: ResourceStatus!
-  udfExecUnits: ResourceStatus!
   execUnits: ResourceStatus!
+  requestCount: ResourceStatus!
+  udfExecUnits: ResourceStatus!
+  udfRequestCount: ResourceStatus!
 }
 
 type AccountResourcesUsage {
-  requestCount: TimeSeries!
   buildDuration: TimeSeries!
+  execUnits: TimeSeries!
+  granularity: TimeAggregationGranularity!
+  requestCount: TimeSeries!
+  serverlessFunctionDuration: TimeSeries!
+  serverlessFunctionInvocationCount: TimeSeries!
   udfExecUnits: TimeSeries!
   udfRequestCount: TimeSeries!
-  serverlessFunctionInvocationCount: TimeSeries!
-  serverlessFunctionDuration: TimeSeries!
-  granularity: TimeAggregationGranularity!
-  execUnits: TimeSeries!
 }
 
 """
+
 'limit_cycle_choice' is exclusive with all other options. It's the only case
 where we'll show account limit status (used/limit)
+
 """
 input AccountResourcesUsageDashboardFilter {
   projectIds: [ID!]
@@ -183,19 +162,19 @@ type AccountResourcesUsageDashboardInvalidFilterCombinationError {
   query: Query!
 }
 
-union AccountResourcesUsageDashboardPayload = AccountResourcesUsageDashboardSuccess | AccountResourcesUsageDashboardInvalidFilterCombinationError
+union AccountResourcesUsageDashboardPayload = AccountResourcesUsageDashboardInvalidFilterCombinationError | AccountResourcesUsageDashboardSuccess
 
 type AccountResourcesUsageDashboardSuccess {
-  periodStart: DateTime!
   periodEnd: DateTime!
-  usage: AccountResourcesUsage!
+  periodStart: DateTime!
   status: AccountResourcesStatus
+  usage: AccountResourcesUsage!
 }
 
 type AccountStatus {
-  isEnabled: Boolean!
-  inArrearsCause: InArrearsCause
   hasExceededLimits: Boolean!
+  inArrearsCause: InArrearsCause
+  isEnabled: Boolean!
   isHobbyPlanEnforced: Boolean!
 }
 
@@ -204,25 +183,25 @@ type AlreadyMemberError {
 }
 
 type ArchiveFileSizeLimitExceededError {
-  query: Query!
   limit: Int!
+  query: Query!
 }
 
 type Branch implements Node {
-  id: ID!
-  name: String!
-  domains: [String!]!
-  latestDeployment: Deployment
   activeDeployment: Deployment
   deployments(after: String, before: String, first: Int, last: Int): DeploymentConnection!
-  graph: Graph!
-  environment: BranchEnvironment!
-  schema: String
-  federatedSchema: String
-  operationChecksEnabled: Boolean!
-  schemaProposals(first: Int, after: String, filter: SchemaProposalFilter!): SchemaProposalConnection!
-  subgraphs: [Subgraph!]!
+  domains: [String!]!
   endpointConfig: EndpointConfig
+  environment: BranchEnvironment!
+  federatedSchema: String
+  graph: Graph!
+  id: ID!
+  latestDeployment: Deployment
+  name: String!
+  operationChecksEnabled: Boolean!
+  schema: String
+  schemaProposals(after: String, first: Int, filter: SchemaProposalFilter!): SchemaProposalConnection!
+  subgraphs: [Subgraph!]!
 }
 
 type BranchAlreadyExistsError {
@@ -230,14 +209,9 @@ type BranchAlreadyExistsError {
 }
 
 type BranchConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [BranchEdge!]!
-
-  """A list of nodes."""
   nodes: [Branch!]!
+  pageInfo: PageInfo!
 }
 
 input BranchCreateInput {
@@ -246,21 +220,17 @@ input BranchCreateInput {
   branchName: String!
 }
 
-union BranchCreatePayload = Query | BranchAlreadyExistsError | GraphDoesNotExistError | GraphNotSelfHostedError
+union BranchCreatePayload = BranchAlreadyExistsError | GraphDoesNotExistError | GraphNotSelfHostedError | Query
 
-union BranchDeletePayload = Query | BranchDoesNotExistError | CannotDeleteProductionBranchError
+union BranchDeletePayload = BranchDoesNotExistError | CannotDeleteProductionBranchError | Query
 
 type BranchDoesNotExistError {
   query: Query!
 }
 
-"""An edge in a connection."""
 type BranchEdge {
-  """The item at the end of the edge"""
-  node: Branch!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: Branch!
 }
 
 enum BranchEnvironment {
@@ -273,17 +243,17 @@ type BranchNotDeployedError {
 }
 
 input BranchUpdateInput {
+  operationChecksEnabled: Boolean
   accountSlug: String!
-  projectSlug: String
   graphSlug: String
+  projectSlug: String
   branchSlug: String!
   trustedDocumentsEnforce: Boolean
   trustedDocumentsBypassHeaderName: String
   trustedDocumentsBypassHeaderValue: String
-  operationChecksEnabled: Boolean
 }
 
-union BranchUpdatePayload = Query | ProjectDoesNotExistError | GraphDoesNotExistError
+union BranchUpdatePayload = GraphDoesNotExistError | ProjectDoesNotExistError | Query
 
 type CannotBeRenamedError {
   query: Query!
@@ -298,8 +268,8 @@ type CannotUseInvitationsWithSSO {
 }
 
 type CompositionCheckError {
-  title: String!
   message: String!
+  title: String!
 }
 
 type CouldNotFindGraphsError {
@@ -316,6 +286,7 @@ type CurrentPlanLimitReachedError {
 }
 
 type CustomDomain {
+  branch: String!
   hostnameVerificationStatus: CustomDomainStatus!
   hostnameVerificationTxtName: String
   hostnameVerificationTxtValue: String
@@ -323,7 +294,6 @@ type CustomDomain {
   sslVerificationCnameName: String
   sslVerificationCnameValue: String
   sslVerificationStatus: CustomDomainStatus!
-  branch: String!
 }
 
 type CustomDomainAlreadyExistsError {
@@ -331,13 +301,13 @@ type CustomDomainAlreadyExistsError {
 }
 
 input CustomDomainCreateInput {
+  name: String!
+  branch: String!
   projectId: ID
   graphId: ID
-  branch: String!
-  name: String!
 }
 
-union CustomDomainCreatePayload = CustomDomainCreateSuccess | ProjectDoesNotExistError | GraphDoesNotExistError | BranchDoesNotExistError | CustomDomainAlreadyExistsError | TooManyCustomDomainsError | BranchNotDeployedError | OperationNotAllowedByPlanError | InvalidDomainError
+union CustomDomainCreatePayload = BranchDoesNotExistError | BranchNotDeployedError | CustomDomainAlreadyExistsError | CustomDomainCreateSuccess | GraphDoesNotExistError | InvalidDomainError | OperationNotAllowedByPlanError | ProjectDoesNotExistError | TooManyCustomDomainsError
 
 type CustomDomainCreateSuccess {
   domain: CustomDomain!
@@ -345,9 +315,9 @@ type CustomDomainCreateSuccess {
 }
 
 input CustomDomainDeleteInput {
+  name: String!
   projectId: ID
   graphId: ID
-  name: String!
 }
 
 union CustomDomainDeletePayload = CustomDomainDeleteSuccess | CustomDomainDoesNotExistError
@@ -362,14 +332,14 @@ type CustomDomainDoesNotExistError {
 }
 
 input CustomDomainReplaceInput {
+  name: String!
+  branch: String!
   projectId: ID
   graphId: ID
   existingName: String!
-  branch: String!
-  name: String!
 }
 
-union CustomDomainReplacePayload = CustomDomainReplaceSuccess | CustomDomainDoesNotExistError | GraphDoesNotExistError | ProjectDoesNotExistError | BranchDoesNotExistError | BranchNotDeployedError | OperationNotAllowedByPlanError | InvalidDomainError
+union CustomDomainReplacePayload = BranchDoesNotExistError | BranchNotDeployedError | CustomDomainDoesNotExistError | CustomDomainReplaceSuccess | GraphDoesNotExistError | InvalidDomainError | OperationNotAllowedByPlanError | ProjectDoesNotExistError
 
 type CustomDomainReplaceSuccess {
   domain: CustomDomain!
@@ -383,16 +353,14 @@ enum CustomDomainStatus {
 }
 
 type DailyDeploymentCountLimitExceededError {
-  query: Query!
   limit: Int!
+  query: Query!
 }
 
 type DatadogIntegration {
   apiKey: String!
-  region: DatadogRegion!
-
-  """Deprecated: environments moved one level up, on AccountIntegration"""
   environments: [BranchEnvironment!]!
+  region: DatadogRegion!
   sampling: Int!
 }
 
@@ -411,73 +379,64 @@ enum DatadogRegion {
   AP1
 }
 
-"""RFC3339 formatted date in the UTC time zone denoted by letter 'Z'"""
 scalar DateTime
 
 input DeleteSubgraphInput {
+  message: String
   accountSlug: String!
   graphSlug: String
   projectSlug: String
   branch: String!
   subgraph: String!
-  message: String
   dryRun: Boolean!
 }
 
-union DeleteSubgraphPayload = DeleteSubgraphSuccess | SubgraphNotFoundError | ProjectDoesNotExistError | ProjectNotFederatedError | ProjectBranchDoesNotExistError | GraphDoesNotExistError | GraphNotFederatedError | GraphBranchDoesNotExistError | FederatedGraphCompositionError
+union DeleteSubgraphPayload = DeleteSubgraphSuccess | FederatedGraphCompositionError | GraphBranchDoesNotExistError | GraphDoesNotExistError | GraphNotFederatedError | ProjectBranchDoesNotExistError | ProjectDoesNotExistError | ProjectNotFederatedError | SubgraphNotFoundError
 
 type DeleteSubgraphSuccess {
   query: Query!
 }
 
-"""Deployment"""
 type Deployment implements Node {
-  id: ID!
-  commit: GitCommit
   branch: Branch!
+  commit: GitCommit
   createdAt: DateTime!
-  startedAt: DateTime
-  finishedAt: DateTime
-  isRedeployable: Boolean!
-  triggerType: DeploymentTriggerType!
-
-  """The duration of the deployment in milliseconds."""
-  duration: Int
-  status: DeploymentStatus!
-  logEntries: [DeploymentLogEntry!]!
-  graph: Graph!
-  schema: String
-  diffAgainstPreviousBranchDeployment: String
   diffAgainstLatestProductionDeployment: String
+  diffAgainstPreviousBranchDeployment: String
+  duration: Int
+  finishedAt: DateTime
+  graph: Graph!
+  id: ID!
+  isRedeployable: Boolean!
+  logEntries: [DeploymentLogEntry!]!
+  schema: String
+  startedAt: DateTime
+  status: DeploymentStatus!
+  triggerType: DeploymentTriggerType!
 }
 
 input DeploymentBySlugCreateInput {
   accountSlug: String!
   graphSlug: String
   projectSlug: String
-  archiveFileSize: Int!
   branch: String
+  archiveFileSize: Int!
 }
 
 type DeploymentConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [DeploymentEdge!]!
-
-  """A list of nodes."""
   nodes: [Deployment!]!
+  pageInfo: PageInfo!
 }
 
 input DeploymentCreateInput {
-  graphId: ID
-  projectId: ID
-  archiveFileSize: Int!
   branch: String
+  projectId: ID
+  graphId: ID
+  archiveFileSize: Int!
 }
 
-union DeploymentCreatePayload = DeploymentCreateSuccess | ProjectDoesNotExistError | ArchiveFileSizeLimitExceededError | DailyDeploymentCountLimitExceededError | ProjectNotManagedError | ProjectNotStandaloneError | GraphDoesNotExistError | GraphNotManagedError | GraphNotStandaloneError | NotAllowedError
+union DeploymentCreatePayload = ArchiveFileSizeLimitExceededError | DailyDeploymentCountLimitExceededError | DeploymentCreateSuccess | GraphDoesNotExistError | GraphNotManagedError | GraphNotStandaloneError | NotAllowedError | ProjectDoesNotExistError | ProjectNotManagedError | ProjectNotStandaloneError
 
 type DeploymentCreateSuccess {
   deployment: Deployment!
@@ -489,13 +448,9 @@ type DeploymentDoesNotExistError {
   query: Query!
 }
 
-"""An edge in a connection."""
 type DeploymentEdge {
-  """The item at the end of the edge"""
-  node: Deployment!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: Deployment!
 }
 
 input DeploymentFilter {
@@ -505,8 +460,8 @@ input DeploymentFilter {
 
 type DeploymentLogEntry {
   createdAt: DateTime!
-  message: String!
   level: DeploymentLogLevel!
+  message: String!
 }
 
 enum DeploymentLogLevel {
@@ -515,7 +470,7 @@ enum DeploymentLogLevel {
   INFO
 }
 
-union DeploymentRedeployPayload = DeploymentRedeploySuccess | DeploymentDoesNotExistError | DailyDeploymentCountLimitExceededError | NotAllowedError
+union DeploymentRedeployPayload = DailyDeploymentCountLimitExceededError | DeploymentDoesNotExistError | DeploymentRedeploySuccess | NotAllowedError
 
 type DeploymentRedeploySuccess {
   deployment: Deployment!
@@ -540,11 +495,11 @@ enum DeploymentTriggerType {
 }
 
 type DiffSnippet {
+  addedLines: [Int!]!
   originalSchemaSnippet: String!
   originalSchemaSnippetFirstLine: Int!
   proposedSchemaSnippet: String!
   proposedSchemaSnippetFirstLine: Int!
-  addedLines: [Int!]!
   removedLines: [Int!]!
 }
 
@@ -566,11 +521,6 @@ type DuplicateDatabaseRegionsError {
   query: Query!
 }
 
-"""
-Implement the Duration scalar
-
-The input/output is a string in ISO8601 format.
-"""
 scalar Duration
 
 input DurationFilter {
@@ -593,43 +543,38 @@ input EndpointConfigInput {
 }
 
 input EndpointConfigUpdateInput {
+  endpointConfig: EndpointConfigInput!
   accountSlug: String!
   graphSlug: String!
   branchSlug: String!
-  endpointConfig: EndpointConfigInput!
 }
 
-union EndpointConfigUpdatePayload = Query | GraphDoesNotExistError
+union EndpointConfigUpdatePayload = GraphDoesNotExistError | Query
 
 input EnviromentVariableUpsertInput {
+  name: String!
+  environments: [BranchEnvironment!]!
   accountSlug: String!
   graphSlug: String
   projectSlug: String
-  name: String!
   value: String!
-  environments: [BranchEnvironment!]!
   sensitive: Boolean
 }
 
 type EnvironmentVariable implements Node {
+  branches: [String!]
+  createdAt: DateTime!
+  environments: [BranchEnvironment!]!
   id: ID!
   name: String!
-  value: String!
-  createdAt: DateTime!
   updatedAt: DateTime!
-  environments: [BranchEnvironment!]!
-  branches: [String!]
+  value: String!
 }
 
 type EnvironmentVariableConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [EnvironmentVariableEdge!]!
-
-  """A list of nodes."""
   nodes: [EnvironmentVariable!]!
+  pageInfo: PageInfo!
 }
 
 type EnvironmentVariableCountLimitExceededError {
@@ -637,17 +582,20 @@ type EnvironmentVariableCountLimitExceededError {
 }
 
 input EnvironmentVariableCreateInput {
-  graphId: ID
-  projectId: ID
-
-  """Must not be already assigned."""
+  """
+  
+      Must not be already assigned.
+      
+  """
   name: String!
-  value: String!
   environments: [BranchEnvironment!]!
+  projectId: ID
+  graphId: ID
+  value: String!
   sensitive: Boolean
 }
 
-union EnvironmentVariableCreatePayload = EnvironmentVariableCreateSuccess | NameAlreadyExistsError | NameTooLongError | NameContainsInvalidCharactersError | ValueTooLongError | ReservedPrefixError | NoEnvironmentsSetError | GraphDoesNotExistError | ProjectDoesNotExistError
+union EnvironmentVariableCreatePayload = EnvironmentVariableCreateSuccess | GraphDoesNotExistError | NameAlreadyExistsError | NameContainsInvalidCharactersError | NameTooLongError | NoEnvironmentsSetError | ProjectDoesNotExistError | ReservedPrefixError | ValueTooLongError
 
 type EnvironmentVariableCreateSuccess {
   environmentVariable: EnvironmentVariable!
@@ -655,20 +603,20 @@ type EnvironmentVariableCreateSuccess {
 }
 
 input EnvironmentVariableDeleteByValuesInput {
-  graphId: ID
-  projectId: ID
   name: String!
   environments: [BranchEnvironment!]!
+  projectId: ID
+  graphId: ID
 }
 
 union EnvironmentVariableDeleteByValuesPayload = EnvironmentVariableDeleteByValuesSuccess | EnvironmentVariableDoesNotExistError
 
 input EnvironmentVariableDeleteByValuesSlugsInput {
+  name: String!
+  environments: [BranchEnvironment!]!
   accountSlug: String!
   graphSlug: String
   projectSlug: String
-  name: String!
-  environments: [BranchEnvironment!]!
 }
 
 type EnvironmentVariableDeleteByValuesSuccess {
@@ -690,13 +638,9 @@ type EnvironmentVariableDoesNotExistError {
   query: Query!
 }
 
-"""An edge in a connection."""
 type EnvironmentVariableEdge {
-  """The item at the end of the edge"""
-  node: EnvironmentVariable!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: EnvironmentVariable!
 }
 
 input EnvironmentVariableSpecification {
@@ -708,11 +652,11 @@ input EnvironmentVariableSpecification {
 input EnvironmentVariableUpdateInput {
   id: ID!
   name: String
-  value: String
   environments: [BranchEnvironment!]
+  value: String
 }
 
-union EnvironmentVariableUpdatePayload = EnvironmentVariableUpdateSuccess | EnvironmentVariableDoesNotExistError | NameAlreadyExistsError | NameTooLongError | NameContainsInvalidCharactersError | ValueTooLongError | ReservedPrefixError | NoEnvironmentsSetError
+union EnvironmentVariableUpdatePayload = EnvironmentVariableDoesNotExistError | EnvironmentVariableUpdateSuccess | NameAlreadyExistsError | NameContainsInvalidCharactersError | NameTooLongError | NoEnvironmentsSetError | ReservedPrefixError | ValueTooLongError
 
 type EnvironmentVariableUpdateSuccess {
   environmentVariable: EnvironmentVariable!
@@ -725,19 +669,13 @@ type ErrorCountByCode {
 }
 
 type FederatedGraphCompositionError {
-  query: Query!
   messages: [String!]!
+  query: Query!
 }
 
 type FieldAnalytics {
   metrics: FieldMetricsTimeSeries
-  topClients(
-    """Detaults to 10, Max 100"""
-    limit: Int
-
-    """Search over the client names/versions"""
-    searchQuery: String
-  ): TopClientsForField
+  topClients(limit: Int, searchQuery: String): TopClientsForField
 }
 
 type FieldMetrics {
@@ -751,8 +689,8 @@ type FieldMetricsTimeSeries {
 }
 
 type FieldMetricsTimeSeriesDataPoint {
-  dateTime: DateTime!
   count: Int!
+  dateTime: DateTime!
 }
 
 enum FunctionKind {
@@ -761,33 +699,33 @@ enum FunctionKind {
 }
 
 type FunctionLogEvent implements LogEvent {
-  id: String!
   branch: String!
-  environment: BranchEnvironment!
-  deploymentId: ID!
   createdAt: DateTime!
+  deploymentId: ID!
+  environment: BranchEnvironment!
   functionKind: FunctionKind!
   functionName: String!
-  region: String!
+  id: String!
   logLevel: LogLevel!
-  url: String
   message: String!
+  region: String!
+  url: String
 }
 
 type GatewayRequestLogEvent implements LogEvent {
-  id: String!
   branch: String!
-  environment: BranchEnvironment!
-  deploymentId: ID!
   createdAt: DateTime!
-  region: String!
-  logLevel: LogLevel!
+  deploymentId: ID!
+  duration: Int!
+  environment: BranchEnvironment!
   httpMethod: String!
   httpStatus: Int!
-  url: String!
-  operation: GatewayRequestLogEventOperation
-  duration: Int!
+  id: String!
+  logLevel: LogLevel!
   message: String!
+  operation: GatewayRequestLogEventOperation
+  region: String!
+  url: String!
 }
 
 type GatewayRequestLogEventOperation {
@@ -796,13 +734,11 @@ type GatewayRequestLogEventOperation {
 }
 
 type GitAccount {
-  provider: GitProvider!
+  connectedAt: DateTime!
   id: ID!
+  provider: GitProvider!
   slug: String!
   type: GitAccountType!
-
-  """Date when the app was authorized to access this account"""
-  connectedAt: DateTime!
 }
 
 union GitAccountsPayload = GitAccountsSuccess | GitHubAuthorizationError
@@ -818,10 +754,10 @@ enum GitAccountType {
 }
 
 type GitCommit {
-  sha: String!
-  message: String!
   author: String
   authorAvatarUrl: String
+  message: String!
+  sha: String!
 }
 
 type GithubApiError {
@@ -830,10 +766,10 @@ type GithubApiError {
 }
 
 enum GithubApiErrorKind {
+  ERROR
   CONNECTION
   STATUS
   DECODE
-  ERROR
   UNKNOWN
 }
 
@@ -859,7 +795,7 @@ input GithubUserTokenUpdateInput {
   code: String!
 }
 
-union GithubUserTokenUpdatePayload = GithubUserTokenUpdateSuccess | GithubApiError
+union GithubUserTokenUpdatePayload = GithubApiError | GithubUserTokenUpdateSuccess
 
 type GithubUserTokenUpdateSuccess {
   query: Query!
@@ -870,15 +806,15 @@ enum GitProvider {
 }
 
 type GitRepository {
-  provider: GitProvider!
+  branches: [String!]!
+  defaultBranch: String
   id: String!
   owner: String!
-  slug: String!
-  url: String!
-  defaultBranch: String
   private: Boolean!
+  provider: GitProvider!
+  slug: String!
   updatedAt: DateTime!
-  branches: [String!]!
+  url: String!
 }
 
 enum GrafbasePlan {
@@ -889,39 +825,31 @@ enum GrafbasePlan {
 }
 
 type Graph implements Node {
-  id: ID!
-  slug: String!
-  repoRootPath: String!
-  graphType: GraphType
-  graphMode: GraphMode!
-  createdAt: DateTime!
-  canBeRenamed: Boolean!
-  status: GraphStatus!
-  customDomains: [CustomDomain!]!
-  repository: GitRepository
-  owners: [Team!]!
   account: Account!
-  branches(after: String, before: String, first: Int, last: Int): BranchConnection!
-  apiKeys(after: String, before: String, first: Int, last: Int): GraphApiKeyConnection!
-  productionBranch: Branch!
-  environmentVariables(after: String, before: String, first: Int, last: Int): EnvironmentVariableConnection!
-  deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
-  schemaChecks(first: Int, after: String, branch: String): SchemaCheckConnection!
-  schemaProposals(after: String, first: Int): SchemaProposalConnection!
-  operationChecksConfiguration: GraphOperationCheckConfiguration!
-  logEvents(first: Int, after: String, last: Int, before: String, filter: LogEventFilter!): LogEventConnection!
   analytics(filters: GraphAnalyticsFilters!): GraphAnalytics
-  requests(first: Int, last: Int, before: String, after: String, filters: RequestFilters!): RequestConnection
-  request(
-    branchName: String
-
-    """
-    The approximate timestamp of the request, within a few minutes of the actual request.
-    """
-    approximateTimestamp: DateTime!
-    traceId: ID!
-  ): Request
+  apiKeys(after: String, before: String, first: Int, last: Int): GraphApiKeyConnection!
+  branches(after: String, before: String, first: Int, last: Int): BranchConnection!
+  canBeRenamed: Boolean!
+  createdAt: DateTime!
+  customDomains: [CustomDomain!]!
+  deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
+  environmentVariables(after: String, before: String, first: Int, last: Int): EnvironmentVariableConnection!
+  graphMode: GraphMode!
+  graphType: GraphType
+  id: ID!
+  logEvents(after: String, before: String, first: Int, last: Int, filter: LogEventFilter!): LogEventConnection!
+  operationChecksConfiguration: GraphOperationCheckConfiguration!
+  owners: [Team!]!
+  productionBranch: Branch!
+  repoRootPath: String!
+  repository: GitRepository
+  request(branchName: String, approximateTimestamp: DateTime!, traceId: ID!): Request
   requestAnalytics(filter: GraphRequestAnalyticsFilter!): RequestAnalytics @deprecated(reason: "Use `analytics` instead")
+  requests(after: String, before: String, first: Int, last: Int, filters: RequestFilters!): RequestConnection
+  schemaChecks(after: String, first: Int, branch: String): SchemaCheckConnection!
+  schemaProposals(after: String, first: Int): SchemaProposalConnection!
+  slug: String!
+  status: GraphStatus!
 }
 
 union GraphAddOwnerPayload = GraphAddOwnerSuccess | GraphDoesNotExistError | NotAllowedError
@@ -931,116 +859,117 @@ type GraphAddOwnerSuccess {
 }
 
 type GraphAnalytics {
-  forField(
-    """Schema path defined as: '<parent-type-name>.<name>'"""
-    schemaPath: String!
-  ): FieldAnalytics!
-  requestMetrics(
-    """Latency percentiles to retrieve. Ex: [50, 99, 99.9]"""
-    latencyPercentiles: [Float!]
-  ): RequestMetricsTimeSeriesV2
-  topOperations(
-    """If not specified, top operations by latency will be empty. Ex: 95"""
-    latencyPercentile: Float
-
-    """Detaults to 10, Max 100"""
-    limit: Int
-
-    """Search over the opeartion names"""
-    searchQuery: String
-  ): TopOperations
-  topClients(
-    """If not specified, top clients by latency will be empty. Ex: 95"""
-    latencyPercentile: Float
-
-    """Detaults to 10, Max 100"""
-    limit: Int
-
-    """Search over the client names/versions"""
-    searchQuery: String
-  ): TopClients
+  forField(schemaPath: String!): FieldAnalytics!
+  requestMetrics(latencyPercentiles: [Float!]): RequestMetricsTimeSeriesV2
+  topClients(limit: Int, searchQuery: String, latencyPercentile: Float): TopClients
+  topOperations(limit: Int, searchQuery: String, latencyPercentile: Float): TopOperations
 }
 
 input GraphAnalyticsFilters {
-  """Defaults to production branch"""
+  """
+  
+      Defaults to production branch
+      
+  """
   branchName: String
 
   """
-  Use this if you really care about having a specific duration like 1 hour, 7 days, etc.
+  
+      Use this if you really care about having a specific duration like 1 hour, 7 days, etc.
+      
   """
   range: Duration
 
   """
-  Use this if you *at least* the data between `from` and `to` to be provided. You may get
-  more, but never less.
+  
+      Use this if you *at least* the data between `from` and `to` to be provided. You may get
+      more, but never less.
+      
   """
   from: DateTime
 
-  """To be used in conjunction with with either `range` or `from`."""
+  """
+  
+      To be used in conjunction with with either `range` or `from`.
+      
+  """
   to: DateTime!
 
   """
-  If explicitly to false, specifying both `from` and `to` will be treated as if `range: (to - from)`
-  had been specified instead. Meaning only the duration between `from` and `to` matters, not
-  necessarily having a data point for `from` itself.
+  
+      If explicitly to false, specifying both `from` and `to` will be treated as if `range: (to - from)`
+      had been specified instead. Meaning only the duration between `from` and `to` matters, not
+      necessarily having a data point for `from` itself.
+      
   """
   isCustomRange: Boolean
 
   """
-  If specified, overrides approximateNumberOfPoints. Must be in whole minutes.
-  At most 150 points can be returned.
+  
+      If specified, overrides approximateNumberOfPoints. Must be in whole minutes.
+      At most 150 points can be returned.
+      
   """
   aggregationStep: Duration
 
-  """Defaults to 100, at most 150 points can be returned."""
+  """
+  
+      Defaults to 100, at most 150 points can be returned.
+      
+  """
   approximateNumberOfDataPoints: Int
 
   """
-  Defaults to true
-  Example: for an aggregationStep of 15 min:
-  - if true, only times with 00, 15, 30 and 45 minutes will appear in the time series
-  - if false, times in the time series will be adjusted to start from the periodStart (~from).
-  So if from = 15:32:00, times will end in 02, 17, 32 and 47.
-  I'll always align to the aggregation step used to store the data though, which
-  is currently in minutes. So cannot have 15:10:20, 15:11:20, etc.
+  
+      Defaults to true
+      Example: for an aggregationStep of 15 min:
+      - if true, only times with 00, 15, 30 and 45 minutes will appear in the time series
+      - if false, times in the time series will be adjusted to start from the periodStart (~from).
+      So if from = 15:32:00, times will end in 02, 17, 32 and 47.
+      I'll always align to the aggregation step used to store the data though, which
+      is currently in minutes. So cannot have 15:10:20, 15:11:20, etc.
+      
   """
   alignPeriodWithAggregationStep: Boolean
   operationName: String
 
-  """Only used if operation name is specified."""
+  """
+  
+      Only used if operation name is specified.
+      
+  """
   operationNormalizedQueryHash: OperationNormalizedQueryHash
   clientName: String
 
-  """Only used if client name is specified."""
+  """
+  
+      Only used if client name is specified.
+      
+  """
   clientVersion: String
 }
 
 type GraphApiKey implements Node {
+  createdAt: DateTime!
+  environment: BranchEnvironment!
   id: ID!
   key: String!
-  environment: BranchEnvironment!
-  createdAt: DateTime!
   name: String!
 }
 
 type GraphApiKeyConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [GraphApiKeyEdge!]!
-
-  """A list of nodes."""
   nodes: [GraphApiKey!]!
+  pageInfo: PageInfo!
 }
 
 input GraphApiKeyCreateInput {
-  graphId: ID!
-  environment: BranchEnvironment!
   name: String!
+  environment: BranchEnvironment!
+  graphId: ID!
 }
 
-union GraphApiKeyCreatePayload = GraphApiKeyCreateSuccess | KeyLimitExceededError | GraphDoesNotExistError
+union GraphApiKeyCreatePayload = GraphApiKeyCreateSuccess | GraphDoesNotExistError | KeyLimitExceededError
 
 type GraphApiKeyCreateSuccess {
   apiKey: GraphApiKey!
@@ -1058,13 +987,9 @@ type GraphApiKeyDeleteSuccess {
   query: Query!
 }
 
-"""An edge in a connection."""
 type GraphApiKeyEdge {
-  """The item at the end of the edge"""
-  node: GraphApiKey!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: GraphApiKey!
 }
 
 input GraphApiKeyUpdateInput {
@@ -1083,27 +1008,22 @@ type GraphBranchDoesNotExistError {
 }
 
 type GraphConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [GraphEdge!]!
-
-  """A list of nodes."""
   nodes: [Graph!]!
+  pageInfo: PageInfo!
 }
 
 input GraphCreateFromRepositoryInput {
   accountId: ID!
   graphSlug: String!
-  gitRepoUrl: Url!
-  gitAccountId: String!
+  repoRootPath: String! = "grafbase"
   productionBranch: String!
   environmentVariables: [EnvironmentVariableSpecification!]! = []
-  repoRootPath: String! = "grafbase"
+  gitRepoUrl: Url!
+  gitAccountId: String!
 }
 
-union GraphCreateFromRepositoryPayload = GraphCreateFromRepositorySuccess | AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | RepositoryContainsNoBranchesError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
+union GraphCreateFromRepositoryPayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | GraphCreateFromRepositorySuccess | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | RepositoryContainsNoBranchesError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
 
 type GraphCreateFromRepositorySuccess {
   graph: Graph!
@@ -1112,12 +1032,12 @@ type GraphCreateFromRepositorySuccess {
 
 input GraphCreateFromSchemaInput {
   accountId: ID!
-  graphSlug: String!
   schema: String!
+  graphSlug: String!
   environmentVariables: [EnvironmentVariableSpecification!]! = []
 }
 
-union GraphCreateFromSchemaPayload = GraphCreateFromSchemaSuccess | SlugAlreadyExistsError | DisabledAccountError | SlugInvalidError | SlugTooLongError | AccountDoesNotExistError | CurrentPlanLimitReachedError | EmptyDatabaseRegionsError | DuplicateDatabaseRegionsError | InvalidDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidEnvironmentVariablesError
+union GraphCreateFromSchemaPayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | GraphCreateFromSchemaSuccess | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
 
 type GraphCreateFromSchemaSuccess {
   graph: Graph!
@@ -1127,15 +1047,15 @@ type GraphCreateFromSchemaSuccess {
 input GraphCreateFromTemplateInput {
   accountId: ID!
   graphSlug: String!
-  templateGitUrl: Url!
+  repoRootPath: String! = "grafbase"
+  environmentVariables: [EnvironmentVariableSpecification!]! = []
   gitAccountId: String!
+  templateGitUrl: Url!
   repoSlug: String!
   repoPrivate: Boolean!
-  environmentVariables: [EnvironmentVariableSpecification!]! = []
-  repoRootPath: String! = "grafbase"
 }
 
-union GraphCreateFromTemplatePayload = GraphCreateFromTemplateSuccess | AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | GithubInstallationInsufficientPermissionsError | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | RepositorySlugInUseError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | TemplateDoesNotExistError
+union GraphCreateFromTemplatePayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | GithubInstallationInsufficientPermissionsError | GraphCreateFromTemplateSuccess | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | RepositorySlugInUseError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | TemplateDoesNotExistError
 
 type GraphCreateFromTemplateSuccess {
   graph: Graph!
@@ -1145,13 +1065,13 @@ type GraphCreateFromTemplateSuccess {
 input GraphCreateInput {
   accountId: ID!
   graphSlug: String!
-  environmentVariables: [EnvironmentVariableSpecification!]! = []
   repoRootPath: String! = "grafbase"
-  graphMode: GraphMode! = MANAGED
   graphType: GraphType
+  graphMode: GraphMode! = MANAGED
+  environmentVariables: [EnvironmentVariableSpecification!]! = []
 }
 
-union GraphCreatePayload = GraphCreateSuccess | AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | StandaloneGraphsNoLongerSupportedError
+union GraphCreatePayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | GraphCreateSuccess | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | StandaloneGraphsNoLongerSupportedError
 
 type GraphCreateSuccess {
   graph: Graph!
@@ -1177,23 +1097,19 @@ input GraphDopplerIntegrationAttributesInput {
   configName: String!
 }
 
-"""An edge in a connection."""
 type GraphEdge {
-  """The item at the end of the edge"""
-  node: Graph!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: Graph!
 }
 
 type GraphIntegration {
   accountIntegrationId: ID!
+  attributes: GraphIntegrationAttributes
+  branch: Branch
   createdAt: DateTime!
   enabled: Boolean!
-  id: ID!
-  branch: Branch
   graph: Graph!
-  attributes: GraphIntegrationAttributes
+  id: ID!
 }
 
 union GraphIntegrationAttributes = ProjectDopplerIntegration
@@ -1213,7 +1129,7 @@ type GraphIntegrationMutationError {
   query: Query!
 }
 
-union GraphIntegrationMutationPayload = GraphIntegrationMutationSuccess | GraphIntegrationMutationError
+union GraphIntegrationMutationPayload = GraphIntegrationMutationError | GraphIntegrationMutationSuccess
 
 type GraphIntegrationMutationSuccess {
   account: Account!
@@ -1242,57 +1158,62 @@ type GraphNotStandaloneError {
 }
 
 type GraphOperationCheckConfiguration {
-  """
-  The time range in days to consider for operation checks. Operations older than the specificied
-  number of days are ignored.
-  """
-  timeRangeDays: Int!
-
-  """
-  The request count threshold to consider for operation checks. Operations that have been
-  registered less than the specified number of occurrences are ignored.
-  """
-  requestCountThreshold: Int!
-
-  """The clients to exclude from operation checks."""
   excludedClients: [String!]!
-
-  """The operations to exclude from operation checks."""
   excludedOperations: [String!]!
+  requestCountThreshold: Int!
+  timeRangeDays: Int!
 }
 
 input GraphOperationCheckConfigurationInput {
-  """The graph to update."""
-  graphId: ID!
-
   """
-  Whether operation checks are enabled for the graph. This is ignored, since
+  
+      Whether operation checks are enabled for the graph. This is ignored, since
   operation checks are now only enabled at the branch level.
+      
   """
   enabled: Boolean
 
   """
-  The time range in days to consider for operation checks. Operations older than the specificied
-  number of days are ignored.
+  
+      The graph to update.
+      
+  """
+  graphId: ID!
+
+  """
+  
+      The time range in days to consider for operation checks. Operations older than the specificied
+      number of days are ignored.
+      
   """
   timeRangeDays: Int
 
   """
-  The request count threshold to consider for operation checks. Operations that have been
-  registered less than the specified number of occurrences are ignored.
+  
+      The request count threshold to consider for operation checks. Operations that have been
+      registered less than the specified number of occurrences are ignored.
+      
   """
   requestCountThreshold: Int
 
-  """The clients to exclude from operation checks."""
+  """
+  
+      The clients to exclude from operation checks.
+      
+  """
   excludedClients: [String!]
 
-  """The operations to exclude from operation checks."""
+  """
+  
+      The operations to exclude from operation checks.
+      
+  """
   excludedOperations: [String!]
 }
 
 union GraphOperationCheckConfigurationUpdatePayload = GraphDoesNotExistError | GraphOperationCheckConfiguration | NotAllowedError
 
-union GraphRemoveOwnerPayload = GraphRemoveOwnerSuccess | GraphDoesNotExistError | NotAllowedError
+union GraphRemoveOwnerPayload = GraphDoesNotExistError | GraphRemoveOwnerSuccess | NotAllowedError
 
 type GraphRemoveOwnerSuccess {
   query: Query!
@@ -1300,17 +1221,17 @@ type GraphRemoveOwnerSuccess {
 
 input GraphRequestAnalyticsFilter {
   branch: String = null
-  period: GraphRequestAnalyticsPeriod
-  now: DateTime
   from: DateTime
   to: DateTime
   aggregationStep: Duration
   approximateNumberOfDataPoints: Int
   alignPeriodWithAggregationStep: Boolean
-  graphqlOperation: String
-  operationId: ID
   clientName: String
   clientVersion: String
+  period: GraphRequestAnalyticsPeriod
+  now: DateTime
+  graphqlOperation: String
+  operationId: ID
 }
 
 enum GraphRequestAnalyticsPeriod {
@@ -1336,11 +1257,11 @@ enum GraphType {
 input GraphUpdateInput {
   id: ID!
   graphSlug: String
-  productionBranch: String
   repoRootPath: String
+  productionBranch: String
 }
 
-union GraphUpdatePayload = GraphUpdateSuccess | CannotBeRenamedError | GraphDoesNotExistError | NotAllowedError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
+union GraphUpdatePayload = CannotBeRenamedError | GraphDoesNotExistError | GraphUpdateSuccess | NotAllowedError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
 
 type GraphUpdateSuccess {
   graph: Graph!
@@ -1357,9 +1278,9 @@ enum InArrearsCause {
 }
 
 type Integration {
+  createdAt: DateTime!
   id: ID!
   name: String!
-  createdAt: DateTime!
 }
 
 type InvalidAccountError {
@@ -1376,8 +1297,8 @@ type InvalidDomainError {
 }
 
 type InvalidEnvironmentVariableError {
-  variableName: String!
   error: InvalidEnvironmentVariableErrorType!
+  variableName: String!
 }
 
 enum InvalidEnvironmentVariableErrorType {
@@ -1398,21 +1319,21 @@ type InvalidRepoRootPathError {
 }
 
 type Invite implements Node {
-  id: ID!
-  role: MemberRole!
+  createdAt: DateTime!
   email: String!
+  id: ID!
   invitedBy: User!
   lastRenewedAt: DateTime!
-  status: InviteStatus!
-  createdAt: DateTime!
   organization: Organization!
+  role: MemberRole!
+  status: InviteStatus!
 }
 
 input InviteAcceptInput {
   id: ID!
 }
 
-union InviteAcceptPayload = InviteAcceptSuccess | InviteDoesNotExistError | AlreadyMemberError | CannotUseInvitationsWithSSO
+union InviteAcceptPayload = AlreadyMemberError | CannotUseInvitationsWithSSO | InviteAcceptSuccess | InviteDoesNotExistError
 
 type InviteAcceptSuccess {
   member: Member!
@@ -1431,14 +1352,9 @@ type InviteCancelSuccess {
 }
 
 type InviteConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [InviteEdge!]!
-
-  """A list of nodes."""
   nodes: [Invite!]!
+  pageInfo: PageInfo!
 }
 
 input InviteDeclineInput {
@@ -1456,22 +1372,18 @@ type InviteDoesNotExistError {
   query: Query!
 }
 
-"""An edge in a connection."""
 type InviteEdge {
-  """The item at the end of the edge"""
-  node: Invite!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: Invite!
 }
 
 input InviteSendInput {
-  organizationId: ID!
-  email: String!
   role: MemberRole!
+  email: String!
+  organizationId: ID!
 }
 
-union InviteSendPayload = InviteSendSuccess | OrganizationDoesNotExistError | NotAllowedToSendInvitesError | CannotUseInvitationsWithSSO
+union InviteSendPayload = CannotUseInvitationsWithSSO | InviteSendSuccess | NotAllowedToSendInvitesError | OrganizationDoesNotExistError
 
 type InviteSendSuccess {
   invite: Invite!
@@ -1483,7 +1395,6 @@ enum InviteStatus {
   EXPIRED
 }
 
-"""A scalar that can represent any JSON value."""
 scalar JSON
 
 type KeyDoesNotExistError {
@@ -1494,86 +1405,67 @@ type KeyLimitExceededError {
   query: Query!
 }
 
-"""
-Users can select the previous/current "limit cycle" which defines the cycle on which limits
-applies. For hobby it's monthly starting the first of each month and for pro it matches the
-billing cycle.
-"""
 enum LimitCycleChoice {
   CURRENT
   PREVIOUS
 }
 
 type LintCheckError {
-  title: String!
   message: String!
   severity: SchemaCheckErrorSeverity!
+  title: String!
 }
 
 interface LogEvent {
-  id: String!
-  createdAt: DateTime!
-  region: String!
-  logLevel: LogLevel!
-  deploymentId: ID!
   branch: String!
+  createdAt: DateTime!
+  deploymentId: ID!
   environment: BranchEnvironment!
+  id: String!
+  logLevel: LogLevel!
   message: String!
+  region: String!
 }
 
 type LogEventConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [LogEventEdge!]!
-
-  """A list of nodes."""
   nodes: [LogEvent!]!
+  pageInfo: PageInfo!
 }
 
-"""An edge in a connection."""
 type LogEventEdge {
-  """The item at the end of the edge"""
-  node: LogEvent!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: LogEvent!
 }
 
 input LogEventFilter {
   query: String
   branch: String
-  from: DateTime
-  to: DateTime
   region: [String!]
   logLevel: [LogLevel!]
+  from: DateTime
+  to: DateTime
 }
 
 enum LogLevel {
-  DEBUG
-  INFO
-  WARN
   ERROR
+  WARN
+  INFO
+  DEBUG
 }
 
 type Member implements Node {
+  account: Account!
+  createdAt: DateTime!
   id: ID!
   role: MemberRole!
-  createdAt: DateTime!
-  account: Account!
   user: User!
 }
 
 type MemberConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [MemberEdge!]!
-
-  """A list of nodes."""
   nodes: [Member!]!
+  pageInfo: PageInfo!
 }
 
 input MemberDeleteInput {
@@ -1585,13 +1477,9 @@ type MemberDeletePayload {
   query: Query!
 }
 
-"""An edge in a connection."""
 type MemberEdge {
-  """The item at the end of the edge"""
-  node: Member!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: Member!
 }
 
 enum MemberRole {
@@ -1619,170 +1507,80 @@ type MustLeaveAtLeastOneKeyForEnvironmentError {
 }
 
 type Mutation {
-  """Create a new access token."""
   accessTokenCreate(input: AccessTokenCreateInput!): AccessTokenCreatePayload!
-
-  """Delete a given access token."""
   accessTokenDelete(input: AccessTokenDeleteInput!): AccessTokenDeletePayload!
   accountIntegrationCreate(accountId: ID!, input: AccountIntegrationInput!): AccountIntegrationMutationPayload!
-  accountIntegrationUpdate(id: ID!, input: AccountIntegrationInput!): AccountIntegrationMutationPayload!
   accountIntegrationDelete(id: ID!): AccountIntegrationMutationPayload!
-
-  """
-  Create new organization account owned by the current user. Slug must be unique.
-  """
+  accountIntegrationUpdate(id: ID!, input: AccountIntegrationInput!): AccountIntegrationMutationPayload!
+  branchCreate(input: BranchCreateInput!): BranchCreatePayload!
+  branchDelete(accountSlug: String!, graphSlug: String, branchName: String!, projectSlug: String): BranchDeletePayload!
+  branchUpdate(input: BranchUpdateInput!): BranchUpdatePayload!
+  customDomainCreate(input: CustomDomainCreateInput!): CustomDomainCreatePayload!
+  customDomainDelete(input: CustomDomainDeleteInput!): CustomDomainDeletePayload!
+  customDomainReplace(input: CustomDomainReplaceInput!): CustomDomainReplacePayload!
+  deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
+  deploymentCreate(input: DeploymentCreateInput!): DeploymentCreatePayload!
+  deploymentCreateBySlug(input: DeploymentBySlugCreateInput!): DeploymentCreatePayload!
+  deploymentRedeploy(id: ID!): DeploymentRedeployPayload!
+  endpointConfigUpdate(input: EndpointConfigUpdateInput!): EndpointConfigUpdatePayload!
+  environentVariableUpsert(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
+  environentVariableUpsertBySlug(input: EnviromentVariableUpsertInput!): EnvironmentVariableCreatePayload!
+  environmentVariableCreate(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
+  environmentVariableDelete(input: EnvironmentVariableDeleteInput!): EnvironmentVariableDeletePayload!
+  environmentVariableDeleteWithValues(input: EnvironmentVariableDeleteByValuesInput!): EnvironmentVariableDeleteByValuesPayload!
+  environmentVariableDeleteWithValuesBySlug(input: EnvironmentVariableDeleteByValuesSlugsInput!): EnvironmentVariableDeleteByValuesPayload!
+  environmentVariableUpdate(input: EnvironmentVariableUpdateInput!): EnvironmentVariableUpdatePayload!
+  githubUserTokenUpdate(input: GithubUserTokenUpdateInput!): GithubUserTokenUpdatePayload!
+  githubUserTokenUpdateE2E(input: GithubUserTokenUpdateE2EInput!): GithubUserTokenUpdateE2EPayload!
+  graphAddOwner(graphId: ID!, ownerId: ID!): GraphAddOwnerPayload!
+  graphApiKeyCreate(input: GraphApiKeyCreateInput!): GraphApiKeyCreatePayload!
+  graphApiKeyDelete(input: GraphApiKeyDeleteInput!): GraphApiKeyDeletePayload!
+  graphApiKeyUpdate(input: GraphApiKeyUpdateInput!): GraphApiKeyUpdatePayload!
+  graphCreate(input: GraphCreateInput!): GraphCreatePayload!
+  graphCreateFromRepository(input: GraphCreateFromRepositoryInput!): GraphCreateFromRepositoryPayload!
+  graphCreateFromSchema(input: GraphCreateFromSchemaInput!): GraphCreateFromSchemaPayload!
+  graphCreateFromTemplate(input: GraphCreateFromTemplateInput!): GraphCreateFromTemplatePayload!
+  graphDelete(input: GraphDeleteInput!): GraphDeletePayload!
+  graphIntegrationCreate(graphId: ID!, accountIntegrationId: ID!, input: GraphIntegrationInput!): GraphIntegrationMutationPayload!
+  graphIntegrationDelete(id: ID!): GraphIntegrationMutationPayload!
+  graphIntegrationUpdate(id: ID!, input: GraphIntegrationInput!): GraphIntegrationMutationPayload!
+  graphOperationCheckConfigurationUpdate(input: GraphOperationCheckConfigurationInput!): GraphOperationCheckConfigurationUpdatePayload!
+  graphRemoveOwner(graphId: ID!, ownerId: ID!): GraphRemoveOwnerPayload!
+  graphUpdate(input: GraphUpdateInput!): GraphUpdatePayload!
+  inviteAccept(input: InviteAcceptInput!): InviteAcceptPayload!
+  inviteCancel(input: InviteCancelInput!): InviteCancelPayload!
+  inviteDecline(input: InviteDeclineInput!): InviteDeclinePayload!
+  inviteSend(input: InviteSendInput!): InviteSendPayload!
+  memberDelete(input: MemberDeleteInput!): MemberDeletePayload!
+  memberUpdate(input: MemberUpdateInput!): MemberUpdatePayload!
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
-  organizationSlugUpdate(input: OrganizationSlugUpdateInput!): OrganizationSlugUpdatePayload!
-  personalAccountSlugUpdate(input: PersonalAccountSlugUpdateInput!): PersonalAccountSlugUpdatePayload!
+  organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
   organizationPaymentMethodReplace(accountId: ID!, stripePaymentMethodId: String!): OrganizationPaymentMethodReplacePayload!
   organizationSetupPaymentMethod(accountId: ID!, stripePaymentMethodId: String!): OrganizationSetupPaymentMethod!
+  organizationSlugUpdate(input: OrganizationSlugUpdateInput!): OrganizationSlugUpdatePayload!
   organizationUpdate(input: OrganizationUpdateInput!): OrganizationUpdatePayload!
-  personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
-  organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
-  branchCreate(input: BranchCreateInput!): BranchCreatePayload!
-  branchUpdate(input: BranchUpdateInput!): BranchUpdatePayload!
-  branchDelete(
-    """slug of the account"""
-    accountSlug: String!
-
-    """slug of the graph"""
-    graphSlug: String
-
-    """slug of the project"""
-    projectSlug: String
-
-    """name of the branch"""
-    branchName: String!
-  ): BranchDeletePayload!
-  endpointConfigUpdate(input: EndpointConfigUpdateInput!): EndpointConfigUpdatePayload!
-
-  """Add a new custom domain."""
-  customDomainCreate(input: CustomDomainCreateInput!): CustomDomainCreatePayload!
-
-  """Delete a custom domain."""
-  customDomainDelete(input: CustomDomainDeleteInput!): CustomDomainDeletePayload!
-
-  """
-  Replace a configured custom domain with another one (domain and target branch)
-  – or modify the target branch of an existing one
-  without changing the domain name.
-  """
-  customDomainReplace(input: CustomDomainReplaceInput!): CustomDomainReplacePayload!
-
-  """Create a new deployment for an existing graph by slugs."""
-  deploymentCreateBySlug(input: DeploymentBySlugCreateInput!): DeploymentCreatePayload!
-
-  """Create a new deployment for an existing graph."""
-  deploymentCreate(input: DeploymentCreateInput!): DeploymentCreatePayload!
-
-  """Create a new deployment for an existing graph."""
-  deploymentRedeploy(
-    """ID of the deployment"""
-    id: ID!
-  ): DeploymentRedeployPayload!
-
-  """Create a new environment variable."""
-  environmentVariableCreate(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
-
-  """Update an environment variable."""
-  environmentVariableUpdate(input: EnvironmentVariableUpdateInput!): EnvironmentVariableUpdatePayload!
-
-  """Create or update an environment variable."""
-  environentVariableUpsert(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
-
-  """Create or update an environment variable."""
-  environentVariableUpsertBySlug(input: EnviromentVariableUpsertInput!): EnvironmentVariableCreatePayload!
-
-  """Delete an environment variable."""
-  environmentVariableDelete(input: EnvironmentVariableDeleteInput!): EnvironmentVariableDeletePayload!
-
-  """Delete an environment variable with variable values."""
-  environmentVariableDeleteWithValues(input: EnvironmentVariableDeleteByValuesInput!): EnvironmentVariableDeleteByValuesPayload!
-
-  """Delete an environment variable with variable values."""
-  environmentVariableDeleteWithValuesBySlug(input: EnvironmentVariableDeleteByValuesSlugsInput!): EnvironmentVariableDeleteByValuesPayload!
-
-  """Create a new graph API key."""
-  graphApiKeyCreate(input: GraphApiKeyCreateInput!): GraphApiKeyCreatePayload!
-
-  """Update a given API key with a new name."""
-  graphApiKeyUpdate(input: GraphApiKeyUpdateInput!): GraphApiKeyUpdatePayload!
-
-  """Delete a given API key."""
-  graphApiKeyDelete(input: GraphApiKeyDeleteInput!): GraphApiKeyDeletePayload!
-  graphIntegrationCreate(accountIntegrationId: ID!, graphId: ID!, input: GraphIntegrationInput!): GraphIntegrationMutationPayload!
-  graphIntegrationUpdate(id: ID!, input: GraphIntegrationInput!): GraphIntegrationMutationPayload!
-  graphIntegrationDelete(id: ID!): GraphIntegrationMutationPayload!
-
-  """Create a new graph without any source for an initial deployment."""
-  graphCreate(input: GraphCreateInput!): GraphCreatePayload!
-
-  """Create a new graph from a schema."""
-  graphCreateFromSchema(input: GraphCreateFromSchemaInput!): GraphCreateFromSchemaPayload!
-
-  """Create a new graph from a GitHub repository."""
-  graphCreateFromRepository(input: GraphCreateFromRepositoryInput!): GraphCreateFromRepositoryPayload!
-
-  """
-  Create a new graph from a template in a newly created GitHub repository.
-  """
-  graphCreateFromTemplate(input: GraphCreateFromTemplateInput!): GraphCreateFromTemplatePayload!
-  graphUpdate(input: GraphUpdateInput!): GraphUpdatePayload!
-  graphOperationCheckConfigurationUpdate(input: GraphOperationCheckConfigurationInput!): GraphOperationCheckConfigurationUpdatePayload!
-  graphDelete(input: GraphDeleteInput!): GraphDeletePayload!
-  graphAddOwner(graphId: ID!, ownerId: ID!): GraphAddOwnerPayload!
-  graphRemoveOwner(graphId: ID!, ownerId: ID!): GraphRemoveOwnerPayload!
-  inviteSend(input: InviteSendInput!): InviteSendPayload!
-  inviteCancel(input: InviteCancelInput!): InviteCancelPayload!
-  inviteAccept(input: InviteAcceptInput!): InviteAcceptPayload!
-  inviteDecline(input: InviteDeclineInput!): InviteDeclinePayload!
-
-  """Update role of an organization member"""
-  memberUpdate(input: MemberUpdateInput!): MemberUpdatePayload!
-
-  """Remove member from an organization"""
-  memberDelete(input: MemberDeleteInput!): MemberDeletePayload!
-
-  """Run checks against the given schema"""
-  schemaCheckCreate(input: SchemaCheckCreateInput!): SchemaCheckPayload!
-  schemaProposalCreate(input: SchemaProposalCreateInput!): SchemaProposalCreatePayload!
-  schemaProposalRequestReview(input: SchemaProposalRequestReviewInput!): SchemaProposalRequestReviewPayload!
-  schemaProposalApprove(input: SchemaProposalApproveInput!): SchemaProposalApprovePayload!
-  schemaProposalReject(input: SchemaProposalRejectInput!): SchemaProposalRejectPayload!
-  schemaProposalDelete(id: ID!): SchemaProposalDeletePayload!
-
-  """
-  Edit the contents of a proposal.
-  
-  All new and edited subgraphs should be included in every call to edit.
-  """
-  schemaProposalEdit(input: SchemaProposalEditInput!): SchemaProposalEditPayload!
-
-  """Publish a new subgraph."""
+  personalAccountSlugUpdate(input: PersonalAccountSlugUpdateInput!): PersonalAccountSlugUpdatePayload!
+  personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload!
   publish(input: PublishInput!): PublishPayload!
-
-  """Delete a subgraph"""
-  deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
+  schemaCheckCreate(input: SchemaCheckCreateInput!): SchemaCheckPayload!
+  schemaProposalApprove(input: SchemaProposalApproveInput!): SchemaProposalApprovePayload!
+  schemaProposalCreate(input: SchemaProposalCreateInput!): SchemaProposalCreatePayload!
+  schemaProposalDelete(id: ID!): SchemaProposalDeletePayload!
+  schemaProposalEdit(input: SchemaProposalEditInput!): SchemaProposalEditPayload!
+  schemaProposalReject(input: SchemaProposalRejectInput!): SchemaProposalRejectPayload!
+  schemaProposalRequestReview(input: SchemaProposalRequestReviewInput!): SchemaProposalRequestReviewPayload!
   slackIntegrationCreate(input: SlackIntegrationCreateInput!): SlackNotificationCreatePayload!
   slackNotificationDelete(id: String!): SlackNotificationDeletePayload!
   stripeSetupIntentCreate: StripeSetupIntentCreatePayload!
-
-  """Assign a team as the owner of a subgraph"""
-  subgraphAddOwner(branchId: ID!, subgraphName: String!, owner: ID!): SubgraphAddOwnerPayload!
-
-  """Unassign a team's ownership of a subgraph"""
+  subgraphAddOwner(owner: ID!, branchId: ID!, subgraphName: String!): SubgraphAddOwnerPayload!
   subgraphRemoveOwner(branchId: ID!, subgraphName: String!): SubgraphRemoveOwnerPayload!
-  teamCreate(organizationId: ID!, name: String!): TeamCreatePayload!
-  teamDelete(teamId: ID!): TeamDeletePayload!
   teamAddMember(teamId: ID!, memberId: ID!): TeamAddMemberPayload!
+  teamAssignRole(role: TeamRole!, teamId: ID!, memberId: ID!): TeamAssignRolePayload!
+  teamCreate(name: String!, organizationId: ID!): TeamCreatePayload!
+  teamDelete(teamId: ID!): TeamDeletePayload!
   teamRemoveMember(teamId: ID!, memberId: ID!): TeamRemoveMemberPayload!
-  teamAssignRole(teamId: ID!, memberId: ID!, role: TeamRole!): TeamAssignRolePayload!
   trustedDocumentsSubmit(accountSlug: String, graphSlug: String, projectSlug: String, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
-
-  """Fetch and attach a GitHub user token to a user using a code"""
-  githubUserTokenUpdate(input: GithubUserTokenUpdateInput!): GithubUserTokenUpdatePayload!
-  githubUserTokenUpdateE2E(input: GithubUserTokenUpdateE2EInput!): GithubUserTokenUpdateE2EPayload!
 }
 
 type NameAlreadyExistsError {
@@ -1840,16 +1638,16 @@ type OldAccessTokenError {
 }
 
 type Operation implements Node {
-  name: String
-  type: OperationType!
-  normalizedQuery: String!
   id: ID!
+  name: String
+  normalizedQuery: String!
+  type: OperationType!
 }
 
 type OperationCheckError {
-  title: String!
   message: String!
   severity: SchemaCheckErrorSeverity!
+  title: String!
 }
 
 scalar OperationNormalizedQueryHash
@@ -1883,41 +1681,41 @@ input OrbBillingAddressInput {
 }
 
 type OrbCustomer {
+  billingAddress: OrbBillingAddress
+  email: String!
   id: String!
   name: String!
-  email: String!
-  taxId: OrbTaxId
-  billingAddress: OrbBillingAddress
   subscriptions(cursor: String): OrbPaginatedSubscriptions!
+  taxId: OrbTaxId
 }
 
 input OrbCustomerUpdateInput {
   name: String
   email: String
-  billingAddress: OrbBillingAddressInput
   taxId: OrbTaxIdInput
+  billingAddress: OrbBillingAddressInput
 }
 
 type OrbInvoice {
-  id: String!
+  currency: String!
   dueDate: DateTime!
+  id: String!
   invoiceDate: DateTime!
+  invoiceNumber: String!
+  invoicePdf: Url!
+  lineItems: [OrbInvoiceLineItem!]!
   status: OrbInvoiceStatus!
   total: String!
-  currency: String!
-  lineItems: [OrbInvoiceLineItem!]!
-  invoicePdf: Url!
-  invoiceNumber: String!
 }
 
 type OrbInvoiceLineItem {
+  amount: String!
+  endDate: DateTime!
   id: String!
   name: String!
-  quantity: Float!
-  amount: String!
   price: OrbPrice!
+  quantity: Float!
   startDate: DateTime!
-  endDate: DateTime!
 }
 
 enum OrbInvoiceStatus {
@@ -1949,8 +1747,8 @@ type OrbPlan {
 type OrbPrice {
   currency: String!
   modelType: OrbPriceModelType!
-  unitConfig: OrbPriceUnitConfig
   packageConfig: OrbPricePackageConfig
+  unitConfig: OrbPriceUnitConfig
 }
 
 enum OrbPriceModelType {
@@ -1974,13 +1772,13 @@ type OrbPriceUnitConfig {
 }
 
 type OrbSubscription {
-  id: String!
-  status: OrbSubscriptionStatus!
-  plan: OrbPlan!
-  currentBillingPeriodStartDate: DateTime
   currentBillingPeriodEndDate: DateTime
+  currentBillingPeriodStartDate: DateTime
   endDate: DateTime
+  id: String!
   invoices(cursor: String): OrbPaginatedInvoices!
+  plan: OrbPlan!
+  status: OrbSubscriptionStatus!
   upcomingInvoice: OrbUpcomingInvoice
 }
 
@@ -1991,14 +1789,14 @@ enum OrbSubscriptionStatus {
 }
 
 type OrbTaxId {
+  country: String!
   type: OrbTaxIdType!
   value: String!
-  country: String!
 }
 
 input OrbTaxIdInput {
-  type: OrbTaxIdType!
   value: String!
+  type: OrbTaxIdType!
   country: String!
 }
 
@@ -2057,19 +1855,19 @@ enum OrbTaxIdType {
 }
 
 type OrbUpcomingInvoice {
-  targetDate: DateTime!
-  subtotal: String!
   currency: String!
   lineItems: [OrbUpcomingInvoiceLineItem!]!
+  subtotal: String!
+  targetDate: DateTime!
 }
 
 type OrbUpcomingInvoiceLineItem {
-  name: String!
-  quantity: Float!
   amount: String!
-  startDate: DateTime!
   endDate: DateTime!
+  name: String!
   price: OrbPrice!
+  quantity: Float!
+  startDate: DateTime!
 }
 
 type OrbValidationError {
@@ -2078,58 +1876,47 @@ type OrbValidationError {
 }
 
 type Organization implements Account & Node {
-  id: ID!
-  slug: String!
-  name: String!
+  accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
+  addToSlackLink: String!
   createdAt: DateTime!
-  status: AccountStatus!
-  plan: GrafbasePlan!
-  samlDomain: String
-  stripeCustomer: StripeCustomer
-  orbCustomer: OrbCustomer
-  orbActiveSubscription: OrbSubscription
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
+  graphsCountStatus: ResourceStatus!
+  id: ID!
   integrations: [AccountIntegration!]!
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
-  graphsCountStatus: ResourceStatus!
-  slackIntegration: SlackIntegration
-
-  """
-  The url for the UI button to install the Grafbase slack app. It is
-  important to use this link and keep it private, since it contains the signed
-  account id of the authenticated user.
-  """
-  addToSlackLink: String!
-  resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
-  accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
+  name: String!
+  orbActiveSubscription: OrbSubscription
+  orbCustomer: OrbCustomer
+  plan: GrafbasePlan!
   resources: AccountResources! @deprecated(reason: "Not relevant for organizations")
+  resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
+  samlDomain: String
+  slackIntegration: SlackIntegration
+  slug: String!
+  status: AccountStatus!
+  stripeCustomer: StripeCustomer
   teams(after: String, first: Int): TeamConnection!
 }
 
 type OrganizationConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [OrganizationEdge!]!
-
-  """A list of nodes."""
   nodes: [Organization!]!
+  pageInfo: PageInfo!
 }
 
 input OrganizationCreateInput {
-  slug: String!
   name: String!
+  slug: String!
   email: String
   stripePaymentMethodId: String!
 }
 
-union OrganizationCreatePayload = OrganizationCreateSuccess | SlugError | SlugSizeCheckError | NameSizeCheckError | ReservedSlugsCheckError | SlugAlreadyExistsError
+union OrganizationCreatePayload = NameSizeCheckError | OrganizationCreateSuccess | ReservedSlugsCheckError | SlugAlreadyExistsError | SlugError | SlugSizeCheckError
 
 type OrganizationCreateSuccess {
-  organization: Organization!
   member: Member!
+  organization: Organization!
   query: Query!
 }
 
@@ -2137,7 +1924,7 @@ input OrganizationDeleteInput {
   id: ID!
 }
 
-union OrganizationDeletePayload = OrganizationDeleteSuccess | OrganizationDoesNotExistError | NotAllowedToDeleteOrganizationError
+union OrganizationDeletePayload = NotAllowedToDeleteOrganizationError | OrganizationDeleteSuccess | OrganizationDoesNotExistError
 
 type OrganizationDeleteSuccess {
   deletedId: ID!
@@ -2148,29 +1935,25 @@ type OrganizationDoesNotExistError {
   query: Query!
 }
 
-"""An edge in a connection."""
 type OrganizationEdge {
-  """The item at the end of the edge"""
-  node: Organization!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: Organization!
 }
 
 type OrganizationOwnershipNotTransferredError {
   query: Query!
 }
 
-union OrganizationPaymentMethodReplacePayload = OrganizationSuccessfulUpdate | MissingStripeCustomerError | OrganizationDoesNotExistError | NotAllowedError
+union OrganizationPaymentMethodReplacePayload = MissingStripeCustomerError | NotAllowedError | OrganizationDoesNotExistError | OrganizationSuccessfulUpdate
 
-union OrganizationSetupPaymentMethod = OrganizationUpgradeToProSuccess | HasAlreadyPaymentMethodError | OrganizationDoesNotExistError | NotAllowedError
+union OrganizationSetupPaymentMethod = HasAlreadyPaymentMethodError | NotAllowedError | OrganizationDoesNotExistError | OrganizationUpgradeToProSuccess
 
 input OrganizationSlugUpdateInput {
   id: ID!
   slug: String!
 }
 
-union OrganizationSlugUpdatePayload = OrganizationSlugUpdateSuccess | SlugError | SlugSizeCheckError | ReservedSlugsCheckError | SlugAlreadyExistsError | OrganizationDoesNotExistError | NotAllowedToSlugUpdateError
+union OrganizationSlugUpdatePayload = NotAllowedToSlugUpdateError | OrganizationDoesNotExistError | OrganizationSlugUpdateSuccess | ReservedSlugsCheckError | SlugAlreadyExistsError | SlugError | SlugSizeCheckError
 
 type OrganizationSlugUpdateSuccess {
   organization: Organization!
@@ -2188,7 +1971,7 @@ input OrganizationUpdateInput {
   orbCustomer: OrbCustomerUpdateInput
 }
 
-union OrganizationUpdatePayload = OrganizationUpdateSuccess | OrganizationDoesNotExistError | NameSizeCheckError | NotAllowedToUpdateOrganizationError | OrbValidationError
+union OrganizationUpdatePayload = NameSizeCheckError | NotAllowedToUpdateOrganizationError | OrbValidationError | OrganizationDoesNotExistError | OrganizationUpdateSuccess
 
 type OrganizationUpdateSuccess {
   organization: Organization!
@@ -2200,36 +1983,28 @@ type OrganizationUpgradeToProSuccess {
   query: Query!
 }
 
-"""Information about pagination in a connection"""
 type PageInfo {
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: String
-
-  """When paginating forwards, the cursor to continue."""
   endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
 }
 
 type PersonalAccount implements Account {
-  id: ID!
-  slug: String!
-  name: String!
+  accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
   createdAt: DateTime!
-  status: AccountStatus!
-  plan: GrafbasePlan!
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
   graphsCountStatus: ResourceStatus!
-  resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
+  id: ID!
+  name: String!
+  plan: GrafbasePlan!
   resources: AccountResources! @deprecated(reason: "use graphs_count_status")
-  accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
+  resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
+  slug: String!
+  status: AccountStatus!
 }
 
-union PersonalAccountDeletePayload = PersonalAccountDeleteSuccess | OrganizationOwnershipNotTransferredError
+union PersonalAccountDeletePayload = OrganizationOwnershipNotTransferredError | PersonalAccountDeleteSuccess
 
 type PersonalAccountDeleteSuccess {
   deletedId: ID!
@@ -2240,7 +2015,7 @@ input PersonalAccountSlugUpdateInput {
   slug: String!
 }
 
-union PersonalAccountSlugUpdatePayload = PersonalAccountSlugUpdateSuccess | SlugError | SlugSizeCheckError | ReservedSlugsCheckError | SlugAlreadyExistsError
+union PersonalAccountSlugUpdatePayload = PersonalAccountSlugUpdateSuccess | ReservedSlugsCheckError | SlugAlreadyExistsError | SlugError | SlugSizeCheckError
 
 type PersonalAccountSlugUpdateSuccess {
   query: Query!
@@ -2250,15 +2025,15 @@ input PersonalAccountUpdateInput {
   name: String!
 }
 
-union PersonalAccountUpdatePayload = PersonalAccountUpdateSuccess | NameSizeCheckError
+union PersonalAccountUpdatePayload = NameSizeCheckError | PersonalAccountUpdateSuccess
 
 type PersonalAccountUpdateSuccess {
   query: Query!
 }
 
 type PreviousRequestAnalytcs {
-  timeSeries: RequestMetricsTimeSeries!
   metrics: RequestMetrics!
+  timeSeries: RequestMetricsTimeSeries!
 }
 
 type ProjectBranchDoesNotExistError {
@@ -2270,9 +2045,9 @@ type ProjectDoesNotExistError {
 }
 
 type ProjectDopplerIntegration {
-  projectName: String!
-  configName: String!
   automatedRedeploy: Boolean!
+  configName: String!
+  projectName: String!
 }
 
 type ProjectNotFederatedError {
@@ -2296,17 +2071,17 @@ type PublishForbidden {
 }
 
 input PublishInput {
+  message: String
+  schema: String!
   accountSlug: String!
   graphSlug: String
   projectSlug: String
   branch: String
   subgraph: String!
   url: String!
-  schema: String!
-  message: String
 }
 
-union PublishPayload = PublishSuccess | ProjectDoesNotExistError | ProjectNotFederatedError | FederatedGraphCompositionError | SchemaRegistryBranchDoesNotExistError | PublishForbidden
+union PublishPayload = FederatedGraphCompositionError | ProjectDoesNotExistError | ProjectNotFederatedError | PublishForbidden | PublishSuccess | SchemaRegistryBranchDoesNotExistError
 
 type PublishSuccess {
   query: Query!
@@ -2314,133 +2089,30 @@ type PublishSuccess {
 
 type Query {
   accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
-  accountBySlug(
-    """slug of the account"""
-    slug: String!
-  ): Account
+  accountBySlug(slug: String!): Account
   accountCreationValidate(input: AccountCreationValidateInput!): AccountCreationValidatePayload!
-
-  """Get branch by account slug, graph slug and the name of the branch."""
-  branch(
-    """slug of the account"""
-    accountSlug: String
-
-    """slug of the graph"""
-    graphSlug: String
-
-    """slug of the project"""
-    projectSlug: String
-
-    """name of the branch"""
-    name: String
-  ): Branch
-
-  """Get branch by domain."""
-  branchByDomain(
-    """domain"""
-    domain: String!
-  ): Branch
-
-  """Get custom domain by project id and name."""
-  customDomainByName(
-    """id of the project"""
-    graphId: ID
-
-    """id of the project"""
-    projectId: ID
-
-    """name of the domain"""
-    name: String!
-  ): CustomDomain
-
-  """Get deployment by ID."""
-  deployment(
-    """ID of the deployment"""
-    id: ID!
-  ): Deployment
-
-  """
-  Return a list of git accounts accessible by the current user sorted by the creation date.
-  """
+  branch(name: String, accountSlug: String, graphSlug: String, projectSlug: String): Branch
+  branchByDomain(domain: String!): Branch
+  customDomainByName(name: String!, projectId: ID, graphId: ID): CustomDomain
+  deployment(id: ID!): Deployment
+  dopplerConfigs(accountIntegrationId: ID!, dopplerProjectName: String!): [DopplerConfig!]!
+  dopplerProjects(accountIntegrationId: ID!): [DopplerProject!]!
   gitAccounts(provider: GitProvider!): GitAccountsPayload!
-
-  """
-  Return a list of git repositories accessible by the current user, sorted by updatedAt.
-  With `query` specified, the list will include up to 10 repos matching the query.
-  Without `query`, the list will include the 10 most recently updated repos.
-  """
-  gitRepos(provider: GitProvider!, gitAccountId: String!, query: String): [GitRepository!]!
-
-  """Returns details about a specific git repository identified by its URL."""
   gitRepoByUrl(url: Url!): GitRepository!
-
-  """
-  Returns the contents of the `schema.graphql` file located in a particular branch of a repository idenitifed by its URL.
-  """
-  schema(url: Url!, branch: String!): String
+  gitRepos(query: String, provider: GitProvider!, gitAccountId: String!): [GitRepository!]!
+  graphByAccountSlug(accountSlug: String!, graphSlug: String!): Graph
+  integrations: [Integration!]!
   invite(id: ID!): Invite
-
-  """Get a graph by account slug and slug of the graph itself."""
-  graphByAccountSlug(
-    """slug of the account"""
-    accountSlug: String!
-
-    """slug of the graph"""
-    graphSlug: String!
-  ): Graph
+  node(id: ID!): Node
+  schema(branch: String!, url: Url!): String
   schemaCheck(id: ID!): SchemaCheck
   schemaProposal(id: ID!): SchemaProposal
-
-  """Get subgraph."""
-  subgraph(
-    """account slug"""
-    accountSlug: String!
-
-    """project slug"""
-    projectSlug: String
-
-    """graph slug"""
-    graphSlug: String
-
-    """name of the branch"""
-    branch: String
-
-    """name of the subgraph"""
-    subgraphName: String!
-  ): Subgraph
   schemaVersion(id: ID!): SchemaVersion
-  schemaVersions(
-    """account slug"""
-    accountSlug: String!
-
-    """project slug"""
-    projectSlug: String
-
-    """graph slug"""
-    graphSlug: String
-
-    """name of the branch"""
-    branch: String
-
-    """name of the subgraph"""
-    subgraphName: String
-
-    """return only versions with changes"""
-    populated: Boolean! = true
-    after: String
-    before: String
-    first: Int
-    last: Int
-  ): SchemaVersionConnection!
+  schemaVersions(after: String, before: String, first: Int, last: Int, accountSlug: String!, graphSlug: String, projectSlug: String, branch: String, subgraphName: String, populated: Boolean! = true): SchemaVersionConnection!
+  subgraph(accountSlug: String!, graphSlug: String, projectSlug: String, branch: String, subgraphName: String!): Subgraph
   team(id: ID!): Team
-  teamBySlug(organizationSlug: String!, slug: String!): Team
-
-  """Give the actual connected user."""
+  teamBySlug(slug: String!, organizationSlug: String!): Team
   viewer: User
-  node(id: ID!): Node
-  integrations: [Integration!]!
-  dopplerProjects(accountIntegrationId: ID!): [DopplerProject!]!
-  dopplerConfigs(accountIntegrationId: ID!, dopplerProjectName: String!): [DopplerConfig!]!
 }
 
 type RepositoryContainsNoBranchesError {
@@ -2452,132 +2124,139 @@ type RepositorySlugInUseError {
 }
 
 type Request implements Node {
-  id: ID!
-  trace: Trace!
-  rootSpanId: ID!
-  startedAt: DateTime!
-  endedAt: DateTime!
-  httpRequestMethod: String!
-  httpStatusCode: Int!
-  urlPath: String!
-  userAgent: String!
   clientName: String!
   clientVersion: String!
+  endedAt: DateTime!
   errorCount: Int!
   errorCountByCode: [ErrorCountByCode!]!
+  httpRequestMethod: String!
+  httpStatusCode: Int!
+  id: ID!
   operations: [RequestOperation!]!
+  rootSpanId: ID!
+  startedAt: DateTime!
+  trace: Trace!
+  urlPath: String!
+  userAgent: String!
 }
 
 type RequestAnalytics {
-  timeSeries: RequestMetricsTimeSeries!
   metrics: RequestMetrics!
-  periodStart: DateTime!
   periodEnd: DateTime!
+  periodStart: DateTime!
   previousPeriodAnalytics: PreviousRequestAnalytcs
+  timeSeries: RequestMetricsTimeSeries!
 }
 
 type RequestConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [RequestEdge!]!
-
-  """A list of nodes."""
   nodes: [Request!]!
+  pageInfo: PageInfo!
 }
 
-"""An edge in a connection."""
 type RequestEdge {
-  """The item at the end of the edge"""
-  node: Request!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: Request!
 }
 
 input RequestFilters {
-  """Defaults to production branch"""
+  """
+  
+      Defaults to production branch
+      
+  """
   branchName: String
+  duration: DurationFilter
+  traceId: [String!]
 
   """
-  Use this if you really care about having a specific duration like 1 hour, 7 days, etc.
+  
+      Use this if you really care about having a specific duration like 1 hour, 7 days, etc.
+      
   """
   range: Duration
 
   """
-  Use this if you *at least* the data between `from` and `to` to be provided. You may get
-  more, but never less.
+  
+      Use this if you *at least* the data between `from` and `to` to be provided. You may get
+      more, but never less.
+      
   """
   from: DateTime
 
-  """To be used in conjunction with with either `range` or `from`."""
+  """
+  
+      To be used in conjunction with with either `range` or `from`.
+      
+  """
   to: DateTime!
   operationName: [String!]
-  operationType: [OperationType!]
   clientName: [String!]
 
-  """Only used if client name is specified."""
+  """
+  
+      Only used if client name is specified.
+      
+  """
   clientVersion: [String!]
-  traceId: [String!]
-  duration: DurationFilter
-  errorCode: [String!]
   httpStatusCode: [Int!]
+  operationType: [OperationType!]
+  errorCode: [String!]
 }
 
 type RequestLogEvent implements LogEvent {
-  id: String!
   branch: String!
-  environment: BranchEnvironment!
-  deploymentId: ID!
   createdAt: DateTime!
-  region: String!
-  logLevel: LogLevel!
-  url: String!
+  deploymentId: ID!
+  duration: Int!
+  environment: BranchEnvironment!
   httpMethod: String!
   httpStatus: Int!
-  duration: Int!
+  id: String!
+  logLevel: LogLevel!
   message: String!
+  region: String!
+  url: String!
 }
 
 type RequestMetrics {
-  requestCount: Int!
-  cacheableRequestCount: Int!
   cacheHitCount: Int!
   cacheMissCount: Int!
   cachePassCount: Int!
+  cacheableRequestCount: Int!
   error4XxCount: Int!
   error5XxCount: Int!
   errorGraphqlCount: Int!
   latencyMsP95: Int
   latencyMsP99: Int
+  requestCount: Int!
 }
 
 type RequestMetricsTimeSeries {
-  data: [RequestMetricsTimeSeriesDataPoint!]!
   aggregationStep: Duration!
+  data: [RequestMetricsTimeSeriesDataPoint!]!
 }
 
 type RequestMetricsTimeSeriesDataPoint {
-  dateTime: DateTime!
-  requestCount: Int!
-  cacheableRequestCount: Int!
   cacheHitCount: Int!
   cacheMissCount: Int!
   cachePassCount: Int!
+  cacheableRequestCount: Int!
+  dateTime: DateTime!
   error4XxCount: Int!
   error5XxCount: Int!
   errorGraphqlCount: Int!
   latencyMsP95: Int
   latencyMsP99: Int
+  requestCount: Int!
 }
 
 type RequestMetricsTimeSeriesDataPointV2 {
-  dateTime: DateTime!
-  count: Int!
   cacheHitCount: Int!
   cacheMissCount: Int!
   cachePassCount: Int!
+  count: Int!
+  dateTime: DateTime!
   error4XxCount: Int!
   error5XxCount: Int!
   errorGraphqlCount: Int!
@@ -2591,10 +2270,10 @@ type RequestMetricsTimeSeriesV2 {
 }
 
 type RequestMetricsV2 {
-  count: Int!
   cacheHitCount: Int!
   cacheMissCount: Int!
   cachePassCount: Int!
+  count: Int!
   error4XxCount: Int!
   error5XxCount: Int!
   errorGraphqlCount: Int!
@@ -2616,31 +2295,19 @@ type ReservedSlugsCheckError {
 }
 
 type ResourceStatus {
+  limit: Int
+  percentage: Float
+  remaining: Int
   unit: UnitType!
   used: Int!
-  limit: Int
-  remaining: Int
-  percentage: Float
 }
 
-"""
-An occurrence of a trusted document that was submitted again (same id), but with
-a different document text. This is an error.
-"""
 type ReusedId {
-  """The document id"""
   documentId: String!
-
-  """The existing document body"""
   existingDocumentText: String!
-
-  """The different, newly submitted document body"""
   newDocumentText: String!
 }
 
-"""
-Trusted documents that were uploaded again (same id), but with a different document body. This is an error.
-"""
 type ReusedIds {
   reused: [ReusedId!]!
 }
@@ -2717,47 +2384,38 @@ enum SchemaChangeType {
 }
 
 type SchemaCheck {
+  compositionCheckErrors: [CompositionCheckError!]!
+  createdAt: DateTime!
+  errorCount: Int!
+  gitCommit: SchemaCheckGitCommit
   id: ID!
+  lintCheckErrors: [LintCheckError!]!
+  operationCheckErrors: [OperationCheckError!]!
+  publishedSchemaVersion: ID @deprecated(reason: "This was never populated with relevant data")
   schema: String!
   subgraphName: String
-  publishedSchemaVersion: ID @deprecated(reason: "This was never populated with relevant data")
-  errorCount: Int!
   validationCheckErrors: [ValidationCheckError!]!
-  compositionCheckErrors: [CompositionCheckError!]!
-  operationCheckErrors: [OperationCheckError!]!
-  lintCheckErrors: [LintCheckError!]!
-  createdAt: DateTime!
-  gitCommit: SchemaCheckGitCommit
 }
 
 type SchemaCheckConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [SchemaCheckEdge!]!
-
-  """A list of nodes."""
   nodes: [SchemaCheck!]!
+  pageInfo: PageInfo!
 }
 
 input SchemaCheckCreateInput {
+  schema: String!
   accountSlug: String!
-  projectSlug: String
   graphSlug: String
+  projectSlug: String
   branch: String
   subgraphName: String
-  schema: String!
   gitCommit: SchemaCheckGitCommitInput
 }
 
-"""An edge in a connection."""
 type SchemaCheckEdge {
-  """The item at the end of the edge"""
-  node: SchemaCheck!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: SchemaCheck!
 }
 
 enum SchemaCheckErrorSeverity {
@@ -2766,34 +2424,34 @@ enum SchemaCheckErrorSeverity {
 }
 
 type SchemaCheckGitCommit {
+  authorAvatarUrl: String
+  authorName: String!
   branch: String!
   commitSha: String!
   commitUrl: String
   message: String!
-  authorName: String!
-  authorAvatarUrl: String
 }
 
 input SchemaCheckGitCommitInput {
+  message: String!
   branch: String!
+  authorAvatarUrl: String
   commitSha: String!
   commitUrl: String
-  message: String!
   authorName: String!
-  authorAvatarUrl: String
 }
 
-union SchemaCheckPayload = SchemaCheck | GraphBranchDoesNotExistError | ProjectBranchDoesNotExistError | GraphDoesNotExistError | ProjectDoesNotExistError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameProvidedOnStandaloneProjectError | SubgraphNameProvidedOnStandaloneGraphError | SubgraphNameMissingOnFederatedProjectError | SubgraphNameMissingOnFederatedGraphError
+union SchemaCheckPayload = GraphBranchDoesNotExistError | GraphDoesNotExistError | ProjectBranchDoesNotExistError | ProjectDoesNotExistError | SchemaCheck | SubgraphNameMissingOnFederatedGraphError | SubgraphNameMissingOnFederatedProjectError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameProvidedOnStandaloneGraphError | SubgraphNameProvidedOnStandaloneProjectError
 
 type SchemaProposal {
-  id: ID!
-  title: String!
   author: User
-  description: String
-  status: SchemaProposalStatus!
   createdAt: DateTime!
+  description: String
+  id: ID!
+  status: SchemaProposalStatus!
   subgraph(subgraphName: String!): SchemaProposalSubgraph
   subgraphs: [SchemaProposalSubgraph!]!
+  title: String!
 }
 
 input SchemaProposalApproveInput {
@@ -2807,14 +2465,9 @@ type SchemaProposalApproveSuccess {
 }
 
 type SchemaProposalConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [SchemaProposalEdge!]!
-
-  """A list of nodes."""
   nodes: [SchemaProposal!]!
+  pageInfo: PageInfo!
 }
 
 input SchemaProposalCreateInput {
@@ -2826,8 +2479,8 @@ input SchemaProposalCreateInput {
 union SchemaProposalCreatePayload = SchemaProposalCreateSuccess
 
 type SchemaProposalCreateSuccess {
-  schemaProposal: SchemaProposal!
   query: Query!
+  schemaProposal: SchemaProposal!
 }
 
 union SchemaProposalDeletePayload = SchemaProposalDeleteSuccess | SchemaProposalDoesNotExistError
@@ -2840,33 +2493,29 @@ type SchemaProposalDoesNotExistError {
   query: Query!
 }
 
-"""An edge in a connection."""
 type SchemaProposalEdge {
-  """The item at the end of the edge"""
-  node: SchemaProposal!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: SchemaProposal!
 }
 
 input SchemaProposalEditInput {
-  schemaProposalId: ID!
   subgraphs: [SchemaProposalEditSubgraph!]!
   description: String
+  schemaProposalId: ID!
 }
 
 type SchemaProposalEditParserError {
-  subgraphName: String!
   error: String!
-  spanStart: Int!
   spanEnd: Int!
+  spanStart: Int!
+  subgraphName: String!
 }
 
 type SchemaProposalEditParserErrors {
   errors: [SchemaProposalEditParserError!]!
 }
 
-union SchemaProposalEditPayload = SchemaProposalEditSuccess | SchemaProposalDoesNotExistError | SchemaProposalEditParserErrors
+union SchemaProposalEditPayload = SchemaProposalDoesNotExistError | SchemaProposalEditParserErrors | SchemaProposalEditSuccess
 
 input SchemaProposalEditSubgraph {
   name: String!
@@ -2902,18 +2551,18 @@ type SchemaProposalRequestReviewSuccess {
 }
 
 enum SchemaProposalStatus {
-  APPROVED
   DRAFT
+  APPROVED
   IMPLEMENTED
   REJECTED
   IN_REVIEW
 }
 
 type SchemaProposalSubgraph {
+  diffSnippets: [DiffSnippet!]!
+  name: String!
   sdl: String
   status: SchemaProposalSubgraphStatus!
-  name: String!
-  diffSnippets: [DiffSnippet!]!
 }
 
 enum SchemaProposalSubgraphStatus {
@@ -2928,72 +2577,48 @@ type SchemaRegistryBranchDoesNotExistError {
 }
 
 type SchemaVersion {
-  id: ID!
-  schema: String!
-  delta: SchemaVersionDelta!
   changes(after: String, before: String, first: Int, last: Int): SchemaVersionChangeConnection!
   createdAt: DateTime!
+  delta: SchemaVersionDelta!
+  id: ID!
   message: String
+  schema: String!
 }
 
 type SchemaVersionChange {
+  message: String!
   path: String
   type: SchemaChangeType!
-  message: String!
 }
 
 type SchemaVersionChangeConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [SchemaVersionChangeEdge!]!
-
-  """A list of nodes."""
   nodes: [SchemaVersionChange!]!
+  pageInfo: PageInfo!
 }
 
-"""An edge in a connection."""
 type SchemaVersionChangeEdge {
-  """The item at the end of the edge"""
-  node: SchemaVersionChange!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: SchemaVersionChange!
 }
 
 type SchemaVersionConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [SchemaVersionEdge!]!
-
-  """A list of nodes."""
   nodes: [SchemaVersion!]!
+  pageInfo: PageInfo!
 }
 
 type SchemaVersionDelta {
-  """Additions."""
   added: Int!
-
-  """Removals."""
-  removed: Int!
-
-  """Modifications."""
   modified: Int!
+  removed: Int!
 }
 
-"""An edge in a connection."""
 type SchemaVersionEdge {
-  """The item at the end of the edge"""
-  node: SchemaVersion!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: SchemaVersion!
 }
 
-"""A Slack channel returned from the Slack API."""
 type SlackChannel {
   id: String!
   name: String!
@@ -3005,23 +2630,26 @@ type SlackIntegration {
 }
 
 input SlackIntegrationCreateInput {
-  tokenId: String!
-
-  """The graph_id field is deprecated. Pass branch_id instead."""
+  """
+  
+      The graph_id field is deprecated. Pass branch_id instead.
+      
+  """
   graphId: String
   branchId: ID
+  tokenId: String!
   channelId: String!
   channelName: String!
 }
 
 type SlackNotification {
-  id: String!
-  graphId: String! @deprecated(reason: "Graphs are being removed. Please use SlackNotification.branch_id instead")
   branchId: String!
   channelName: String!
+  graphId: String! @deprecated(reason: "Graphs are being removed. Please use SlackNotification.branch_id instead")
+  id: String!
 }
 
-union SlackNotificationCreatePayload = SlackNotification | ProjectDoesNotExistError
+union SlackNotificationCreatePayload = ProjectDoesNotExistError | SlackNotification
 
 union SlackNotificationDeletePayload = Query
 
@@ -3030,9 +2658,9 @@ type SlugAlreadyExistsError {
 }
 
 type SlugError {
-  message: String!
   actual: String!
   expected: String!
+  message: String!
   query: Query!
 }
 
@@ -3057,15 +2685,15 @@ type StandaloneGraphsNoLongerSupportedError {
 
 type StripeCard {
   brand: String!
-  funding: String!
   expMonth: Int!
   expYear: Int!
+  funding: String!
   last4: String!
 }
 
 type StripeCustomer {
   id: String!
-  paymentMethods(type: StripePaymentMethodType, endingBefore: String, startingAfter: String, limit: Int): StripePaginatedPaymentMethods!
+  paymentMethods(limit: Int, type: StripePaymentMethodType, endingBefore: String, startingAfter: String): StripePaginatedPaymentMethods!
 }
 
 type StripePaginatedPaymentMethods {
@@ -3075,9 +2703,9 @@ type StripePaginatedPaymentMethods {
 }
 
 type StripePaymentMethod {
-  id: String!
-  created: DateTime!
   card: StripeCard
+  created: DateTime!
+  id: String!
   type: StripePaymentMethodType!
 }
 
@@ -3114,24 +2742,24 @@ enum StripePaymentMethodType {
 }
 
 type StripeSetupIntent {
-  id: String!
   clientSecret: String!
+  id: String!
 }
 
 union StripeSetupIntentCreatePayload = StripeSetupIntentCreateSuccess
 
 type StripeSetupIntentCreateSuccess {
-  setupIntent: StripeSetupIntent!
   query: Query!
+  setupIntent: StripeSetupIntent!
 }
 
 type Subgraph {
-  name: String!
-  url: String!
-  schema: String!
   createdAt: DateTime!
-  updatedAt: DateTime!
+  name: String!
   owners: [Team!]!
+  schema: String!
+  updatedAt: DateTime!
+  url: String!
 }
 
 union SubgraphAddOwnerPayload = SubgraphAddOwnerSuccess
@@ -3172,19 +2800,13 @@ type SubgraphRemoveOwnerSuccess {
 
 type Team implements Node {
   id: ID!
-  name: String!
-  slug: String!
-
-  """The users that are part of the team"""
   members(after: String, first: Int): UserConnection!
-  parentTeamId: ID
-
-  """The team this team is member of, if any."""
+  name: String!
   parent: Team
-
-  """The teams that are part of the team"""
-  subteams(after: String, first: Int): TeamConnection!
+  parentTeamId: ID
   query: Query!
+  slug: String!
+  subteams(after: String, first: Int): TeamConnection!
 }
 
 union TeamAddMemberPayload = TeamAddMemberSuccess | TeamDoesNotExistError
@@ -3200,17 +2822,12 @@ type TeamAssignRoleSuccess {
 }
 
 type TeamConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [TeamEdge!]!
-
-  """A list of nodes."""
   nodes: [Team!]!
+  pageInfo: PageInfo!
 }
 
-union TeamCreatePayload = Team | OrganizationDoesNotExistError | TeamNameAlreadyTakenError
+union TeamCreatePayload = OrganizationDoesNotExistError | Team | TeamNameAlreadyTakenError
 
 union TeamDeletePayload = TeamDeleteSuccess | TeamDoesNotExistError
 
@@ -3222,31 +2839,24 @@ type TeamDoesNotExistError {
   query: Query!
 }
 
-"""An edge in a connection."""
 type TeamEdge {
-  """The item at the end of the edge"""
-  node: Team!
-
-  """A cursor for use in pagination"""
   cursor: String!
+  node: Team!
 }
 
 type TeamNameAlreadyTakenError {
   query: Query!
 }
 
-union TeamRemoveMemberPayload = TeamRemoveMemberSuccess | TeamDoesNotExistError
+union TeamRemoveMemberPayload = TeamDoesNotExistError | TeamRemoveMemberSuccess
 
 type TeamRemoveMemberSuccess {
   query: Query!
 }
 
 enum TeamRole {
-  """__Team__ admin"""
-  ADMIN
-
-  """Regular non-admin member."""
   MEMBER
+  ADMIN
 }
 
 type TemplateDoesNotExistError {
@@ -3260,9 +2870,9 @@ enum TimeAggregationGranularity {
 }
 
 type TimeSeries {
-  unit: UnitType!
   data: [TimeSeriesDataPoint!]!
   statistics: TimeSeriesStatistics!
+  unit: UnitType!
 }
 
 type TimeSeriesDataPoint {
@@ -3287,38 +2897,38 @@ type TooManyCustomDomainsError {
 }
 
 type TopClientByNameAndVersionOrderedByHighestCount {
+  count: Int!
   name: String!
   version: String!
-  count: Int!
 }
 
 type TopClientByNameAndVersionOrderedByHighestErrorRatio {
-  name: String!
-  version: String!
   count: Int!
   errorCount: Int!
+  name: String!
+  version: String!
 }
 
 type TopClientByNameAndVersionOrderedByHighestLatency {
+  latencyMs: Int!
   name: String!
   version: String!
-  latencyMs: Int!
 }
 
 type TopClientByNameOrderedByHighestCount {
-  name: String!
   count: Int!
+  name: String!
 }
 
 type TopClientByNameOrderedByHighestErrorRatio {
-  name: String!
   count: Int!
   errorCount: Int!
+  name: String!
 }
 
 type TopClientByNameOrderedByHighestLatency {
-  name: String!
   latencyMs: Int!
+  name: String!
 }
 
 type TopClients {
@@ -3327,15 +2937,15 @@ type TopClients {
 }
 
 type TopClientsByName {
-  orderedByHighestLatency: [TopClientByNameOrderedByHighestLatency!]!
   orderedByHighestCount: [TopClientByNameOrderedByHighestCount!]!
   orderedByHighestErrorRatio: [TopClientByNameOrderedByHighestErrorRatio!]!
+  orderedByHighestLatency: [TopClientByNameOrderedByHighestLatency!]!
 }
 
 type TopClientsByNameAndVersion {
-  orderedByHighestLatency: [TopClientByNameAndVersionOrderedByHighestLatency!]!
   orderedByHighestCount: [TopClientByNameAndVersionOrderedByHighestCount!]!
   orderedByHighestErrorRatio: [TopClientByNameAndVersionOrderedByHighestErrorRatio!]!
+  orderedByHighestLatency: [TopClientByNameAndVersionOrderedByHighestLatency!]!
 }
 
 type TopClientsForField {
@@ -3352,38 +2962,38 @@ type TopClientsForFieldByNameAndVersion {
 }
 
 type TopOperationByNameAndHashOrderedByHighestCount {
+  count: Int!
   name: String!
   normalizedQueryHash: OperationNormalizedQueryHash!
-  count: Int!
 }
 
 type TopOperationByNameAndHashOrderedByHighestErrorRatio {
-  name: String!
-  normalizedQueryHash: OperationNormalizedQueryHash!
   count: Int!
   errorCount: Int!
+  name: String!
+  normalizedQueryHash: OperationNormalizedQueryHash!
 }
 
 type TopOperationByNameAndHashOrderedByHighestLatency {
+  latencyMs: Int!
   name: String!
   normalizedQueryHash: OperationNormalizedQueryHash!
-  latencyMs: Int!
 }
 
 type TopOperationByNameOrderedByHighestCount {
-  name: String!
   count: Int!
+  name: String!
 }
 
 type TopOperationByNameOrderedByHighestErrorRatio {
-  name: String!
   count: Int!
   errorCount: Int!
+  name: String!
 }
 
 type TopOperationByNameOrderedByHighestLatency {
-  name: String!
   latencyMs: Int!
+  name: String!
 }
 
 type TopOperations {
@@ -3392,15 +3002,15 @@ type TopOperations {
 }
 
 type TopOperationsByName {
-  orderedByHighestLatency: [TopOperationByNameOrderedByHighestLatency!]!
   orderedByHighestCount: [TopOperationByNameOrderedByHighestCount!]!
   orderedByHighestErrorRatio: [TopOperationByNameOrderedByHighestErrorRatio!]!
+  orderedByHighestLatency: [TopOperationByNameOrderedByHighestLatency!]!
 }
 
 type TopOperationsByNameAndHash {
-  orderedByHighestLatency: [TopOperationByNameAndHashOrderedByHighestLatency!]!
   orderedByHighestCount: [TopOperationByNameAndHashOrderedByHighestCount!]!
   orderedByHighestErrorRatio: [TopOperationByNameAndHashOrderedByHighestErrorRatio!]!
+  orderedByHighestLatency: [TopOperationByNameAndHashOrderedByHighestLatency!]!
 }
 
 type Trace {
@@ -3410,23 +3020,18 @@ type Trace {
 }
 
 type TraceSpan {
-  id: ID!
-  parentId: ID
-  name: String!
-  startedAt: DateTime!
-  endedAt: DateTime!
-  statusCode: TraceSpanStatusCode
-
-  """
-  Attributes are key-value pairs that represent additional information about the span.
-  It's always a map of strings to strings.
-  """
   attributes: JSON!
+  endedAt: DateTime!
+  id: ID!
+  name: String!
+  parentId: ID
+  startedAt: DateTime!
+  statusCode: TraceSpanStatusCode
 }
 
 enum TraceSpanStatusCode {
-  OK
   ERROR
+  OK
 }
 
 type TrustedDocument {
@@ -3439,7 +3044,7 @@ input TrustedDocumentInput {
   documentText: String!
 }
 
-union TrustedDocumentsSubmitPayload = TrustedDocumentsSubmitSuccess | ReusedIds | GraphDoesNotExistError | ProjectDoesNotExistError | OldAccessTokenError
+union TrustedDocumentsSubmitPayload = GraphDoesNotExistError | OldAccessTokenError | ProjectDoesNotExistError | ReusedIds | TrustedDocumentsSubmitSuccess
 
 type TrustedDocumentsSubmitSuccess {
   count: Int!
@@ -3452,47 +3057,35 @@ enum UnitType {
   BYTES
 }
 
-"""
-URL is a String implementing the [URL Standard](http://url.spec.whatwg.org/)
-"""
 scalar Url
 
 type User implements Node {
-  id: ID!
-  name: String!
-  email: String!
   avatarUrl: String
   createdAt: DateTime!
-  organizations(after: String, before: String, first: Int, last: Int): OrganizationConnection!
+  email: String!
+  id: ID!
+  name: String!
   organizationMemberships: [Member!]!
+  organizations(after: String, before: String, first: Int, last: Int): OrganizationConnection!
   personalAccount: PersonalAccount
 }
 
 type UserConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [UserEdge!]!
-
-  """A list of nodes."""
   nodes: [User!]!
+  pageInfo: PageInfo!
   totalCount: Int!
 }
 
-"""An edge in a connection."""
 type UserEdge {
-  """The item at the end of the edge"""
+  cursor: String!
   node: User!
   role: TeamRole!
-
-  """A cursor for use in pagination"""
-  cursor: String!
 }
 
 type ValidationCheckError {
-  title: String!
   message: String!
+  title: String!
 }
 
 type ValueTooLongError {
