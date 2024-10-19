@@ -6944,6 +6944,11 @@ type IssueArchivePayload implements ArchivePayload {
   entity: Issue
 }
 
+input IssueBatchCreateInput {
+  """The issues to create."""
+  issues: [IssueCreateInput!]!
+}
+
 type IssueBatchPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -10838,6 +10843,12 @@ type Mutation {
     """The issue object to create."""
     input: IssueCreateInput!
   ): IssuePayload!
+
+  """Creates a list of issues in one transaction."""
+  issueBatchCreate(
+    """A list of issue objects to create."""
+    input: IssueBatchCreateInput!
+  ): IssueBatchPayload!
 
   """Updates an issue."""
   issueUpdate(
@@ -22505,6 +22516,11 @@ type UserSettings implements Node {
 
   """Whether to show full user names instead of display names."""
   showFullUserNames: Boolean!
+
+  """
+  Whether to auto-assign newly created issues to the current user by default.
+  """
+  autoAssignToSelf: Boolean!
 }
 
 type UserSettingsFlagPayload {
