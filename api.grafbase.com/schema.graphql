@@ -133,14 +133,14 @@ type AccountResourcesStatus {
 }
 
 type AccountResourcesUsage {
-  buildDuration: TimeSeries!
+  buildDuration: TimeSeries! @deprecated(reason: "to be removed soon")
   execUnits: TimeSeries!
   granularity: TimeAggregationGranularity!
   requestCount: TimeSeries!
-  serverlessFunctionDuration: TimeSeries!
-  serverlessFunctionInvocationCount: TimeSeries!
-  udfExecUnits: TimeSeries!
-  udfRequestCount: TimeSeries!
+  serverlessFunctionDuration: TimeSeries! @deprecated(reason: "to be removed soon")
+  serverlessFunctionInvocationCount: TimeSeries! @deprecated(reason: "to be removed soon")
+  udfExecUnits: TimeSeries! @deprecated(reason: "to be removed soon")
+  udfRequestCount: TimeSeries! @deprecated(reason: "to be removed soon")
 }
 
 """
@@ -818,8 +818,8 @@ type GitRepository {
 }
 
 enum GrafbasePlan {
-  HOBBY
-  PRO
+  HOBBY @deprecated(reason: "to be removed soon")
+  PRO @deprecated(reason: "to be removed soon")
   TRIAL
   ENTERPRISE
 }
@@ -1137,7 +1137,7 @@ type GraphIntegrationMutationSuccess {
 }
 
 enum GraphMode {
-  MANAGED
+  MANAGED @deprecated(reason: "to be removed soon")
   SELF_HOSTED
 }
 
@@ -1250,7 +1250,7 @@ enum GraphStatus {
 }
 
 enum GraphType {
-  STANDALONE
+  STANDALONE @deprecated(reason: "to be removed soon")
   FEDERATED
 }
 
@@ -1565,6 +1565,8 @@ type Mutation {
   publish(input: PublishInput!): PublishPayload!
   schemaCheckCreate(input: SchemaCheckCreateInput!): SchemaCheckPayload!
   schemaProposalApprove(input: SchemaProposalApproveInput!): SchemaProposalApprovePayload!
+  schemaProposalCommentReply(parentCommentId: ID!, text: String!): SchemaProposalCommentReplyPayload!
+  schemaProposalCommentThreadCreate(input: SchemaProposalCommentThreadCreateInput!): SchemaProposalCommentThreadCreatePayload!
   schemaProposalCreate(input: SchemaProposalCreateInput!): SchemaProposalCreatePayload!
   schemaProposalDelete(id: ID!): SchemaProposalDeletePayload!
   schemaProposalEdit(input: SchemaProposalEditInput!): SchemaProposalEditPayload!
@@ -1882,7 +1884,7 @@ type Organization implements Account & Node {
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
   graphsCountStatus: ResourceStatus!
   id: ID!
-  integrations: [AccountIntegration!]!
+  integrations: [AccountIntegration!]! @deprecated(reason: "to be removed soon")
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
   name: String!
@@ -1897,6 +1899,7 @@ type Organization implements Account & Node {
   status: AccountStatus!
   stripeCustomer: StripeCustomer
   teams(after: String, first: Int): TeamConnection!
+  trialExpiresAt: DateTime
 }
 
 type OrganizationConnection {
@@ -1909,10 +1912,10 @@ input OrganizationCreateInput {
   name: String!
   slug: String!
   email: String
-  stripePaymentMethodId: String!
+  stripePaymentMethodId: String
 }
 
-union OrganizationCreatePayload = NameSizeCheckError | OrganizationCreateSuccess | ReservedSlugsCheckError | SlugAlreadyExistsError | SlugError | SlugSizeCheckError
+union OrganizationCreatePayload = NameSizeCheckError | OrganizationCreateSuccess | ReservedSlugsCheckError | SlugAlreadyExistsError | SlugError | SlugSizeCheckError | TrialPlanUnavailableError
 
 type OrganizationCreateSuccess {
   member: Member!
@@ -2464,6 +2467,106 @@ type SchemaProposalApproveSuccess {
   query: Query!
 }
 
+interface SchemaProposalComment {
+  author: User
+  createdAt: DateTime!
+  id: ID!
+  text: String!
+}
+
+type SchemaProposalCommentOnLine implements SchemaProposalComment {
+  author: User
+  createdAt: DateTime!
+  id: ID!
+  line: Int
+  replies: [SchemaProposalReply!]!
+  subgraphName: String!
+  text: String!
+}
+
+type SchemaProposalCommentOnProposal implements SchemaProposalComment {
+  author: User
+  createdAt: DateTime!
+  id: ID!
+  replies: [SchemaProposalReply!]!
+  text: String!
+}
+
+type SchemaProposalCommentOnSdl implements SchemaProposalComment {
+  author: User
+  createdAt: DateTime!
+  id: ID!
+  replies: [SchemaProposalReply!]!
+  text: String!
+}
+
+union SchemaProposalCommentReplyPayload = SchemaProposalCommentReplySuccess
+
+type SchemaProposalCommentReplySuccess {
+  query: Query!
+}
+
+input SchemaProposalCommentThreadCreateInput {
+  """
+  
+      The content of the comment.
+      
+  """
+  text: String!
+
+  """
+  
+      Must be provided if and only if location is Line.
+      
+  """
+  subgraphName: String
+
+  """
+  
+      Must be provided if and only if location is Line.
+      
+  """
+  line: Int
+
+  """
+  
+      The parent schema proposal.
+      
+  """
+  schemaProposalId: ID!
+
+  """
+  
+      Where the comment is located.
+      
+  """
+  location: SchemaProposalCommentThreadLocation!
+
+  """
+  
+      The whole subgraph schema being commented on. Must be provided if and only if location is Line.
+      
+      This argument is necessary to avoid cases where the schema has been updated
+  between the time it was retried and the time the comment is posted. In these
+  cases, if we use the latest subgraph schema, the line numbers may have changed
+  and the comment would end up in the wrong place.
+      
+  """
+  subgraphSchema: String
+}
+
+union SchemaProposalCommentThreadCreatePayload = SchemaProposalCommentThreadCreateSuccess
+
+type SchemaProposalCommentThreadCreateSuccess {
+  query: Query!
+}
+
+enum SchemaProposalCommentThreadLocation {
+  LINE
+  SDL
+  PROPOSAL
+}
+
 type SchemaProposalConnection {
   edges: [SchemaProposalEdge!]!
   nodes: [SchemaProposal!]!
@@ -2540,6 +2643,13 @@ type SchemaProposalRejectSuccess {
   query: Query!
 }
 
+type SchemaProposalReply implements SchemaProposalComment {
+  author: User
+  createdAt: DateTime!
+  id: ID!
+  text: String!
+}
+
 input SchemaProposalRequestReviewInput {
   id: ID!
 }
@@ -2559,6 +2669,7 @@ enum SchemaProposalStatus {
 }
 
 type SchemaProposalSubgraph {
+  comments: [SchemaProposalComment!]!
   diffSnippets: [DiffSnippet!]!
   name: String!
   sdl: String
@@ -3034,6 +3145,10 @@ enum TraceSpanStatusCode {
   OK
 }
 
+type TrialPlanUnavailableError {
+  query: Query!
+}
+
 type TrustedDocument {
   documentId: String!
   documentText: String!
@@ -3061,6 +3176,7 @@ scalar Url
 
 type User implements Node {
   avatarUrl: String
+  canStartNewTrial: Boolean!
   createdAt: DateTime!
   email: String!
   id: ID!
