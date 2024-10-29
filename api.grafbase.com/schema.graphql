@@ -1567,6 +1567,7 @@ type Mutation {
   schemaProposalApprove(input: SchemaProposalApproveInput!): SchemaProposalApprovePayload!
   schemaProposalCommentReply(parentCommentId: ID!, text: String!): SchemaProposalCommentReplyPayload!
   schemaProposalCommentThreadCreate(input: SchemaProposalCommentThreadCreateInput!): SchemaProposalCommentThreadCreatePayload!
+  schemaProposalCommentThreadResolve(rootCommentId: ID!): SchemaProposalCommentThreadResolvePayload!
   schemaProposalCreate(input: SchemaProposalCreateInput!): SchemaProposalCreatePayload!
   schemaProposalDelete(id: ID!): SchemaProposalDeletePayload!
   schemaProposalEdit(input: SchemaProposalEditInput!): SchemaProposalEditPayload!
@@ -2480,6 +2481,7 @@ type SchemaProposalCommentOnLine implements SchemaProposalComment {
   id: ID!
   line: Int
   replies: [SchemaProposalReply!]!
+  resolved: Boolean!
   subgraphName: String!
   text: String!
 }
@@ -2497,6 +2499,7 @@ type SchemaProposalCommentOnSdl implements SchemaProposalComment {
   createdAt: DateTime!
   id: ID!
   replies: [SchemaProposalReply!]!
+  resolved: Boolean!
   text: String!
 }
 
@@ -2565,6 +2568,13 @@ enum SchemaProposalCommentThreadLocation {
   LINE
   SDL
   PROPOSAL
+}
+
+union SchemaProposalCommentThreadResolvePayload = SchemaProposalCommentThreadResolveSuccess
+
+type SchemaProposalCommentThreadResolveSuccess {
+  affectedRows: Int!
+  query: Query!
 }
 
 type SchemaProposalConnection {
