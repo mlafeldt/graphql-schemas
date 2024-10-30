@@ -3910,6 +3910,12 @@ type Draft implements Node {
   """The project update for which this is a draft comment."""
   projectUpdate: ProjectUpdate
 
+  """[INTERNAL] The initiative for which this is a draft initiative update."""
+  initiative: Initiative
+
+  """[INTERNAL] The initiative update for which this is a draft comment."""
+  initiativeUpdate: InitiativeUpdate
+
   """The post for which this is a draft comment."""
   post: Post
 
@@ -4638,7 +4644,7 @@ input FavoriteUpdateInput {
   folderName: String
 }
 
-"""A feature flag for a project."""
+"""A feature flag for a project or an issue."""
 type FeatureFlag implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -4678,8 +4684,11 @@ type FeatureFlag implements Node {
   """The organization of the feature flag."""
   organization: Organization!
 
+  """The issue the feature flag is associated with."""
+  issue: Issue
+
   """The project the feature flag is associated with."""
-  project: Project!
+  project: Project
 
   """The integration providing the feature flag."""
   integration: Integration!
@@ -4804,6 +4813,9 @@ type FeedItem implements Node {
 
   """The project update that is in the feed."""
   projectUpdate: ProjectUpdate
+
+  """The initiative update that is in the feed."""
+  initiativeUpdate: InitiativeUpdate
 
   """The post that is in the feed."""
   post: Post
@@ -16913,6 +16925,9 @@ type ProjectUpdateInteraction implements Node {
   """The unique identifier of the entity."""
   id: ID!
 
+  """The time at which the user read the project update."""
+  readAt: DateTime!
+
   """The time at which the entity was created."""
   createdAt: DateTime!
 
@@ -16927,14 +16942,11 @@ type ProjectUpdateInteraction implements Node {
   """
   archivedAt: DateTime
 
-  """The user that has interacted with the project update."""
-  user: User!
-
   """The project update that has been interacted with."""
   projectUpdate: ProjectUpdate!
 
-  """The time at which the user read the project update."""
-  readAt: DateTime!
+  """The user that has interacted with the project update."""
+  user: User!
 }
 
 type ProjectUpdateInteractionConnection {
@@ -21782,64 +21794,6 @@ input TriageResponsibilityUpdateInput {
   timeScheduleId: String
 }
 
-"""An update for project/initiative"""
-type Update implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The update content in markdown format."""
-  body: String!
-
-  """The project that the update is associated with."""
-  project: Project
-
-  """The initiative that the update is associated with."""
-  initiative: Initiative
-
-  """The health at the time of the update."""
-  health: UpdateHealthType!
-
-  """The user who wrote the update."""
-  user: User!
-
-  """The time the update was edited."""
-  editedAt: DateTime
-
-  """
-  [Internal] Serialized JSON representing current state of the project/initiative properties when posting the update.
-  """
-  infoSnapshot: JSONObject
-
-  """Whether update diff should be hidden."""
-  isDiffHidden: Boolean!
-
-  """[Internal] The content of the update as a Prosemirror document."""
-  bodyData: String!
-
-  """The update's unique URL slug."""
-  slugId: String!
-}
-
-type UpdateConnection {
-  edges: [UpdateEdge!]!
-  nodes: [Update!]!
-  pageInfo: PageInfo!
-}
-
 """Issue update date sorting options."""
 input UpdatedAtSort {
   """Whether nulls should be sorted first or last"""
@@ -21847,20 +21801,6 @@ input UpdatedAtSort {
 
   """The order for the individual sort"""
   order: PaginationSortOrder
-}
-
-type UpdateEdge {
-  node: Update!
-
-  """Used in `before` and `after` args"""
-  cursor: String!
-}
-
-"""The health type when the update is created."""
-enum UpdateHealthType {
-  onTrack
-  atRisk
-  offTrack
 }
 
 """Object representing Google Cloud upload policy, plus additional data."""
@@ -22515,6 +22455,9 @@ type UserSettings implements Node {
 
   """The notification channel settings the user has selected."""
   notificationPreferences: JSONObject!
+
+  """The notification category preferences for the user."""
+  notificationCategoryPreferences: JSONObject!
 
   """The notification delivery preferences for the user."""
   notificationDeliveryPreferences: NotificationDeliveryPreferences!
