@@ -2455,6 +2455,7 @@ type SchemaProposal {
   createdAt: DateTime!
   description: String
   id: ID!
+  revision: Int!
   status: SchemaProposalStatus!
   subgraph(subgraphName: String!): SchemaProposalSubgraph
   subgraphs: [SchemaProposalSubgraph!]!
@@ -2553,7 +2554,8 @@ input SchemaProposalCommentThreadCreateInput {
 
   """
   
-      The whole subgraph schema being commented on. Must be provided if and only if location is Line.
+      The revision / version number of the proposal, obtained from
+  SchemaProposal.revision. Must be provided if and only if location is Line.
       
       This argument is necessary to avoid cases where the schema has been updated
   between the time it was retried and the time the comment is posted. In these
@@ -2561,10 +2563,10 @@ input SchemaProposalCommentThreadCreateInput {
   and the comment would end up in the wrong place.
       
   """
-  subgraphSchema: String
+  proposalRevision: Int
 }
 
-union SchemaProposalCommentThreadCreatePayload = SchemaProposalCommentThreadCreateSuccess
+union SchemaProposalCommentThreadCreatePayload = SchemaProposalCommentThreadCreateSuccess | SchemaProposalDoesNotExistError
 
 type SchemaProposalCommentThreadCreateSuccess {
   query: Query!
