@@ -1791,6 +1791,18 @@ type CustomerNeed implements Node {
   creator: User
 }
 
+"""A generic payload return from entity archive mutations."""
+type CustomerNeedArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: CustomerNeed
+}
+
 """Customer needs filtering options."""
 input CustomerNeedCollectionFilter {
   """Comparator for the identifier."""
@@ -9721,6 +9733,12 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """[ALPHA] Archives a customer need."""
+  customerNeedArchive(
+    """The identifier of the customer need to delete."""
+    id: String!
+  ): CustomerNeedArchivePayload!
+
   """[ALPHA] Creates a new customer."""
   customerCreate(
     """The customer to create."""
@@ -10119,12 +10137,18 @@ type Mutation {
 
   """Connects the organization with the GitHub App."""
   integrationGithubConnect(
+    """The GitHub grant code that's exchanged for OAuth tokens."""
+    code: String!
+
     """The GitHub data to connect with."""
     installationId: String!
   ): IntegrationPayload!
 
   """Connects the organization with the GitHub Import App."""
   integrationGithubImportConnect(
+    """The GitHub grant code that's exchanged for OAuth tokens."""
+    code: String!
+
     """The GitHub data to connect with."""
     installationId: String!
   ): IntegrationPayload!
@@ -11752,6 +11776,106 @@ type NotificationBatchActionPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""A user's notification category preferences."""
+type NotificationCategoryPreferences {
+  """The preferences for notifications about assignments."""
+  assignments: NotificationCategoryPreferencesChannel
+
+  """The preferences for notifications about status changes."""
+  statusChanges: NotificationCategoryPreferencesChannel
+
+  """The preferences for notifications about comments and replies."""
+  commentsAndReplies: NotificationCategoryPreferencesChannel
+
+  """The preferences for notifications about mentions."""
+  mentions: NotificationCategoryPreferencesChannel
+
+  """The preferences for notifications about reactions."""
+  reactions: NotificationCategoryPreferencesChannel
+
+  """The preferences for notifications about subscriptions."""
+  subscriptions: NotificationCategoryPreferencesChannel
+
+  """The preferences for notifications about document changes."""
+  documentChanges: NotificationCategoryPreferencesChannel
+
+  """The preferences for notifications about posts and updates."""
+  postsAndUpdates: NotificationCategoryPreferencesChannel
+
+  """The preferences for notifications about reminders."""
+  reminders: NotificationCategoryPreferencesChannel
+
+  """The preferences for notifications about reviews."""
+  reviews: NotificationCategoryPreferencesChannel
+
+  """The preferences for notifications about apps and integrations."""
+  appsAndIntegrations: NotificationCategoryPreferencesChannel
+}
+
+"""A user's notification category preferences for a channel."""
+type NotificationCategoryPreferencesChannel {
+  """Whether notifications are enabled for this category for mobile."""
+  mobile: Boolean!
+
+  """Whether notifications are enabled for this category for desktop."""
+  desktop: Boolean!
+
+  """Whether notifications are enabled for this category for email."""
+  email: Boolean!
+
+  """Whether notifications are enabled for this category for Slack."""
+  slack: Boolean!
+}
+
+input NotificationCategoryPreferencesChannelInput {
+  """Whether notifications are enabled for this category for mobile."""
+  mobile: Boolean!
+
+  """Whether notifications are enabled for this category for desktop."""
+  desktop: Boolean!
+
+  """Whether notifications are enabled for this category for email."""
+  email: Boolean!
+
+  """Whether notifications are enabled for this category for Slack."""
+  slack: Boolean!
+}
+
+input NotificationCategoryPreferencesInput {
+  """The preferences for notifications about assignments."""
+  assignments: NotificationCategoryPreferencesChannelInput
+
+  """The preferences for notifications about status changes."""
+  statusChanges: NotificationCategoryPreferencesChannelInput
+
+  """The preferences for notifications about comments and replies."""
+  commentsAndReplies: NotificationCategoryPreferencesChannelInput
+
+  """The preferences for notifications about mentions."""
+  mentions: NotificationCategoryPreferencesChannelInput
+
+  """The preferences for notifications about reactions."""
+  reactions: NotificationCategoryPreferencesChannelInput
+
+  """The preferences for notifications about subscriptions."""
+  subscriptions: NotificationCategoryPreferencesChannelInput
+
+  """The preferences for notifications about document changes."""
+  documentChanges: NotificationCategoryPreferencesChannelInput
+
+  """The preferences for notifications about posts and updates."""
+  postsAndUpdates: NotificationCategoryPreferencesChannelInput
+
+  """The preferences for notifications about reminders."""
+  reminders: NotificationCategoryPreferencesChannelInput
+
+  """The preferences for notifications about reviews."""
+  reviews: NotificationCategoryPreferencesChannelInput
+
+  """The preferences for notifications about apps and integrations."""
+  appsAndIntegrations: NotificationCategoryPreferencesChannelInput
 }
 
 type NotificationConnection {
@@ -22422,6 +22546,9 @@ input UserSettingsUpdateInput {
 
   """The user's notification preferences."""
   notificationPreferences: JSONObject
+
+  """The user's notification category preferences."""
+  notificationCategoryPreferences: NotificationCategoryPreferencesInput
 
   """The user's notification delivery preferences."""
   notificationDeliveryPreferences: NotificationDeliveryPreferencesInput
