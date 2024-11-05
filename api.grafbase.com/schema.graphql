@@ -1568,6 +1568,7 @@ type Mutation {
   schemaProposalCommentReply(parentCommentId: ID!, text: String!): SchemaProposalCommentReplyPayload!
   schemaProposalCommentThreadCreate(input: SchemaProposalCommentThreadCreateInput!): SchemaProposalCommentThreadCreatePayload!
   schemaProposalCommentThreadResolve(rootCommentId: ID!): SchemaProposalCommentThreadResolvePayload!
+  schemaProposalCommentThreadUnresolve(rootCommentId: ID!): SchemaProposalCommentThreadUnresolvePayload!
   schemaProposalCreate(input: SchemaProposalCreateInput!): SchemaProposalCreatePayload!
   schemaProposalDelete(id: ID!): SchemaProposalDeletePayload!
   schemaProposalEdit(input: SchemaProposalEditInput!): SchemaProposalEditPayload!
@@ -2450,6 +2451,7 @@ input SchemaCheckGitCommitInput {
 union SchemaCheckPayload = GraphBranchDoesNotExistError | GraphDoesNotExistError | ProjectBranchDoesNotExistError | ProjectDoesNotExistError | SchemaCheck | SubgraphNameMissingOnFederatedGraphError | SubgraphNameMissingOnFederatedProjectError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameProvidedOnStandaloneGraphError | SubgraphNameProvidedOnStandaloneProjectError
 
 type SchemaProposal {
+  activityFeed: [SchemaProposalActivityFeedItem!]!
   author: User
   comments: [SchemaProposalComment!]!
   createdAt: DateTime!
@@ -2460,6 +2462,18 @@ type SchemaProposal {
   subgraph(subgraphName: String!): SchemaProposalSubgraph
   subgraphs: [SchemaProposalSubgraph!]!
   title: String!
+}
+
+interface SchemaProposalActivityFeedItem {
+  createdAt: DateTime!
+  id: ID!
+}
+
+type SchemaProposalApproval implements SchemaProposalActivityFeedItem {
+  author: User
+  createdAt: DateTime!
+  id: ID!
+  message: String
 }
 
 input SchemaProposalApproveInput {
@@ -2480,7 +2494,7 @@ interface SchemaProposalComment {
   text: String!
 }
 
-type SchemaProposalCommentOnLine implements SchemaProposalComment {
+type SchemaProposalCommentOnLine implements SchemaProposalActivityFeedItem & SchemaProposalComment {
   author: User
   context(contextLines: Int!): String
   createdAt: DateTime!
@@ -2493,7 +2507,7 @@ type SchemaProposalCommentOnLine implements SchemaProposalComment {
   text: String!
 }
 
-type SchemaProposalCommentOnProposal implements SchemaProposalComment {
+type SchemaProposalCommentOnProposal implements SchemaProposalActivityFeedItem & SchemaProposalComment {
   author: User
   createdAt: DateTime!
   id: ID!
@@ -2501,7 +2515,7 @@ type SchemaProposalCommentOnProposal implements SchemaProposalComment {
   text: String!
 }
 
-type SchemaProposalCommentOnSdl implements SchemaProposalComment {
+type SchemaProposalCommentOnSdl implements SchemaProposalActivityFeedItem & SchemaProposalComment {
   author: User
   createdAt: DateTime!
   id: ID!
@@ -2585,6 +2599,13 @@ type SchemaProposalCommentThreadResolveSuccess {
   query: Query!
 }
 
+union SchemaProposalCommentThreadUnresolvePayload = SchemaProposalCommentThreadUnresolveSuccess
+
+type SchemaProposalCommentThreadUnresolveSuccess {
+  affectedRows: Int!
+  query: Query!
+}
+
 type SchemaProposalConnection {
   edges: [SchemaProposalEdge!]!
   nodes: [SchemaProposal!]!
@@ -2652,6 +2673,13 @@ input SchemaProposalFilter {
 }
 
 input SchemaProposalRejectInput {
+  id: ID!
+  message: String
+}
+
+type SchemaProposalRejection implements SchemaProposalActivityFeedItem {
+  author: User
+  createdAt: DateTime!
   id: ID!
   message: String
 }
