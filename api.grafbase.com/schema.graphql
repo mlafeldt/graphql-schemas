@@ -125,22 +125,12 @@ type AccountResources {
 }
 
 type AccountResourcesStatus {
-  buildDuration: ResourceStatus!
-  execUnits: ResourceStatus!
   requestCount: ResourceStatus!
-  udfExecUnits: ResourceStatus!
-  udfRequestCount: ResourceStatus!
 }
 
 type AccountResourcesUsage {
-  buildDuration: TimeSeries! @deprecated(reason: "to be removed soon")
-  execUnits: TimeSeries!
   granularity: TimeAggregationGranularity!
   requestCount: TimeSeries!
-  serverlessFunctionDuration: TimeSeries! @deprecated(reason: "to be removed soon")
-  serverlessFunctionInvocationCount: TimeSeries! @deprecated(reason: "to be removed soon")
-  udfExecUnits: TimeSeries! @deprecated(reason: "to be removed soon")
-  udfRequestCount: TimeSeries! @deprecated(reason: "to be removed soon")
 }
 
 """
@@ -1067,11 +1057,11 @@ input GraphCreateInput {
   graphSlug: String!
   repoRootPath: String! = "grafbase"
   graphType: GraphType
-  graphMode: GraphMode! = MANAGED
+  graphMode: GraphMode! = SELF_HOSTED
   environmentVariables: [EnvironmentVariableSpecification!]! = []
 }
 
-union GraphCreatePayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | GraphCreateSuccess | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | StandaloneGraphsNoLongerSupportedError
+union GraphCreatePayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | GraphCreateSuccess | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | ManagedGraphsNoLongerSupportedError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | StandaloneGraphsNoLongerSupportedError
 
 type GraphCreateSuccess {
   graph: Graph!
@@ -1454,6 +1444,10 @@ enum LogLevel {
   DEBUG
 }
 
+type ManagedGraphsNoLongerSupportedError {
+  query: Query!
+}
+
 type Member implements Node {
   account: Account!
   createdAt: DateTime!
@@ -1519,8 +1513,8 @@ type Mutation {
   customDomainDelete(input: CustomDomainDeleteInput!): CustomDomainDeletePayload!
   customDomainReplace(input: CustomDomainReplaceInput!): CustomDomainReplacePayload!
   deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
-  deploymentCreate(input: DeploymentCreateInput!): DeploymentCreatePayload!
-  deploymentCreateBySlug(input: DeploymentBySlugCreateInput!): DeploymentCreatePayload!
+  deploymentCreate(input: DeploymentCreateInput!): DeploymentCreatePayload! @deprecated(reason: "this mutation will be removed")
+  deploymentCreateBySlug(input: DeploymentBySlugCreateInput!): DeploymentCreatePayload! @deprecated(reason: "this mutation will be removed")
   deploymentRedeploy(id: ID!): DeploymentRedeployPayload!
   endpointConfigUpdate(input: EndpointConfigUpdateInput!): EndpointConfigUpdatePayload!
   environentVariableUpsert(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
@@ -1666,219 +1660,6 @@ enum OperationType {
   SUBSCRIPTION
 }
 
-type OrbBillingAddress {
-  city: String
-  country: String
-  line1: String
-  line2: String
-  postalCode: String
-  state: String
-}
-
-input OrbBillingAddressInput {
-  city: String
-  country: String
-  line1: String
-  line2: String
-  postalCode: String
-  state: String
-}
-
-type OrbCustomer {
-  billingAddress: OrbBillingAddress
-  email: String!
-  id: String!
-  name: String!
-  subscriptions(cursor: String): OrbPaginatedSubscriptions!
-  taxId: OrbTaxId
-}
-
-input OrbCustomerUpdateInput {
-  name: String
-  email: String
-  taxId: OrbTaxIdInput
-  billingAddress: OrbBillingAddressInput
-}
-
-type OrbInvoice {
-  currency: String!
-  dueDate: DateTime!
-  id: String!
-  invoiceDate: DateTime!
-  invoiceNumber: String!
-  invoicePdf: Url!
-  lineItems: [OrbInvoiceLineItem!]!
-  status: OrbInvoiceStatus!
-  total: String!
-}
-
-type OrbInvoiceLineItem {
-  amount: String!
-  endDate: DateTime!
-  id: String!
-  name: String!
-  price: OrbPrice!
-  quantity: Float!
-  startDate: DateTime!
-}
-
-enum OrbInvoiceStatus {
-  ISSUED
-  PAID
-  SYNCED
-  VOID
-  DRAFT
-}
-
-type OrbPaginatedInvoices {
-  data: [OrbInvoice!]!
-  paginationMetadata: OrbPaginationMetadata!
-}
-
-type OrbPaginatedSubscriptions {
-  data: [OrbSubscription!]!
-  paginationMetadata: OrbPaginationMetadata!
-}
-
-type OrbPaginationMetadata {
-  nextCursor: String
-}
-
-type OrbPlan {
-  externalPlanId: String
-}
-
-type OrbPrice {
-  currency: String!
-  modelType: OrbPriceModelType!
-  packageConfig: OrbPricePackageConfig
-  unitConfig: OrbPriceUnitConfig
-}
-
-enum OrbPriceModelType {
-  UNIT
-  TIERED
-  BULK
-  PACKAGE
-  BPS
-  TIERED_BPS
-  BULK_BPS
-  MATRIX
-}
-
-type OrbPricePackageConfig {
-  packageAmount: String!
-  packageSize: Float!
-}
-
-type OrbPriceUnitConfig {
-  unitAmount: String!
-}
-
-type OrbSubscription {
-  currentBillingPeriodEndDate: DateTime
-  currentBillingPeriodStartDate: DateTime
-  endDate: DateTime
-  id: String!
-  invoices(cursor: String): OrbPaginatedInvoices!
-  plan: OrbPlan!
-  status: OrbSubscriptionStatus!
-  upcomingInvoice: OrbUpcomingInvoice
-}
-
-enum OrbSubscriptionStatus {
-  ACTIVE
-  ENDED
-  UPCOMING
-}
-
-type OrbTaxId {
-  country: String!
-  type: OrbTaxIdType!
-  value: String!
-}
-
-input OrbTaxIdInput {
-  value: String!
-  type: OrbTaxIdType!
-  country: String!
-}
-
-enum OrbTaxIdType {
-  AE_TRN
-  AU_ABN
-  AU_ARN
-  BG_UIC
-  BR_CNPJ
-  BR_CPF
-  CA_BN
-  CA_GST_HST
-  CA_PST_BC
-  CA_PST_MB
-  CA_PST_SK
-  CA_QST
-  CH_VAT
-  CL_TIN
-  EG_TIN
-  ES_CIF
-  EU_OSS_VAT
-  EU_VAT
-  GB_VAT
-  GE_VAT
-  HK_BR
-  HU_TIN
-  ID_NPWP
-  IL_VAT
-  IN_GST
-  IS_VAT
-  JP_CN
-  JP_RN
-  JP_TRN
-  KE_PIN
-  KR_BRN
-  LI_UID
-  MX_RFC
-  MY_FRP
-  MY_ITN
-  MY_SST
-  NO_VAT
-  NZ_GST
-  PH_TIN
-  RU_INN
-  RU_KPP
-  SA_VAT
-  SG_GST
-  SG_UEN
-  SI_TIN
-  TH_VAT
-  TR_TIN
-  TW_VAT
-  UA_VAT
-  US_EIN
-  ZA_VAT
-}
-
-type OrbUpcomingInvoice {
-  currency: String!
-  lineItems: [OrbUpcomingInvoiceLineItem!]!
-  subtotal: String!
-  targetDate: DateTime!
-}
-
-type OrbUpcomingInvoiceLineItem {
-  amount: String!
-  endDate: DateTime!
-  name: String!
-  price: OrbPrice!
-  quantity: Float!
-  startDate: DateTime!
-}
-
-type OrbValidationError {
-  errors: [String!]!
-  query: Query!
-}
-
 type Organization implements Account & Node {
   accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
   addToSlackLink: String!
@@ -1890,8 +1671,6 @@ type Organization implements Account & Node {
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
   name: String!
-  orbActiveSubscription: OrbSubscription
-  orbCustomer: OrbCustomer
   plan: GrafbasePlan!
   resources: AccountResources! @deprecated(reason: "Not relevant for organizations")
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
@@ -1973,10 +1752,9 @@ type OrganizationSuccessfulUpdate {
 input OrganizationUpdateInput {
   id: ID!
   name: String
-  orbCustomer: OrbCustomerUpdateInput
 }
 
-union OrganizationUpdatePayload = NameSizeCheckError | NotAllowedToUpdateOrganizationError | OrbValidationError | OrganizationDoesNotExistError | OrganizationUpdateSuccess
+union OrganizationUpdatePayload = NameSizeCheckError | NotAllowedToUpdateOrganizationError | OrganizationDoesNotExistError | OrganizationUpdateSuccess
 
 type OrganizationUpdateSuccess {
   organization: Organization!
@@ -2503,6 +2281,7 @@ type SchemaProposalCommentOnLine implements SchemaProposalActivityFeedItem & Sch
   path: String!
   replies: [SchemaProposalReply!]!
   resolved: Boolean!
+  resolvedBy: User
   subgraphName: String!
   text: String!
 }
@@ -2521,6 +2300,7 @@ type SchemaProposalCommentOnSdl implements SchemaProposalActivityFeedItem & Sche
   id: ID!
   replies: [SchemaProposalReply!]!
   resolved: Boolean!
+  resolvedBy: User
   text: String!
 }
 
@@ -2708,8 +2488,8 @@ type SchemaProposalRequestReviewSuccess {
 }
 
 enum SchemaProposalStatus {
-  DRAFT
   APPROVED
+  DRAFT
   IMPLEMENTED
   REJECTED
   IN_REVIEW
