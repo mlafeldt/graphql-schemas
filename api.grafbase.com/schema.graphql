@@ -191,6 +191,7 @@ type Branch implements Node {
   operationChecksEnabled: Boolean!
   schema: String
   schemaProposals(after: String, first: Int, filter: SchemaProposalFilter!): SchemaProposalConnection!
+  schemaProposalsConfiguration: SchemaProposalsConfiguration
   subgraphs: [Subgraph!]!
 }
 
@@ -234,6 +235,7 @@ type BranchNotDeployedError {
 
 input BranchUpdateInput {
   operationChecksEnabled: Boolean
+  schemaProposalsConfiguration: SchemaProposalsConfigurationUpdateInput
   accountSlug: String!
   graphSlug: String
   projectSlug: String
@@ -541,118 +543,6 @@ input EndpointConfigUpdateInput {
 
 union EndpointConfigUpdatePayload = GraphDoesNotExistError | Query
 
-input EnviromentVariableUpsertInput {
-  name: String!
-  environments: [BranchEnvironment!]!
-  accountSlug: String!
-  graphSlug: String
-  projectSlug: String
-  value: String!
-  sensitive: Boolean
-}
-
-type EnvironmentVariable implements Node {
-  branches: [String!]
-  createdAt: DateTime!
-  environments: [BranchEnvironment!]!
-  id: ID!
-  name: String!
-  updatedAt: DateTime!
-  value: String!
-}
-
-type EnvironmentVariableConnection {
-  edges: [EnvironmentVariableEdge!]!
-  nodes: [EnvironmentVariable!]!
-  pageInfo: PageInfo!
-}
-
-type EnvironmentVariableCountLimitExceededError {
-  query: Query!
-}
-
-input EnvironmentVariableCreateInput {
-  """
-  
-      Must not be already assigned.
-      
-  """
-  name: String!
-  environments: [BranchEnvironment!]!
-  projectId: ID
-  graphId: ID
-  value: String!
-  sensitive: Boolean
-}
-
-union EnvironmentVariableCreatePayload = EnvironmentVariableCreateSuccess | GraphDoesNotExistError | NameAlreadyExistsError | NameContainsInvalidCharactersError | NameTooLongError | NoEnvironmentsSetError | ProjectDoesNotExistError | ReservedPrefixError | ValueTooLongError
-
-type EnvironmentVariableCreateSuccess {
-  environmentVariable: EnvironmentVariable!
-  query: Query!
-}
-
-input EnvironmentVariableDeleteByValuesInput {
-  name: String!
-  environments: [BranchEnvironment!]!
-  projectId: ID
-  graphId: ID
-}
-
-union EnvironmentVariableDeleteByValuesPayload = EnvironmentVariableDeleteByValuesSuccess | EnvironmentVariableDoesNotExistError
-
-input EnvironmentVariableDeleteByValuesSlugsInput {
-  name: String!
-  environments: [BranchEnvironment!]!
-  accountSlug: String!
-  graphSlug: String
-  projectSlug: String
-}
-
-type EnvironmentVariableDeleteByValuesSuccess {
-  query: Query!
-}
-
-input EnvironmentVariableDeleteInput {
-  id: ID!
-}
-
-union EnvironmentVariableDeletePayload = EnvironmentVariableDeleteSuccess | EnvironmentVariableDoesNotExistError
-
-type EnvironmentVariableDeleteSuccess {
-  deletedId: ID!
-  query: Query!
-}
-
-type EnvironmentVariableDoesNotExistError {
-  query: Query!
-}
-
-type EnvironmentVariableEdge {
-  cursor: String!
-  node: EnvironmentVariable!
-}
-
-input EnvironmentVariableSpecification {
-  name: String!
-  value: String!
-  sensitive: Boolean
-}
-
-input EnvironmentVariableUpdateInput {
-  id: ID!
-  name: String
-  environments: [BranchEnvironment!]
-  value: String
-}
-
-union EnvironmentVariableUpdatePayload = EnvironmentVariableDoesNotExistError | EnvironmentVariableUpdateSuccess | NameAlreadyExistsError | NameContainsInvalidCharactersError | NameTooLongError | NoEnvironmentsSetError | ReservedPrefixError | ValueTooLongError
-
-type EnvironmentVariableUpdateSuccess {
-  environmentVariable: EnvironmentVariable!
-  query: Query!
-}
-
 type ErrorCountByCode {
   code: String!
   count: Int!
@@ -823,7 +713,6 @@ type Graph implements Node {
   createdAt: DateTime!
   customDomains: [CustomDomain!]!
   deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
-  environmentVariables(after: String, before: String, first: Int, last: Int): EnvironmentVariableConnection!
   graphMode: GraphMode!
   graphType: GraphType
   id: ID!
@@ -1008,12 +897,11 @@ input GraphCreateFromRepositoryInput {
   graphSlug: String!
   repoRootPath: String! = "grafbase"
   productionBranch: String!
-  environmentVariables: [EnvironmentVariableSpecification!]! = []
   gitRepoUrl: Url!
   gitAccountId: String!
 }
 
-union GraphCreateFromRepositoryPayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | GraphCreateFromRepositorySuccess | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | RepositoryContainsNoBranchesError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
+union GraphCreateFromRepositoryPayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | GraphCreateFromRepositorySuccess | InvalidDatabaseRegionsError | InvalidRepoRootPathError | RepositoryContainsNoBranchesError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
 
 type GraphCreateFromRepositorySuccess {
   graph: Graph!
@@ -1024,10 +912,9 @@ input GraphCreateFromSchemaInput {
   accountId: ID!
   schema: String!
   graphSlug: String!
-  environmentVariables: [EnvironmentVariableSpecification!]! = []
 }
 
-union GraphCreateFromSchemaPayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | GraphCreateFromSchemaSuccess | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
+union GraphCreateFromSchemaPayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | GraphCreateFromSchemaSuccess | InvalidDatabaseRegionsError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
 
 type GraphCreateFromSchemaSuccess {
   graph: Graph!
@@ -1038,14 +925,13 @@ input GraphCreateFromTemplateInput {
   accountId: ID!
   graphSlug: String!
   repoRootPath: String! = "grafbase"
-  environmentVariables: [EnvironmentVariableSpecification!]! = []
   gitAccountId: String!
   templateGitUrl: Url!
   repoSlug: String!
   repoPrivate: Boolean!
 }
 
-union GraphCreateFromTemplatePayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | GithubInstallationInsufficientPermissionsError | GraphCreateFromTemplateSuccess | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | RepositorySlugInUseError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | TemplateDoesNotExistError
+union GraphCreateFromTemplatePayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | GithubInstallationInsufficientPermissionsError | GraphCreateFromTemplateSuccess | InvalidDatabaseRegionsError | InvalidRepoRootPathError | RepositorySlugInUseError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | TemplateDoesNotExistError
 
 type GraphCreateFromTemplateSuccess {
   graph: Graph!
@@ -1058,10 +944,9 @@ input GraphCreateInput {
   repoRootPath: String! = "grafbase"
   graphType: GraphType
   graphMode: GraphMode! = SELF_HOSTED
-  environmentVariables: [EnvironmentVariableSpecification!]! = []
 }
 
-union GraphCreatePayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | EnvironmentVariableCountLimitExceededError | GraphCreateSuccess | InvalidDatabaseRegionsError | InvalidEnvironmentVariablesError | InvalidRepoRootPathError | ManagedGraphsNoLongerSupportedError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | StandaloneGraphsNoLongerSupportedError
+union GraphCreatePayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | GraphCreateSuccess | InvalidDatabaseRegionsError | InvalidRepoRootPathError | ManagedGraphsNoLongerSupportedError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | StandaloneGraphsNoLongerSupportedError
 
 type GraphCreateSuccess {
   graph: Graph!
@@ -1286,24 +1171,6 @@ type InvalidDomainError {
   query: Query!
 }
 
-type InvalidEnvironmentVariableError {
-  error: InvalidEnvironmentVariableErrorType!
-  variableName: String!
-}
-
-enum InvalidEnvironmentVariableErrorType {
-  NAME_TOO_LONG
-  NAME_CONTAINS_INVALID_CHARACTERS
-  VALUE_TOO_LONG
-  RESERVED_PREFIX
-  DUPLICATE
-  NO_ENVIRONMENTS_SET
-}
-
-type InvalidEnvironmentVariablesError {
-  errors: [InvalidEnvironmentVariableError!]!
-}
-
 type InvalidRepoRootPathError {
   query: Query!
 }
@@ -1517,13 +1384,6 @@ type Mutation {
   deploymentCreateBySlug(input: DeploymentBySlugCreateInput!): DeploymentCreatePayload! @deprecated(reason: "this mutation will be removed")
   deploymentRedeploy(id: ID!): DeploymentRedeployPayload!
   endpointConfigUpdate(input: EndpointConfigUpdateInput!): EndpointConfigUpdatePayload!
-  environentVariableUpsert(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
-  environentVariableUpsertBySlug(input: EnviromentVariableUpsertInput!): EnvironmentVariableCreatePayload!
-  environmentVariableCreate(input: EnvironmentVariableCreateInput!): EnvironmentVariableCreatePayload!
-  environmentVariableDelete(input: EnvironmentVariableDeleteInput!): EnvironmentVariableDeletePayload!
-  environmentVariableDeleteWithValues(input: EnvironmentVariableDeleteByValuesInput!): EnvironmentVariableDeleteByValuesPayload!
-  environmentVariableDeleteWithValuesBySlug(input: EnvironmentVariableDeleteByValuesSlugsInput!): EnvironmentVariableDeleteByValuesPayload!
-  environmentVariableUpdate(input: EnvironmentVariableUpdateInput!): EnvironmentVariableUpdatePayload!
   githubUserTokenUpdate(input: GithubUserTokenUpdateInput!): GithubUserTokenUpdatePayload!
   githubUserTokenUpdateE2E(input: GithubUserTokenUpdateE2EInput!): GithubUserTokenUpdateE2EPayload!
   graphAddOwner(graphId: ID!, ownerId: ID!): GraphAddOwnerPayload!
@@ -1581,30 +1441,14 @@ type Mutation {
   trustedDocumentsSubmit(accountSlug: String, graphSlug: String, projectSlug: String, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
 }
 
-type NameAlreadyExistsError {
-  query: Query!
-}
-
-type NameContainsInvalidCharactersError {
-  query: Query!
-}
-
 type NameSizeCheckError {
   maxLength: Int!
   message: String!
   query: Query!
 }
 
-type NameTooLongError {
-  query: Query!
-}
-
 interface Node {
   id: ID!
-}
-
-type NoEnvironmentsSetError {
-  query: Query!
 }
 
 type NotAllowedError {
@@ -2068,10 +1912,6 @@ type RequestOperation {
   type: OperationType!
 }
 
-type ReservedPrefixError {
-  query: Query!
-}
-
 type ReservedSlugsCheckError {
   message: String!
   query: Query!
@@ -2485,6 +2325,18 @@ union SchemaProposalRequestReviewPayload = SchemaProposalRequestReviewSuccess
 
 type SchemaProposalRequestReviewSuccess {
   query: Query!
+}
+
+type SchemaProposalsConfiguration {
+  enforceChecks: Boolean!
+  keepApprovalsOnEdit: Boolean!
+  requireApprovalFromSubgraphOwners: Boolean!
+}
+
+input SchemaProposalsConfigurationUpdateInput {
+  enforceChecks: Boolean
+  requireApprovalFromSubgraphOwners: Boolean
+  keepApprovalsOnEdit: Boolean
 }
 
 enum SchemaProposalStatus {
@@ -3029,9 +2881,5 @@ type UserEdge {
 type ValidationCheckError {
   message: String!
   title: String!
-}
-
-type ValueTooLongError {
-  query: Query!
 }
 
