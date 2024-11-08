@@ -6156,6 +6156,7 @@ enum IntegrationService {
   slackAsks
   slackCustomViewNotifications
   slackOrgProjectUpdatesPost
+  slackOrgInitiativeUpdatesPost
   slackPersonal
   slackPost
   slackProjectPost
@@ -6173,6 +6174,7 @@ type IntegrationSettings {
   slackProjectPost: SlackPostSettings
   slackCustomViewNotifications: SlackPostSettings
   slackOrgProjectUpdatesPost: SlackPostSettings
+  slackOrgInitiativeUpdatesPost: SlackPostSettings
   googleSheets: GoogleSheetsSettings
   gitHub: GitHubSettings
   gitHubImport: GitHubImportSettings
@@ -6197,6 +6199,7 @@ input IntegrationSettingsInput {
   slackProjectPost: SlackPostSettingsInput
   slackCustomViewNotifications: SlackPostSettingsInput
   slackOrgProjectUpdatesPost: SlackPostSettingsInput
+  slackOrgInitiativeUpdatesPost: SlackPostSettingsInput
   googleSheets: GoogleSheetsSettingsInput
   gitHub: GitHubSettingsInput
   gitHubImport: GitHubImportSettingsInput
@@ -9763,6 +9766,19 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """[ALPHA] Merges two customers."""
+  customerMerge(
+    """
+    The ID of the customer to merge. The needs of this customer will be transferred before it gets deleted.
+    """
+    sourceCustomerId: String!
+
+    """
+    The ID of the target customer to merge into. The needs of this customer will be retained
+    """
+    targetCustomerId: String!
+  ): CustomerPayload!
+
   """[ALPHA] Creates a new customer status."""
   customerStatusCreate(
     """The CustomerStatus object to create."""
@@ -10391,6 +10407,17 @@ type Mutation {
 
   """Slack integration for organization level project update notifications."""
   integrationSlackOrgProjectUpdatesPost(
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): SlackChannelConnectPayload!
+
+  """
+  [Internal] Slack integration for organization level initiative update notifications.
+  """
+  integrationSlackOrgInitiativeUpdatesPost(
     """The Slack OAuth redirect URI."""
     redirectUri: String!
 
@@ -11879,6 +11906,37 @@ input NotificationCategoryPreferencesInput {
 
   """The preferences for notifications about apps and integrations."""
   appsAndIntegrations: NotificationCategoryPreferencesChannelInput
+}
+
+"""
+A user's notification channel preferences, indicating if a channel is enabled or not
+"""
+type NotificationChannelPreferences {
+  """Whether notifications are currently enabled for mobile."""
+  mobile: Boolean
+
+  """Whether notifications are currently enabled for desktop."""
+  desktop: Boolean
+
+  """Whether notifications are currently enabled for email."""
+  email: Boolean
+
+  """Whether notifications are currently enabled for Slack."""
+  slack: Boolean
+}
+
+input NotificationChannelPreferencesInput {
+  """Whether notifications are currently enabled for mobile."""
+  mobile: Boolean
+
+  """Whether notifications are currently enabled for desktop."""
+  desktop: Boolean
+
+  """Whether notifications are currently enabled for email."""
+  email: Boolean
+
+  """Whether notifications are currently enabled for Slack."""
+  slack: Boolean
 }
 
 type NotificationConnection {
@@ -13475,6 +13533,9 @@ type Organization implements Node {
   """The month at which the fiscal year starts. Defaults to January (0)."""
   fiscalYearStartMonth: Float!
 
+  """[Internal] The list of working days. Sunday is 0, Monday is 1, etc."""
+  workingDays: [Float!]!
+
   """Whether SAML authentication is enabled for organization."""
   samlEnabled: Boolean!
 
@@ -14080,6 +14141,9 @@ input OrganizationUpdateInput {
 
   """The month at which the fiscal year starts."""
   fiscalYearStartMonth: Float
+
+  """[Internal] The list of working days. Sunday is 0, Monday is 1, etc."""
+  workingDays: [Float!]
 
   """
   Whether the organization has opted for reduced customer support attachment information.
@@ -17057,6 +17121,26 @@ type ProjectUpdateWithInteractionPayload {
 
   """The project update that was created or updated."""
   interaction: ProjectUpdateInteraction!
+}
+
+"""A comment on a pull request."""
+type PullRequestComment implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
 }
 
 """[ALPHA] A pull request reviewer."""
@@ -22441,7 +22525,12 @@ type UserSettings implements Node {
   notificationPreferences: JSONObject!
 
   """The notification category preferences for the user."""
-  notificationCategoryPreferences: JSONObject!
+  notificationCategoryPreferences: NotificationCategoryPreferences!
+
+  """
+  Whether the user has specific notification channels enabled or disabled.
+  """
+  notificationChannelPreferences: NotificationChannelPreferences!
 
   """The notification delivery preferences for the user."""
   notificationDeliveryPreferences: NotificationDeliveryPreferences!
@@ -22547,6 +22636,9 @@ input UserSettingsUpdateInput {
 
   """The user's notification category preferences."""
   notificationCategoryPreferences: NotificationCategoryPreferencesInput
+
+  """The user's notification channel preferences."""
+  notificationChannelPreferences: NotificationChannelPreferencesInput
 
   """The user's notification delivery preferences."""
   notificationDeliveryPreferences: NotificationDeliveryPreferencesInput
@@ -23361,6 +23453,11 @@ type ZendeskSettings {
 
   """The ID of the Linear bot user."""
   botUserId: String
+
+  """
+  [INTERNAL] Temporary flag indicating if the integration has the necessary scopes for Customers
+  """
+  canReadCustomers: Boolean
 }
 
 input ZendeskSettingsInput {
@@ -23398,5 +23495,10 @@ input ZendeskSettingsInput {
 
   """The ID of the Linear bot user."""
   botUserId: String
+
+  """
+  [INTERNAL] Temporary flag indicating if the integration has the necessary scopes for Customers
+  """
+  canReadCustomers: Boolean
 }
 
