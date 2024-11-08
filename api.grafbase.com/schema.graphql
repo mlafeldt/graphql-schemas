@@ -168,6 +168,10 @@ type AccountStatus {
   isHobbyPlanEnforced: Boolean!
 }
 
+type AlreadyExistsError {
+  query: Query!
+}
+
 type AlreadyMemberError {
   query: Query!
 }
@@ -191,7 +195,7 @@ type Branch implements Node {
   operationChecksEnabled: Boolean!
   schema: String
   schemaProposals(after: String, first: Int, filter: SchemaProposalFilter!): SchemaProposalConnection!
-  schemaProposalsConfiguration: SchemaProposalsConfiguration
+  schemaProposalsConfiguration: SchemaProposalsConfiguration!
   subgraphs: [Subgraph!]!
 }
 
@@ -1143,10 +1147,6 @@ type GraphUpdateSuccess {
   query: Query!
 }
 
-type HasAlreadyPaymentMethodError {
-  query: Query!
-}
-
 enum InArrearsCause {
   NEVER_PAID
   UNPAID_INVOICE
@@ -1359,10 +1359,6 @@ type MemberUpdatePayload {
   query: Query!
 }
 
-type MissingStripeCustomerError {
-  query: Query!
-}
-
 type MustLeaveAtLeastOneKeyForEnvironmentError {
   query: Query!
 }
@@ -1375,6 +1371,8 @@ type Mutation {
   accountIntegrationUpdate(id: ID!, input: AccountIntegrationInput!): AccountIntegrationMutationPayload!
   branchCreate(input: BranchCreateInput!): BranchCreatePayload!
   branchDelete(accountSlug: String!, graphSlug: String, branchName: String!, projectSlug: String): BranchDeletePayload!
+  branchSchemaProposalsConfiguredReviewerAdd(input: SchemaProposalsConfiguredReviewerAddInput!): SchemaProposalsConfiguredReviewerAddPayload!
+  branchSchemaProposalsConfiguredReviewerRemove(input: SchemaProposalsConfiguredReviewerRemoveInput!): SchemaProposalsConfiguredReviewerRemovePayload!
   branchUpdate(input: BranchUpdateInput!): BranchUpdatePayload!
   customDomainCreate(input: CustomDomainCreateInput!): CustomDomainCreatePayload!
   customDomainDelete(input: CustomDomainDeleteInput!): CustomDomainDeletePayload!
@@ -1409,8 +1407,6 @@ type Mutation {
   memberUpdate(input: MemberUpdateInput!): MemberUpdatePayload!
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
-  organizationPaymentMethodReplace(accountId: ID!, stripePaymentMethodId: String!): OrganizationPaymentMethodReplacePayload!
-  organizationSetupPaymentMethod(accountId: ID!, stripePaymentMethodId: String!): OrganizationSetupPaymentMethod!
   organizationSlugUpdate(input: OrganizationSlugUpdateInput!): OrganizationSlugUpdatePayload!
   organizationUpdate(input: OrganizationUpdateInput!): OrganizationUpdatePayload!
   personalAccountDelete: PersonalAccountDeletePayload!
@@ -1430,7 +1426,6 @@ type Mutation {
   schemaProposalRequestReview(input: SchemaProposalRequestReviewInput!): SchemaProposalRequestReviewPayload!
   slackIntegrationCreate(input: SlackIntegrationCreateInput!): SlackNotificationCreatePayload!
   slackNotificationDelete(id: String!): SlackNotificationDeletePayload!
-  stripeSetupIntentCreate: StripeSetupIntentCreatePayload!
   subgraphAddOwner(owner: ID!, branchId: ID!, subgraphName: String!): SubgraphAddOwnerPayload!
   subgraphRemoveOwner(branchId: ID!, subgraphName: String!): SubgraphRemoveOwnerPayload!
   teamAddMember(teamId: ID!, memberId: ID!): TeamAddMemberPayload!
@@ -1522,7 +1517,6 @@ type Organization implements Account & Node {
   slackIntegration: SlackIntegration
   slug: String!
   status: AccountStatus!
-  stripeCustomer: StripeCustomer
   teams(after: String, first: Int): TeamConnection!
   trialExpiresAt: DateTime
 }
@@ -1537,7 +1531,6 @@ input OrganizationCreateInput {
   name: String!
   slug: String!
   email: String
-  stripePaymentMethodId: String
 }
 
 union OrganizationCreatePayload = NameSizeCheckError | OrganizationCreateSuccess | ReservedSlugsCheckError | SlugAlreadyExistsError | SlugError | SlugSizeCheckError | TrialPlanUnavailableError
@@ -1572,10 +1565,6 @@ type OrganizationOwnershipNotTransferredError {
   query: Query!
 }
 
-union OrganizationPaymentMethodReplacePayload = MissingStripeCustomerError | NotAllowedError | OrganizationDoesNotExistError | OrganizationSuccessfulUpdate
-
-union OrganizationSetupPaymentMethod = HasAlreadyPaymentMethodError | NotAllowedError | OrganizationDoesNotExistError | OrganizationUpgradeToProSuccess
-
 input OrganizationSlugUpdateInput {
   id: ID!
   slug: String!
@@ -1588,11 +1577,6 @@ type OrganizationSlugUpdateSuccess {
   query: Query!
 }
 
-type OrganizationSuccessfulUpdate {
-  organization: Organization!
-  query: Query!
-}
-
 input OrganizationUpdateInput {
   id: ID!
   name: String
@@ -1601,11 +1585,6 @@ input OrganizationUpdateInput {
 union OrganizationUpdatePayload = NameSizeCheckError | NotAllowedToUpdateOrganizationError | OrganizationDoesNotExistError | OrganizationUpdateSuccess
 
 type OrganizationUpdateSuccess {
-  organization: Organization!
-  query: Query!
-}
-
-type OrganizationUpgradeToProSuccess {
   organization: Organization!
   query: Query!
 }
@@ -1933,6 +1912,10 @@ type ReusedId {
 
 type ReusedIds {
   reused: [ReusedId!]!
+}
+
+type ReviewerDoesNotExistError {
+  query: Query!
 }
 
 enum SchemaChangeType {
@@ -2328,6 +2311,7 @@ type SchemaProposalRequestReviewSuccess {
 }
 
 type SchemaProposalsConfiguration {
+  configuredReviewers: [SchemaProposalsConfiguredReviewers!]!
   enforceChecks: Boolean!
   keepApprovalsOnEdit: Boolean!
   requireApprovalFromSubgraphOwners: Boolean!
@@ -2337,6 +2321,53 @@ input SchemaProposalsConfigurationUpdateInput {
   enforceChecks: Boolean
   requireApprovalFromSubgraphOwners: Boolean
   keepApprovalsOnEdit: Boolean
+}
+
+input SchemaProposalsConfiguredReviewerAddInput {
+  branchId: ID!
+
+  """
+  
+      Either a UserId or a TeamId
+      
+  """
+  reviewerId: ID!
+}
+
+union SchemaProposalsConfiguredReviewerAddPayload = AlreadyExistsError | BranchDoesNotExistError | SchemaProposalsConfiguredReviewerAddSuccess | TeamDoesNotExistError | UserDoesNotExistError
+
+type SchemaProposalsConfiguredReviewerAddSuccess {
+  query: Query!
+  reviewer: SchemaProposalsConfiguredReviewers!
+}
+
+input SchemaProposalsConfiguredReviewerRemoveInput {
+  branchId: ID!
+
+  """
+  
+      Either a SchemaProposalUserReviewerId or a SchemaProposalTeamReviewerId
+      
+  """
+  reviewerId: ID!
+}
+
+union SchemaProposalsConfiguredReviewerRemovePayload = BranchDoesNotExistError | ReviewerDoesNotExistError | SchemaProposalsConfiguredReviewerRemoveSuccess
+
+type SchemaProposalsConfiguredReviewerRemoveSuccess {
+  query: Query!
+}
+
+union SchemaProposalsConfiguredReviewers = SchemaProposalsConfiguredReviewerTeam | SchemaProposalsConfiguredReviewerUser
+
+type SchemaProposalsConfiguredReviewerTeam {
+  id: ID!
+  team: Team!
+}
+
+type SchemaProposalsConfiguredReviewerUser {
+  id: ID!
+  user: User!
 }
 
 enum SchemaProposalStatus {
@@ -2471,76 +2502,6 @@ type SlugTooLongError {
 
 type StandaloneGraphsNoLongerSupportedError {
   query: Query!
-}
-
-type StripeCard {
-  brand: String!
-  expMonth: Int!
-  expYear: Int!
-  funding: String!
-  last4: String!
-}
-
-type StripeCustomer {
-  id: String!
-  paymentMethods(limit: Int, type: StripePaymentMethodType, endingBefore: String, startingAfter: String): StripePaginatedPaymentMethods!
-}
-
-type StripePaginatedPaymentMethods {
-  data: [StripePaymentMethod!]!
-  hasMore: Boolean!
-  nextPage: String
-}
-
-type StripePaymentMethod {
-  card: StripeCard
-  created: DateTime!
-  id: String!
-  type: StripePaymentMethodType!
-}
-
-enum StripePaymentMethodType {
-  ACSS_DEBIT
-  AFFIRM
-  AFTERPAY_CLEARPAY
-  ALIPAY
-  AU_BECS_DEBIT
-  BACS_DEBIT
-  BANCONTACT
-  BLIK
-  BOLETO
-  CARD
-  CASHAPP
-  CUSTOMER_BALANCE
-  EPS
-  FPX
-  GIROPAY
-  GRABPAY
-  IDEAL
-  KLARNA
-  KONBINI
-  LINK
-  OXXO
-  P24
-  PAYNOW
-  PIX
-  PROMPTPAY
-  SEPA_DEBIT
-  SOFORT
-  US_BANK_ACCOUNT
-  WECHAT_PAY
-}
-
-type StripeSetupIntent {
-  clientSecret: String!
-  id: String!
-}
-
-union StripeSetupIntentCreatePayload = StripeSetupIntentCreateSuccess
-
-type StripeSetupIntentCreateSuccess {
-  query: Query!
-  setupIntent: StripeSetupIntent!
 }
 
 type Subgraph {
@@ -2870,6 +2831,10 @@ type UserConnection {
   nodes: [User!]!
   pageInfo: PageInfo!
   totalCount: Int!
+}
+
+type UserDoesNotExistError {
+  query: Query!
 }
 
 type UserEdge {
