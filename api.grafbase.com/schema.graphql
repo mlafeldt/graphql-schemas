@@ -134,10 +134,8 @@ type AccountResourcesUsage {
 }
 
 """
-
 'limit_cycle_choice' is exclusive with all other options. It's the only case
 where we'll show account limit status (used/limit)
-
 """
 input AccountResourcesUsageDashboardFilter {
   projectIds: [ID!]
@@ -617,88 +615,11 @@ type GatewayRequestLogEventOperation {
   type: OperationType!
 }
 
-type GitAccount {
-  connectedAt: DateTime!
-  id: ID!
-  provider: GitProvider!
-  slug: String!
-  type: GitAccountType!
-}
-
-union GitAccountsPayload = GitAccountsSuccess | GitHubAuthorizationError
-
-type GitAccountsSuccess {
-  accounts: [GitAccount!]!
-  query: Query!
-}
-
-enum GitAccountType {
-  ORGANIZATION
-  PERSONAL
-}
-
 type GitCommit {
   author: String
   authorAvatarUrl: String
   message: String!
   sha: String!
-}
-
-type GithubApiError {
-  error: GithubApiErrorKind!
-  query: Query!
-}
-
-enum GithubApiErrorKind {
-  ERROR
-  CONNECTION
-  STATUS
-  DECODE
-  UNKNOWN
-}
-
-type GitHubAuthorizationError {
-  query: Query!
-}
-
-type GithubInstallationInsufficientPermissionsError {
-  query: Query!
-}
-
-input GithubUserTokenUpdateE2EInput {
-  token: String!
-}
-
-union GithubUserTokenUpdateE2EPayload = GithubUserTokenUpdateE2ESuccess
-
-type GithubUserTokenUpdateE2ESuccess {
-  query: Query!
-}
-
-input GithubUserTokenUpdateInput {
-  code: String!
-}
-
-union GithubUserTokenUpdatePayload = GithubApiError | GithubUserTokenUpdateSuccess
-
-type GithubUserTokenUpdateSuccess {
-  query: Query!
-}
-
-enum GitProvider {
-  GITHUB
-}
-
-type GitRepository {
-  branches: [String!]!
-  defaultBranch: String
-  id: String!
-  owner: String!
-  private: Boolean!
-  provider: GitProvider!
-  slug: String!
-  updatedAt: DateTime!
-  url: String!
 }
 
 enum GrafbasePlan {
@@ -725,7 +646,6 @@ type Graph implements Node {
   owners: [Team!]!
   productionBranch: Branch!
   repoRootPath: String!
-  repository: GitRepository
   request(branchName: String, approximateTimestamp: DateTime!, traceId: ID!): Request
   requestAnalytics(filter: GraphRequestAnalyticsFilter!): RequestAnalytics @deprecated(reason: "Use `analytics` instead")
   requests(after: String, before: String, first: Int, last: Int, filters: RequestFilters!): RequestConnection
@@ -749,86 +669,56 @@ type GraphAnalytics {
 }
 
 input GraphAnalyticsFilters {
-  """
-  
-      Defaults to production branch
-      
-  """
+  """Defaults to production branch"""
   branchName: String
 
   """
-  
-      Use this if you really care about having a specific duration like 1 hour, 7 days, etc.
-      
+  Use this if you really care about having a specific duration like 1 hour, 7 days, etc.
   """
   range: Duration
 
   """
-  
-      Use this if you *at least* the data between `from` and `to` to be provided. You may get
-      more, but never less.
-      
+  Use this if you *at least* the data between `from` and `to` to be provided. You may get
+  more, but never less.
   """
   from: DateTime
 
-  """
-  
-      To be used in conjunction with with either `range` or `from`.
-      
-  """
+  """To be used in conjunction with with either `range` or `from`."""
   to: DateTime!
 
   """
-  
-      If explicitly to false, specifying both `from` and `to` will be treated as if `range: (to - from)`
-      had been specified instead. Meaning only the duration between `from` and `to` matters, not
-      necessarily having a data point for `from` itself.
-      
+  If explicitly to false, specifying both `from` and `to` will be treated as if `range: (to - from)`
+  had been specified instead. Meaning only the duration between `from` and `to` matters, not
+  necessarily having a data point for `from` itself.
   """
   isCustomRange: Boolean
 
   """
-  
-      If specified, overrides approximateNumberOfPoints. Must be in whole minutes.
-      At most 150 points can be returned.
-      
+  If specified, overrides approximateNumberOfPoints. Must be in whole minutes.
+  At most 150 points can be returned.
   """
   aggregationStep: Duration
 
-  """
-  
-      Defaults to 100, at most 150 points can be returned.
-      
-  """
+  """Defaults to 100, at most 150 points can be returned."""
   approximateNumberOfDataPoints: Int
 
   """
-  
-      Defaults to true
-      Example: for an aggregationStep of 15 min:
-      - if true, only times with 00, 15, 30 and 45 minutes will appear in the time series
-      - if false, times in the time series will be adjusted to start from the periodStart (~from).
-      So if from = 15:32:00, times will end in 02, 17, 32 and 47.
-      I'll always align to the aggregation step used to store the data though, which
-      is currently in minutes. So cannot have 15:10:20, 15:11:20, etc.
-      
+  Defaults to true
+  Example: for an aggregationStep of 15 min:
+  - if true, only times with 00, 15, 30 and 45 minutes will appear in the time series
+  - if false, times in the time series will be adjusted to start from the periodStart (~from).
+  So if from = 15:32:00, times will end in 02, 17, 32 and 47.
+  I'll always align to the aggregation step used to store the data though, which
+  is currently in minutes. So cannot have 15:10:20, 15:11:20, etc.
   """
   alignPeriodWithAggregationStep: Boolean
   operationName: String
 
-  """
-  
-      Only used if operation name is specified.
-      
-  """
+  """Only used if operation name is specified."""
   operationNormalizedQueryHash: OperationNormalizedQueryHash
   clientName: String
 
-  """
-  
-      Only used if client name is specified.
-      
-  """
+  """Only used if client name is specified."""
   clientVersion: String
 }
 
@@ -894,52 +784,6 @@ type GraphConnection {
   edges: [GraphEdge!]!
   nodes: [Graph!]!
   pageInfo: PageInfo!
-}
-
-input GraphCreateFromRepositoryInput {
-  accountId: ID!
-  graphSlug: String!
-  repoRootPath: String! = "grafbase"
-  productionBranch: String!
-  gitRepoUrl: Url!
-  gitAccountId: String!
-}
-
-union GraphCreateFromRepositoryPayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | GraphCreateFromRepositorySuccess | InvalidDatabaseRegionsError | InvalidRepoRootPathError | RepositoryContainsNoBranchesError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
-
-type GraphCreateFromRepositorySuccess {
-  graph: Graph!
-  query: Query!
-}
-
-input GraphCreateFromSchemaInput {
-  accountId: ID!
-  schema: String!
-  graphSlug: String!
-}
-
-union GraphCreateFromSchemaPayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | GraphCreateFromSchemaSuccess | InvalidDatabaseRegionsError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError
-
-type GraphCreateFromSchemaSuccess {
-  graph: Graph!
-  query: Query!
-}
-
-input GraphCreateFromTemplateInput {
-  accountId: ID!
-  graphSlug: String!
-  repoRootPath: String! = "grafbase"
-  gitAccountId: String!
-  templateGitUrl: Url!
-  repoSlug: String!
-  repoPrivate: Boolean!
-}
-
-union GraphCreateFromTemplatePayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | GithubInstallationInsufficientPermissionsError | GraphCreateFromTemplateSuccess | InvalidDatabaseRegionsError | InvalidRepoRootPathError | RepositorySlugInUseError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | TemplateDoesNotExistError
-
-type GraphCreateFromTemplateSuccess {
-  graph: Graph!
-  query: Query!
 }
 
 input GraphCreateInput {
@@ -1045,48 +889,30 @@ type GraphOperationCheckConfiguration {
 
 input GraphOperationCheckConfigurationInput {
   """
-  
-      Whether operation checks are enabled for the graph. This is ignored, since
+  Whether operation checks are enabled for the graph. This is ignored, since
   operation checks are now only enabled at the branch level.
-      
   """
   enabled: Boolean
 
-  """
-  
-      The graph to update.
-      
-  """
+  """The graph to update."""
   graphId: ID!
 
   """
-  
-      The time range in days to consider for operation checks. Operations older than the specificied
-      number of days are ignored.
-      
+  The time range in days to consider for operation checks. Operations older than the specificied
+  number of days are ignored.
   """
   timeRangeDays: Int
 
   """
-  
-      The request count threshold to consider for operation checks. Operations that have been
-      registered less than the specified number of occurrences are ignored.
-      
+  The request count threshold to consider for operation checks. Operations that have been
+  registered less than the specified number of occurrences are ignored.
   """
   requestCountThreshold: Int
 
-  """
-  
-      The clients to exclude from operation checks.
-      
-  """
+  """The clients to exclude from operation checks."""
   excludedClients: [String!]
 
-  """
-  
-      The operations to exclude from operation checks.
-      
-  """
+  """The operations to exclude from operation checks."""
   excludedOperations: [String!]
 }
 
@@ -1382,16 +1208,11 @@ type Mutation {
   deploymentCreateBySlug(input: DeploymentBySlugCreateInput!): DeploymentCreatePayload! @deprecated(reason: "this mutation will be removed")
   deploymentRedeploy(id: ID!): DeploymentRedeployPayload!
   endpointConfigUpdate(input: EndpointConfigUpdateInput!): EndpointConfigUpdatePayload!
-  githubUserTokenUpdate(input: GithubUserTokenUpdateInput!): GithubUserTokenUpdatePayload!
-  githubUserTokenUpdateE2E(input: GithubUserTokenUpdateE2EInput!): GithubUserTokenUpdateE2EPayload!
   graphAddOwner(graphId: ID!, ownerId: ID!): GraphAddOwnerPayload!
   graphApiKeyCreate(input: GraphApiKeyCreateInput!): GraphApiKeyCreatePayload!
   graphApiKeyDelete(input: GraphApiKeyDeleteInput!): GraphApiKeyDeletePayload!
   graphApiKeyUpdate(input: GraphApiKeyUpdateInput!): GraphApiKeyUpdatePayload!
   graphCreate(input: GraphCreateInput!): GraphCreatePayload!
-  graphCreateFromRepository(input: GraphCreateFromRepositoryInput!): GraphCreateFromRepositoryPayload!
-  graphCreateFromSchema(input: GraphCreateFromSchemaInput!): GraphCreateFromSchemaPayload!
-  graphCreateFromTemplate(input: GraphCreateFromTemplateInput!): GraphCreateFromTemplatePayload!
   graphDelete(input: GraphDeleteInput!): GraphDeletePayload!
   graphIntegrationCreate(graphId: ID!, accountIntegrationId: ID!, input: GraphIntegrationInput!): GraphIntegrationMutationPayload!
   graphIntegrationDelete(id: ID!): GraphIntegrationMutationPayload!
@@ -1409,9 +1230,9 @@ type Mutation {
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
   organizationSlugUpdate(input: OrganizationSlugUpdateInput!): OrganizationSlugUpdatePayload!
   organizationUpdate(input: OrganizationUpdateInput!): OrganizationUpdatePayload!
-  personalAccountDelete: PersonalAccountDeletePayload!
+  personalAccountDelete: PersonalAccountDeletePayload! @deprecated(reason: "to be removed")
   personalAccountSlugUpdate(input: PersonalAccountSlugUpdateInput!): PersonalAccountSlugUpdatePayload!
-  personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload!
+  personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload! @deprecated(reason: "to be removed")
   publish(input: PublishInput!): PublishPayload!
   schemaCheckCreate(input: SchemaCheckCreateInput!): SchemaCheckPayload!
   schemaProposalApprove(input: SchemaProposalApproveInput!): SchemaProposalApprovePayload!
@@ -1424,9 +1245,10 @@ type Mutation {
   schemaProposalEdit(input: SchemaProposalEditInput!): SchemaProposalEditPayload!
   schemaProposalReject(input: SchemaProposalRejectInput!): SchemaProposalRejectPayload!
   schemaProposalRequestReview(input: SchemaProposalRequestReviewInput!): SchemaProposalRequestReviewPayload!
+  schemaProposalReviewRequestCreate(input: SchemaProposalReviewRequestCreateInput!): SchemaProposalReviewRequestCreatePayload!
   slackIntegrationCreate(input: SlackIntegrationCreateInput!): SlackNotificationCreatePayload!
   slackNotificationDelete(id: String!): SlackNotificationDeletePayload!
-  subgraphAddOwner(owner: ID!, branchId: ID!, subgraphName: String!): SubgraphAddOwnerPayload!
+  subgraphAddOwner(branchId: ID!, subgraphName: String!, owner: ID!): SubgraphAddOwnerPayload!
   subgraphRemoveOwner(branchId: ID!, subgraphName: String!): SubgraphRemoveOwnerPayload!
   teamAddMember(teamId: ID!, memberId: ID!): TeamAddMemberPayload!
   teamAssignRole(role: TeamRole!, teamId: ID!, memberId: ID!): TeamAssignRolePayload!
@@ -1434,6 +1256,8 @@ type Mutation {
   teamDelete(teamId: ID!): TeamDeletePayload!
   teamRemoveMember(teamId: ID!, memberId: ID!): TeamRemoveMemberPayload!
   trustedDocumentsSubmit(accountSlug: String, graphSlug: String, projectSlug: String, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
+  userDelete: UserDeletePayload!
+  userUpdate(input: UserUpdateInput!): UserUpdatePayload!
 }
 
 type NameSizeCheckError {
@@ -1703,14 +1527,10 @@ type Query {
   deployment(id: ID!): Deployment
   dopplerConfigs(accountIntegrationId: ID!, dopplerProjectName: String!): [DopplerConfig!]!
   dopplerProjects(accountIntegrationId: ID!): [DopplerProject!]!
-  gitAccounts(provider: GitProvider!): GitAccountsPayload!
-  gitRepoByUrl(url: Url!): GitRepository!
-  gitRepos(query: String, provider: GitProvider!, gitAccountId: String!): [GitRepository!]!
   graphByAccountSlug(accountSlug: String!, graphSlug: String!): Graph
   integrations: [Integration!]!
   invite(id: ID!): Invite
   node(id: ID!): Node
-  schema(branch: String!, url: Url!): String
   schemaCheck(id: ID!): SchemaCheck
   schemaProposal(id: ID!): SchemaProposal
   schemaVersion(id: ID!): SchemaVersion
@@ -1719,14 +1539,6 @@ type Query {
   team(id: ID!): Team
   teamBySlug(slug: String!, organizationSlug: String!): Team
   viewer: User
-}
-
-type RepositoryContainsNoBranchesError {
-  query: Query!
-}
-
-type RepositorySlugInUseError {
-  query: Query!
 }
 
 type Request implements Node {
@@ -1766,44 +1578,28 @@ type RequestEdge {
 }
 
 input RequestFilters {
-  """
-  
-      Defaults to production branch
-      
-  """
+  """Defaults to production branch"""
   branchName: String
   duration: DurationFilter
   traceId: [String!]
 
   """
-  
-      Use this if you really care about having a specific duration like 1 hour, 7 days, etc.
-      
+  Use this if you really care about having a specific duration like 1 hour, 7 days, etc.
   """
   range: Duration
 
   """
-  
-      Use this if you *at least* the data between `from` and `to` to be provided. You may get
-      more, but never less.
-      
+  Use this if you *at least* the data between `from` and `to` to be provided. You may get
+  more, but never less.
   """
   from: DateTime
 
-  """
-  
-      To be used in conjunction with with either `range` or `from`.
-      
-  """
+  """To be used in conjunction with with either `range` or `from`."""
   to: DateTime!
   operationName: [String!]
   clientName: [String!]
 
-  """
-  
-      Only used if client name is specified.
-      
-  """
+  """Only used if client name is specified."""
   clientVersion: [String!]
   httpStatusCode: [Int!]
   operationType: [OperationType!]
@@ -2063,6 +1859,7 @@ type SchemaProposal {
   subgraph(subgraphName: String!): SchemaProposalSubgraph
   subgraphs: [SchemaProposalSubgraph!]!
   title: String!
+  viewerIsReviewer: Boolean!
 }
 
 interface SchemaProposalActivityFeedItem {
@@ -2134,51 +1931,29 @@ type SchemaProposalCommentReplySuccess {
 }
 
 input SchemaProposalCommentThreadCreateInput {
-  """
-  
-      The content of the comment.
-      
-  """
+  """The content of the comment."""
   text: String!
 
-  """
-  
-      Must be provided if and only if location is Line.
-      
-  """
+  """Must be provided if and only if location is Line."""
   subgraphName: String
 
-  """
-  
-      Must be provided if and only if location is Line.
-      
-  """
+  """Must be provided if and only if location is Line."""
   line: Int
 
-  """
-  
-      The parent schema proposal.
-      
-  """
+  """The parent schema proposal."""
   schemaProposalId: ID!
 
-  """
-  
-      Where the comment is located.
-      
-  """
+  """Where the comment is located."""
   location: SchemaProposalCommentThreadLocation!
 
   """
-  
-      The revision / version number of the proposal, obtained from
+  The revision / version number of the proposal, obtained from
   SchemaProposal.revision. Must be provided if and only if location is Line.
-      
-      This argument is necessary to avoid cases where the schema has been updated
+  
+  This argument is necessary to avoid cases where the schema has been updated
   between the time it was retried and the time the comment is posted. In these
   cases, if we use the latest subgraph schema, the line numbers may have changed
   and the comment would end up in the wrong place.
-      
   """
   proposalRevision: Int
 }
@@ -2310,6 +2085,26 @@ type SchemaProposalRequestReviewSuccess {
   query: Query!
 }
 
+type SchemaProposalReviewRequest implements SchemaProposalActivityFeedItem {
+  createdAt: DateTime!
+  id: ID!
+  requestFor: UserOrTeam!
+  requestedBy: ID!
+}
+
+input SchemaProposalReviewRequestCreateInput {
+  schemaProposalId: ID!
+
+  """Must be either a team id or a user id."""
+  reviewerId: ID!
+}
+
+union SchemaProposalReviewRequestCreatePayload = SchemaProposalDoesNotExistError | SchemaProposalReviewRequestCreateSuccess
+
+type SchemaProposalReviewRequestCreateSuccess {
+  query: Query!
+}
+
 type SchemaProposalsConfiguration {
   configuredReviewers: [SchemaProposalsConfiguredReviewers!]!
   enforceChecks: Boolean!
@@ -2326,11 +2121,7 @@ input SchemaProposalsConfigurationUpdateInput {
 input SchemaProposalsConfiguredReviewerAddInput {
   branchId: ID!
 
-  """
-  
-      Either a UserId or a TeamId
-      
-  """
+  """Either a UserId or a TeamId"""
   reviewerId: ID!
 }
 
@@ -2345,9 +2136,7 @@ input SchemaProposalsConfiguredReviewerRemoveInput {
   branchId: ID!
 
   """
-  
-      Either a SchemaProposalUserReviewerId or a SchemaProposalTeamReviewerId
-      
+  Either a SchemaProposalUserReviewerId or a SchemaProposalTeamReviewerId
   """
   reviewerId: ID!
 }
@@ -2451,11 +2240,7 @@ type SlackIntegration {
 }
 
 input SlackIntegrationCreateInput {
-  """
-  
-      The graph_id field is deprecated. Pass branch_id instead.
-      
-  """
+  """The graph_id field is deprecated. Pass branch_id instead."""
   graphId: String
   branchId: ID
   tokenId: String!
@@ -2608,10 +2393,6 @@ type TeamRemoveMemberSuccess {
 enum TeamRole {
   MEMBER
   ADMIN
-}
-
-type TemplateDoesNotExistError {
-  query: Query!
 }
 
 enum TimeAggregationGranularity {
@@ -2812,8 +2593,6 @@ enum UnitType {
   BYTES
 }
 
-scalar Url
-
 type User implements Node {
   avatarUrl: String
   canStartNewTrial: Boolean!
@@ -2823,7 +2602,6 @@ type User implements Node {
   name: String!
   organizationMemberships: [Member!]!
   organizations(after: String, before: String, first: Int, last: Int): OrganizationConnection!
-  personalAccount: PersonalAccount
 }
 
 type UserConnection {
@@ -2831,6 +2609,12 @@ type UserConnection {
   nodes: [User!]!
   pageInfo: PageInfo!
   totalCount: Int!
+}
+
+union UserDeletePayload = OrganizationOwnershipNotTransferredError | UserDeleteSuccess
+
+type UserDeleteSuccess {
+  query: Query!
 }
 
 type UserDoesNotExistError {
@@ -2841,6 +2625,18 @@ type UserEdge {
   cursor: String!
   node: User!
   role: TeamRole!
+}
+
+union UserOrTeam = Team | User
+
+input UserUpdateInput {
+  name: String!
+}
+
+union UserUpdatePayload = NameSizeCheckError | UserUpdateSuccess
+
+type UserUpdateSuccess {
+  query: Query!
 }
 
 type ValidationCheckError {
