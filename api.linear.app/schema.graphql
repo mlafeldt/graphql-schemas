@@ -1855,6 +1855,11 @@ type CustomerNeedConnection {
   pageInfo: PageInfo!
 }
 
+input CustomerNeedCreateFromAttachmentInput {
+  """The attachment this need is created from."""
+  attachmentId: String!
+}
+
 input CustomerNeedCreateInput {
   """
   The identifier in UUID v4 format. If none is provided, the backend will generate one.
@@ -9724,6 +9729,12 @@ type Mutation {
     input: CustomerNeedCreateInput!
   ): CustomerNeedPayload!
 
+  """[ALPHA] Creates a new customer need out of an attachment"""
+  customerNeedCreateFromAttachment(
+    """The customer need to create."""
+    input: CustomerNeedCreateFromAttachmentInput!
+  ): CustomerNeedPayload!
+
   """[ALPHA] Updates a customer need"""
   customerNeedUpdate(
     """The properties of the customer need to update."""
@@ -9741,7 +9752,13 @@ type Mutation {
 
   """[ALPHA] Archives a customer need."""
   customerNeedArchive(
-    """The identifier of the customer need to delete."""
+    """The identifier of the customer need to archive."""
+    id: String!
+  ): CustomerNeedArchivePayload!
+
+  """[ALPHA] Unarchives a customer need."""
+  customerNeedUnarchive(
+    """The identifier of the customer need to unarchive."""
     id: String!
   ): CustomerNeedArchivePayload!
 
@@ -15366,6 +15383,12 @@ type ProjectMilestone implements Node {
 
   """The project of the milestone."""
   project: Project!
+
+  """[Internal] The progress history of the project milestone."""
+  progressHistory: JSONObject!
+
+  """[Internal] The current progress of the project milestone."""
+  currentProgress: JSONObject!
 
   """
   The order of the milestone in relation to other milestones within a project.
