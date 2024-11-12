@@ -231,10 +231,6 @@ enum BranchEnvironment {
   PRODUCTION
 }
 
-type BranchNotDeployedError {
-  query: Query!
-}
-
 input BranchUpdateInput {
   operationChecksEnabled: Boolean
   schemaProposalsConfiguration: SchemaProposalsConfigurationUpdateInput
@@ -277,73 +273,6 @@ type CouldNotFindProjectsError {
 type CurrentPlanLimitReachedError {
   max: Int!
   query: Query!
-}
-
-type CustomDomain {
-  branch: String!
-  hostnameVerificationStatus: CustomDomainStatus!
-  hostnameVerificationTxtName: String
-  hostnameVerificationTxtValue: String
-  name: String!
-  sslVerificationCnameName: String
-  sslVerificationCnameValue: String
-  sslVerificationStatus: CustomDomainStatus!
-}
-
-type CustomDomainAlreadyExistsError {
-  query: Query!
-}
-
-input CustomDomainCreateInput {
-  name: String!
-  branch: String!
-  projectId: ID
-  graphId: ID
-}
-
-union CustomDomainCreatePayload = BranchDoesNotExistError | BranchNotDeployedError | CustomDomainAlreadyExistsError | CustomDomainCreateSuccess | GraphDoesNotExistError | InvalidDomainError | OperationNotAllowedByPlanError | ProjectDoesNotExistError | TooManyCustomDomainsError
-
-type CustomDomainCreateSuccess {
-  domain: CustomDomain!
-  query: Query!
-}
-
-input CustomDomainDeleteInput {
-  name: String!
-  projectId: ID
-  graphId: ID
-}
-
-union CustomDomainDeletePayload = CustomDomainDeleteSuccess | CustomDomainDoesNotExistError
-
-type CustomDomainDeleteSuccess {
-  name: String!
-  query: Query!
-}
-
-type CustomDomainDoesNotExistError {
-  query: Query!
-}
-
-input CustomDomainReplaceInput {
-  name: String!
-  branch: String!
-  projectId: ID
-  graphId: ID
-  existingName: String!
-}
-
-union CustomDomainReplacePayload = BranchDoesNotExistError | BranchNotDeployedError | CustomDomainDoesNotExistError | CustomDomainReplaceSuccess | GraphDoesNotExistError | InvalidDomainError | OperationNotAllowedByPlanError | ProjectDoesNotExistError
-
-type CustomDomainReplaceSuccess {
-  domain: CustomDomain!
-  query: Query!
-}
-
-enum CustomDomainStatus {
-  ACTIVE
-  PENDING
-  ERROR
 }
 
 type DailyDeploymentCountLimitExceededError {
@@ -393,7 +322,6 @@ type DeleteSubgraphSuccess {
 
 type Deployment implements Node {
   branch: Branch!
-  commit: GitCommit
   createdAt: DateTime!
   diffAgainstLatestProductionDeployment: String
   diffAgainstPreviousBranchDeployment: String
@@ -402,7 +330,6 @@ type Deployment implements Node {
   graph: Graph!
   id: ID!
   isRedeployable: Boolean!
-  logEntries: [DeploymentLogEntry!]!
   schema: String
   startedAt: DateTime
   status: DeploymentStatus!
@@ -425,9 +352,9 @@ type DeploymentConnection {
 
 input DeploymentCreateInput {
   branch: String
-  projectId: ID
-  graphId: ID
   archiveFileSize: Int!
+  graphId: ID
+  projectId: ID
 }
 
 union DeploymentCreatePayload = ArchiveFileSizeLimitExceededError | DailyDeploymentCountLimitExceededError | DeploymentCreateSuccess | GraphDoesNotExistError | GraphNotManagedError | GraphNotStandaloneError | NotAllowedError | ProjectDoesNotExistError | ProjectNotManagedError | ProjectNotStandaloneError
@@ -450,18 +377,6 @@ type DeploymentEdge {
 input DeploymentFilter {
   branch: String
   statuses: [DeploymentStatus!]
-}
-
-type DeploymentLogEntry {
-  createdAt: DateTime!
-  level: DeploymentLogLevel!
-  message: String!
-}
-
-enum DeploymentLogLevel {
-  ERROR
-  WARN
-  INFO
 }
 
 union DeploymentRedeployPayload = DailyDeploymentCountLimitExceededError | DeploymentDoesNotExistError | DeploymentRedeploySuccess | NotAllowedError
@@ -615,13 +530,6 @@ type GatewayRequestLogEventOperation {
   type: OperationType!
 }
 
-type GitCommit {
-  author: String
-  authorAvatarUrl: String
-  message: String!
-  sha: String!
-}
-
 enum GrafbasePlan {
   HOBBY @deprecated(reason: "to be removed soon")
   PRO @deprecated(reason: "to be removed soon")
@@ -636,7 +544,6 @@ type Graph implements Node {
   branches(after: String, before: String, first: Int, last: Int): BranchConnection!
   canBeRenamed: Boolean!
   createdAt: DateTime!
-  customDomains: [CustomDomain!]!
   deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
   graphMode: GraphMode!
   graphType: GraphType
@@ -645,7 +552,6 @@ type Graph implements Node {
   operationChecksConfiguration: GraphOperationCheckConfiguration!
   owners: [Team!]!
   productionBranch: Branch!
-  repoRootPath: String!
   request(branchName: String, approximateTimestamp: DateTime!, traceId: ID!): Request
   requestAnalytics(filter: GraphRequestAnalyticsFilter!): RequestAnalytics @deprecated(reason: "Use `analytics` instead")
   requests(after: String, before: String, first: Int, last: Int, filters: RequestFilters!): RequestConnection
@@ -789,7 +695,6 @@ type GraphConnection {
 input GraphCreateInput {
   accountId: ID!
   graphSlug: String!
-  repoRootPath: String! = "grafbase"
   graphType: GraphType
   graphMode: GraphMode! = SELF_HOSTED
 }
@@ -962,7 +867,6 @@ enum GraphType {
 input GraphUpdateInput {
   id: ID!
   graphSlug: String
-  repoRootPath: String
   productionBranch: String
 }
 
@@ -990,10 +894,6 @@ type InvalidAccountError {
 
 type InvalidDatabaseRegionsError {
   invalid: [String!]!
-  query: Query!
-}
-
-type InvalidDomainError {
   query: Query!
 }
 
@@ -1123,18 +1023,18 @@ type LogEventEdge {
 
 input LogEventFilter {
   query: String
-  branch: String
   region: [String!]
+  branch: String
   logLevel: [LogLevel!]
   from: DateTime
   to: DateTime
 }
 
 enum LogLevel {
-  ERROR
-  WARN
-  INFO
   DEBUG
+  INFO
+  WARN
+  ERROR
 }
 
 type ManagedGraphsNoLongerSupportedError {
@@ -1200,9 +1100,6 @@ type Mutation {
   branchSchemaProposalsConfiguredReviewerAdd(input: SchemaProposalsConfiguredReviewerAddInput!): SchemaProposalsConfiguredReviewerAddPayload!
   branchSchemaProposalsConfiguredReviewerRemove(input: SchemaProposalsConfiguredReviewerRemoveInput!): SchemaProposalsConfiguredReviewerRemovePayload!
   branchUpdate(input: BranchUpdateInput!): BranchUpdatePayload!
-  customDomainCreate(input: CustomDomainCreateInput!): CustomDomainCreatePayload!
-  customDomainDelete(input: CustomDomainDeleteInput!): CustomDomainDeletePayload!
-  customDomainReplace(input: CustomDomainReplaceInput!): CustomDomainReplacePayload!
   deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
   deploymentCreate(input: DeploymentCreateInput!): DeploymentCreatePayload! @deprecated(reason: "this mutation will be removed")
   deploymentCreateBySlug(input: DeploymentBySlugCreateInput!): DeploymentCreatePayload! @deprecated(reason: "this mutation will be removed")
@@ -1312,10 +1209,6 @@ type OperationCheckError {
 }
 
 scalar OperationNormalizedQueryHash
-
-type OperationNotAllowedByPlanError {
-  query: Query!
-}
 
 enum OperationType {
   QUERY
@@ -1511,7 +1404,7 @@ input PublishInput {
   url: String!
 }
 
-union PublishPayload = FederatedGraphCompositionError | ProjectDoesNotExistError | ProjectNotFederatedError | PublishForbidden | PublishSuccess | SchemaRegistryBranchDoesNotExistError
+union PublishPayload = FederatedGraphCompositionError | GraphDoesNotExistError | ProjectDoesNotExistError | PublishForbidden | PublishSuccess | SchemaRegistryBranchDoesNotExistError
 
 type PublishSuccess {
   query: Query!
@@ -1522,8 +1415,6 @@ type Query {
   accountBySlug(slug: String!): Account
   accountCreationValidate(input: AccountCreationValidateInput!): AccountCreationValidatePayload!
   branch(name: String, accountSlug: String, graphSlug: String, projectSlug: String): Branch
-  branchByDomain(domain: String!): Branch
-  customDomainByName(name: String!, projectId: ID, graphId: ID): CustomDomain
   deployment(id: ID!): Deployment
   dopplerConfigs(accountIntegrationId: ID!, dopplerProjectName: String!): [DopplerConfig!]!
   dopplerProjects(accountIntegrationId: ID!): [DopplerProject!]!
@@ -1839,10 +1730,10 @@ type SchemaCheckGitCommit {
 input SchemaCheckGitCommitInput {
   message: String!
   branch: String!
-  authorAvatarUrl: String
   commitSha: String!
   commitUrl: String
   authorName: String!
+  authorAvatarUrl: String
 }
 
 union SchemaCheckPayload = GraphBranchDoesNotExistError | GraphDoesNotExistError | ProjectBranchDoesNotExistError | ProjectDoesNotExistError | SchemaCheck | SubgraphNameMissingOnFederatedGraphError | SubgraphNameMissingOnFederatedProjectError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameProvidedOnStandaloneGraphError | SubgraphNameProvidedOnStandaloneProjectError
@@ -1854,6 +1745,7 @@ type SchemaProposal {
   createdAt: DateTime!
   description: String
   id: ID!
+  reviewers: [SchemaProposalReviewer!]!
   revision: Int!
   status: SchemaProposalStatus!
   subgraph(subgraphName: String!): SchemaProposalSubgraph
@@ -2085,6 +1977,24 @@ type SchemaProposalRequestReviewSuccess {
   query: Query!
 }
 
+union SchemaProposalReviewer = SchemaProposalReviewerTeam | SchemaProposalReviewerUser
+
+enum SchemaProposalReviewerStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+type SchemaProposalReviewerTeam {
+  teamId: ID!
+}
+
+type SchemaProposalReviewerUser {
+  onBehalfOf: [Team!]!
+  status: SchemaProposalReviewerStatus!
+  user: User!
+}
+
 type SchemaProposalReviewRequest implements SchemaProposalActivityFeedItem {
   createdAt: DateTime!
   id: ID!
@@ -2161,9 +2071,9 @@ type SchemaProposalsConfiguredReviewerUser {
 
 enum SchemaProposalStatus {
   APPROVED
+  REJECTED
   DRAFT
   IMPLEMENTED
-  REJECTED
   IN_REVIEW
 }
 
@@ -2421,10 +2331,6 @@ type TokenDoesNotExistError {
 }
 
 type TokenLimitExceededError {
-  query: Query!
-}
-
-type TooManyCustomDomainsError {
   query: Query!
 }
 
