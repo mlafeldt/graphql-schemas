@@ -1979,6 +1979,9 @@ input CustomerNeedUpdateInput {
 
   """Optional URL to the source of the customer need."""
   url: String
+
+  """The attachment this need is attached to."""
+  attachmentId: String
 }
 
 type CustomerPayload {
@@ -6222,7 +6225,7 @@ input IntegrationSettingsInput {
   jiraPersonal: JiraPersonalSettingsInput
 }
 
-"""The configuration of all integrations for a project or a team."""
+"""The configuration of all integrations for different entities."""
 type IntegrationsSettings implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -6279,6 +6282,9 @@ type IntegrationsSettings implements Node {
 
   """Whether to send a new project update to workspace Slack channel."""
   slackProjectUpdateCreatedToWorkspace: Boolean
+
+  """Whether to send a Slack message when a initiate update is created."""
+  slackInitiativeUpdateCreated: Boolean
 
   """Whether to send a Slack message when a new issue is added to triage."""
   slackIssueAddedToTriage: Boolean
@@ -12081,6 +12087,11 @@ input NotificationEntityInput {
   """The id of the project update related to the notification."""
   projectUpdateId: String
 
+  """
+  [Internal] The id of the initiative update related to the notification.
+  """
+  initiativeUpdateId: String
+
   """The id of the OAuth client approval related to the notification."""
   oauthClientApprovalId: String
 
@@ -12277,6 +12288,9 @@ input NotificationUpdateInput {
 
   """The id of the project update related to the notification."""
   projectUpdateId: String
+
+  """[Internal] The id of the project update related to the notification."""
+  initiativeUpdateId: String
 }
 
 """Notion specific settings."""
@@ -15789,8 +15803,17 @@ type ProjectNotification implements Notification & Entity & Node {
   """The project related to the notification."""
   project: Project!
 
+  """The initiative related to the notification."""
+  initiative: Initiative!
+
+  """The document related to the notification."""
+  document: Document!
+
   """The project update related to the notification."""
   projectUpdate: ProjectUpdate
+
+  """[Internal] The initiative update related to the notification."""
+  initiativeUpdate: InitiativeUpdate
 
   """The comment related to the notification."""
   comment: Comment
