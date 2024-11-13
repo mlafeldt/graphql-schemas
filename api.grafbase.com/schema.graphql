@@ -57,7 +57,6 @@ interface Account {
   id: ID!
   name: String!
   plan: GrafbasePlan!
-  resources: AccountResources!
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
   slug: String!
   status: AccountStatus!
@@ -120,10 +119,6 @@ type AccountIntegrationMutationSuccess {
   query: Query!
 }
 
-type AccountResources {
-  graphs: ResourceStatus!
-}
-
 type AccountResourcesStatus {
   requestCount: ResourceStatus!
 }
@@ -160,10 +155,7 @@ type AccountResourcesUsageDashboardSuccess {
 }
 
 type AccountStatus {
-  hasExceededLimits: Boolean!
-  inArrearsCause: InArrearsCause
   isEnabled: Boolean!
-  isHobbyPlanEnforced: Boolean!
 }
 
 type AlreadyExistsError {
@@ -425,11 +417,6 @@ type DopplerProject {
   name: String!
 }
 
-type DuplicateDatabaseRegionsError {
-  duplicates: [String!]!
-  query: Query!
-}
-
 scalar Duration
 
 input DurationFilter {
@@ -437,10 +424,6 @@ input DurationFilter {
   lte: Duration
   gt: Duration
   gte: Duration
-}
-
-type EmptyDatabaseRegionsError {
-  query: Query!
 }
 
 type EndpointConfig {
@@ -531,8 +514,6 @@ type GatewayRequestLogEventOperation {
 }
 
 enum GrafbasePlan {
-  HOBBY @deprecated(reason: "to be removed soon")
-  PRO @deprecated(reason: "to be removed soon")
   TRIAL
   ENTERPRISE
 }
@@ -699,7 +680,7 @@ input GraphCreateInput {
   graphMode: GraphMode! = SELF_HOSTED
 }
 
-union GraphCreatePayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | DuplicateDatabaseRegionsError | EmptyDatabaseRegionsError | GraphCreateSuccess | InvalidDatabaseRegionsError | InvalidRepoRootPathError | ManagedGraphsNoLongerSupportedError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | StandaloneGraphsNoLongerSupportedError
+union GraphCreatePayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | GraphCreateSuccess | ManagedGraphsNoLongerSupportedError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | StandaloneGraphsNoLongerSupportedError
 
 type GraphCreateSuccess {
   graph: Graph!
@@ -877,11 +858,6 @@ type GraphUpdateSuccess {
   query: Query!
 }
 
-enum InArrearsCause {
-  NEVER_PAID
-  UNPAID_INVOICE
-}
-
 type Integration {
   createdAt: DateTime!
   id: ID!
@@ -889,15 +865,6 @@ type Integration {
 }
 
 type InvalidAccountError {
-  query: Query!
-}
-
-type InvalidDatabaseRegionsError {
-  invalid: [String!]!
-  query: Query!
-}
-
-type InvalidRepoRootPathError {
   query: Query!
 }
 
@@ -1128,7 +1095,6 @@ type Mutation {
   organizationSlugUpdate(input: OrganizationSlugUpdateInput!): OrganizationSlugUpdatePayload!
   organizationUpdate(input: OrganizationUpdateInput!): OrganizationUpdatePayload!
   personalAccountDelete: PersonalAccountDeletePayload! @deprecated(reason: "to be removed")
-  personalAccountSlugUpdate(input: PersonalAccountSlugUpdateInput!): PersonalAccountSlugUpdatePayload!
   personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload! @deprecated(reason: "to be removed")
   publish(input: PublishInput!): PublishPayload!
   schemaCheckCreate(input: SchemaCheckCreateInput!): SchemaCheckPayload!
@@ -1228,7 +1194,6 @@ type Organization implements Account & Node {
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
   name: String!
   plan: GrafbasePlan!
-  resources: AccountResources! @deprecated(reason: "Not relevant for organizations")
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
   samlDomain: String
   slackIntegration: SlackIntegration
@@ -1313,34 +1278,10 @@ type PageInfo {
   startCursor: String
 }
 
-type PersonalAccount implements Account {
-  accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
-  createdAt: DateTime!
-  graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
-  graphsCountStatus: ResourceStatus!
-  id: ID!
-  name: String!
-  plan: GrafbasePlan!
-  resources: AccountResources! @deprecated(reason: "use graphs_count_status")
-  resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
-  slug: String!
-  status: AccountStatus!
-}
-
 union PersonalAccountDeletePayload = OrganizationOwnershipNotTransferredError | PersonalAccountDeleteSuccess
 
 type PersonalAccountDeleteSuccess {
   deletedId: ID!
-  query: Query!
-}
-
-input PersonalAccountSlugUpdateInput {
-  slug: String!
-}
-
-union PersonalAccountSlugUpdatePayload = PersonalAccountSlugUpdateSuccess | ReservedSlugsCheckError | SlugAlreadyExistsError | SlugError | SlugSizeCheckError
-
-type PersonalAccountSlugUpdateSuccess {
   query: Query!
 }
 
@@ -1986,7 +1927,7 @@ enum SchemaProposalReviewerStatus {
 }
 
 type SchemaProposalReviewerTeam {
-  teamId: ID!
+  team: Team!
 }
 
 type SchemaProposalReviewerUser {
