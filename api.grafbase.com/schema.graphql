@@ -74,51 +74,6 @@ type AccountDoesNotExistError {
   query: Query!
 }
 
-type AccountDopplerIntegration {
-  accessToken: String!
-}
-
-input AccountDopplerIntegrationInput {
-  accessToken: String!
-}
-
-type AccountIntegration {
-  accountId: ID!
-  attributes: AccountIntegrationAttributes!
-  createdAt: DateTime!
-  enabled: Boolean!
-  environments: [BranchEnvironment!]!
-  graphs: [GraphIntegration!]!
-  id: ID!
-  integrationId: ID!
-}
-
-union AccountIntegrationAttributes = AccountDopplerIntegration | DatadogIntegration
-
-input AccountIntegrationAttributesInput {
-  datadog: DatadogIntegrationInput
-  doppler: AccountDopplerIntegrationInput
-}
-
-input AccountIntegrationInput {
-  graphs: [ID!]
-  enabled: Boolean!
-  environments: [BranchEnvironment!]
-  attributes: AccountIntegrationAttributesInput!
-}
-
-type AccountIntegrationMutationError {
-  message: String!
-  query: Query!
-}
-
-union AccountIntegrationMutationPayload = AccountIntegrationMutationError | AccountIntegrationMutationSuccess
-
-type AccountIntegrationMutationSuccess {
-  account: Account!
-  query: Query!
-}
-
 type AccountResourcesStatus {
   requestCount: ResourceStatus!
 }
@@ -272,28 +227,6 @@ type DailyDeploymentCountLimitExceededError {
   query: Query!
 }
 
-type DatadogIntegration {
-  apiKey: String!
-  environments: [BranchEnvironment!]!
-  region: DatadogRegion!
-  sampling: Int!
-}
-
-input DatadogIntegrationInput {
-  apiKey: String!
-  region: DatadogRegion!
-  sampling: Int!
-}
-
-enum DatadogRegion {
-  US1
-  US3
-  US5
-  EU1
-  US1_FED
-  AP1
-}
-
 scalar DateTime
 
 input DeleteSubgraphInput {
@@ -315,8 +248,6 @@ type DeleteSubgraphSuccess {
 type Deployment implements Node {
   branch: Branch!
   createdAt: DateTime!
-  diffAgainstLatestProductionDeployment: String
-  diffAgainstPreviousBranchDeployment: String
   duration: Int
   finishedAt: DateTime
   graph: Graph!
@@ -406,15 +337,6 @@ type DiffSnippet {
 
 type DisabledAccountError {
   query: Query!
-}
-
-type DopplerConfig {
-  name: String!
-  projectName: String!
-}
-
-type DopplerProject {
-  name: String!
 }
 
 scalar Duration
@@ -534,7 +456,6 @@ type Graph implements Node {
   owners: [Team!]!
   productionBranch: Branch!
   request(branchName: String, approximateTimestamp: DateTime!, traceId: ID!): Request
-  requestAnalytics(filter: GraphRequestAnalyticsFilter!): RequestAnalytics @deprecated(reason: "Use `analytics` instead")
   requests(after: String, before: String, first: Int, last: Int, filters: RequestFilters!): RequestConnection
   schemaChecks(after: String, first: Int, branch: String): SchemaCheckConnection!
   schemaProposals(after: String, first: Int): SchemaProposalConnection!
@@ -701,48 +622,9 @@ type GraphDoesNotExistError {
   query: Query!
 }
 
-input GraphDopplerIntegrationAttributesInput {
-  projectName: String!
-  configName: String!
-}
-
 type GraphEdge {
   cursor: String!
   node: Graph!
-}
-
-type GraphIntegration {
-  accountIntegrationId: ID!
-  attributes: GraphIntegrationAttributes
-  branch: Branch
-  createdAt: DateTime!
-  enabled: Boolean!
-  graph: Graph!
-  id: ID!
-}
-
-union GraphIntegrationAttributes = ProjectDopplerIntegration
-
-input GraphIntegrationAttributesInput {
-  doppler: GraphDopplerIntegrationAttributesInput
-}
-
-input GraphIntegrationInput {
-  enabled: Boolean!
-  attributes: GraphIntegrationAttributesInput
-  branch: ID
-}
-
-type GraphIntegrationMutationError {
-  message: String!
-  query: Query!
-}
-
-union GraphIntegrationMutationPayload = GraphIntegrationMutationError | GraphIntegrationMutationSuccess
-
-type GraphIntegrationMutationSuccess {
-  account: Account!
-  query: Query!
 }
 
 enum GraphMode {
@@ -774,12 +656,6 @@ type GraphOperationCheckConfiguration {
 }
 
 input GraphOperationCheckConfigurationInput {
-  """
-  Whether operation checks are enabled for the graph. This is ignored, since
-  operation checks are now only enabled at the branch level.
-  """
-  enabled: Boolean
-
   """The graph to update."""
   graphId: ID!
 
@@ -800,6 +676,12 @@ input GraphOperationCheckConfigurationInput {
 
   """The operations to exclude from operation checks."""
   excludedOperations: [String!]
+
+  """
+  Whether operation checks are enabled for the graph. This is ignored, since
+  operation checks are now only enabled at the branch level.
+  """
+  enabled: Boolean
 }
 
 union GraphOperationCheckConfigurationUpdatePayload = GraphDoesNotExistError | GraphOperationCheckConfiguration | NotAllowedError
@@ -808,27 +690,6 @@ union GraphRemoveOwnerPayload = GraphDoesNotExistError | GraphRemoveOwnerSuccess
 
 type GraphRemoveOwnerSuccess {
   query: Query!
-}
-
-input GraphRequestAnalyticsFilter {
-  branch: String = null
-  from: DateTime
-  to: DateTime
-  aggregationStep: Duration
-  approximateNumberOfDataPoints: Int
-  alignPeriodWithAggregationStep: Boolean
-  clientName: String
-  clientVersion: String
-  period: GraphRequestAnalyticsPeriod
-  now: DateTime
-  graphqlOperation: String
-  operationId: ID
-}
-
-enum GraphRequestAnalyticsPeriod {
-  LAST_HOUR
-  LAST_24_HOURS
-  LAST_7_DAYS
 }
 
 type GraphScopeLimitExceededError {
@@ -856,12 +717,6 @@ union GraphUpdatePayload = CannotBeRenamedError | GraphDoesNotExistError | Graph
 type GraphUpdateSuccess {
   graph: Graph!
   query: Query!
-}
-
-type Integration {
-  createdAt: DateTime!
-  id: ID!
-  name: String!
 }
 
 type InvalidAccountError {
@@ -990,8 +845,8 @@ type LogEventEdge {
 
 input LogEventFilter {
   query: String
-  region: [String!]
   branch: String
+  region: [String!]
   logLevel: [LogLevel!]
   from: DateTime
   to: DateTime
@@ -1059,9 +914,6 @@ type MustLeaveAtLeastOneKeyForEnvironmentError {
 type Mutation {
   accessTokenCreate(input: AccessTokenCreateInput!): AccessTokenCreatePayload!
   accessTokenDelete(input: AccessTokenDeleteInput!): AccessTokenDeletePayload!
-  accountIntegrationCreate(accountId: ID!, input: AccountIntegrationInput!): AccountIntegrationMutationPayload!
-  accountIntegrationDelete(id: ID!): AccountIntegrationMutationPayload!
-  accountIntegrationUpdate(id: ID!, input: AccountIntegrationInput!): AccountIntegrationMutationPayload!
   branchCreate(input: BranchCreateInput!): BranchCreatePayload!
   branchDelete(accountSlug: String!, graphSlug: String, branchName: String!, projectSlug: String): BranchDeletePayload!
   branchSchemaProposalsConfiguredReviewerAdd(input: SchemaProposalsConfiguredReviewerAddInput!): SchemaProposalsConfiguredReviewerAddPayload!
@@ -1078,9 +930,6 @@ type Mutation {
   graphApiKeyUpdate(input: GraphApiKeyUpdateInput!): GraphApiKeyUpdatePayload!
   graphCreate(input: GraphCreateInput!): GraphCreatePayload!
   graphDelete(input: GraphDeleteInput!): GraphDeletePayload!
-  graphIntegrationCreate(graphId: ID!, accountIntegrationId: ID!, input: GraphIntegrationInput!): GraphIntegrationMutationPayload!
-  graphIntegrationDelete(id: ID!): GraphIntegrationMutationPayload!
-  graphIntegrationUpdate(id: ID!, input: GraphIntegrationInput!): GraphIntegrationMutationPayload!
   graphOperationCheckConfigurationUpdate(input: GraphOperationCheckConfigurationInput!): GraphOperationCheckConfigurationUpdatePayload!
   graphRemoveOwner(graphId: ID!, ownerId: ID!): GraphRemoveOwnerPayload!
   graphUpdate(input: GraphUpdateInput!): GraphUpdatePayload!
@@ -1189,7 +1038,6 @@ type Organization implements Account & Node {
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
   graphsCountStatus: ResourceStatus!
   id: ID!
-  integrations: [AccountIntegration!]! @deprecated(reason: "to be removed soon")
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
   name: String!
@@ -1295,23 +1143,12 @@ type PersonalAccountUpdateSuccess {
   query: Query!
 }
 
-type PreviousRequestAnalytcs {
-  metrics: RequestMetrics!
-  timeSeries: RequestMetricsTimeSeries!
-}
-
 type ProjectBranchDoesNotExistError {
   query: Query!
 }
 
 type ProjectDoesNotExistError {
   query: Query!
-}
-
-type ProjectDopplerIntegration {
-  automatedRedeploy: Boolean!
-  configName: String!
-  projectName: String!
 }
 
 type ProjectNotFederatedError {
@@ -1357,10 +1194,7 @@ type Query {
   accountCreationValidate(input: AccountCreationValidateInput!): AccountCreationValidatePayload!
   branch(name: String, accountSlug: String, graphSlug: String, projectSlug: String): Branch
   deployment(id: ID!): Deployment
-  dopplerConfigs(accountIntegrationId: ID!, dopplerProjectName: String!): [DopplerConfig!]!
-  dopplerProjects(accountIntegrationId: ID!): [DopplerProject!]!
   graphByAccountSlug(accountSlug: String!, graphSlug: String!): Graph
-  integrations: [Integration!]!
   invite(id: ID!): Invite
   node(id: ID!): Node
   schemaCheck(id: ID!): SchemaCheck
@@ -1388,14 +1222,6 @@ type Request implements Node {
   trace: Trace!
   urlPath: String!
   userAgent: String!
-}
-
-type RequestAnalytics {
-  metrics: RequestMetrics!
-  periodEnd: DateTime!
-  periodStart: DateTime!
-  previousPeriodAnalytics: PreviousRequestAnalytcs
-  timeSeries: RequestMetricsTimeSeries!
 }
 
 type RequestConnection {
@@ -1451,38 +1277,6 @@ type RequestLogEvent implements LogEvent {
   message: String!
   region: String!
   url: String!
-}
-
-type RequestMetrics {
-  cacheHitCount: Int!
-  cacheMissCount: Int!
-  cachePassCount: Int!
-  cacheableRequestCount: Int!
-  error4XxCount: Int!
-  error5XxCount: Int!
-  errorGraphqlCount: Int!
-  latencyMsP95: Int
-  latencyMsP99: Int
-  requestCount: Int!
-}
-
-type RequestMetricsTimeSeries {
-  aggregationStep: Duration!
-  data: [RequestMetricsTimeSeriesDataPoint!]!
-}
-
-type RequestMetricsTimeSeriesDataPoint {
-  cacheHitCount: Int!
-  cacheMissCount: Int!
-  cachePassCount: Int!
-  cacheableRequestCount: Int!
-  dateTime: DateTime!
-  error4XxCount: Int!
-  error5XxCount: Int!
-  errorGraphqlCount: Int!
-  latencyMsP95: Int
-  latencyMsP99: Int
-  requestCount: Int!
 }
 
 type RequestMetricsTimeSeriesDataPointV2 {
