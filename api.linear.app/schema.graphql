@@ -5542,6 +5542,11 @@ type Initiative implements Node {
     orderBy: PaginationOrderBy
   ): EntityExternalLinkConnection!
 
+  """
+  [Internal] Settings for all integrations associated with that initiative.
+  """
+  integrationsSettings: IntegrationsSettings
+
   """The initiative's content in markdown format."""
   content: String
 }
@@ -5788,6 +5793,9 @@ type InitiativeNotification implements Notification & Entity & Node {
 
   """Related initiative ID."""
   initiativeId: String!
+
+  """[Internal] Related initiative update ID."""
+  initiativeUpdateId: String
 }
 
 """An initiative notification subscription."""
@@ -6169,6 +6177,7 @@ enum IntegrationService {
   slackPost
   slackProjectPost
   slackProjectUpdatesPost
+  slackInitiativePost
   sentry
   zendesk
   email
@@ -6180,6 +6189,7 @@ type IntegrationSettings {
   slackAsks: SlackAsksSettings
   slackPost: SlackPostSettings
   slackProjectPost: SlackPostSettings
+  slackInitiativePost: SlackPostSettings
   slackCustomViewNotifications: SlackPostSettings
   slackOrgProjectUpdatesPost: SlackPostSettings
   slackOrgInitiativeUpdatesPost: SlackPostSettings
@@ -6205,6 +6215,7 @@ input IntegrationSettingsInput {
   slackAsks: SlackAsksSettingsInput
   slackPost: SlackPostSettingsInput
   slackProjectPost: SlackPostSettingsInput
+  slackInitiativePost: SlackPostSettingsInput
   slackCustomViewNotifications: SlackPostSettingsInput
   slackOrgProjectUpdatesPost: SlackPostSettingsInput
   slackOrgInitiativeUpdatesPost: SlackPostSettingsInput
@@ -6300,6 +6311,9 @@ type IntegrationsSettings implements Node {
 
   """Project which those settings apply to."""
   project: Project
+
+  """Initiative which those settings apply to."""
+  initiative: Initiative
 }
 
 type IntegrationsSettingsConnection {
@@ -6345,6 +6359,9 @@ input IntegrationsSettingsCreateInput {
   """
   slackProjectUpdateCreatedToWorkspace: Boolean
 
+  """Whether to send a Slack message when an initiative update is created."""
+  slackInitiativeUpdateCreated: Boolean
+
   """Whether to send a Slack message when a new issue is added to triage."""
   slackIssueAddedToTriage: Boolean
 
@@ -6364,6 +6381,9 @@ input IntegrationsSettingsCreateInput {
 
   """The identifier of the project to create settings for."""
   projectId: String
+
+  """The identifier of the initiative to create settings for."""
+  initiativeId: String
 
   """The identifier of the custom view to create settings for."""
   customViewId: String
@@ -6428,6 +6448,9 @@ input IntegrationsSettingsUpdateInput {
   Whether to send a Slack message when a project update is created to workspace channel.
   """
   slackProjectUpdateCreatedToWorkspace: Boolean
+
+  """Whether to send a Slack message when an initiative update is created."""
+  slackInitiativeUpdateCreated: Boolean
 
   """Whether to send a Slack message when a new issue is added to triage."""
   slackIssueAddedToTriage: Boolean
@@ -10416,6 +10439,18 @@ type Mutation {
     code: String!
   ): SlackChannelConnectPayload!
 
+  """[Internal] Slack integration for initiative notifications."""
+  integrationSlackInitiativePost(
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """Integration's associated initiative."""
+    initiativeId: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): SlackChannelConnectPayload!
+
   """Slack integration for custom view notifications."""
   integrationSlackCustomViewNotifications(
     """The Slack OAuth redirect URI."""
@@ -11632,6 +11667,24 @@ type Mutation {
     flag: UserFlagType!
   ): UserSettingsFlagPayload!
 
+  """
+  Subscribes to or unsubscribes from a notification category for a given notification channel for the user
+  """
+  notificationCategoryChannelSubscriptionUpdate(
+    """
+    The notification channel in which to subscribe to or unsubscribe from the category
+    """
+    channel: NotificationChannel!
+
+    """The notification category to subscribe to or unsubscribe from"""
+    category: NotificationCategory!
+
+    """
+    True if the user wants to subscribe, false if the user wants to unsubscribe
+    """
+    subscribe: Boolean!
+  ): UserSettingsPayload!
+
   """Creates a new ViewPreferences object."""
   viewPreferencesCreate(
     """The ViewPreferences object to create."""
@@ -11831,6 +11884,22 @@ type NotificationBatchActionPayload {
   success: Boolean!
 }
 
+"""The categories of notifications a user can subscribe to."""
+enum NotificationCategory {
+  assignments
+  statusChanges
+  commentsAndReplies
+  mentions
+  reactions
+  subscriptions
+  documentChanges
+  postsAndUpdates
+  reminders
+  reviews
+  appsAndIntegrations
+  system
+}
+
 """A user's notification category preferences."""
 type NotificationCategoryPreferences {
   """The preferences for notifications about assignments."""
@@ -11929,6 +11998,14 @@ input NotificationCategoryPreferencesInput {
 
   """The preferences for notifications about apps and integrations."""
   appsAndIntegrations: NotificationCategoryPreferencesChannelInput
+}
+
+"""The delivery channels a user can receive notifications in."""
+enum NotificationChannel {
+  desktop
+  mobile
+  email
+  slack
 }
 
 """
@@ -19237,6 +19314,12 @@ input ReactionCreateInput {
 
   """[Internal] The post to associate the reaction with."""
   postId: String
+
+  """[Internal] The pull request to associate the reaction with."""
+  pullRequestId: String
+
+  """[Internal] The pull request comment to associate the reaction with."""
+  pullRequestCommentId: String
 }
 
 type ReactionEdge {
@@ -19651,11 +19734,17 @@ enum SendStrategy {
 type SentrySettings {
   """The slug of the Sentry organization being connected."""
   organizationSlug: String!
+
+  """The ID of the Sentry organization being connected."""
+  organizationId: Float!
 }
 
 input SentrySettingsInput {
   """The slug of the Sentry organization being connected."""
   organizationSlug: String!
+
+  """The ID of the Sentry organization being connected."""
+  organizationId: Float!
 }
 
 """Shared Slack integration settings."""
