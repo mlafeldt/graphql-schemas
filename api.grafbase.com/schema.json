@@ -10204,6 +10204,37 @@
             "deprecationReason": null
           },
           {
+            "name": "schemaProposalRevertToDraft",
+            "description": null,
+            "args": [
+              {
+                "name": "schemaProposalId",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "UNION",
+                "name": "SchemaProposalRevertToDraftPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "schemaProposalReviewRequestCreate",
             "description": null,
             "args": [
@@ -16470,22 +16501,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "id",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -16520,6 +16535,11 @@
           {
             "kind": "OBJECT",
             "name": "SchemaProposalReviewRequest",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "SchemaProposalStatusChange",
             "ofType": null
           }
         ]
@@ -16644,6 +16664,11 @@
           {
             "kind": "OBJECT",
             "name": "SchemaProposalApproveSuccess",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "SchemaProposalDoesNotExistError",
             "ofType": null
           }
         ]
@@ -17262,6 +17287,20 @@
         "fields": null,
         "inputFields": [
           {
+            "name": "schemaProposalId",
+            "description": "The parent schema proposal.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
             "name": "text",
             "description": "The content of the comment.",
             "type": {
@@ -17292,20 +17331,6 @@
               "kind": "SCALAR",
               "name": "Int",
               "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "schemaProposalId",
-            "description": "The parent schema proposal.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
             },
             "defaultValue": null
           },
@@ -17863,16 +17888,6 @@
             "defaultValue": null
           },
           {
-            "name": "description",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
             "name": "schemaProposalId",
             "description": null,
             "type": {
@@ -17883,6 +17898,16 @@
                 "name": "ID",
                 "ofType": null
               }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "description",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "defaultValue": null
           }
@@ -18156,6 +18181,11 @@
         "possibleTypes": [
           {
             "kind": "OBJECT",
+            "name": "SchemaProposalDoesNotExistError",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "SchemaProposalRejectSuccess",
             "ofType": null
           }
@@ -18374,6 +18404,11 @@
         "possibleTypes": [
           {
             "kind": "OBJECT",
+            "name": "SchemaProposalDoesNotExistError",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "SchemaProposalRequestReviewSuccess",
             "ofType": null
           }
@@ -18382,6 +18417,54 @@
       {
         "kind": "OBJECT",
         "name": "SchemaProposalRequestReviewSuccess",
+        "description": null,
+        "fields": [
+          {
+            "name": "query",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Query",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "UNION",
+        "name": "SchemaProposalRevertToDraftPayload",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "SchemaProposalDoesNotExistError",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "SchemaProposalRevertToDraftSuccess",
+            "ofType": null
+          }
+        ]
+      },
+      {
+        "kind": "OBJECT",
+        "name": "SchemaProposalRevertToDraftSuccess",
         "description": null,
         "fields": [
           {
@@ -18757,6 +18840,71 @@
             "deprecationReason": null
           }
         ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "SchemaProposalStatusChange",
+        "description": null,
+        "fields": [
+          {
+            "name": "createdAt",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "fromStatus",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "SchemaProposalStatus",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "toStatus",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "SchemaProposalStatus",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "SchemaProposalActivityFeedItem",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
         "possibleTypes": null
       },
       {
