@@ -253,10 +253,8 @@ type Deployment implements Node {
   graph: Graph!
   id: ID!
   isRedeployable: Boolean!
-  schema: String
   startedAt: DateTime
   status: DeploymentStatus!
-  triggerType: DeploymentTriggerType!
 }
 
 input DeploymentBySlugCreateInput {
@@ -314,16 +312,6 @@ enum DeploymentStatus {
   IN_PROGRESS
   SUCCEEDED
   FAILED
-}
-
-enum DeploymentTriggerType {
-  GRAPH_CREATION
-  PROJECT_CREATION @deprecated(reason: "replaced by GraphCreation")
-  GIT_PUSH
-  CLI
-  REDEPLOYMENT
-  NEW_SCHEMA_PUBLICATION
-  INTERNAL
 }
 
 type DiffSnippet {
@@ -445,11 +433,8 @@ type Graph implements Node {
   analytics(filters: GraphAnalyticsFilters!): GraphAnalytics
   apiKeys(after: String, before: String, first: Int, last: Int): GraphApiKeyConnection!
   branches(after: String, before: String, first: Int, last: Int): BranchConnection!
-  canBeRenamed: Boolean!
   createdAt: DateTime!
   deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
-  graphMode: GraphMode!
-  graphType: GraphType
   id: ID!
   logEvents(after: String, before: String, first: Int, last: Int, filter: LogEventFilter!): LogEventConnection!
   operationChecksConfiguration: GraphOperationCheckConfiguration!
@@ -460,7 +445,6 @@ type Graph implements Node {
   schemaChecks(after: String, first: Int, branch: String): SchemaCheckConnection!
   schemaProposals(after: String, first: Int): SchemaProposalConnection!
   slug: String!
-  status: GraphStatus!
 }
 
 union GraphAddOwnerPayload = GraphAddOwnerSuccess | GraphDoesNotExistError | NotAllowedError
@@ -597,8 +581,6 @@ type GraphConnection {
 input GraphCreateInput {
   accountId: ID!
   graphSlug: String!
-  graphType: GraphType
-  graphMode: GraphMode! = SELF_HOSTED
 }
 
 union GraphCreatePayload = AccountDoesNotExistError | CurrentPlanLimitReachedError | DisabledAccountError | GraphCreateSuccess | ManagedGraphsNoLongerSupportedError | SlugAlreadyExistsError | SlugInvalidError | SlugTooLongError | StandaloneGraphsNoLongerSupportedError
@@ -625,11 +607,6 @@ type GraphDoesNotExistError {
 type GraphEdge {
   cursor: String!
   node: Graph!
-}
-
-enum GraphMode {
-  MANAGED @deprecated(reason: "to be removed soon")
-  SELF_HOSTED
 }
 
 type GraphNotFederatedError {
@@ -694,16 +671,6 @@ type GraphRemoveOwnerSuccess {
 
 type GraphScopeLimitExceededError {
   query: Query!
-}
-
-enum GraphStatus {
-  ACTIVE
-  INACTIVE
-}
-
-enum GraphType {
-  STANDALONE @deprecated(reason: "to be removed soon")
-  FEDERATED
 }
 
 input GraphUpdateInput {
@@ -1472,7 +1439,7 @@ input SchemaCheckGitCommitInput {
   authorAvatarUrl: String
 }
 
-union SchemaCheckPayload = GraphBranchDoesNotExistError | GraphDoesNotExistError | ProjectBranchDoesNotExistError | ProjectDoesNotExistError | SchemaCheck | SubgraphNameMissingOnFederatedGraphError | SubgraphNameMissingOnFederatedProjectError | SubgraphNameProvidedOnSingleProjectError | SubgraphNameProvidedOnStandaloneGraphError | SubgraphNameProvidedOnStandaloneProjectError
+union SchemaCheckPayload = GraphBranchDoesNotExistError | GraphDoesNotExistError | SchemaCheck | SubgraphNameMissingOnFederatedGraphError
 
 type SchemaProposal {
   activityFeed: [SchemaProposalActivityFeedItem!]!
@@ -1962,22 +1929,6 @@ type SubgraphAddOwnerSuccess {
 }
 
 type SubgraphNameMissingOnFederatedGraphError {
-  query: Query!
-}
-
-type SubgraphNameMissingOnFederatedProjectError {
-  query: Query!
-}
-
-type SubgraphNameProvidedOnSingleProjectError {
-  query: Query! @deprecated(reason: "Type renamed to SubgraphNameProvidedOnStandaloneProjectError")
-}
-
-type SubgraphNameProvidedOnStandaloneGraphError {
-  query: Query!
-}
-
-type SubgraphNameProvidedOnStandaloneProjectError {
   query: Query!
 }
 
