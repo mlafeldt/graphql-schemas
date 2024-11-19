@@ -2298,7 +2298,7 @@ input CustomerTierCreateInput {
   id: String
 
   """The name of the tier."""
-  name: String!
+  name: String
 
   """The UI color of the tier as a HEX string."""
   color: String!
@@ -10206,6 +10206,12 @@ type Mutation {
     installationId: String!
   ): IntegrationPayload!
 
+  """Refreshes the data for a GitHub import integration."""
+  integrationGithubImportRefresh(
+    """The id of the integration to update."""
+    id: String!
+  ): IntegrationPayload!
+
   """Connects the organization with a GitHub Enterprise Server."""
   integrationGitHubEnterpriseServerConnect(
     """The name of GitHub organization."""
@@ -11327,7 +11333,7 @@ type Mutation {
   projectUpdateMarkAsRead(
     """The identifier of the project update."""
     id: String!
-  ): ProjectUpdateWithInteractionPayload!
+  ): ProjectUpdateWithInteractionPayload! @deprecated(reason: "Project uppdate interactions are not used and will be removed.")
 
   """Create a notification to remind a user about a project update."""
   createProjectUpdateReminder(
@@ -17231,7 +17237,7 @@ type ProjectUpdateWithInteractionPayload {
   success: Boolean!
 
   """The project update that was created or updated."""
-  interaction: ProjectUpdateInteraction!
+  interaction: ProjectUpdateInteraction! @deprecated(reason: "Project update interactions are not used and will be removed.")
 }
 
 """A comment on a pull request."""
@@ -17288,6 +17294,39 @@ input PullRequestReviewerInput {
 
   """The date when the pull request was last reviewed."""
   lastReviewedAt: DateTime
+}
+
+"""[ALPHA] User-specific state for a pull request."""
+type PullRequestUserState {
+  """The ID of the user the state belongs to."""
+  userId: String!
+
+  """
+  The date when the user's attention was last needed on the pull request.
+  """
+  attentionLastNeededAt: DateTime
+
+  """The date when the user last interacted with the pull request."""
+  lastActivityAt: DateTime
+
+  """The date when the user last dismissed the pull request from view."""
+  lastDismissedAt: DateTime
+}
+
+input PullRequestUserStateInput {
+  """The ID of the user the state belongs to."""
+  userId: String!
+
+  """
+  The date when the user's attention was last needed on the pull request.
+  """
+  attentionLastNeededAt: DateTime
+
+  """The date when the user last interacted with the pull request."""
+  lastActivityAt: DateTime
+
+  """The date when the user last dismissed the pull request from view."""
+  lastDismissedAt: DateTime
 }
 
 """A user's web or mobile push notification subscription."""
@@ -19724,7 +19763,7 @@ type SentrySettings {
   organizationSlug: String!
 
   """The ID of the Sentry organization being connected."""
-  organizationId: Float!
+  organizationId: Int!
 }
 
 input SentrySettingsInput {
@@ -19732,7 +19771,7 @@ input SentrySettingsInput {
   organizationSlug: String!
 
   """The ID of the Sentry organization being connected."""
-  organizationId: Float!
+  organizationId: Int!
 }
 
 """Shared Slack integration settings."""
