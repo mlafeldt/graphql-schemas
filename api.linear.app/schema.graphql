@@ -1772,7 +1772,7 @@ type CustomerNeed implements Node {
   attachment: Attachment
 
   """
-  The urgency of the customer need. 0 = No urgency, 1 = Critical, 2 = Important, 3 = Nice to have.
+  Whether the customer need is important or not. 0 = Not important, 1 = Important.
   """
   priority: Float!
 
@@ -1882,7 +1882,7 @@ input CustomerNeedCreateInput {
   attachmentId: String
 
   """
-  The urgency of the customer need. 0 = No urgency, 1 = Critical, 2 = Important, 3 = Nice to have.
+  Whether the customer need is important or not. 0 = Not important, 1 = Important.
   """
   priority: Float
 
@@ -1967,7 +1967,7 @@ input CustomerNeedUpdateInput {
   projectId: String
 
   """
-  The urgency of the customer need. 0 = No urgency, 1 = Critical, 2 = Important, 3 = Nice to have.
+  Whether the customer need is important or not. 0 = Not important, 1 = Important.
   """
   priority: Float
 
@@ -3422,9 +3422,6 @@ type DocumentContent implements Node {
 
   """The document content in markdown format."""
   content: String
-
-  """[Internal] The document content as a Prosemirror document."""
-  contentData: JSONObject @deprecated(reason: "Use `contentState` instead")
 
   """The document content state as a base64 encoded string."""
   contentState: String
@@ -7014,9 +7011,6 @@ type Issue implements Node {
   """The issue's description in markdown format."""
   description: String
 
-  """[Internal] The issue's description as a Prosemirror document."""
-  descriptionData: JSON @deprecated(reason: "Use description instead.")
-
   """[Internal] The issue's description content as YJS state."""
   descriptionState: String
 
@@ -7257,6 +7251,9 @@ input IssueCreateInput {
 
   """The comment the issue is created from."""
   sourceCommentId: String
+
+  """[Internal] The pull request comment the issue is created from."""
+  sourcePullRequestCommentId: String
 
   """The position of the issue in its column on the board view."""
   boardOrder: Float
@@ -8806,9 +8803,6 @@ type IssueSearchResult implements Node {
 
   """The issue's description in markdown format."""
   description: String
-
-  """[Internal] The issue's description as a Prosemirror document."""
-  descriptionData: JSON @deprecated(reason: "Use description instead.")
 
   """[Internal] The issue's description content as YJS state."""
   descriptionState: String
@@ -21436,31 +21430,6 @@ input TeamUpdateInput {
   """What to use as an default estimate for unestimated issues."""
   defaultIssueEstimate: Float
 
-  """
-  The workflow state into which issues are moved when a draft PR has been opened.
-  """
-  draftWorkflowStateId: String
-
-  """
-  The workflow state into which issues are moved when a PR has been opened.
-  """
-  startWorkflowStateId: String
-
-  """
-  The workflow state into which issues are moved when a review has been requested for the PR.
-  """
-  reviewWorkflowStateId: String
-
-  """
-  The workflow state into which issues are moved when a PR is ready to be merged.
-  """
-  mergeableWorkflowStateId: String
-
-  """
-  The workflow state into which issues are moved when a PR has been merged.
-  """
-  mergeWorkflowStateId: String
-
   """Whether to send new issue notifications to Slack."""
   slackNewIssue: Boolean
 
@@ -23002,6 +22971,7 @@ enum ViewType {
   quickView
   issueIdentifiers
   customers
+  customer
   reviews
   myReviews
   feedAll
