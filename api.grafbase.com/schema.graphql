@@ -294,11 +294,6 @@ type DeploymentEdge {
   node: Deployment!
 }
 
-input DeploymentFilter {
-  branch: String
-  statuses: [DeploymentStatus!]
-}
-
 union DeploymentRedeployPayload = DailyDeploymentCountLimitExceededError | DeploymentDoesNotExistError | DeploymentRedeploySuccess | NotAllowedError
 
 type DeploymentRedeploySuccess {
@@ -382,46 +377,6 @@ type FieldMetricsTimeSeriesDataPoint {
   dateTime: DateTime!
 }
 
-enum FunctionKind {
-  AUTHORIZER
-  RESOLVER
-}
-
-type FunctionLogEvent implements LogEvent {
-  branch: String!
-  createdAt: DateTime!
-  deploymentId: ID!
-  environment: BranchEnvironment!
-  functionKind: FunctionKind!
-  functionName: String!
-  id: String!
-  logLevel: LogLevel!
-  message: String!
-  region: String!
-  url: String
-}
-
-type GatewayRequestLogEvent implements LogEvent {
-  branch: String!
-  createdAt: DateTime!
-  deploymentId: ID!
-  duration: Int!
-  environment: BranchEnvironment!
-  httpMethod: String!
-  httpStatus: Int!
-  id: String!
-  logLevel: LogLevel!
-  message: String!
-  operation: GatewayRequestLogEventOperation
-  region: String!
-  url: String!
-}
-
-type GatewayRequestLogEventOperation {
-  name: String
-  type: OperationType!
-}
-
 enum GrafbasePlan {
   TRIAL
   ENTERPRISE
@@ -430,12 +385,9 @@ enum GrafbasePlan {
 type Graph implements Node {
   account: Account!
   analytics(filters: GraphAnalyticsFilters!): GraphAnalytics
-  apiKeys(after: String, before: String, first: Int, last: Int): GraphApiKeyConnection!
   branches(after: String, before: String, first: Int, last: Int): BranchConnection!
   createdAt: DateTime!
-  deployments(after: String, before: String, first: Int, last: Int, filter: DeploymentFilter): DeploymentConnection!
   id: ID!
-  logEvents(after: String, before: String, first: Int, last: Int, filter: LogEventFilter!): LogEventConnection!
   operationChecksConfiguration: GraphOperationCheckConfiguration!
   owners: [Team!]!
   productionBranch: Branch!
@@ -511,60 +463,6 @@ input GraphAnalyticsFilters {
 
   """Only used if client name is specified."""
   clientVersion: String
-}
-
-type GraphApiKey implements Node {
-  createdAt: DateTime!
-  environment: BranchEnvironment!
-  id: ID!
-  key: String!
-  name: String!
-}
-
-type GraphApiKeyConnection {
-  edges: [GraphApiKeyEdge!]!
-  nodes: [GraphApiKey!]!
-  pageInfo: PageInfo!
-}
-
-input GraphApiKeyCreateInput {
-  name: String!
-  environment: BranchEnvironment!
-  graphId: ID!
-}
-
-union GraphApiKeyCreatePayload = GraphApiKeyCreateSuccess | GraphDoesNotExistError | KeyLimitExceededError
-
-type GraphApiKeyCreateSuccess {
-  apiKey: GraphApiKey!
-  query: Query!
-}
-
-input GraphApiKeyDeleteInput {
-  id: ID!
-}
-
-union GraphApiKeyDeletePayload = GraphApiKeyDeleteSuccess | KeyDoesNotExistError | MustLeaveAtLeastOneKeyForEnvironmentError
-
-type GraphApiKeyDeleteSuccess {
-  deletedId: ID!
-  query: Query!
-}
-
-type GraphApiKeyEdge {
-  cursor: String!
-  node: GraphApiKey!
-}
-
-input GraphApiKeyUpdateInput {
-  id: ID!
-  name: String!
-}
-
-union GraphApiKeyUpdatePayload = GraphApiKeyUpdateSuccess | KeyDoesNotExistError
-
-type GraphApiKeyUpdateSuccess {
-  query: Query!
 }
 
 type GraphBranchDoesNotExistError {
@@ -768,14 +666,6 @@ enum InviteStatus {
 
 scalar JSON
 
-type KeyDoesNotExistError {
-  query: Query!
-}
-
-type KeyLimitExceededError {
-  query: Query!
-}
-
 enum LimitCycleChoice {
   CURRENT
   PREVIOUS
@@ -785,44 +675,6 @@ type LintCheckError {
   message: String!
   severity: SchemaCheckErrorSeverity!
   title: String!
-}
-
-interface LogEvent {
-  branch: String!
-  createdAt: DateTime!
-  deploymentId: ID!
-  environment: BranchEnvironment!
-  id: String!
-  logLevel: LogLevel!
-  message: String!
-  region: String!
-}
-
-type LogEventConnection {
-  edges: [LogEventEdge!]!
-  nodes: [LogEvent!]!
-  pageInfo: PageInfo!
-}
-
-type LogEventEdge {
-  cursor: String!
-  node: LogEvent!
-}
-
-input LogEventFilter {
-  query: String
-  branch: String
-  region: [String!]
-  logLevel: [LogLevel!]
-  from: DateTime
-  to: DateTime
-}
-
-enum LogLevel {
-  DEBUG
-  INFO
-  WARN
-  ERROR
 }
 
 type ManagedGraphsNoLongerSupportedError {
@@ -873,10 +725,6 @@ type MemberUpdatePayload {
   query: Query!
 }
 
-type MustLeaveAtLeastOneKeyForEnvironmentError {
-  query: Query!
-}
-
 type Mutation {
   accessTokenCreate(input: AccessTokenCreateInput!): AccessTokenCreatePayload!
   accessTokenDelete(input: AccessTokenDeleteInput!): AccessTokenDeletePayload!
@@ -891,9 +739,6 @@ type Mutation {
   deploymentRedeploy(id: ID!): DeploymentRedeployPayload!
   endpointConfigUpdate(input: EndpointConfigUpdateInput!): EndpointConfigUpdatePayload!
   graphAddOwner(graphId: ID!, ownerId: ID!): GraphAddOwnerPayload!
-  graphApiKeyCreate(input: GraphApiKeyCreateInput!): GraphApiKeyCreatePayload!
-  graphApiKeyDelete(input: GraphApiKeyDeleteInput!): GraphApiKeyDeletePayload!
-  graphApiKeyUpdate(input: GraphApiKeyUpdateInput!): GraphApiKeyUpdatePayload!
   graphCreate(input: GraphCreateInput!): GraphCreatePayload!
   graphDelete(input: GraphDeleteInput!): GraphDeletePayload!
   graphOperationCheckConfigurationUpdate(input: GraphOperationCheckConfigurationInput!): GraphOperationCheckConfigurationUpdatePayload!
@@ -1229,21 +1074,6 @@ input RequestFilters {
   httpStatusCode: [Int!]
   operationType: [OperationType!]
   errorCode: [String!]
-}
-
-type RequestLogEvent implements LogEvent {
-  branch: String!
-  createdAt: DateTime!
-  deploymentId: ID!
-  duration: Int!
-  environment: BranchEnvironment!
-  httpMethod: String!
-  httpStatus: Int!
-  id: String!
-  logLevel: LogLevel!
-  message: String!
-  region: String!
-  url: String!
 }
 
 type RequestMetricsTimeSeriesDataPointV2 {
