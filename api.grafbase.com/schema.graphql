@@ -7,8 +7,13 @@ type AccessToken implements Node {
 }
 
 type AccessTokenConnection {
+  """A list of edges."""
   edges: [AccessTokenEdge!]!
+
+  """A list of nodes."""
   nodes: [AccessToken!]!
+
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
@@ -39,8 +44,12 @@ type AccessTokenDeleteSuccess {
   query: Query!
 }
 
+"""An edge in a connection."""
 type AccessTokenEdge {
+  """A cursor for use in pagination"""
   cursor: String!
+
+  """The item at the end of the edge"""
   node: AccessToken!
 }
 
@@ -149,8 +158,13 @@ type BranchAlreadyExistsError {
 }
 
 type BranchConnection {
+  """A list of edges."""
   edges: [BranchEdge!]!
+
+  """A list of nodes."""
   nodes: [Branch!]!
+
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
@@ -168,8 +182,12 @@ type BranchDoesNotExistError {
   query: Query!
 }
 
+"""An edge in a connection."""
 type BranchEdge {
+  """A cursor for use in pagination"""
   cursor: String!
+
+  """The item at the end of the edge"""
   node: Branch!
 }
 
@@ -227,6 +245,7 @@ type DailyDeploymentCountLimitExceededError {
   query: Query!
 }
 
+"""RFC3339 formatted date in the UTC time zone denoted by letter 'Z'"""
 scalar DateTime
 
 input DeleteSubgraphInput {
@@ -245,9 +264,12 @@ type DeleteSubgraphSuccess {
   query: Query!
 }
 
+"""Deployment"""
 type Deployment implements Node {
   branch: Branch!
   createdAt: DateTime!
+
+  """The duration of the deployment in milliseconds."""
   duration: Int
   finishedAt: DateTime
   id: ID!
@@ -265,8 +287,13 @@ input DeploymentBySlugCreateInput {
 }
 
 type DeploymentConnection {
+  """A list of edges."""
   edges: [DeploymentEdge!]!
+
+  """A list of nodes."""
   nodes: [Deployment!]!
+
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
@@ -289,8 +316,12 @@ type DeploymentDoesNotExistError {
   query: Query!
 }
 
+"""An edge in a connection."""
 type DeploymentEdge {
+  """A cursor for use in pagination"""
   cursor: String!
+
+  """The item at the end of the edge"""
   node: Deployment!
 }
 
@@ -321,6 +352,11 @@ type DisabledAccountError {
   query: Query!
 }
 
+"""
+Implement the Duration scalar
+
+The input/output is a string in ISO8601 format.
+"""
 scalar Duration
 
 input DurationFilter {
@@ -470,8 +506,13 @@ type GraphBranchDoesNotExistError {
 }
 
 type GraphConnection {
+  """A list of edges."""
   edges: [GraphEdge!]!
+
+  """A list of nodes."""
   nodes: [Graph!]!
+
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
@@ -501,8 +542,12 @@ type GraphDoesNotExistError {
   query: Query!
 }
 
+"""An edge in a connection."""
 type GraphEdge {
+  """A cursor for use in pagination"""
   cursor: String!
+
+  """The item at the end of the edge"""
   node: Graph!
 }
 
@@ -523,9 +568,22 @@ type GraphNotStandaloneError {
 }
 
 type GraphOperationCheckConfiguration {
+  """The clients to exclude from operation checks."""
   excludedClients: [String!]!
+
+  """The operations to exclude from operation checks."""
   excludedOperations: [String!]!
+
+  """
+  The request count threshold to consider for operation checks. Operations that have been
+  registered less than the specified number of occurrences are ignored.
+  """
   requestCountThreshold: Int!
+
+  """
+  The time range in days to consider for operation checks. Operations older than the specificied
+  number of days are ignored.
+  """
   timeRangeDays: Int!
 }
 
@@ -621,8 +679,13 @@ type InviteCancelSuccess {
 }
 
 type InviteConnection {
+  """A list of edges."""
   edges: [InviteEdge!]!
+
+  """A list of nodes."""
   nodes: [Invite!]!
+
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
@@ -641,8 +704,12 @@ type InviteDoesNotExistError {
   query: Query!
 }
 
+"""An edge in a connection."""
 type InviteEdge {
+  """A cursor for use in pagination"""
   cursor: String!
+
+  """The item at the end of the edge"""
   node: Invite!
 }
 
@@ -664,8 +731,14 @@ enum InviteStatus {
   EXPIRED
 }
 
+"""A scalar that can represent any JSON value."""
 scalar JSON
 
+"""
+Users can select the previous/current "limit cycle" which defines the cycle on which limits
+applies. For hobby it's monthly starting the first of each month and for pro it matches the
+billing cycle.
+"""
 enum LimitCycleChoice {
   CURRENT
   PREVIOUS
@@ -690,8 +763,13 @@ type Member implements Node {
 }
 
 type MemberConnection {
+  """A list of edges."""
   edges: [MemberEdge!]!
+
+  """A list of nodes."""
   nodes: [Member!]!
+
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
@@ -704,8 +782,12 @@ type MemberDeletePayload {
   query: Query!
 }
 
+"""An edge in a connection."""
 type MemberEdge {
+  """A cursor for use in pagination"""
   cursor: String!
+
+  """The item at the end of the edge"""
   node: Member!
 }
 
@@ -726,19 +808,32 @@ type MemberUpdatePayload {
 }
 
 type Mutation {
+  """Create a new access token."""
   accessTokenCreate(input: AccessTokenCreateInput!): AccessTokenCreatePayload!
+
+  """Delete a given access token."""
   accessTokenDelete(input: AccessTokenDeleteInput!): AccessTokenDeletePayload!
   branchCreate(input: BranchCreateInput!): BranchCreatePayload!
   branchDelete(accountSlug: String!, graphSlug: String, branchName: String!, projectSlug: String): BranchDeletePayload!
   branchSchemaProposalsConfiguredReviewerAdd(input: SchemaProposalsConfiguredReviewerAddInput!): SchemaProposalsConfiguredReviewerAddPayload!
   branchSchemaProposalsConfiguredReviewerRemove(input: SchemaProposalsConfiguredReviewerRemoveInput!): SchemaProposalsConfiguredReviewerRemovePayload!
   branchUpdate(input: BranchUpdateInput!): BranchUpdatePayload!
+
+  """Delete a subgraph"""
   deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
+
+  """Create a new deployment for an existing graph."""
   deploymentCreate(input: DeploymentCreateInput!): DeploymentCreatePayload! @deprecated(reason: "this mutation will be removed")
+
+  """Create a new deployment for an existing graph by slugs."""
   deploymentCreateBySlug(input: DeploymentBySlugCreateInput!): DeploymentCreatePayload! @deprecated(reason: "this mutation will be removed")
+
+  """Create a new deployment for an existing graph."""
   deploymentRedeploy(id: ID!): DeploymentRedeployPayload!
   endpointConfigUpdate(input: EndpointConfigUpdateInput!): EndpointConfigUpdatePayload!
   graphAddOwner(graphId: ID!, ownerId: ID!): GraphAddOwnerPayload!
+
+  """Create a new graph without any source for an initial deployment."""
   graphCreate(input: GraphCreateInput!): GraphCreatePayload!
   graphDelete(input: GraphDeleteInput!): GraphDeletePayload!
   graphOperationCheckConfigurationUpdate(input: GraphOperationCheckConfigurationInput!): GraphOperationCheckConfigurationUpdatePayload!
@@ -748,31 +843,64 @@ type Mutation {
   inviteCancel(input: InviteCancelInput!): InviteCancelPayload!
   inviteDecline(input: InviteDeclineInput!): InviteDeclinePayload!
   inviteSend(input: InviteSendInput!): InviteSendPayload!
+
+  """Remove member from an organization"""
   memberDelete(input: MemberDeleteInput!): MemberDeletePayload!
+
+  """Update role of an organization member"""
   memberUpdate(input: MemberUpdateInput!): MemberUpdatePayload!
+
+  """
+  Create new organization account owned by the current user. Slug must be unique.
+  """
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
   organizationSlugUpdate(input: OrganizationSlugUpdateInput!): OrganizationSlugUpdatePayload!
   organizationUpdate(input: OrganizationUpdateInput!): OrganizationUpdatePayload!
   personalAccountDelete: PersonalAccountDeletePayload! @deprecated(reason: "to be removed")
   personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload! @deprecated(reason: "to be removed")
+
+  """Publish a new subgraph."""
   publish(input: PublishInput!): PublishPayload!
+
+  """Run checks against the given schema"""
   schemaCheckCreate(input: SchemaCheckCreateInput!): SchemaCheckPayload!
   schemaProposalApprove(input: SchemaProposalApproveInput!): SchemaProposalApprovePayload!
   schemaProposalCommentReply(parentCommentId: ID!, text: String!): SchemaProposalCommentReplyPayload!
   schemaProposalCommentThreadCreate(input: SchemaProposalCommentThreadCreateInput!): SchemaProposalCommentThreadCreatePayload!
+
+  """Mark a comment thread as resolved."""
   schemaProposalCommentThreadResolve(rootCommentId: ID!): SchemaProposalCommentThreadResolvePayload!
+
+  """Reverts the resolution of a comment thread."""
   schemaProposalCommentThreadUnresolve(rootCommentId: ID!): SchemaProposalCommentThreadUnresolvePayload!
   schemaProposalCreate(input: SchemaProposalCreateInput!): SchemaProposalCreatePayload!
   schemaProposalDelete(id: ID!): SchemaProposalDeletePayload!
+
+  """
+  Edit the contents of a proposal.
+  
+  The proposed subgraphs can be just a subset of the subgraphs being edited in
+  the proposal. The changes from the previous edit on other subgraphs be carried over.
+  """
   schemaProposalEdit(input: SchemaProposalEditInput!): SchemaProposalEditPayload!
   schemaProposalReject(input: SchemaProposalRejectInput!): SchemaProposalRejectPayload!
   schemaProposalRequestReview(input: SchemaProposalRequestReviewInput!): SchemaProposalRequestReviewPayload!
+
+  """
+  Take a schema proposal back to draft status. This is possible from any state.
+  """
   schemaProposalRevertToDraft(schemaProposalId: ID!): SchemaProposalRevertToDraftPayload!
+
+  """Request a review for a schema proposal from a user or a team."""
   schemaProposalReviewRequestCreate(input: SchemaProposalReviewRequestCreateInput!): SchemaProposalReviewRequestCreatePayload!
   slackIntegrationCreate(input: SlackIntegrationCreateInput!): SlackNotificationCreatePayload!
   slackNotificationDelete(id: String!): SlackNotificationDeletePayload!
+
+  """Assign a team as the owner of a subgraph"""
   subgraphAddOwner(branchId: ID!, subgraphName: String!, owner: ID!): SubgraphAddOwnerPayload!
+
+  """Unassign a team's ownership of a subgraph"""
   subgraphRemoveOwner(branchId: ID!, subgraphName: String!): SubgraphRemoveOwnerPayload!
   teamAddMember(teamId: ID!, memberId: ID!): TeamAddMemberPayload!
   teamAssignRole(role: TeamRole!, teamId: ID!, memberId: ID!): TeamAssignRolePayload!
@@ -780,6 +908,8 @@ type Mutation {
   teamDelete(teamId: ID!): TeamDeletePayload!
   teamRemoveMember(teamId: ID!, memberId: ID!): TeamRemoveMemberPayload!
   trustedDocumentsSubmit(accountSlug: String, graphSlug: String, projectSlug: String, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
+
+  """Delete the user."""
   userDelete: UserDeletePayload!
   userUpdate(input: UserUpdateInput!): UserUpdatePayload!
 }
@@ -845,6 +975,12 @@ enum OperationType {
 
 type Organization implements Account & Node {
   accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
+
+  """
+  The url for the UI button to install the Grafbase slack app. It is
+  important to use this link and keep it private, since it contains the signed
+  account id of the authenticated user.
+  """
   addToSlackLink: String!
   createdAt: DateTime!
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
@@ -864,8 +1000,13 @@ type Organization implements Account & Node {
 }
 
 type OrganizationConnection {
+  """A list of edges."""
   edges: [OrganizationEdge!]!
+
+  """A list of nodes."""
   nodes: [Organization!]!
+
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
@@ -898,8 +1039,12 @@ type OrganizationDoesNotExistError {
   query: Query!
 }
 
+"""An edge in a connection."""
 type OrganizationEdge {
+  """A cursor for use in pagination"""
   cursor: String!
+
+  """The item at the end of the edge"""
   node: Organization!
 }
 
@@ -931,10 +1076,18 @@ type OrganizationUpdateSuccess {
   query: Query!
 }
 
+"""Information about pagination in a connection"""
 type PageInfo {
+  """When paginating forwards, the cursor to continue."""
   endCursor: String
+
+  """When paginating forwards, are there more items?"""
   hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
   hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
   startCursor: String
 }
 
@@ -1004,8 +1157,14 @@ type Query {
   accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
   accountBySlug(slug: String!): Account
   accountCreationValidate(input: AccountCreationValidateInput!): AccountCreationValidatePayload!
+
+  """Get branch by account slug, graph slug and the name of the branch."""
   branch(name: String, accountSlug: String, graphSlug: String, projectSlug: String): Branch
+
+  """Get deployment by ID."""
   deployment(id: ID!): Deployment
+
+  """Get a graph by account slug and slug of the graph itself."""
   graphByAccountSlug(accountSlug: String!, graphSlug: String!): Graph
   invite(id: ID!): Invite
   node(id: ID!): Node
@@ -1013,9 +1172,13 @@ type Query {
   schemaProposal(id: ID!): SchemaProposal
   schemaVersion(id: ID!): SchemaVersion
   schemaVersions(after: String, before: String, first: Int, last: Int, accountSlug: String!, graphSlug: String, projectSlug: String, branch: String, subgraphName: String, populated: Boolean! = true): SchemaVersionConnection!
+
+  """Get subgraph."""
   subgraph(accountSlug: String!, graphSlug: String, projectSlug: String, branch: String, subgraphName: String!): Subgraph
   team(id: ID!): Team
   teamBySlug(slug: String!, organizationSlug: String!): Team
+
+  """Give the actual connected user."""
   viewer: User
 }
 
@@ -1037,13 +1200,22 @@ type Request implements Node {
 }
 
 type RequestConnection {
+  """A list of edges."""
   edges: [RequestEdge!]!
+
+  """A list of nodes."""
   nodes: [Request!]!
+
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
+"""An edge in a connection."""
 type RequestEdge {
+  """A cursor for use in pagination"""
   cursor: String!
+
+  """The item at the end of the edge"""
   node: Request!
 }
 
@@ -1123,12 +1295,24 @@ type ResourceStatus {
   used: Int!
 }
 
+"""
+An occurrence of a trusted document that was submitted again (same id), but with
+a different document text. This is an error.
+"""
 type ReusedId {
+  """The document id"""
   documentId: String!
+
+  """The existing document body"""
   existingDocumentText: String!
+
+  """The different, newly submitted document body"""
   newDocumentText: String!
 }
 
+"""
+Trusted documents that were uploaded again (same id), but with a different document body. This is an error.
+"""
 type ReusedIds {
   reused: [ReusedId!]!
 }
@@ -1225,8 +1409,13 @@ type SchemaCheck {
 }
 
 type SchemaCheckConnection {
+  """A list of edges."""
   edges: [SchemaCheckEdge!]!
+
+  """A list of nodes."""
   nodes: [SchemaCheck!]!
+
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
@@ -1240,8 +1429,12 @@ input SchemaCheckCreateInput {
   gitCommit: SchemaCheckGitCommitInput
 }
 
+"""An edge in a connection."""
 type SchemaCheckEdge {
+  """A cursor for use in pagination"""
   cursor: String!
+
+  """The item at the end of the edge"""
   node: SchemaCheck!
 }
 
@@ -1271,18 +1464,41 @@ input SchemaCheckGitCommitInput {
 union SchemaCheckPayload = GraphBranchDoesNotExistError | GraphDoesNotExistError | SchemaCheck | SubgraphNameMissingOnFederatedGraphError
 
 type SchemaProposal {
+  """The whole activity feed."""
   activityFeed: [SchemaProposalActivityFeedItem!]!
   author: User
   comments: [SchemaProposalComment!]!
   createdAt: DateTime!
   description: String
   id: ID!
+
+  """
+  All the reviewers and their status.
+  
+  It will return all users that:
+  
+  - Have been configured as reviewers for the branch of the proposal.
+  - Have been requested to review the proposal.
+  - Have reviewed the proposal.
+  
+  And all the teams that have been configured or requested, but where the review
+  is pending. This does not return teams that have already have a review status,
+  because are returned in SchemaProposalReviewerUser.onBehalfOf.
+  """
   reviewers: [SchemaProposalReviewer!]!
+
+  """
+  The revision number of the proposal, i.e. how many times edits were applied to the proposal's subgraphs.
+  """
   revision: Int!
   status: SchemaProposalStatus!
   subgraph(subgraphName: String!): SchemaProposalSubgraph
   subgraphs: [SchemaProposalSubgraph!]!
   title: String!
+
+  """
+  Is the currently logged in user a reviewer of this proposal? That is to say, eitheir they are configured as a reviewer, or
+  """
   viewerIsReviewer: Boolean!
 }
 
@@ -1316,20 +1532,46 @@ interface SchemaProposalComment {
 }
 
 type SchemaProposalCommentOnLine implements SchemaProposalActivityFeedItem & SchemaProposalComment {
+  """Who wrote the comment. Will be null in case the user was deleted."""
   author: User
+
+  """The section of the subgraph SDL where the comment is located."""
   context(contextLines: Int!): String
   createdAt: DateTime!
   id: ID!
+
+  """
+  Which line the comment applies to in the subgraph SDL. This may be `null` if
+  the comment was on an item that is no longer part of the current subgraph schema.
+  
+  The line is 1-indexes
+  """
   line: Int
+
+  """
+  The logical path in the schema where the comment is located. This is only
+  exposed for debugging, prefer using the `line` field.
+  """
   path: String!
+
+  """All the replies in chronological order, from oldest to newest."""
   replies: [SchemaProposalReply!]!
+
+  """Is this comment thread resolved?"""
   resolved: Boolean!
+
+  """The user who marked the thread as resolved."""
   resolvedBy: User
+
+  """Which subgraph the comment applies to."""
   subgraphName: String!
+
+  """The content of the comment."""
   text: String!
 }
 
 type SchemaProposalCommentOnProposal implements SchemaProposalActivityFeedItem & SchemaProposalComment {
+  """Who wrote the comment. Will be null in case the user was deleted."""
   author: User
   createdAt: DateTime!
   id: ID!
@@ -1342,7 +1584,11 @@ type SchemaProposalCommentOnSdl implements SchemaProposalActivityFeedItem & Sche
   createdAt: DateTime!
   id: ID!
   replies: [SchemaProposalReply!]!
+
+  """Is this comment thread resolved?"""
   resolved: Boolean!
+
+  """The user who marked the thread as resolved."""
   resolvedBy: User
   text: String!
 }
@@ -1408,8 +1654,13 @@ type SchemaProposalCommentThreadUnresolveSuccess {
 }
 
 type SchemaProposalConnection {
+  """A list of edges."""
   edges: [SchemaProposalEdge!]!
+
+  """A list of nodes."""
   nodes: [SchemaProposal!]!
+
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
@@ -1436,8 +1687,12 @@ type SchemaProposalDoesNotExistError {
   query: Query!
 }
 
+"""An edge in a connection."""
 type SchemaProposalEdge {
+  """A cursor for use in pagination"""
   cursor: String!
+
+  """The item at the end of the edge"""
   node: SchemaProposal!
 }
 
@@ -1492,6 +1747,7 @@ type SchemaProposalRejectSuccess {
 }
 
 type SchemaProposalReply implements SchemaProposalComment {
+  """Who wrote the comment. Will be null in case the user was deleted."""
   author: User
   createdAt: DateTime!
   id: ID!
@@ -1527,6 +1783,9 @@ type SchemaProposalReviewerTeam {
 }
 
 type SchemaProposalReviewerUser {
+  """
+  The teams that were requested or configured for review that the user reviewed on behalf of.
+  """
   onBehalfOf: [Team!]!
   status: SchemaProposalReviewerStatus!
   user: User!
@@ -1594,6 +1853,7 @@ type SchemaProposalsConfiguredReviewerRemoveSuccess {
   query: Query!
 }
 
+"""A (required) schema proposal reviewer in the branch configuration."""
 union SchemaProposalsConfiguredReviewers = SchemaProposalsConfiguredReviewerTeam | SchemaProposalsConfiguredReviewerUser
 
 type SchemaProposalsConfiguredReviewerTeam {
@@ -1655,33 +1915,57 @@ type SchemaVersionChange {
 }
 
 type SchemaVersionChangeConnection {
+  """A list of edges."""
   edges: [SchemaVersionChangeEdge!]!
+
+  """A list of nodes."""
   nodes: [SchemaVersionChange!]!
+
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
+"""An edge in a connection."""
 type SchemaVersionChangeEdge {
+  """A cursor for use in pagination"""
   cursor: String!
+
+  """The item at the end of the edge"""
   node: SchemaVersionChange!
 }
 
 type SchemaVersionConnection {
+  """A list of edges."""
   edges: [SchemaVersionEdge!]!
+
+  """A list of nodes."""
   nodes: [SchemaVersion!]!
+
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
 type SchemaVersionDelta {
+  """Additions."""
   added: Int!
+
+  """Modifications."""
   modified: Int!
+
+  """Removals."""
   removed: Int!
 }
 
+"""An edge in a connection."""
 type SchemaVersionEdge {
+  """A cursor for use in pagination"""
   cursor: String!
+
+  """The item at the end of the edge"""
   node: SchemaVersion!
 }
 
+"""A Slack channel returned from the Slack API."""
 type SlackChannel {
   id: String!
   name: String!
@@ -1773,12 +2057,18 @@ type SubgraphRemoveOwnerSuccess {
 
 type Team implements Node {
   id: ID!
+
+  """The users that are part of the team"""
   members(after: String, first: Int): UserConnection!
   name: String!
+
+  """The team this team is member of, if any."""
   parent: Team
   parentTeamId: ID
   query: Query!
   slug: String!
+
+  """The teams that are part of the team"""
   subteams(after: String, first: Int): TeamConnection!
 }
 
@@ -1795,8 +2085,13 @@ type TeamAssignRoleSuccess {
 }
 
 type TeamConnection {
+  """A list of edges."""
   edges: [TeamEdge!]!
+
+  """A list of nodes."""
   nodes: [Team!]!
+
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
@@ -1812,8 +2107,12 @@ type TeamDoesNotExistError {
   query: Query!
 }
 
+"""An edge in a connection."""
 type TeamEdge {
+  """A cursor for use in pagination"""
   cursor: String!
+
+  """The item at the end of the edge"""
   node: Team!
 }
 
@@ -1985,6 +2284,10 @@ type Trace {
 }
 
 type TraceSpan {
+  """
+  Attributes are key-value pairs that represent additional information about the span.
+  It's always a map of strings to strings.
+  """
   attributes: JSON!
   endedAt: DateTime!
   id: ID!
@@ -2038,8 +2341,13 @@ type User implements Node {
 }
 
 type UserConnection {
+  """A list of edges."""
   edges: [UserEdge!]!
+
+  """A list of nodes."""
   nodes: [User!]!
+
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -2054,8 +2362,12 @@ type UserDoesNotExistError {
   query: Query!
 }
 
+"""An edge in a connection."""
 type UserEdge {
+  """A cursor for use in pagination"""
   cursor: String!
+
+  """The item at the end of the edge"""
   node: User!
   role: TeamRole!
 }
