@@ -130,11 +130,6 @@ type AlreadyMemberError {
   query: Query!
 }
 
-type ArchiveFileSizeLimitExceededError {
-  limit: Int!
-  query: Query!
-}
-
 type Branch implements Node {
   activeDeployment: Deployment
   deployments(after: String, before: String, first: Int, last: Int): DeploymentConnection!
@@ -278,14 +273,6 @@ type Deployment implements Node {
   status: DeploymentStatus!
 }
 
-input DeploymentBySlugCreateInput {
-  accountSlug: String!
-  graphSlug: String
-  projectSlug: String
-  branch: String
-  archiveFileSize: Int!
-}
-
 type DeploymentConnection {
   """A list of edges."""
   edges: [DeploymentEdge!]!
@@ -295,21 +282,6 @@ type DeploymentConnection {
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
-}
-
-input DeploymentCreateInput {
-  branch: String
-  archiveFileSize: Int!
-  graphId: ID
-  projectId: ID
-}
-
-union DeploymentCreatePayload = ArchiveFileSizeLimitExceededError | DailyDeploymentCountLimitExceededError | DeploymentCreateSuccess | GraphDoesNotExistError | GraphNotManagedError | GraphNotStandaloneError | NotAllowedError | ProjectDoesNotExistError | ProjectNotManagedError | ProjectNotStandaloneError
-
-type DeploymentCreateSuccess {
-  deployment: Deployment!
-  presignedUrl: String!
-  query: Query!
 }
 
 type DeploymentDoesNotExistError {
@@ -555,15 +527,7 @@ type GraphNotFederatedError {
   query: Query!
 }
 
-type GraphNotManagedError {
-  query: Query!
-}
-
 type GraphNotSelfHostedError {
-  query: Query!
-}
-
-type GraphNotStandaloneError {
   query: Query!
 }
 
@@ -588,9 +552,6 @@ type GraphOperationCheckConfiguration {
 }
 
 input GraphOperationCheckConfigurationInput {
-  """The graph to update."""
-  graphId: ID!
-
   """
   The time range in days to consider for operation checks. Operations older than the specificied
   number of days are ignored.
@@ -608,6 +569,9 @@ input GraphOperationCheckConfigurationInput {
 
   """The operations to exclude from operation checks."""
   excludedOperations: [String!]
+
+  """The graph to update."""
+  graphId: ID!
 
   """
   Whether operation checks are enabled for the graph. This is ignored, since
@@ -821,12 +785,6 @@ type Mutation {
 
   """Delete a subgraph"""
   deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
-
-  """Create a new deployment for an existing graph."""
-  deploymentCreate(input: DeploymentCreateInput!): DeploymentCreatePayload! @deprecated(reason: "this mutation will be removed")
-
-  """Create a new deployment for an existing graph by slugs."""
-  deploymentCreateBySlug(input: DeploymentBySlugCreateInput!): DeploymentCreatePayload! @deprecated(reason: "this mutation will be removed")
 
   """Create a new deployment for an existing graph."""
   deploymentRedeploy(id: ID!): DeploymentRedeployPayload!
@@ -1117,14 +1075,6 @@ type ProjectDoesNotExistError {
 }
 
 type ProjectNotFederatedError {
-  query: Query!
-}
-
-type ProjectNotManagedError {
-  query: Query!
-}
-
-type ProjectNotStandaloneError {
   query: Query!
 }
 
