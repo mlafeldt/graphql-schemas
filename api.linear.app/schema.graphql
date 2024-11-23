@@ -3109,6 +3109,69 @@ input CycleUpdateInput {
   completedAt: DateTime
 }
 
+"""A dashboard."""
+type Dashboard implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The dashboard's unique URL slug."""
+  slugId: String!
+
+  """The name of the dashboard."""
+  name: String!
+
+  """The description of the dashboard."""
+  description: String
+
+  """The icon of the dashboard."""
+  icon: String
+
+  """The color of the icon of the dashboard."""
+  color: String
+
+  """Whether the dashboard is shared with everyone in the organization."""
+  shared: Boolean!
+
+  """The organization of the dashboard."""
+  organization: Organization!
+
+  """The user who created the dashboard."""
+  creator: User
+
+  """The user who last updated the dashboard."""
+  updatedBy: User
+
+  """The owner of the dashboard."""
+  owner: User
+}
+
+type DashboardConnection {
+  edges: [DashboardEdge!]!
+  nodes: [Dashboard!]!
+  pageInfo: PageInfo!
+}
+
+type DashboardEdge {
+  node: Dashboard!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
 """Comparator for dates."""
 input DateComparator {
   """Equals constraint."""
@@ -23165,6 +23228,68 @@ input WebhookUpdateInput {
 
   """List of resources the webhook should subscribe to."""
   resourceTypes: [String!]
+}
+
+"""A widget."""
+type Widget implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The title of the widget."""
+  name: String
+
+  """The description of the widget."""
+  description: String
+
+  """The sort order of the widget."""
+  sortOrder: Float!
+
+  """The user who created the widget."""
+  creator: User
+
+  """The user who last updated the widget."""
+  updatedBy: User
+
+  """The type of the widget."""
+  type: String!
+
+  """
+  The filter that determines which issues are used to populate the dashboard item chart.
+  """
+  issueFilter: JSONObject
+
+  """The config for the insights chart."""
+  insight: JSONObject
+
+  """The dashboard that the dashboard item belongs to."""
+  dashboard: Dashboard
+}
+
+type WidgetConnection {
+  edges: [WidgetEdge!]!
+  nodes: [Widget!]!
+  pageInfo: PageInfo!
+}
+
+type WidgetEdge {
+  node: Widget!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
 }
 
 """A condition to match for the workflow to be triggered."""
