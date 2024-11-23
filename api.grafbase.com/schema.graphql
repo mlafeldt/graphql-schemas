@@ -243,6 +243,11 @@ type DailyDeploymentCountLimitExceededError {
 """RFC3339 formatted date in the UTC time zone denoted by letter 'Z'"""
 scalar DateTime
 
+type DeleteSubgraphDeploymentFailure {
+  deploymentError: String!
+  query: Query!
+}
+
 input DeleteSubgraphInput {
   message: String
   accountSlug: String!
@@ -253,7 +258,7 @@ input DeleteSubgraphInput {
   dryRun: Boolean!
 }
 
-union DeleteSubgraphPayload = DeleteSubgraphSuccess | FederatedGraphCompositionError | GraphBranchDoesNotExistError | GraphDoesNotExistError | GraphNotFederatedError | ProjectBranchDoesNotExistError | ProjectDoesNotExistError | ProjectNotFederatedError | SubgraphNotFoundError
+union DeleteSubgraphPayload = DeleteSubgraphDeploymentFailure | DeleteSubgraphSuccess | FederatedGraphCompositionError | GraphBranchDoesNotExistError | GraphDoesNotExistError | GraphNotFederatedError | ProjectBranchDoesNotExistError | ProjectDoesNotExistError | ProjectNotFederatedError | SubgraphNotFoundError
 
 type DeleteSubgraphSuccess {
   query: Query!
@@ -271,6 +276,7 @@ type Deployment implements Node {
   isRedeployable: Boolean!
   startedAt: DateTime
   status: DeploymentStatus!
+  steps: [DeploymentStep!]!
 }
 
 type DeploymentConnection {
@@ -309,6 +315,25 @@ enum DeploymentStatus {
   IN_PROGRESS
   SUCCEEDED
   FAILED
+}
+
+type DeploymentStep {
+  durationMs: Int!
+  errors: [DeploymentStepError!]!
+  startedAt: DateTime!
+  status: DeploymentStepStatus!
+  title: String!
+}
+
+union DeploymentStepError = DeploymentStepGeneralError
+
+type DeploymentStepGeneralError {
+  message: String!
+}
+
+enum DeploymentStepStatus {
+  SUCCESS
+  FAILURE
 }
 
 type DiffSnippet {
@@ -1082,6 +1107,11 @@ type ProjectScopeLimitExceededError {
   query: Query!
 }
 
+type PublishDeploymentFailure {
+  deploymentError: String!
+  query: Query!
+}
+
 type PublishForbidden {
   query: Query!
 }
@@ -1097,7 +1127,7 @@ input PublishInput {
   url: String!
 }
 
-union PublishPayload = FederatedGraphCompositionError | GraphDoesNotExistError | ProjectDoesNotExistError | PublishForbidden | PublishSuccess | SchemaRegistryBranchDoesNotExistError
+union PublishPayload = FederatedGraphCompositionError | GraphDoesNotExistError | ProjectDoesNotExistError | PublishDeploymentFailure | PublishForbidden | PublishSuccess | SchemaRegistryBranchDoesNotExistError
 
 type PublishSuccess {
   query: Query!
