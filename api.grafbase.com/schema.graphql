@@ -267,6 +267,7 @@ type DeleteSubgraphSuccess {
 """Deployment"""
 type Deployment implements Node {
   branch: Branch!
+  compositionInputs: [DeploymentSubgraph!]!
   createdAt: DateTime!
 
   """The duration of the deployment in milliseconds."""
@@ -277,6 +278,13 @@ type Deployment implements Node {
   startedAt: DateTime
   status: DeploymentStatus!
   steps: [DeploymentStep!]!
+
+  """
+  The subgraph that was published or removed, triggering the deployment.
+  
+  This is nullable in case we introduce back redeployments in the future.
+  """
+  subgraph: DeploymentSubgraph
 }
 
 type DeploymentConnection {
@@ -334,6 +342,11 @@ type DeploymentStepGeneralError {
 enum DeploymentStepStatus {
   SUCCESS
   FAILURE
+}
+
+type DeploymentSubgraph {
+  name: String!
+  versionNumber: Int!
 }
 
 type DiffSnippet {
