@@ -122,6 +122,11 @@ type AccountStatus {
   isEnabled: Boolean!
 }
 
+type AccountUsageTimeSeries {
+  overall: UsageMetrics!
+  points: [UsageMetricsTimeSeriesDataPoint!]!
+}
+
 type AlreadyExistsError {
   query: Query!
 }
@@ -266,12 +271,25 @@ type DeleteSubgraphSuccess {
 
 """Deployment"""
 type Deployment implements Node {
+  """The schema exposed by the gateway."""
+  apiSchema: String
+
+  """
+  Diff of the API SDL in this deployment with the last successful deployment.
+  This field only makes sense for successful deployments, so it will be null on
+  failed deployments.
+  """
+  apiSchemaDiff: [DiffSnippet!]
   branch: Branch!
+  changeCounts: DeploymentChangeCounts
   compositionInputs: [DeploymentSubgraph!]!
   createdAt: DateTime!
 
   """The duration of the deployment in milliseconds."""
   duration: Int
+
+  """The federated SDL used to initialize the gateway."""
+  federatedSdl: String
   finishedAt: DateTime
   id: ID!
   isRedeployable: Boolean!
@@ -285,6 +303,15 @@ type Deployment implements Node {
   This is nullable in case we introduce back redeployments in the future.
   """
   subgraph: DeploymentSubgraph
+}
+
+type DeploymentChangeCounts {
+  addedFields: Int!
+  addedTypes: Int!
+  changedFields: Int!
+  changedTypes: Int!
+  removedFields: Int!
+  removedTypes: Int!
 }
 
 type DeploymentConnection {
@@ -993,6 +1020,7 @@ type Organization implements Account & Node {
   status: AccountStatus!
   teams(after: String, first: Int): TeamConnection!
   trialExpiresAt: DateTime
+  usage(filters: UsageFilters!): AccountUsageTimeSeries
 }
 
 type OrganizationConnection {
@@ -2320,6 +2348,63 @@ enum UnitType {
   NO_UNIT
   MILLI_SECONDS
   BYTES
+}
+
+input UsageFilters {
+  graphSlug: String
+
+  """
+  Use this if you really care about having a specific duration like 1 hour, 7 days, etc.
+  """
+  range: Duration
+
+  """
+  Use this if you *at least* the data between `from` and `to` to be provided. You may get
+  more, but never less.
+  """
+  from: DateTime
+
+  """To be used in conjunction with with either `range` or `from`."""
+  to: DateTime!
+
+  """
+  If explicitly to false, specifying both `from` and `to` will be treated as if `range: (to - from)`
+  had been specified instead. Meaning only the duration between `from` and `to` matters, not
+  necessarily having a data point for `from` itself.
+  """
+  isCustomRange: Boolean
+
+  """
+  Defaults to one 1 day and cannot be less than one hour. At most 150 points can be returned.
+  """
+  aggregationStep: Duration
+
+  """
+  Overrides aggregation_step if specified at most 150 points can be returned.
+  """
+  approximateNumberOfDataPoints: Int
+
+  """
+  Defaults to true
+  Example: for an aggregationStep of 15 min:
+  - if true, only times with 00, 15, 30 and 45 minutes will appear in the time series
+  - if false, times in the time series will be adjusted to start from the periodStart (~from).
+  So if from = 15:32:00, times will end in 02, 17, 32 and 47.
+  I'll always align to the aggregation step used to store the data though, which
+  is currently in minutes. So cannot have 15:10:20, 15:11:20, etc.
+  """
+  alignPeriodWithAggregationStep: Boolean
+}
+
+type UsageMetrics {
+  requestsCount: Int!
+  spansCount: Int!
+}
+
+type UsageMetricsTimeSeriesDataPoint {
+  dateTime: DateTime!
+  requestsCount: Int!
+  spansCount: Int!
 }
 
 type User implements Node {
