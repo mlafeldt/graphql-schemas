@@ -786,6 +786,33 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "usage",
+            "description": null,
+            "args": [
+              {
+                "name": "filters",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "UsageFilters",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "AccountUsageTimeSeries",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -11048,6 +11075,33 @@
         "possibleTypes": null
       },
       {
+        "kind": "OBJECT",
+        "name": "PublishNoChange",
+        "description": "Returned when the client tries to publish the same subgraph schema with the same url as already published. Such a publish does not result in a deployment.",
+        "fields": [
+          {
+            "name": "query",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Query",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "UNION",
         "name": "PublishPayload",
         "description": null,
@@ -11079,6 +11133,11 @@
           {
             "kind": "OBJECT",
             "name": "PublishForbidden",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "PublishNoChange",
             "ofType": null
           },
           {
@@ -21189,7 +21248,7 @@
           },
           {
             "name": "aggregationStep",
-            "description": "Defaults to one 1 day and cannot be less than one hour. At most 150 points can be returned.",
+            "description": "If specified, overrides approximateNumberOfPoints. Must be in whole minutes.\nAt most 150 points can be returned.",
             "type": {
               "kind": "SCALAR",
               "name": "Duration",
@@ -21199,7 +21258,7 @@
           },
           {
             "name": "approximateNumberOfDataPoints",
-            "description": "Overrides aggregation_step if specified at most 150 points can be returned.",
+            "description": "Defaults to 100, at most 150 points can be returned.",
             "type": {
               "kind": "SCALAR",
               "name": "Int",

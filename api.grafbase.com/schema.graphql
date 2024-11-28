@@ -69,6 +69,7 @@ interface Account {
   resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
   slug: String!
   status: AccountStatus!
+  usage(filters: UsageFilters!): AccountUsageTimeSeries
 }
 
 input AccountCreationValidateInput {
@@ -1168,7 +1169,15 @@ input PublishInput {
   url: String!
 }
 
-union PublishPayload = FederatedGraphCompositionError | GraphDoesNotExistError | ProjectDoesNotExistError | PublishDeploymentFailure | PublishForbidden | PublishSuccess | SchemaRegistryBranchDoesNotExistError
+"""
+Returned when the client tries to publish the same subgraph schema with the same
+url as already published. Such a publish does not result in a deployment.
+"""
+type PublishNoChange {
+  query: Query!
+}
+
+union PublishPayload = FederatedGraphCompositionError | GraphDoesNotExistError | ProjectDoesNotExistError | PublishDeploymentFailure | PublishForbidden | PublishNoChange | PublishSuccess | SchemaRegistryBranchDoesNotExistError
 
 type PublishSuccess {
   query: Query!
@@ -2375,13 +2384,12 @@ input UsageFilters {
   isCustomRange: Boolean
 
   """
-  Defaults to one 1 day and cannot be less than one hour. At most 150 points can be returned.
+  If specified, overrides approximateNumberOfPoints. Must be in whole minutes.
+  At most 150 points can be returned.
   """
   aggregationStep: Duration
 
-  """
-  Overrides aggregation_step if specified at most 150 points can be returned.
-  """
+  """Defaults to 100, at most 150 points can be returned."""
   approximateNumberOfDataPoints: Int
 
   """
