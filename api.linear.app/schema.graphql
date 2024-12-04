@@ -7832,6 +7832,9 @@ type IssueHistory implements Node {
   """What the due date was changed to."""
   toDueDate: TimelessDate
 
+  """The id of linked customer need."""
+  customerNeedId: String
+
   """
   [Internal] Serialized JSON representing changes for certain non-relational properties.
   """
@@ -9118,6 +9121,11 @@ input IssueUpdateInput {
   The SLA day count type for the issue. Whether SLA should be business days only or calendar days (default).
   """
   slaType: SLADayCountType
+
+  """
+  Whether the issue was automatically closed because its parent issue was closed.
+  """
+  autoClosedByParentClosing: Boolean
 }
 
 input JiraConfigurationInput {
@@ -12052,101 +12060,75 @@ enum NotificationCategory {
 """A user's notification category preferences."""
 type NotificationCategoryPreferences {
   """The preferences for notifications about assignments."""
-  assignments: NotificationCategoryPreferencesChannel
+  assignments: NotificationChannelPreferences!
 
   """The preferences for notifications about status changes."""
-  statusChanges: NotificationCategoryPreferencesChannel
+  statusChanges: NotificationChannelPreferences!
 
   """The preferences for notifications about comments and replies."""
-  commentsAndReplies: NotificationCategoryPreferencesChannel
+  commentsAndReplies: NotificationChannelPreferences!
 
   """The preferences for notifications about mentions."""
-  mentions: NotificationCategoryPreferencesChannel
+  mentions: NotificationChannelPreferences!
 
   """The preferences for notifications about reactions."""
-  reactions: NotificationCategoryPreferencesChannel
+  reactions: NotificationChannelPreferences!
 
   """The preferences for notifications about subscriptions."""
-  subscriptions: NotificationCategoryPreferencesChannel
+  subscriptions: NotificationChannelPreferences!
 
   """The preferences for notifications about document changes."""
-  documentChanges: NotificationCategoryPreferencesChannel
+  documentChanges: NotificationChannelPreferences!
 
   """The preferences for notifications about posts and updates."""
-  postsAndUpdates: NotificationCategoryPreferencesChannel
+  postsAndUpdates: NotificationChannelPreferences!
 
   """The preferences for notifications about reminders."""
-  reminders: NotificationCategoryPreferencesChannel
+  reminders: NotificationChannelPreferences!
 
   """The preferences for notifications about reviews."""
-  reviews: NotificationCategoryPreferencesChannel
+  reviews: NotificationChannelPreferences!
 
   """The preferences for notifications about apps and integrations."""
-  appsAndIntegrations: NotificationCategoryPreferencesChannel
-}
+  appsAndIntegrations: NotificationChannelPreferences!
 
-"""A user's notification category preferences for a channel."""
-type NotificationCategoryPreferencesChannel {
-  """Whether notifications are enabled for this category for mobile."""
-  mobile: Boolean!
-
-  """Whether notifications are enabled for this category for desktop."""
-  desktop: Boolean!
-
-  """Whether notifications are enabled for this category for email."""
-  email: Boolean!
-
-  """Whether notifications are enabled for this category for Slack."""
-  slack: Boolean!
-}
-
-input NotificationCategoryPreferencesChannelInput {
-  """Whether notifications are enabled for this category for mobile."""
-  mobile: Boolean!
-
-  """Whether notifications are enabled for this category for desktop."""
-  desktop: Boolean!
-
-  """Whether notifications are enabled for this category for email."""
-  email: Boolean!
-
-  """Whether notifications are enabled for this category for Slack."""
-  slack: Boolean!
+  """The preferences for system notifications."""
+  system: NotificationChannelPreferences!
 }
 
 input NotificationCategoryPreferencesInput {
   """The preferences for notifications about assignments."""
-  assignments: NotificationCategoryPreferencesChannelInput
+  assignments: PartialNotificationChannelPreferencesInput
 
   """The preferences for notifications about status changes."""
-  statusChanges: NotificationCategoryPreferencesChannelInput
+  statusChanges: PartialNotificationChannelPreferencesInput
 
   """The preferences for notifications about comments and replies."""
-  commentsAndReplies: NotificationCategoryPreferencesChannelInput
+  commentsAndReplies: PartialNotificationChannelPreferencesInput
 
   """The preferences for notifications about mentions."""
-  mentions: NotificationCategoryPreferencesChannelInput
+  mentions: PartialNotificationChannelPreferencesInput
 
   """The preferences for notifications about reactions."""
-  reactions: NotificationCategoryPreferencesChannelInput
+  reactions: PartialNotificationChannelPreferencesInput
 
   """The preferences for notifications about subscriptions."""
-  subscriptions: NotificationCategoryPreferencesChannelInput
+  subscriptions: PartialNotificationChannelPreferencesInput
 
   """The preferences for notifications about document changes."""
-  documentChanges: NotificationCategoryPreferencesChannelInput
+  documentChanges: PartialNotificationChannelPreferencesInput
 
   """The preferences for notifications about posts and updates."""
-  postsAndUpdates: NotificationCategoryPreferencesChannelInput
+  postsAndUpdates: PartialNotificationChannelPreferencesInput
 
   """The preferences for notifications about reminders."""
-  reminders: NotificationCategoryPreferencesChannelInput
+  reminders: PartialNotificationChannelPreferencesInput
 
   """The preferences for notifications about reviews."""
-  reviews: NotificationCategoryPreferencesChannelInput
+  reviews: PartialNotificationChannelPreferencesInput
 
   """The preferences for notifications about apps and integrations."""
-  appsAndIntegrations: NotificationCategoryPreferencesChannelInput
+  appsAndIntegrations: PartialNotificationChannelPreferencesInput
 }
 
 """The delivery channels a user can receive notifications in."""
@@ -12162,30 +12144,30 @@ A user's notification channel preferences, indicating if a channel is enabled or
 """
 type NotificationChannelPreferences {
   """Whether notifications are currently enabled for mobile."""
-  mobile: Boolean
+  mobile: Boolean!
 
   """Whether notifications are currently enabled for desktop."""
-  desktop: Boolean
+  desktop: Boolean!
 
   """Whether notifications are currently enabled for email."""
-  email: Boolean
+  email: Boolean!
 
   """Whether notifications are currently enabled for Slack."""
-  slack: Boolean
+  slack: Boolean!
 }
 
 input NotificationChannelPreferencesInput {
   """Whether notifications are currently enabled for mobile."""
-  mobile: Boolean
+  mobile: Boolean!
 
   """Whether notifications are currently enabled for desktop."""
-  desktop: Boolean
+  desktop: Boolean!
 
   """Whether notifications are currently enabled for email."""
-  email: Boolean
+  email: Boolean!
 
   """Whether notifications are currently enabled for Slack."""
-  slack: Boolean
+  slack: Boolean!
 }
 
 type NotificationConnection {
@@ -14553,6 +14535,71 @@ type PaidSubscription implements Node {
 
   """The date the subscription will be billed next."""
   nextBillingAt: DateTime
+}
+
+"""A user's notification category preferences."""
+type PartialNotificationCategoryPreferences {
+  """The preferences for notifications about assignments."""
+  assignments: PartialNotificationChannelPreferences
+
+  """The preferences for notifications about status changes."""
+  statusChanges: PartialNotificationChannelPreferences
+
+  """The preferences for notifications about comments and replies."""
+  commentsAndReplies: PartialNotificationChannelPreferences
+
+  """The preferences for notifications about mentions."""
+  mentions: PartialNotificationChannelPreferences
+
+  """The preferences for notifications about reactions."""
+  reactions: PartialNotificationChannelPreferences
+
+  """The preferences for notifications about subscriptions."""
+  subscriptions: PartialNotificationChannelPreferences
+
+  """The preferences for notifications about document changes."""
+  documentChanges: PartialNotificationChannelPreferences
+
+  """The preferences for notifications about posts and updates."""
+  postsAndUpdates: PartialNotificationChannelPreferences
+
+  """The preferences for notifications about reminders."""
+  reminders: PartialNotificationChannelPreferences
+
+  """The preferences for notifications about reviews."""
+  reviews: PartialNotificationChannelPreferences
+
+  """The preferences for notifications about apps and integrations."""
+  appsAndIntegrations: PartialNotificationChannelPreferences
+}
+
+"""A user's notification category preferences for a channel."""
+type PartialNotificationChannelPreferences {
+  """Whether notifications are currently enabled for mobile."""
+  mobile: Boolean
+
+  """Whether notifications are currently enabled for desktop."""
+  desktop: Boolean
+
+  """Whether notifications are currently enabled for email."""
+  email: Boolean
+
+  """Whether notifications are currently enabled for Slack."""
+  slack: Boolean
+}
+
+input PartialNotificationChannelPreferencesInput {
+  """Whether notifications are currently enabled for mobile."""
+  mobile: Boolean
+
+  """Whether notifications are currently enabled for desktop."""
+  desktop: Boolean
+
+  """Whether notifications are currently enabled for email."""
+  email: Boolean
+
+  """Whether notifications are currently enabled for Slack."""
+  slack: Boolean
 }
 
 """Registered passkey for authentication."""
@@ -22831,13 +22878,19 @@ type UserSettings implements Node {
   """The notification channel settings the user has selected."""
   notificationPreferences: JSONObject!
 
-  """The notification category preferences for the user."""
-  notificationCategoryPreferences: NotificationCategoryPreferences!
+  """
+  The notification category preferences overrides for the user. If a category is
+  not set, it will use the default preference (see
+  getNotificationCategoryPreferenceFallback).
+  """
+  notificationCategoryPreferences: PartialNotificationCategoryPreferences!
 
   """
-  Whether the user has specific notification channels enabled or disabled.
+  Whether the user has specific notification channels enabled or disabled. We
+  expect all channel values to be backfilled, but in case any are missing we
+  will use the default preference (see getNotificationChannelPreferenceFallback)
   """
-  notificationChannelPreferences: NotificationChannelPreferences!
+  notificationChannelPreferences: PartialNotificationChannelPreferences!
 
   """The notification delivery preferences for the user."""
   notificationDeliveryPreferences: NotificationDeliveryPreferences!

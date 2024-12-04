@@ -28006,6 +28006,18 @@
             "deprecationReason": null
           },
           {
+            "name": "customerNeedId",
+            "description": "The id of linked customer need.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "changes",
             "description": "[Internal] Serialized JSON representing changes for certain non-relational properties.",
             "args": [],
@@ -34476,8 +34488,8 @@
       },
       {
         "kind": "OBJECT",
-        "name": "NotificationChannelPreferences",
-        "description": "A user's notification channel preferences, indicating if a channel is enabled or not",
+        "name": "PartialNotificationChannelPreferences",
+        "description": "A user's notification category preferences for a channel.",
         "fields": [
           {
             "name": "mobile",
@@ -34535,12 +34547,155 @@
       },
       {
         "kind": "OBJECT",
-        "name": "NotificationCategoryPreferencesChannel",
-        "description": "A user's notification category preferences for a channel.",
+        "name": "PartialNotificationCategoryPreferences",
+        "description": "A user's notification category preferences.",
+        "fields": [
+          {
+            "name": "assignments",
+            "description": "The preferences for notifications about assignments.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PartialNotificationChannelPreferences",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "statusChanges",
+            "description": "The preferences for notifications about status changes.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PartialNotificationChannelPreferences",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "commentsAndReplies",
+            "description": "The preferences for notifications about comments and replies.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PartialNotificationChannelPreferences",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "mentions",
+            "description": "The preferences for notifications about mentions.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PartialNotificationChannelPreferences",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "reactions",
+            "description": "The preferences for notifications about reactions.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PartialNotificationChannelPreferences",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "subscriptions",
+            "description": "The preferences for notifications about subscriptions.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PartialNotificationChannelPreferences",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentChanges",
+            "description": "The preferences for notifications about document changes.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PartialNotificationChannelPreferences",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "postsAndUpdates",
+            "description": "The preferences for notifications about posts and updates.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PartialNotificationChannelPreferences",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "reminders",
+            "description": "The preferences for notifications about reminders.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PartialNotificationChannelPreferences",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "reviews",
+            "description": "The preferences for notifications about reviews.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PartialNotificationChannelPreferences",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "appsAndIntegrations",
+            "description": "The preferences for notifications about apps and integrations.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PartialNotificationChannelPreferences",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "NotificationChannelPreferences",
+        "description": "A user's notification channel preferences, indicating if a channel is enabled or not",
         "fields": [
           {
             "name": "mobile",
-            "description": "Whether notifications are enabled for this category for mobile.",
+            "description": "Whether notifications are currently enabled for mobile.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -34556,7 +34711,7 @@
           },
           {
             "name": "desktop",
-            "description": "Whether notifications are enabled for this category for desktop.",
+            "description": "Whether notifications are currently enabled for desktop.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -34572,7 +34727,7 @@
           },
           {
             "name": "email",
-            "description": "Whether notifications are enabled for this category for email.",
+            "description": "Whether notifications are currently enabled for email.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -34588,7 +34743,7 @@
           },
           {
             "name": "slack",
-            "description": "Whether notifications are enabled for this category for Slack.",
+            "description": "Whether notifications are currently enabled for Slack.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -34618,9 +34773,13 @@
             "description": "The preferences for notifications about assignments.",
             "args": [],
             "type": {
-              "kind": "OBJECT",
-              "name": "NotificationCategoryPreferencesChannel",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationChannelPreferences",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -34630,9 +34789,13 @@
             "description": "The preferences for notifications about status changes.",
             "args": [],
             "type": {
-              "kind": "OBJECT",
-              "name": "NotificationCategoryPreferencesChannel",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationChannelPreferences",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -34642,9 +34805,13 @@
             "description": "The preferences for notifications about comments and replies.",
             "args": [],
             "type": {
-              "kind": "OBJECT",
-              "name": "NotificationCategoryPreferencesChannel",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationChannelPreferences",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -34654,9 +34821,13 @@
             "description": "The preferences for notifications about mentions.",
             "args": [],
             "type": {
-              "kind": "OBJECT",
-              "name": "NotificationCategoryPreferencesChannel",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationChannelPreferences",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -34666,9 +34837,13 @@
             "description": "The preferences for notifications about reactions.",
             "args": [],
             "type": {
-              "kind": "OBJECT",
-              "name": "NotificationCategoryPreferencesChannel",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationChannelPreferences",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -34678,9 +34853,13 @@
             "description": "The preferences for notifications about subscriptions.",
             "args": [],
             "type": {
-              "kind": "OBJECT",
-              "name": "NotificationCategoryPreferencesChannel",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationChannelPreferences",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -34690,9 +34869,13 @@
             "description": "The preferences for notifications about document changes.",
             "args": [],
             "type": {
-              "kind": "OBJECT",
-              "name": "NotificationCategoryPreferencesChannel",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationChannelPreferences",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -34702,9 +34885,13 @@
             "description": "The preferences for notifications about posts and updates.",
             "args": [],
             "type": {
-              "kind": "OBJECT",
-              "name": "NotificationCategoryPreferencesChannel",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationChannelPreferences",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -34714,9 +34901,13 @@
             "description": "The preferences for notifications about reminders.",
             "args": [],
             "type": {
-              "kind": "OBJECT",
-              "name": "NotificationCategoryPreferencesChannel",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationChannelPreferences",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -34726,9 +34917,13 @@
             "description": "The preferences for notifications about reviews.",
             "args": [],
             "type": {
-              "kind": "OBJECT",
-              "name": "NotificationCategoryPreferencesChannel",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationChannelPreferences",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -34738,9 +34933,29 @@
             "description": "The preferences for notifications about apps and integrations.",
             "args": [],
             "type": {
-              "kind": "OBJECT",
-              "name": "NotificationCategoryPreferencesChannel",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationChannelPreferences",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "system",
+            "description": "The preferences for system notifications.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationChannelPreferences",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -34834,14 +35049,14 @@
           },
           {
             "name": "notificationCategoryPreferences",
-            "description": "The notification category preferences for the user.",
+            "description": "The notification category preferences overrides for the user. If a category is not set, it will use the default preference (see getNotificationCategoryPreferenceFallback).",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "NotificationCategoryPreferences",
+                "name": "PartialNotificationCategoryPreferences",
                 "ofType": null
               }
             },
@@ -34850,14 +35065,14 @@
           },
           {
             "name": "notificationChannelPreferences",
-            "description": "Whether the user has specific notification channels enabled or disabled.",
+            "description": "Whether the user has specific notification channels enabled or disabled. We expect all channel values to be backfilled, but in case any are missing we will use the default preference (see getNotificationChannelPreferenceFallback)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "NotificationChannelPreferences",
+                "name": "PartialNotificationChannelPreferences",
                 "ofType": null
               }
             },
@@ -64873,6 +65088,16 @@
               "ofType": null
             },
             "defaultValue": null
+          },
+          {
+            "name": "autoClosedByParentClosing",
+            "description": "Whether the issue was automatically closed because its parent issue was closed.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -65295,7 +65520,7 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "NotificationChannelPreferencesInput",
+        "name": "PartialNotificationChannelPreferencesInput",
         "description": null,
         "fields": null,
         "inputFields": [
@@ -65346,13 +65571,134 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "NotificationCategoryPreferencesChannelInput",
+        "name": "NotificationCategoryPreferencesInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "assignments",
+            "description": "The preferences for notifications about assignments.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "PartialNotificationChannelPreferencesInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "statusChanges",
+            "description": "The preferences for notifications about status changes.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "PartialNotificationChannelPreferencesInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "commentsAndReplies",
+            "description": "The preferences for notifications about comments and replies.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "PartialNotificationChannelPreferencesInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "mentions",
+            "description": "The preferences for notifications about mentions.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "PartialNotificationChannelPreferencesInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "reactions",
+            "description": "The preferences for notifications about reactions.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "PartialNotificationChannelPreferencesInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "subscriptions",
+            "description": "The preferences for notifications about subscriptions.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "PartialNotificationChannelPreferencesInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "documentChanges",
+            "description": "The preferences for notifications about document changes.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "PartialNotificationChannelPreferencesInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "postsAndUpdates",
+            "description": "The preferences for notifications about posts and updates.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "PartialNotificationChannelPreferencesInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "reminders",
+            "description": "The preferences for notifications about reminders.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "PartialNotificationChannelPreferencesInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "reviews",
+            "description": "The preferences for notifications about reviews.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "PartialNotificationChannelPreferencesInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "appsAndIntegrations",
+            "description": "The preferences for notifications about apps and integrations.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "PartialNotificationChannelPreferencesInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "NotificationChannelPreferencesInput",
         "description": null,
         "fields": null,
         "inputFields": [
           {
             "name": "mobile",
-            "description": "Whether notifications are enabled for this category for mobile.",
+            "description": "Whether notifications are currently enabled for mobile.",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -65366,7 +65712,7 @@
           },
           {
             "name": "desktop",
-            "description": "Whether notifications are enabled for this category for desktop.",
+            "description": "Whether notifications are currently enabled for desktop.",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -65380,7 +65726,7 @@
           },
           {
             "name": "email",
-            "description": "Whether notifications are enabled for this category for email.",
+            "description": "Whether notifications are currently enabled for email.",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -65394,7 +65740,7 @@
           },
           {
             "name": "slack",
-            "description": "Whether notifications are enabled for this category for Slack.",
+            "description": "Whether notifications are currently enabled for Slack.",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -65403,127 +65749,6 @@
                 "name": "Boolean",
                 "ofType": null
               }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "NotificationCategoryPreferencesInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "assignments",
-            "description": "The preferences for notifications about assignments.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NotificationCategoryPreferencesChannelInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "statusChanges",
-            "description": "The preferences for notifications about status changes.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NotificationCategoryPreferencesChannelInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "commentsAndReplies",
-            "description": "The preferences for notifications about comments and replies.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NotificationCategoryPreferencesChannelInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "mentions",
-            "description": "The preferences for notifications about mentions.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NotificationCategoryPreferencesChannelInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "reactions",
-            "description": "The preferences for notifications about reactions.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NotificationCategoryPreferencesChannelInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "subscriptions",
-            "description": "The preferences for notifications about subscriptions.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NotificationCategoryPreferencesChannelInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "documentChanges",
-            "description": "The preferences for notifications about document changes.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NotificationCategoryPreferencesChannelInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "postsAndUpdates",
-            "description": "The preferences for notifications about posts and updates.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NotificationCategoryPreferencesChannelInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "reminders",
-            "description": "The preferences for notifications about reminders.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NotificationCategoryPreferencesChannelInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "reviews",
-            "description": "The preferences for notifications about reviews.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NotificationCategoryPreferencesChannelInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "appsAndIntegrations",
-            "description": "The preferences for notifications about apps and integrations.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NotificationCategoryPreferencesChannelInput",
-              "ofType": null
             },
             "defaultValue": null
           }
