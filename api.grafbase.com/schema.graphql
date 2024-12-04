@@ -62,11 +62,9 @@ interface Account {
   accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
   createdAt: DateTime!
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
-  graphsCountStatus: ResourceStatus!
   id: ID!
   name: String!
   plan: GrafbasePlan!
-  resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
   slug: String!
   status: AccountStatus!
   usage(filters: UsageFilters!): AccountUsageTimeSeries
@@ -82,41 +80,6 @@ type AccountCreationValidatePayload {
 
 type AccountDoesNotExistError {
   query: Query!
-}
-
-type AccountResourcesStatus {
-  requestCount: ResourceStatus!
-}
-
-type AccountResourcesUsage {
-  granularity: TimeAggregationGranularity!
-  requestCount: TimeSeries!
-}
-
-"""
-'limit_cycle_choice' is exclusive with all other options. It's the only case
-where we'll show account limit status (used/limit)
-"""
-input AccountResourcesUsageDashboardFilter {
-  projectIds: [ID!]
-  graphIds: [ID!]
-  limitCycleChoice: LimitCycleChoice
-  startDate: DateTime
-  endDate: DateTime
-}
-
-type AccountResourcesUsageDashboardInvalidFilterCombinationError {
-  message: String!
-  query: Query!
-}
-
-union AccountResourcesUsageDashboardPayload = AccountResourcesUsageDashboardInvalidFilterCombinationError | AccountResourcesUsageDashboardSuccess
-
-type AccountResourcesUsageDashboardSuccess {
-  periodEnd: DateTime!
-  periodStart: DateTime!
-  status: AccountResourcesStatus
-  usage: AccountResourcesUsage!
 }
 
 type AccountStatus {
@@ -255,10 +218,10 @@ type DeleteSubgraphDeploymentFailure {
 }
 
 input DeleteSubgraphInput {
-  message: String
   accountSlug: String!
   graphSlug: String
   projectSlug: String
+  message: String
   branch: String!
   subgraph: String!
   dryRun: Boolean!
@@ -765,16 +728,6 @@ enum InviteStatus {
 """A scalar that can represent any JSON value."""
 scalar JSON
 
-"""
-Users can select the previous/current "limit cycle" which defines the cycle on which limits
-applies. For hobby it's monthly starting the first of each month and for pro it matches the
-billing cycle.
-"""
-enum LimitCycleChoice {
-  CURRENT
-  PREVIOUS
-}
-
 type LintCheckError {
   message: String!
   severity: SchemaCheckErrorSeverity!
@@ -1009,13 +962,11 @@ type Organization implements Account & Node {
   addToSlackLink: String!
   createdAt: DateTime!
   graphs(after: String, before: String, first: Int, last: Int): GraphConnection!
-  graphsCountStatus: ResourceStatus!
   id: ID!
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
   name: String!
   plan: GrafbasePlan!
-  resourcesUsageDashboard(filter: AccountResourcesUsageDashboardFilter): AccountResourcesUsageDashboardPayload!
   samlDomain: String
   slackIntegration: SlackIntegration
   slug: String!
@@ -1160,11 +1111,11 @@ type PublishForbidden {
 }
 
 input PublishInput {
-  message: String
   schema: String!
   accountSlug: String!
   graphSlug: String
   projectSlug: String
+  message: String
   branch: String
   subgraph: String!
   url: String!
@@ -1316,14 +1267,6 @@ type RequestOperation {
 type ReservedSlugsCheckError {
   message: String!
   query: Query!
-}
-
-type ResourceStatus {
-  limit: Int
-  percentage: Float
-  remaining: Int
-  unit: UnitType!
-  used: Int!
 }
 
 """
@@ -2162,27 +2105,6 @@ enum TeamRole {
   ADMIN
 }
 
-enum TimeAggregationGranularity {
-  DAILY
-  WEEKLY
-  MONTHLY
-}
-
-type TimeSeries {
-  data: [TimeSeriesDataPoint!]!
-  statistics: TimeSeriesStatistics!
-  unit: UnitType!
-}
-
-type TimeSeriesDataPoint {
-  datetime: DateTime!
-  value: Int!
-}
-
-type TimeSeriesStatistics {
-  sum: Int!
-}
-
 type TokenDoesNotExistError {
   query: Query!
 }
@@ -2352,12 +2274,6 @@ union TrustedDocumentsSubmitPayload = GraphDoesNotExistError | OldAccessTokenErr
 type TrustedDocumentsSubmitSuccess {
   count: Int!
   documents: [TrustedDocument!]!
-}
-
-enum UnitType {
-  NO_UNIT
-  MILLI_SECONDS
-  BYTES
 }
 
 input UsageFilters {
