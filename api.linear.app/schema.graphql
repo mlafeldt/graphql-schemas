@@ -5489,6 +5489,11 @@ type ImageUploadFromUrlPayload {
   success: Boolean!
 }
 
+input InheritanceEntityMapping {
+  """Mapping of the entity ID to the new entity ID."""
+  workflowStates: JSONObject!
+}
+
 """An initiative to group projects."""
 type Initiative implements Node {
   """The unique identifier of the entity."""
@@ -11633,6 +11638,11 @@ type Mutation {
 
   """Updates a team."""
   teamUpdate(
+    """
+    [INTERNAL] Mapping of existing team entities to those inherited from the parent team
+    """
+    mapping: InheritanceEntityMapping
+
     """A partial team object to update the team with."""
     input: TeamUpdateInput!
 
@@ -20690,6 +20700,11 @@ type SyncedExternalThread {
   Whether the current user has the corresponding personal integration connected for the external service.
   """
   isPersonalIntegrationConnected: Boolean!
+
+  """
+  Whether a connected personal integration is required to comment in this thread.
+  """
+  isPersonalIntegrationRequired: Boolean!
 }
 
 type SynchronizedPayload {
@@ -22898,20 +22913,6 @@ type UserSettings implements Node {
   """The notification channel settings the user has selected."""
   notificationPreferences: JSONObject!
 
-  """
-  The notification category preferences overrides for the user. If a category is
-  not set, it will use the default preference (see
-  getNotificationCategoryPreferenceFallback).
-  """
-  notificationCategoryPreferences: PartialNotificationCategoryPreferences!
-
-  """
-  Whether the user has specific notification channels enabled or disabled. We
-  expect all channel values to be backfilled, but in case any are missing we
-  will use the default preference (see getNotificationChannelPreferenceFallback)
-  """
-  notificationChannelPreferences: PartialNotificationChannelPreferences!
-
   """The notification delivery preferences for the user."""
   notificationDeliveryPreferences: NotificationDeliveryPreferences!
 
@@ -22950,6 +22951,12 @@ type UserSettings implements Node {
   Whether to auto-assign newly created issues to the current user by default.
   """
   autoAssignToSelf: Boolean!
+
+  """The user's notification category preferences."""
+  notificationCategoryPreferences: NotificationCategoryPreferences!
+
+  """The user's notification channel preferences."""
+  notificationChannelPreferences: NotificationChannelPreferences!
 }
 
 type UserSettingsFlagPayload {
@@ -23657,6 +23664,9 @@ type WorkflowState implements Node {
 
   """The team to which this state belongs to."""
   team: Team!
+
+  """The state inherited from"""
+  inheritedFrom: WorkflowState
 
   """Issues belonging in this state."""
   issues(
