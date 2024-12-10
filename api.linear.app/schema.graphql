@@ -1979,9 +1979,6 @@ input CustomerNeedUpdateInput {
 
   """Optional URL to the source of the customer need."""
   url: String
-
-  """The attachment this need is attached to."""
-  attachmentId: String
 }
 
 type CustomerPayload {
@@ -5512,6 +5509,17 @@ type Initiative implements Node {
   The time at which the entity was archived. Null if the entity has not been archived.
   """
   archivedAt: DateTime
+
+  """
+  [Internal] The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  """
+  updateReminderFrequencyInWeeks: Float
+
+  """[Internal] The day at which to prompt for updates."""
+  updateRemindersDay: Day!
+
+  """[Internal] The hour at which to prompt for updates."""
+  updateRemindersHour: Float!
 
   """The name of the initiative."""
   name: String!
@@ -14764,6 +14772,17 @@ type Project implements Node {
   """
   archivedAt: DateTime
 
+  """
+  [Internal] The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  """
+  updateReminderFrequencyInWeeks: Float
+
+  """[Internal] The day at which to prompt for updates."""
+  updateRemindersDay: Day!
+
+  """[Internal] The hour at which to prompt for updates."""
+  updateRemindersHour: Float!
+
   """The project's name."""
   name: String!
 
@@ -16376,6 +16395,17 @@ type ProjectSearchResult implements Node {
   """
   archivedAt: DateTime
 
+  """
+  [Internal] The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  """
+  updateReminderFrequencyInWeeks: Float
+
+  """[Internal] The day at which to prompt for updates."""
+  updateRemindersDay: Day!
+
+  """[Internal] The hour at which to prompt for updates."""
+  updateRemindersHour: Float!
+
   """The project's name."""
   name: String!
 
@@ -17485,6 +17515,47 @@ type ProjectUpdateWithInteractionPayload {
 
   """The project update that was created or updated."""
   interaction: ProjectUpdateInteraction! @deprecated(reason: "Project update interactions are not used and will be removed.")
+}
+
+"""[ALPHA] A pull request check."""
+type PullRequestCheck {
+  """The name of the check."""
+  name: String!
+
+  """The status of the check."""
+  status: String!
+
+  """The URL of the check."""
+  url: String
+
+  """Whether the check is required."""
+  isRequired: Boolean
+
+  """The date/time at which when the check was started."""
+  startedAt: DateTime
+
+  """The date/time at which when the check was completed."""
+  completedAt: DateTime
+}
+
+input PullRequestCheckInput {
+  """The name of the check."""
+  name: String!
+
+  """The status of the check."""
+  status: String!
+
+  """The URL of the check."""
+  url: String
+
+  """Whether the check is required."""
+  isRequired: Boolean
+
+  """The date/time at which when the check was started."""
+  startedAt: DateTime
+
+  """The date/time at which when the check was completed."""
+  completedAt: DateTime
 }
 
 """A comment on a pull request."""
