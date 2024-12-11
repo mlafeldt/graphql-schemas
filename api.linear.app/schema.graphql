@@ -3062,6 +3062,33 @@ type CyclePayload {
   success: Boolean!
 }
 
+enum CyclePeriod {
+  before
+  during
+  cooldown
+  after
+}
+
+"""Comparator for period when issue was added to a cycle."""
+input CyclePeriodComparator {
+  """Equals constraint."""
+  eq: CyclePeriod
+
+  """Not-equals constraint."""
+  neq: CyclePeriod
+
+  """In-array constraint."""
+  in: [CyclePeriod!]
+
+  """Not-in-array constraint."""
+  nin: [CyclePeriod!]
+
+  """
+  Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.
+  """
+  null: Boolean
+}
+
 """
 Input for shifting all cycles from a certain cycle onwards by a certain number of days
 """
@@ -7240,6 +7267,9 @@ input IssueCollectionFilter {
   """Comparator for the issues added to cycle at date."""
   addedToCycleAt: NullableDateComparator
 
+  """Comparator for the period when issue was added to a cycle."""
+  addedToCyclePeriod: CyclePeriodComparator
+
   """Comparator for the issues due date."""
   dueDate: NullableTimelessDateComparator
 
@@ -7631,6 +7661,9 @@ input IssueFilter {
 
   """Comparator for the issues added to cycle at date."""
   addedToCycleAt: NullableDateComparator
+
+  """Comparator for the period when issue was added to a cycle."""
+  addedToCyclePeriod: CyclePeriodComparator
 
   """Comparator for the issues due date."""
   dueDate: NullableTimelessDateComparator
@@ -12077,6 +12110,18 @@ enum NotificationCategory {
   system
 }
 
+"""Metadata about a single notification category"""
+type NotificationCategoryMetadata {
+  """The category's title"""
+  title: String!
+
+  """The category's description"""
+  description: String!
+
+  """The category's sort order among all categories"""
+  sortOrder: Float!
+}
+
 """A user's notification category preferences."""
 type NotificationCategoryPreferences {
   """The preferences for notifications about assignments."""
@@ -12161,6 +12206,51 @@ input NotificationCategoryPreferencesInput {
 
   """The preferences for notifications about customers."""
   customers: PartialNotificationChannelPreferencesInput
+}
+
+"""Metadata about notification categories"""
+type NotificationCategoryPreferencesMetadata {
+  """The metadata for notifications about assignments."""
+  assignments: NotificationCategoryMetadata!
+
+  """The metadata for notifications about status changes."""
+  statusChanges: NotificationCategoryMetadata!
+
+  """The metadata for notifications about comments and replies."""
+  commentsAndReplies: NotificationCategoryMetadata!
+
+  """The metadata for notifications about mentions."""
+  mentions: NotificationCategoryMetadata!
+
+  """The metadata for notifications about reactions."""
+  reactions: NotificationCategoryMetadata!
+
+  """The metadata for notifications about subscriptions."""
+  subscriptions: NotificationCategoryMetadata!
+
+  """The metadata for notifications about document changes."""
+  documentChanges: NotificationCategoryMetadata!
+
+  """The metadata for notifications about posts and updates."""
+  postsAndUpdates: NotificationCategoryMetadata!
+
+  """The metadata for notifications about reminders."""
+  reminders: NotificationCategoryMetadata!
+
+  """The metadata for notifications about reviews."""
+  reviews: NotificationCategoryMetadata!
+
+  """The metadata for notifications about apps and integrations."""
+  appsAndIntegrations: NotificationCategoryMetadata!
+
+  """The preferences for system notifications."""
+  system: NotificationCategoryMetadata!
+
+  """The preferences for triage notifications."""
+  triage: NotificationCategoryMetadata!
+
+  """The preferences for customer notifications."""
+  customers: NotificationCategoryMetadata!
 }
 
 """The delivery channels a user can receive notifications in."""
@@ -12860,6 +12950,9 @@ input NullableIssueFilter {
 
   """Comparator for the issues added to cycle at date."""
   addedToCycleAt: NullableDateComparator
+
+  """Comparator for the period when issue was added to a cycle."""
+  addedToCyclePeriod: CyclePeriodComparator
 
   """Comparator for the issues due date."""
   dueDate: NullableTimelessDateComparator
