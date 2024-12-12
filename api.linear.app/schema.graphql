@@ -3134,7 +3134,7 @@ input CycleUpdateInput {
 }
 
 """
-A dashboard, usually a collection of widgets to display several insights at once.
+[Internal] A dashboard, usually a collection of widgets to display several insights at once.
 """
 type Dashboard implements Node {
   """The unique identifier of the entity."""
@@ -5543,10 +5543,10 @@ type Initiative implements Node {
   updateReminderFrequencyInWeeks: Float
 
   """[Internal] The day at which to prompt for updates."""
-  updateRemindersDay: Day!
+  updateRemindersDay: Day
 
   """[Internal] The hour at which to prompt for updates."""
-  updateRemindersHour: Float!
+  updateRemindersHour: Float
 
   """The name of the initiative."""
   name: String!
@@ -6144,7 +6144,7 @@ input InitiativeToProjectUpdateInput {
   sortOrder: Float
 }
 
-"""An initiative update."""
+"""[ALPHA] An initiative update."""
 type InitiativeUpdate implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -14871,10 +14871,10 @@ type Project implements Node {
   updateReminderFrequencyInWeeks: Float
 
   """[Internal] The day at which to prompt for updates."""
-  updateRemindersDay: Day!
+  updateRemindersDay: Day
 
   """[Internal] The hour at which to prompt for updates."""
-  updateRemindersHour: Float!
+  updateRemindersHour: Float
 
   """The project's name."""
   name: String!
@@ -15842,6 +15842,12 @@ type ProjectMilestone implements Node {
   """The project milestone's description in markdown format."""
   description: String
 
+  """The status of the project milestone."""
+  status: ProjectMilestoneStatus!
+
+  """The progress % of the project milestone."""
+  progress: Float!
+
   """
   [Internal] The project milestone's description as a Prosemirror document.
   """
@@ -16089,6 +16095,14 @@ type ProjectMilestonePayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""The status of a project milestone."""
+enum ProjectMilestoneStatus {
+  unstarted
+  next
+  overdue
+  done
 }
 
 input ProjectMilestoneUpdateInput {
@@ -16494,10 +16508,10 @@ type ProjectSearchResult implements Node {
   updateReminderFrequencyInWeeks: Float
 
   """[Internal] The day at which to prompt for updates."""
-  updateRemindersDay: Day!
+  updateRemindersDay: Day
 
   """[Internal] The hour at which to prompt for updates."""
-  updateRemindersHour: Float!
+  updateRemindersHour: Float
 
   """The project's name."""
   name: String!
@@ -21974,6 +21988,9 @@ type Template implements Node {
 
   """The user who last updated the template."""
   lastUpdatedBy: User
+
+  """The original template inherited from."""
+  inheritedFrom: Template
 }
 
 type TemplateConnection {
@@ -23562,7 +23579,7 @@ input WebhookUpdateInput {
 }
 
 """
-A widget, contains a small configuration on how to display a specific piece of content, like an insight.
+[Internal] A widget, contains a small configuration on how to display a specific piece of content, like an insight.
 """
 type Widget implements Node {
   """The unique identifier of the entity."""
