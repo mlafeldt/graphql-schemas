@@ -7186,6 +7186,36 @@ type Issue implements Node {
 
   """Reactions associated with the issue."""
   reactions: [Reaction!]!
+
+  """Customer needs associated with the issue."""
+  needs(
+    """Filter returned needs."""
+    filter: CustomerNeedFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CustomerNeedConnection!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -7589,6 +7619,9 @@ type IssueDraft implements Node {
 
   """Serialized array of JSONs representing customer needs."""
   needs: JSONObject
+
+  """Serialized array of JSONs representing the recurring issue's schedule."""
+  schedule: JSONObject
 }
 
 type IssueDraftConnection {
@@ -9006,6 +9039,36 @@ type IssueSearchResult implements Node {
 
   """Reactions associated with the issue."""
   reactions: [Reaction!]!
+
+  """Customer needs associated with the issue."""
+  needs(
+    """Filter returned needs."""
+    filter: CustomerNeedFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CustomerNeedConnection!
 
   """Metadata related to search result."""
   metadata: JSONObject!
@@ -12308,7 +12371,7 @@ type NotificationDeliveryPreferencesChannel {
   """
   [DEPRECATED] Whether notifications are enabled for this channel. Use notificationChannelPreferences instead.
   """
-  notificationsDisabled: Boolean
+  notificationsDisabled: Boolean @deprecated(reason: "This field has been replaced by notificationChannelPreferences")
 
   """The schedule for notifications on this channel."""
   schedule: NotificationDeliveryPreferencesSchedule
@@ -23127,9 +23190,9 @@ type UserSettings implements Node {
   subscribedToPrivacyLegalUpdates: Boolean!
 
   """
-  Whether this user is subscribed to unread notifications reminder emails or not.
+  [DEPRECATED] Whether this user is subscribed to unread notifications reminder emails or not.
   """
-  subscribedToUnreadNotificationsReminder: Boolean!
+  subscribedToUnreadNotificationsReminder: Boolean! @deprecated(reason: "This field has been replaced by notificationChannelPreferences")
 
   """Whether to show full user names instead of display names."""
   showFullUserNames: Boolean!
@@ -23201,11 +23264,11 @@ input UserSettingsUpdateInput {
   subscribedToPrivacyLegalUpdates: Boolean
 
   """
-  Whether this user is subscribed to email notifications reminder or not.
+  [DEPRECATED] Whether this user is subscribed to email notifications reminder or not.
   """
   subscribedToUnreadNotificationsReminder: Boolean
 
-  """The user's notification preferences."""
+  """[DEPRECATED] The user's notification preferences."""
   notificationPreferences: JSONObject
 
   """The user's notification category preferences."""
