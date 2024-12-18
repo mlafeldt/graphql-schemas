@@ -5444,6 +5444,13 @@ input GitLabSettingsInput {
   expiresAt: String
 }
 
+"""[Internal] The kind of link between an issue and a pull request."""
+enum GitLinkKind {
+  closes
+  contributes
+  links
+}
+
 """Google Sheets specific settings."""
 type GoogleSheetsSettings {
   spreadsheetId: String!
@@ -9672,6 +9679,9 @@ type Mutation {
 
     """The GitHub pull request number to link."""
     number: Float
+
+    """[Internal] The kind of link between the issue and the pull request."""
+    linkKind: GitLinkKind
   ): AttachmentPayload!
 
   """Link an existing Zendesk ticket to an issue."""
@@ -11393,9 +11403,17 @@ type Mutation {
   organizationCancelDelete: OrganizationCancelDeletePayload!
 
   """
-  Starts a trial for the organization. Administrator privileges required.
+  Starts a trial for the organization on the specified plan type. Administrator privileges required.
   """
-  organizationStartTrial: OrganizationStartTrialPayload!
+  organizationStartTrialForPlan(
+    """Plan details for trial"""
+    input: OrganizationStartTrialInput!
+  ): OrganizationStartTrialPayload!
+
+  """
+  [DEPRECATED] Starts a trial for the organization. Administrator privileges required.
+  """
+  organizationStartTrial: OrganizationStartTrialPayload! @deprecated(reason: "Use organizationStartTrialForPlan")
 
   """Creates a new project link."""
   projectLinkCreate(
@@ -14548,6 +14566,11 @@ type OrganizationRegionResponse {
 
   """The region for the organization."""
   region: String
+}
+
+input OrganizationStartTrialInput {
+  """The plan type to trial."""
+  planType: String!
 }
 
 type OrganizationStartTrialPayload {

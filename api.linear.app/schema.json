@@ -73192,6 +73192,31 @@
       },
       {
         "kind": "INPUT_OBJECT",
+        "name": "OrganizationStartTrialInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "planType",
+            "description": "The plan type to trial.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
         "name": "ProjectLinkCreateInput",
         "description": null,
         "fields": null,
@@ -89053,6 +89078,16 @@
                   "ofType": null
                 },
                 "defaultValue": null
+              },
+              {
+                "name": "linkKind",
+                "description": "[Internal] The kind of link between the issue and the pull request.",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "GitLinkKind",
+                  "ofType": null
+                },
+                "defaultValue": null
               }
             ],
             "type": {
@@ -96751,9 +96786,24 @@
             "deprecationReason": null
           },
           {
-            "name": "organizationStartTrial",
-            "description": "Starts a trial for the organization. Administrator privileges required.",
-            "args": [],
+            "name": "organizationStartTrialForPlan",
+            "description": "Starts a trial for the organization on the specified plan type. Administrator privileges required.",
+            "args": [
+              {
+                "name": "input",
+                "description": "Plan details for trial",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "OrganizationStartTrialInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -96765,6 +96815,22 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "organizationStartTrial",
+            "description": "[DEPRECATED] Starts a trial for the organization. Administrator privileges required.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationStartTrialPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use organizationStartTrialForPlan"
           },
           {
             "name": "projectLinkCreate",
@@ -99761,6 +99827,35 @@
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "GitLinkKind",
+        "description": "[Internal] The kind of link between an issue and a pull request.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "closes",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "contributes",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "links",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
