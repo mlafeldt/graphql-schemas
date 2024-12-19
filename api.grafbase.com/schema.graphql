@@ -341,6 +341,14 @@ type DeploymentSubgraph {
   versionNumber: Int!
 }
 
+"""
+One side of a two-sided diff. "Old" and "new" are to be taken in the most general sense.
+"""
+enum DiffSide {
+  OLD
+  NEW
+}
+
 type DiffSnippet {
   addedLines: [Int!]!
   originalSchemaSnippet: String!
@@ -832,6 +840,11 @@ type Mutation {
   Create new organization account owned by the current user. Slug must be unique.
   """
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
+
+  """
+  Create a new enterprise organization account owned by the current user. Used in E2E tests.
+  """
+  organizationCreateEnterprise(input: OrganizationCreateInput!): OrganizationCreatePayload!
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
   organizationSlugUpdate(input: OrganizationSlugUpdateInput!): OrganizationSlugUpdatePayload!
   organizationUpdate(input: OrganizationUpdateInput!): OrganizationUpdatePayload!
@@ -1518,6 +1531,7 @@ type SchemaProposalCommentOnLine implements SchemaProposalActivityFeedItem & Sch
   """The section of the subgraph SDL where the comment is located."""
   context(contextLines: Int!): String
   createdAt: DateTime!
+  diffSide: DiffSide!
   id: ID!
 
   """
@@ -1591,6 +1605,13 @@ input SchemaProposalCommentThreadCreateInput {
 
   """Must be provided if and only if location is Line."""
   line: Int
+
+  """
+  Whether the comment applies to the existing or the proposed schema.
+  
+  Must be provided if and only if location is Line.
+  """
+  diffSide: DiffSide
 
   """Where the comment is located."""
   location: SchemaProposalCommentThreadLocation!
