@@ -1518,7 +1518,7 @@ type CustomAttributeEdge {
   cursor: String!
 }
 
-"""[ALPHA] A customer whose needs will be tied to issues or projects."""
+"""A customer whose needs will be tied to issues or projects."""
 type Customer implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -1736,7 +1736,7 @@ input CustomerFilter {
 }
 
 """
-[ALPHA] A customer need, expressed through a reference to an issue, project, or comment.
+A customer need, expressed through a reference to an issue, project, or comment.
 """
 type CustomerNeed implements Node {
   """The unique identifier of the entity."""
@@ -2109,7 +2109,7 @@ input CustomerSortInput {
   approximateNeedCount: ApproximateNeedCountSort
 }
 
-"""[ALPHA] A customer status."""
+"""A customer status."""
 type CustomerStatus implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -2259,7 +2259,7 @@ input CustomerStatusUpdateInput {
   type: CustomerStatusType
 }
 
-"""[ALPHA] A customer tier."""
+"""A customer tier."""
 type CustomerTier implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -10077,19 +10077,19 @@ type Mutation {
     input: ContactSalesCreateInput!
   ): ContactPayload!
 
-  """[ALPHA] Creates a new customer need."""
+  """Creates a new customer need."""
   customerNeedCreate(
     """The customer need to create."""
     input: CustomerNeedCreateInput!
   ): CustomerNeedPayload!
 
-  """[ALPHA] Creates a new customer need out of an attachment"""
+  """Creates a new customer need out of an attachment"""
   customerNeedCreateFromAttachment(
     """The customer need to create."""
     input: CustomerNeedCreateFromAttachmentInput!
   ): CustomerNeedPayload!
 
-  """[ALPHA] Updates a customer need"""
+  """Updates a customer need"""
   customerNeedUpdate(
     """The properties of the customer need to update."""
     input: CustomerNeedUpdateInput!
@@ -10098,31 +10098,31 @@ type Mutation {
     id: String!
   ): CustomerNeedPayload!
 
-  """[ALPHA] Deletes a customer need."""
+  """Deletes a customer need."""
   customerNeedDelete(
     """The identifier of the customer need to delete."""
     id: String!
   ): DeletePayload!
 
-  """[ALPHA] Archives a customer need."""
+  """Archives a customer need."""
   customerNeedArchive(
     """The identifier of the customer need to archive."""
     id: String!
   ): CustomerNeedArchivePayload!
 
-  """[ALPHA] Unarchives a customer need."""
+  """Unarchives a customer need."""
   customerNeedUnarchive(
     """The identifier of the customer need to unarchive."""
     id: String!
   ): CustomerNeedArchivePayload!
 
-  """[ALPHA] Creates a new customer."""
+  """Creates a new customer."""
   customerCreate(
     """The customer to create."""
     input: CustomerCreateInput!
   ): CustomerPayload!
 
-  """[ALPHA] Updates a customer"""
+  """Updates a customer"""
   customerUpdate(
     """The properties of the customer to update."""
     input: CustomerUpdateInput!
@@ -10131,13 +10131,13 @@ type Mutation {
     id: String!
   ): CustomerPayload!
 
-  """[ALPHA] Deletes a customer."""
+  """Deletes a customer."""
   customerDelete(
     """The identifier of the customer to delete."""
     id: String!
   ): DeletePayload!
 
-  """[ALPHA] Merges two customers."""
+  """Merges two customers."""
   customerMerge(
     """
     The ID of the customer to merge. The needs of this customer will be transferred before it gets deleted.
@@ -10151,21 +10151,21 @@ type Mutation {
   ): CustomerPayload!
 
   """
-  [ALPHA] Upserts a customer, creating it if it doesn't exists, updating it
-  otherwise. Matches against an existing customer with `id` or `externalIds`
+  Upserts a customer, creating it if it doesn't exists, updating it otherwise.
+  Matches against an existing customer with `id` or `externalIds`
   """
   customerUpsert(
     """The customer to create."""
     input: CustomerUpsertInput!
   ): CustomerPayload!
 
-  """[ALPHA] Creates a new customer tier."""
+  """Creates a new customer tier."""
   customerTierCreate(
     """The CustomerTier object to create."""
     input: CustomerTierCreateInput!
   ): CustomerTierPayload!
 
-  """[ALPHA] Updates a customer tier."""
+  """Updates a customer tier."""
   customerTierUpdate(
     """A partial CustomerTier object to update the CustomerTier with."""
     input: CustomerTierUpdateInput!
@@ -10174,7 +10174,7 @@ type Mutation {
     id: String!
   ): CustomerTierPayload!
 
-  """[ALPHA] Deletes a customer tier."""
+  """Deletes a customer tier."""
   customerTierDelete(
     """The identifier of the customer tier to delete."""
     id: String!
@@ -14971,6 +14971,12 @@ type Post implements Node {
   """[Internal] The content of the post as a Prosemirror document."""
   bodyData: String!
 
+  """The post's title."""
+  title: String
+
+  """The post's unique URL slug."""
+  slugId: String!
+
   """The user who wrote the post."""
   creator: User
 
@@ -14999,6 +15005,7 @@ type Post implements Node {
 """Type of Post"""
 enum PostType {
   summary
+  update
 }
 
 """Issue priority sorting options."""
@@ -18283,7 +18290,7 @@ type Query {
   """One specific customer need"""
   customerNeed(id: String!): CustomerNeed!
 
-  """[ALPHA] Suggests issue title based on a customer request."""
+  """Suggests issue title based on a customer request."""
   issueTitleSuggestionFromCustomerRequest(request: String!): IssueTitleSuggestionFromCustomerRequestPayload!
 
   """All customers."""
@@ -18315,7 +18322,7 @@ type Query {
     """
     orderBy: PaginationOrderBy
 
-    """[INTERNAL] Sort returned customers."""
+    """Sort returned customers."""
     sorts: [CustomerSortInput!]
   ): CustomerConnection!
 
