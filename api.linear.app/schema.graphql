@@ -2434,7 +2434,7 @@ input CustomerUpsertInput {
   domains: [String!]
 
   """The id of the customers in external systems."""
-  externalId: [String!]
+  externalId: String
 
   """The ID of the Slack channel used to interact with the customer."""
   slackChannelId: String
@@ -9230,6 +9230,12 @@ input IssueUpdateInput {
   """The identifiers of the issue labels associated with this ticket."""
   labelIds: [String!]
 
+  """The identifiers of the issue labels to be added to this issue."""
+  addedLabelIds: [String!]
+
+  """The identifiers of the issue labels to be removed from this issue."""
+  removedLabelIds: [String!]
+
   """The identifier of the team associated with the issue."""
   teamId: String
 
@@ -10152,7 +10158,7 @@ type Mutation {
 
   """
   Upserts a customer, creating it if it doesn't exists, updating it otherwise.
-  Matches against an existing customer with `id` or `externalIds`
+  Matches against an existing customer with `id` or `externalId`
   """
   customerUpsert(
     """The customer to create."""
@@ -17229,8 +17235,18 @@ type ProjectStatusConnection {
 }
 
 type ProjectStatusCountPayload {
-  """Number of projects using this project status."""
+  """Total number of projects using this project status."""
   count: Float!
+
+  """
+  Total number of projects using this project status that are not visible to the user because they are in a private team.
+  """
+  privateCount: Float!
+
+  """
+  Total number of projects using this project status that are not visible to the user because they are in an archived team.
+  """
+  archivedTeamCount: Float!
 }
 
 input ProjectStatusCreateInput {
