@@ -1735,6 +1735,38 @@ input CustomerFilter {
   or: [CustomerFilter!]
 }
 
+"""[Internal] An import of customer data from an external service."""
+type CustomerImport implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The status for the import job."""
+  status: String!
+
+  """User readable error message, if one has occurred during the import."""
+  error: String
+
+  """Current step progress in % (0-100)."""
+  progress: Float
+
+  """File URL for the uploaded CSV for the import."""
+  csvFileUrl: String!
+}
+
 """
 A customer need, expressed through a reference to an issue, project, or comment.
 """
@@ -1777,9 +1809,9 @@ type CustomerNeed implements Node {
   priority: Float!
 
   """
-  Optional URL to the source of the customer need. Used when manually creating a need.
+  [DEPRECATED] Optional URL to the source of the customer need. Used when manually creating a need.
   """
-  url: String
+  url: String @deprecated(reason: "Use attachment.url instead")
 
   """The need content in markdown format."""
   body: String
@@ -9763,6 +9795,9 @@ type Mutation {
 
     """Optional attachment ID that may be provided through the API."""
     id: String
+
+    """The URL of the Zendesk ticket to link."""
+    url: String
   ): AttachmentPayload!
 
   """Link an existing Discord message to an issue."""
