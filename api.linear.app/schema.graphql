@@ -3503,9 +3503,6 @@ type Document implements Node {
 
   """The canonical url for the document."""
   url: String!
-
-  """[Internal] The documents content as a Prosemirror document."""
-  contentData: JSON @deprecated(reason: "Use content instead.")
 }
 
 """A generic payload return from entity archive mutations."""
@@ -4007,9 +4004,6 @@ type DocumentSearchResult implements Node {
 
   """The canonical url for the document."""
   url: String!
-
-  """[Internal] The documents content as a Prosemirror document."""
-  contentData: JSON @deprecated(reason: "Use content instead.")
 
   """Metadata related to search result."""
   metadata: JSONObject!
@@ -6335,6 +6329,17 @@ input InitiativeUpdateInput {
 
   """The initiative's content in markdown format."""
   content: String
+
+  """
+  [Internal] The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  """
+  updateReminderFrequencyInWeeks: Float
+
+  """[Internal] The day at which to prompt for updates."""
+  updateRemindersDay: Day
+
+  """[Internal] The hour at which to prompt for updates."""
+  updateRemindersHour: Int
 }
 
 """An integration with an external service."""
@@ -16071,11 +16076,6 @@ type ProjectMilestone implements Node {
   """The progress % of the project milestone."""
   progress: Float!
 
-  """
-  [Internal] The project milestone's description as a Prosemirror document.
-  """
-  descriptionData: JSON @deprecated(reason: "Use `descriptionState` instead.")
-
   """[Internal] The project milestone's description as YJS state."""
   descriptionState: String
 
@@ -17624,6 +17624,17 @@ input ProjectUpdateInput {
 
   """The time until which project update reminders are paused."""
   projectUpdateRemindersPausedUntilAt: DateTime
+
+  """
+  [Internal] The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  """
+  updateReminderFrequencyInWeeks: Float
+
+  """[Internal] The day at which to prompt for updates."""
+  updateRemindersDay: Day
+
+  """[Internal] The hour at which to prompt for updates."""
+  updateRemindersHour: Int
 
   """The identifier of the project lead."""
   leadId: String
