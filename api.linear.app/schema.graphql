@@ -234,18 +234,6 @@ type Attachment implements Node {
   issue: Issue!
 }
 
-"""A generic payload return from entity archive mutations."""
-type AttachmentArchivePayload implements ArchivePayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """Whether the operation was successful."""
-  success: Boolean!
-
-  """The archived/unarchived entity. Null if entity was deleted."""
-  entity: Attachment
-}
-
 """Attachment collection filtering options."""
 input AttachmentCollectionFilter {
   """Comparator for the identifier."""
@@ -9982,12 +9970,6 @@ type Mutation {
     """Optional attachment ID that may be provided through the API."""
     id: String
   ): AttachmentPayload!
-
-  """[DEPRECATED] Archives an issue attachment."""
-  attachmentArchive(
-    """The identifier of the attachment to archive."""
-    id: String!
-  ): AttachmentArchivePayload! @deprecated(reason: "This mutation is deprecated, please use `attachmentDelete` instead")
 
   """Deletes an issue attachment."""
   attachmentDelete(
