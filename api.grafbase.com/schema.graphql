@@ -643,6 +643,12 @@ type GraphUpdateSuccess {
   query: Query!
 }
 
+interface InboxMessage {
+  createdAt: DateTime!
+  notificationId: ID!
+  readAt: DateTime
+}
+
 type InvalidAccountError {
   query: Query!
 }
@@ -835,6 +841,7 @@ type Mutation {
 
   """Update role of an organization member"""
   memberUpdate(input: MemberUpdateInput!): MemberUpdatePayload!
+  notificationsMarkAsRead(notificationIds: [ID!]!): NotificationsMarkAsReadPayload!
 
   """
   Create new organization account owned by the current user. Slug must be unique.
@@ -937,6 +944,19 @@ type NotAllowedToSlugUpdateError {
 
 type NotAllowedToUpdateOrganizationError {
   query: Query!
+}
+
+type NotificationsInbox {
+  messages: [InboxMessage!]!
+}
+
+union NotificationsMarkAsReadPayload = NotificationsMarkAsReadSuccess
+
+type NotificationsMarkAsReadSuccess {
+  query: Query!
+
+  """How many notifications were marked as read."""
+  updated: Int!
 }
 
 type OldAccessTokenError {
@@ -1168,6 +1188,9 @@ type Query {
   graphByAccountSlug(accountSlug: String!, graphSlug: String!): Graph
   invite(id: ID!): Invite
   node(id: ID!): Node
+
+  """Return the notifications inbox of the currently connected user."""
+  notificationsInbox: NotificationsInbox
   schemaCheck(id: ID!): SchemaCheck
   schemaProposal(id: ID!): SchemaProposal
   schemaVersion(id: ID!): SchemaVersion
@@ -1499,11 +1522,12 @@ interface SchemaProposalActivityFeedItem {
   createdAt: DateTime!
 }
 
-type SchemaProposalApproval implements SchemaProposalActivityFeedItem {
+type SchemaProposalApproval implements SchemaProposalActivityFeedItem & SchemaProposalReview {
   author: User
   createdAt: DateTime!
   id: ID!
   message: String
+  schemaProposal: SchemaProposal!
 }
 
 input SchemaProposalApproveInput {
@@ -1734,11 +1758,12 @@ input SchemaProposalRejectInput {
   message: String
 }
 
-type SchemaProposalRejection implements SchemaProposalActivityFeedItem {
+type SchemaProposalRejection implements SchemaProposalActivityFeedItem & SchemaProposalReview {
   author: User
   createdAt: DateTime!
   id: ID!
   message: String
+  schemaProposal: SchemaProposal!
 }
 
 union SchemaProposalRejectPayload = SchemaProposalDoesNotExistError | SchemaProposalRejectSuccess
@@ -1771,6 +1796,13 @@ type SchemaProposalRevertToDraftSuccess {
   query: Query!
 }
 
+interface SchemaProposalReview {
+  author: User
+  createdAt: DateTime!
+  id: ID!
+  schemaProposal: SchemaProposal!
+}
+
 union SchemaProposalReviewer = SchemaProposalReviewerTeam | SchemaProposalReviewerUser
 
 enum SchemaProposalReviewerStatus {
@@ -1792,11 +1824,19 @@ type SchemaProposalReviewerUser {
   user: User!
 }
 
+type SchemaProposalReviewNotification implements InboxMessage {
+  createdAt: DateTime!
+  notificationId: ID!
+  readAt: DateTime
+  review: SchemaProposalReview!
+}
+
 type SchemaProposalReviewRequest implements SchemaProposalActivityFeedItem {
   createdAt: DateTime!
   id: ID!
   requestFor: UserOrTeam!
   requestedBy: ID!
+  schemaProposal: SchemaProposal!
 }
 
 input SchemaProposalReviewRequestCreateInput {
@@ -1810,6 +1850,13 @@ union SchemaProposalReviewRequestCreatePayload = SchemaProposalDoesNotExistError
 
 type SchemaProposalReviewRequestCreateSuccess {
   query: Query!
+}
+
+type SchemaProposalReviewRequestNotification implements InboxMessage {
+  createdAt: DateTime!
+  notificationId: ID!
+  readAt: DateTime
+  reviewRequest: SchemaProposalReviewRequest!
 }
 
 type SchemaProposalRevision implements SchemaProposalActivityFeedItem {
@@ -1887,7 +1934,14 @@ enum SchemaProposalStatus {
 type SchemaProposalStatusChange implements SchemaProposalActivityFeedItem {
   createdAt: DateTime!
   fromStatus: SchemaProposalStatus!
+  schemaProposal: SchemaProposal!
   toStatus: SchemaProposalStatus!
+}
+
+type SchemaProposalStatusChangeNotification implements InboxMessage {
+  createdAt: DateTime!
+  notificationId: ID!
+  readAt: DateTime
 }
 
 type SchemaProposalSubgraph {
@@ -2063,6 +2117,13 @@ union SubgraphRemoveOwnerPayload = SubgraphRemoveOwnerSuccess
 
 type SubgraphRemoveOwnerSuccess {
   query: Query!
+}
+
+type Subscription {
+  """
+  Whenever new notifications are available for the current user, return how many.
+  """
+  notificationsInboxMessages: Int!
 }
 
 type Team implements Node {
