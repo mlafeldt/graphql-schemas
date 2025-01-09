@@ -12450,20 +12450,6 @@ type NotificationChannelPreferences {
   slack: Boolean!
 }
 
-input NotificationChannelPreferencesInput {
-  """Whether notifications are currently enabled for mobile."""
-  mobile: Boolean!
-
-  """Whether notifications are currently enabled for desktop."""
-  desktop: Boolean!
-
-  """Whether notifications are currently enabled for email."""
-  email: Boolean!
-
-  """Whether notifications are currently enabled for Slack."""
-  slack: Boolean!
-}
-
 type NotificationConnection {
   edges: [NotificationEdge!]!
   nodes: [Notification!]!
@@ -23317,9 +23303,6 @@ type UserSettings implements Node {
   """
   archivedAt: DateTime
 
-  """The notification channel settings the user has selected."""
-  notificationPreferences: JSONObject!
-
   """
   The notification delivery preferences for the user. Note: notificationDisabled
   field is deprecated in favor of notificationChannelPreferences.
@@ -23428,14 +23411,11 @@ input UserSettingsUpdateInput {
   """
   subscribedToUnreadNotificationsReminder: Boolean
 
-  """[DEPRECATED] The user's notification preferences."""
-  notificationPreferences: JSONObject
-
   """The user's notification category preferences."""
   notificationCategoryPreferences: NotificationCategoryPreferencesInput
 
   """The user's notification channel preferences."""
-  notificationChannelPreferences: NotificationChannelPreferencesInput
+  notificationChannelPreferences: PartialNotificationChannelPreferencesInput
 
   """The user's notification delivery preferences."""
   notificationDeliveryPreferences: NotificationDeliveryPreferencesInput
