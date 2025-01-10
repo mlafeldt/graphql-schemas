@@ -6130,6 +6130,15 @@ type CVSS {
   vectorString: String
 }
 
+"""The Common Vulnerability Scoring System"""
+type CvssSeverities {
+  """The CVSS v3 severity associated with this advisory"""
+  cvssV3: CVSS
+
+  """The CVSS v4 severity associated with this advisory"""
+  cvssV4: CVSS
+}
+
 """A common weakness enumeration"""
 type CWE implements Node {
   """The id of the CWE"""
@@ -6777,6 +6786,11 @@ type DependencyGraphDependency {
   The name of the package in the canonical form used by the package manager.
   """
   packageName: String!
+
+  """
+  Public preview: The relationship of the dependency. Can be direct, transitive, or unknown
+  """
+  relationship: String!
 
   """The repository containing the package"""
   repository: Repository
@@ -32889,6 +32903,9 @@ type SecurityAdvisory implements Node {
 
   """The CVSS associated with this advisory"""
   cvss: CVSS! @deprecated(reason: "`cvss` will be removed. New `cvss_severities` field will now contain both `cvss_v3` and `cvss_v4` properties. Removal on 2025-10-01 UTC.")
+
+  """The CVSS associated with this advisory"""
+  cvssSeverities: CvssSeverities!
 
   """CWEs associated with this Advisory"""
   cwes(
