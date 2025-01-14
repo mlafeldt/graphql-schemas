@@ -5581,8 +5581,11 @@ type ImageUploadFromUrlPayload {
 }
 
 input InheritanceEntityMapping {
-  """Mapping of the entity ID to the new entity ID."""
+  """Mapping of the WorkflowState ID to the new WorkflowState ID."""
   workflowStates: JSONObject!
+
+  """Mapping of the IssueLabel ID to the new IssueLabel name."""
+  issueLabels: JSONObject
 }
 
 """An initiative to group projects."""
@@ -11507,27 +11510,6 @@ type Mutation {
   """
   organizationStartTrial: OrganizationStartTrialPayload! @deprecated(reason: "Use organizationStartTrialForPlan")
 
-  """Creates a new project link."""
-  projectLinkCreate(
-    """The project link object to create."""
-    input: ProjectLinkCreateInput!
-  ): ProjectLinkPayload!
-
-  """Updates a project link."""
-  projectLinkUpdate(
-    """The project link object to update."""
-    input: ProjectLinkUpdateInput!
-
-    """The identifier of the project link to update."""
-    id: String!
-  ): ProjectLinkPayload!
-
-  """Deletes a project link."""
-  projectLinkDelete(
-    """The identifier of the project link to delete."""
-    id: String!
-  ): DeletePayload!
-
   """Creates a new project milestone."""
   projectMilestoneCreate(
     """The project milestone to create."""
@@ -15405,33 +15387,6 @@ type Project implements Node {
     orderBy: PaginationOrderBy
   ): IssueConnection!
 
-  """[DEPRECATED] Links associated with the project."""
-  links(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): ProjectLinkConnection! @deprecated(reason: "Use externalLinks instead")
-
   """External links associated with the project."""
   externalLinks(
     """A cursor to be used with last for backward pagination."""
@@ -15937,12 +15892,6 @@ type ProjectLink implements Node {
 
   """The order of the item in the project resources list."""
   sortOrder: Float!
-
-  """The user who created the link."""
-  creator: User!
-
-  """The project that the link is associated with."""
-  project: Project!
 }
 
 type ProjectLinkConnection {
@@ -15951,52 +15900,11 @@ type ProjectLinkConnection {
   pageInfo: PageInfo!
 }
 
-input ProjectLinkCreateInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
-  """The URL of the link."""
-  url: String!
-
-  """The label for the link."""
-  label: String!
-
-  """Related project for the link."""
-  projectId: String!
-
-  """The order of the item in the project resources list."""
-  sortOrder: Float
-}
-
 type ProjectLinkEdge {
   node: ProjectLink!
 
   """Used in `before` and `after` args"""
   cursor: String!
-}
-
-type ProjectLinkPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The project that was created or updated."""
-  projectLink: ProjectLink!
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-input ProjectLinkUpdateInput {
-  """The URL of the link."""
-  url: String
-
-  """The label for the link."""
-  label: String
-
-  """The order of the item in the project resources list."""
-  sortOrder: Float
 }
 
 """A milestone for a project."""
@@ -17036,33 +16944,6 @@ type ProjectSearchResult implements Node {
     """
     orderBy: PaginationOrderBy
   ): IssueConnection!
-
-  """[DEPRECATED] Links associated with the project."""
-  links(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): ProjectLinkConnection! @deprecated(reason: "Use externalLinks instead")
 
   """External links associated with the project."""
   externalLinks(
@@ -19112,36 +18993,6 @@ type Query {
 
   """[INTERNAL] Get organization metadata by urlKey or organization id."""
   organizationMeta(urlKey: String!): OrganizationMeta
-
-  """All links for the project."""
-  projectLinks(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): ProjectLinkConnection!
-
-  """One specific project link."""
-  projectLink(id: String!): ProjectLink!
 
   """All milestones for the project."""
   projectMilestones(
@@ -23362,11 +23213,6 @@ type UserSettings implements Node {
   """
   subscribedToPrivacyLegalUpdates: Boolean!
 
-  """
-  [DEPRECATED] Whether this user is subscribed to unread notifications reminder emails or not.
-  """
-  subscribedToUnreadNotificationsReminder: Boolean! @deprecated(reason: "This field has been replaced by notificationChannelPreferences")
-
   """Whether to show full user names instead of display names."""
   showFullUserNames: Boolean!
 
@@ -23435,11 +23281,6 @@ input UserSettingsUpdateInput {
   Whether this user is subscribed to privacy and legal update emails or not.
   """
   subscribedToPrivacyLegalUpdates: Boolean
-
-  """
-  [DEPRECATED] Whether this user is subscribed to email notifications reminder or not.
-  """
-  subscribedToUnreadNotificationsReminder: Boolean
 
   """The user's notification category preferences."""
   notificationCategoryPreferences: NotificationCategoryPreferencesInput
