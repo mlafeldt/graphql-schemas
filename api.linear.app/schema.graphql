@@ -14481,9 +14481,6 @@ input OrganizationInviteCreateInput {
   """What user role the invite should grant."""
   role: UserRoleType = user
 
-  """The message to send to the invitee."""
-  message: String
-
   """The teams that the user has been invited to."""
   teamIds: [String!]
 
@@ -15010,6 +15007,118 @@ type Post implements Node {
 
   """The type of the post."""
   type: PostType
+}
+
+"""[Internal] A post related notification."""
+type PostNotification implements Notification & Entity & Node {
+  """
+  Related comment ID. Null if the notification is not related to a comment.
+  """
+  commentId: String
+
+  """
+  Related parent comment ID. Null if the notification is not related to a comment.
+  """
+  parentCommentId: String
+
+  """Name of the reaction emoji related to the notification."""
+  reactionEmoji: String
+
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """Notification type."""
+  type: String!
+
+  """The user that caused the notification."""
+  actor: User
+
+  """The external user that caused the notification."""
+  externalUserActor: ExternalUser
+
+  """The user that received the notification."""
+  user: User!
+
+  """
+  The time at when the user marked the notification as read. Null, if the the user hasn't read the notification
+  """
+  readAt: DateTime
+
+  """
+  The time at when an email reminder for this notification was sent to the user. Null, if no email
+      reminder has been sent.
+  """
+  emailedAt: DateTime
+
+  """
+  The time until a notification will be snoozed. After that it will appear in the inbox again.
+  """
+  snoozedUntilAt: DateTime
+
+  """The time at which a notification was unsnoozed.."""
+  unsnoozedAt: DateTime
+
+  """[Internal] URL to the target of the notification."""
+  url: String!
+
+  """[Internal] Inbox URL for the notification."""
+  inboxUrl: String!
+
+  """[Internal] Notification title."""
+  title: String!
+
+  """[Internal] Notification subtitle."""
+  subtitle: String!
+
+  """[Internal] If notification actor was Linear."""
+  isLinearActor: Boolean!
+
+  """[Internal] Notification avatar URL."""
+  actorAvatarUrl: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorInitials: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorAvatarColor: String!
+
+  """[Internal] Issue's status type for issue notifications."""
+  issueStatusType: String
+
+  """[Internal] Project update health for new updates."""
+  projectUpdateHealth: String
+
+  """
+  [Internal] Notifications with the same grouping key will be grouped together in the UI.
+  """
+  groupingKey: String!
+
+  """
+  [Internal] Priority of the notification with the same grouping key. Higher
+  number means higher priority. If priority is the same, notifications should be
+  sorted by `createdAt`.
+  """
+  groupingPriority: Float!
+
+  """The bot that caused the notification."""
+  botActor: ActorBot
+
+  """Related post ID."""
+  postId: String!
 }
 
 """Type of Post"""
@@ -15860,48 +15969,6 @@ type ProjectHistoryConnection {
 
 type ProjectHistoryEdge {
   node: ProjectHistory!
-
-  """Used in `before` and `after` args"""
-  cursor: String!
-}
-
-"""An external link for a project."""
-type ProjectLink implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The link's URL."""
-  url: String!
-
-  """The link's label."""
-  label: String!
-
-  """The order of the item in the project resources list."""
-  sortOrder: Float!
-}
-
-type ProjectLinkConnection {
-  edges: [ProjectLinkEdge!]!
-  nodes: [ProjectLink!]!
-  pageInfo: PageInfo!
-}
-
-type ProjectLinkEdge {
-  node: ProjectLink!
 
   """Used in `before` and `after` args"""
   cursor: String!
