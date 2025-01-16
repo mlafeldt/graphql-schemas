@@ -771,11 +771,19 @@ type AuthOauthClientWithScope {
   webhookUrl: String
 }
 
+type AuthOauthClientWithTokenCount {
+  """The auth OAuth client."""
+  client: AuthOauthClient!
+
+  """The count of tokens matching the app, scopes, and actor mode."""
+  tokenCount: Float!
+}
+
 type AuthOauthClientWithTokens {
   """The auth OAuth client."""
   client: AuthOauthClient!
 
-  """The token matching the app, scope, and actor."""
+  """The tokens matching the user, app, scopes, and actor mode."""
   tokens: [OauthToken!]!
 }
 
@@ -1557,6 +1565,9 @@ type Customer implements Node {
 
   """The approximate number of needs of the customer."""
   approximateNeedCount: Float!
+
+  """The integration that manages the Customer."""
+  integration: Integration
 }
 
 """Customer filtering options."""
