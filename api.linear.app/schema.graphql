@@ -2883,6 +2883,9 @@ type Cycle implements Node {
   """[Internal] The current progress of the cycle."""
   currentProgress: JSONObject!
 
+  """The cycle inherited from."""
+  inheritedFrom: Cycle
+
   """Issues associated with the cycle."""
   issues(
     """Filter returned issues."""
@@ -3603,6 +3606,9 @@ type DocumentContent implements Node {
 
   """The document that the content is associated with."""
   document: Document
+
+  """[ALPHA] The meeting that the content is associated with."""
+  meeting: Meeting
 
   """
   The time at which the document content was restored from a previous version.
@@ -5667,6 +5673,9 @@ type Initiative implements Node {
 
   """The status of the initiative. One of Planned, Active, Completed"""
   status: InitiativeStatus!
+
+  """[ALPHA] The last initiative update posted for this initiative."""
+  lastUpdate: InitiativeUpdate
 
   """The health of the initiative."""
   health: InitiativeUpdateHealthType
@@ -9617,6 +9626,71 @@ input ManualSort {
 
   """The order for the individual sort"""
   order: PaginationSortOrder
+}
+
+"""A meeting that can be attached to different entities."""
+type Meeting implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The meeting title."""
+  title: String!
+
+  """The icon of the meeting."""
+  icon: String
+
+  """The color of the icon."""
+  color: String
+
+  """The user who created the meeting."""
+  creator: User
+
+  """The user who last updated the meeting."""
+  updatedBy: User
+
+  """The project that the meeting is associated with."""
+  project: Project
+
+  """[Internal] The initiative that the meeting is associated with."""
+  initiative: Initiative
+
+  """
+  The time at which the meeting was hidden. Null if the entity has not been hidden.
+  """
+  hiddenAt: DateTime
+
+  """A flag that indicates whether the meeting is in the trash bin."""
+  trashed: Boolean
+
+  """The order of the item in the resources list."""
+  sortOrder: Float!
+}
+
+type MeetingConnection {
+  edges: [MeetingEdge!]!
+  nodes: [Meeting!]!
+  pageInfo: PageInfo!
+}
+
+type MeetingEdge {
+  node: Meeting!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
 }
 
 """Issue project milestone options."""
@@ -15267,6 +15341,9 @@ type Project implements Node {
   """
   priority: Int!
 
+  """The last project update posted for this project."""
+  lastUpdate: ProjectUpdate
+
   """The health of the project."""
   health: ProjectUpdateHealthType
 
@@ -16782,6 +16859,9 @@ type ProjectSearchResult implements Node {
   The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
   """
   priority: Int!
+
+  """The last project update posted for this project."""
+  lastUpdate: ProjectUpdate
 
   """The health of the project."""
   health: ProjectUpdateHealthType
