@@ -103,7 +103,8 @@ type AlreadyMemberError {
 
 type Branch implements Node {
   activeDeployment: Deployment
-  deployments(after: String, before: String, first: Int, last: Int): DeploymentConnection!
+  analytics(filters: GraphAnalyticsFilters!): GraphAnalytics
+  deployments(after: String, before: String, first: Int, last: Int, filters: DeploymentFilters): DeploymentConnection!
   domains: [String!]!
   endpointConfig: EndpointConfig
   environment: BranchEnvironment!
@@ -304,6 +305,26 @@ type DeploymentEdge {
   node: Deployment!
 }
 
+input DeploymentFilters {
+  finishedAt: DeploymentFinishedAtFilters
+}
+
+input DeploymentFinishedAtFilters {
+  """
+  Use this if you really care about having a specific duration like 1 hour, 7 days, etc.
+  """
+  range: Duration
+
+  """
+  Use this if you *at least* the data between `from` and `to` to be provided. You may get
+  more, but never less.
+  """
+  from: DateTime
+
+  """To be used in conjunction with with either `range` or `from`."""
+  to: DateTime!
+}
+
 union DeploymentRedeployPayload = DailyDeploymentCountLimitExceededError | DeploymentDoesNotExistError | DeploymentRedeploySuccess | NotAllowedError
 
 type DeploymentRedeploySuccess {
@@ -433,6 +454,7 @@ enum GrafbasePlan {
 type Graph implements Node {
   account: Account!
   analytics(filters: GraphAnalyticsFilters!): GraphAnalytics
+  branch(name: String): Branch
   branches(after: String, before: String, first: Int, last: Int): BranchConnection!
   createdAt: DateTime!
   id: ID!
@@ -1248,7 +1270,6 @@ input RequestFilters {
   """Defaults to production branch"""
   branchName: String
   duration: DurationFilter
-  traceId: [String!]
 
   """
   Use this if you really care about having a specific duration like 1 hour, 7 days, etc.
@@ -1263,6 +1284,7 @@ input RequestFilters {
 
   """To be used in conjunction with with either `range` or `from`."""
   to: DateTime!
+  traceId: [String!]
   operationName: [String!]
   clientName: [String!]
 
