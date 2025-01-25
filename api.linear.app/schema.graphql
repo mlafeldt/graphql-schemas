@@ -490,6 +490,12 @@ input AuditEntryFilter {
 
   """Filters that the audit entry actor must satisfy."""
   actor: NullableUserFilter
+
+  """Compound filters, all of which need to be matched by the issue."""
+  and: [AuditEntryFilter!]
+
+  """Compound filters, one of which need to be matched by the issue."""
+  or: [AuditEntryFilter!]
 }
 
 type AuditEntryType {
@@ -4696,13 +4702,20 @@ input InitiativeCollectionFilter {
   """Comparator for the initiative slug ID."""
   slugId: StringComparator
 
-  """Comparator for the initiative status."""
+  """Comparator for the initiative status: Planned, Active, Completed"""
   status: StringComparator
 
   """Filters that the initiative creator must satisfy."""
   creator: UserFilter
 
-  """[Internal] Comparator for the initiative health (with age)."""
+  """
+  [Internal] Comparator for the initiative health: onTrack, atRisk, offTrack
+  """
+  health: StringComparator
+
+  """
+  [Internal] Comparator for the initiative health (with age): onTrack, atRisk, offTrack, outdated, noUpdate
+  """
   healthWithAge: StringComparator
 
   """Compound filters, all of which need to be matched by the initiative."""
@@ -4789,13 +4802,20 @@ input InitiativeFilter {
   """Comparator for the initiative slug ID."""
   slugId: StringComparator
 
-  """Comparator for the initiative status."""
+  """Comparator for the initiative status: Planned, Active, Completed"""
   status: StringComparator
 
   """Filters that the initiative creator must satisfy."""
   creator: UserFilter
 
-  """[Internal] Comparator for the initiative health (with age)."""
+  """
+  [Internal] Comparator for the initiative health: onTrack, atRisk, offTrack
+  """
+  health: StringComparator
+
+  """
+  [Internal] Comparator for the initiative health (with age): onTrack, atRisk, offTrack, outdated, noUpdate
+  """
   healthWithAge: StringComparator
 
   """Compound filters, all of which need to be matched by the initiative."""
@@ -11940,10 +11960,12 @@ input NullableProjectFilter {
   """Comparator for the project target date."""
   targetDate: NullableDateComparator
 
-  """Comparator for the project health."""
+  """Comparator for the project health: onTrack, atRisk, offTrack"""
   health: StringComparator
 
-  """Comparator for the project health (with age)."""
+  """
+  Comparator for the project health (with age): onTrack, atRisk, offTrack, outdated, noUpdate
+  """
   healthWithAge: StringComparator
 
   """Comparator for filtering projects with relations."""
@@ -14046,10 +14068,12 @@ input ProjectCollectionFilter {
   """Comparator for the project target date."""
   targetDate: NullableDateComparator
 
-  """Comparator for the project health."""
+  """Comparator for the project health: onTrack, atRisk, offTrack"""
   health: StringComparator
 
-  """Comparator for the project health (with age)."""
+  """
+  Comparator for the project health (with age): onTrack, atRisk, offTrack, outdated, noUpdate
+  """
   healthWithAge: StringComparator
 
   """Comparator for filtering projects with relations."""
@@ -14246,10 +14270,12 @@ input ProjectFilter {
   """Comparator for the project target date."""
   targetDate: NullableDateComparator
 
-  """Comparator for the project health."""
+  """Comparator for the project health: onTrack, atRisk, offTrack"""
   health: StringComparator
 
-  """Comparator for the project health (with age)."""
+  """
+  Comparator for the project health (with age): onTrack, atRisk, offTrack, outdated, noUpdate
+  """
   healthWithAge: StringComparator
 
   """Comparator for filtering projects with relations."""
@@ -15776,6 +15802,9 @@ type ProjectUpdate implements Node {
 
   """The URL to the project update."""
   url: String!
+
+  """Whether the project update is stale."""
+  isStale: Boolean!
 
   """The diff between the current update and the previous one."""
   diff: JSONObject
@@ -17392,6 +17421,9 @@ type Query {
 
   """All initiatives in the workspace."""
   initiatives(
+    """Filter returned initiatives."""
+    filter: InitiativeFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
