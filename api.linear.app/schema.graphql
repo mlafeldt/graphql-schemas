@@ -1491,6 +1491,19 @@ input CustomerNeedCreateInput {
 
   """Optional URL for the attachment associated with the customer need."""
   attachmentUrl: String
+
+  """
+  Create need as a user with the provided name. This option is only available to
+  OAuth applications creating needs in `actor=application` mode.
+  """
+  createAsUser: String
+
+  """
+  Provide an external user avatar URL. Can only be used in conjunction with the
+  `createAsUser` options. This option is only available to OAuth applications
+  creating needs in `actor=application` mode.
+  """
+  displayIconUrl: String
 }
 
 type CustomerNeedEdge {
@@ -4381,6 +4394,8 @@ input GitHubRepoMappingInput {
 }
 
 input GitHubSettingsInput {
+  pullRequestReviewTool: PullRequestReviewTool
+
   """The avatar URL for the GitHub organization."""
   orgAvatarUrl: String
 
@@ -12316,6 +12331,9 @@ input NullableUserFilter {
   """Comparator for the user's admin status."""
   admin: BooleanComparator
 
+  """Comparator for the user's invited status."""
+  invited: BooleanComparator
+
   """
   Filter based on the currently authenticated user. Set to true to filter for
   the authenticated user, false for any other user.
@@ -16331,6 +16349,11 @@ type ProjectUpdateWithInteractionPayload {
   interaction: ProjectUpdateInteraction! @deprecated(reason: "Project update interactions are not used and will be removed.")
 }
 
+enum PullRequestReviewTool {
+  source
+  graphite
+}
+
 """A user's web or mobile push notification subscription."""
 type PushSubscription implements Node {
   """The unique identifier of the entity."""
@@ -19496,6 +19519,9 @@ type Team implements Node {
   """Calendar feed URL (iCal) for cycles."""
   cycleCalenderUrl: String!
 
+  """The name of the team including it's parent team name if it has one."""
+  displayName: String!
+
   """Issues associated with the team."""
   issues(
     """Filter returned issues."""
@@ -21129,6 +21155,9 @@ input UserCollectionFilter {
   """Comparator for the user's admin status."""
   admin: BooleanComparator
 
+  """Comparator for the user's invited status."""
+  invited: BooleanComparator
+
   """
   Filter based on the currently authenticated user. Set to true to filter for
   the authenticated user, false for any other user.
@@ -21196,6 +21225,9 @@ input UserFilter {
 
   """Comparator for the user's admin status."""
   admin: BooleanComparator
+
+  """Comparator for the user's invited status."""
+  invited: BooleanComparator
 
   """
   Filter based on the currently authenticated user. Set to true to filter for
