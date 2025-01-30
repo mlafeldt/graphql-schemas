@@ -1,3 +1,9 @@
+"""
+The `_Any` scalar is used to pass representations of entities from external
+services into the root `_entities` field for execution.
+"""
+scalar _Any
+
 type AccessToken implements Node {
   accountId: ID
   createdAt: DateTime!
@@ -428,7 +434,13 @@ type FederatedGraphCompositionError {
 
 type FieldAnalytics {
   metrics: FieldMetricsTimeSeries
-  topClients(limit: Int, searchQuery: String): TopClientsForField
+  topClients(
+    """Detaults to 10, Max 100"""
+    limit: Int
+
+    """Search over the client names/versions"""
+    searchQuery: String
+  ): TopClientsForField
 }
 
 type FieldMetrics {
@@ -461,7 +473,15 @@ type Graph implements Node {
   operationChecksConfiguration: GraphOperationCheckConfiguration!
   owners: [Team!]!
   productionBranch: Branch!
-  request(branchName: String, approximateTimestamp: DateTime!, traceId: ID!): Request
+  request(
+    branchName: String
+
+    """
+    The approximate timestamp of the request, within a few minutes of the actual request.
+    """
+    approximateTimestamp: DateTime!
+    traceId: ID!
+  ): Request
   requests(after: String, before: String, first: Int, last: Int, filters: RequestFilters!): RequestConnection
   schemaChecks(after: String, first: Int, branch: String): SchemaCheckConnection!
   schemaProposals(after: String, first: Int): SchemaProposalConnection!
@@ -475,10 +495,34 @@ type GraphAddOwnerSuccess {
 }
 
 type GraphAnalytics {
-  forField(schemaPath: String!): FieldAnalytics!
-  requestMetrics(latencyPercentiles: [Float!]): RequestMetricsTimeSeriesV2
-  topClients(limit: Int, searchQuery: String, latencyPercentile: Float): TopClients
-  topOperations(limit: Int, searchQuery: String, latencyPercentile: Float): TopOperations
+  forField(
+    """Schema path defined as: '<parent-type-name>.<name>'"""
+    schemaPath: String!
+  ): FieldAnalytics!
+  requestMetrics(
+    """Latency percentiles to retrieve. Ex: [50, 99, 99.9]"""
+    latencyPercentiles: [Float!]
+  ): RequestMetricsTimeSeriesV2
+  topClients(
+    """Detaults to 10, Max 100"""
+    limit: Int
+
+    """Search over the client names/versions"""
+    searchQuery: String
+
+    """If not specified, top clients by latency will be empty. Ex: 95"""
+    latencyPercentile: Float
+  ): TopClients
+  topOperations(
+    """Detaults to 10, Max 100"""
+    limit: Int
+
+    """Search over the opeartion names"""
+    searchQuery: String
+
+    """If not specified, top operations by latency will be empty. Ex: 95"""
+    latencyPercentile: Float
+  ): TopOperations
 }
 
 input GraphAnalyticsFilters {
@@ -836,7 +880,19 @@ type Mutation {
   """Delete a given access token."""
   accessTokenDelete(input: AccessTokenDeleteInput!): AccessTokenDeletePayload!
   branchCreate(input: BranchCreateInput!): BranchCreatePayload!
-  branchDelete(accountSlug: String!, graphSlug: String, branchName: String!, projectSlug: String): BranchDeletePayload!
+  branchDelete(
+    """slug of the account"""
+    accountSlug: String!
+
+    """slug of the graph"""
+    graphSlug: String
+
+    """name of the branch"""
+    branchName: String!
+
+    """slug of the project"""
+    projectSlug: String
+  ): BranchDeletePayload!
   branchSchemaProposalsConfiguredReviewerAdd(input: SchemaProposalsConfiguredReviewerAddInput!): SchemaProposalsConfiguredReviewerAddPayload!
   branchSchemaProposalsConfiguredReviewerRemove(input: SchemaProposalsConfiguredReviewerRemoveInput!): SchemaProposalsConfiguredReviewerRemovePayload!
   branchUpdate(input: BranchUpdateInput!): BranchUpdatePayload!
@@ -845,7 +901,10 @@ type Mutation {
   deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
 
   """Create a new deployment for an existing graph."""
-  deploymentRedeploy(id: ID!): DeploymentRedeployPayload!
+  deploymentRedeploy(
+    """ID of the deployment"""
+    id: ID!
+  ): DeploymentRedeployPayload!
   endpointConfigUpdate(input: EndpointConfigUpdateInput!): EndpointConfigUpdatePayload!
   graphAddOwner(graphId: ID!, ownerId: ID!): GraphAddOwnerPayload!
 
@@ -871,11 +930,6 @@ type Mutation {
   Create new organization account owned by the current user. Slug must be unique.
   """
   organizationCreate(input: OrganizationCreateInput!): OrganizationCreatePayload!
-
-  """
-  Create a new enterprise organization account owned by the current user. Used in E2E tests.
-  """
-  organizationCreateEnterprise(input: OrganizationCreateInput!): OrganizationCreatePayload!
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
   organizationSlugUpdate(input: OrganizationSlugUpdateInput!): OrganizationSlugUpdatePayload!
   organizationUpdate(input: OrganizationUpdateInput!): OrganizationUpdatePayload!
@@ -1173,6 +1227,7 @@ type PublishForbidden {
 }
 
 input PublishInput {
+  url: String!
   schema: String!
   accountSlug: String!
   graphSlug: String
@@ -1180,7 +1235,6 @@ input PublishInput {
   message: String
   branch: String
   subgraph: String!
-  url: String!
 }
 
 """
@@ -1199,17 +1253,41 @@ type PublishSuccess {
 
 type Query {
   accessTokens(after: String, before: String, first: Int, last: Int): AccessTokenConnection!
-  accountBySlug(slug: String!): Account
+  accountBySlug(
+    """slug of the account"""
+    slug: String!
+  ): Account
   accountCreationValidate(input: AccountCreationValidateInput!): AccountCreationValidatePayload!
 
   """Get branch by account slug, graph slug and the name of the branch."""
-  branch(name: String, accountSlug: String, graphSlug: String, projectSlug: String): Branch
+  branch(
+    """name of the branch"""
+    name: String
+
+    """slug of the account"""
+    accountSlug: String
+
+    """slug of the graph"""
+    graphSlug: String
+
+    """slug of the project"""
+    projectSlug: String
+  ): Branch
 
   """Get deployment by ID."""
-  deployment(id: ID!): Deployment
+  deployment(
+    """ID of the deployment"""
+    id: ID!
+  ): Deployment
 
   """Get a graph by account slug and slug of the graph itself."""
-  graphByAccountSlug(accountSlug: String!, graphSlug: String!): Graph
+  graphByAccountSlug(
+    """slug of the account"""
+    accountSlug: String!
+
+    """slug of the graph"""
+    graphSlug: String!
+  ): Graph
   invite(id: ID!): Invite
   node(id: ID!): Node
 
@@ -1218,10 +1296,48 @@ type Query {
   schemaCheck(id: ID!): SchemaCheck
   schemaProposal(id: ID!): SchemaProposal
   schemaVersion(id: ID!): SchemaVersion
-  schemaVersions(after: String, before: String, first: Int, last: Int, accountSlug: String!, graphSlug: String, projectSlug: String, branch: String, subgraphName: String, populated: Boolean! = true): SchemaVersionConnection!
+  schemaVersions(
+    after: String
+    before: String
+    first: Int
+    last: Int
+
+    """account slug"""
+    accountSlug: String!
+
+    """graph slug"""
+    graphSlug: String
+
+    """project slug"""
+    projectSlug: String
+
+    """name of the branch"""
+    branch: String
+
+    """name of the subgraph"""
+    subgraphName: String
+
+    """return only versions with changes"""
+    populated: Boolean! = true
+  ): SchemaVersionConnection!
 
   """Get subgraph."""
-  subgraph(accountSlug: String!, graphSlug: String, projectSlug: String, branch: String, subgraphName: String!): Subgraph
+  subgraph(
+    """account slug"""
+    accountSlug: String!
+
+    """graph slug"""
+    graphSlug: String
+
+    """project slug"""
+    projectSlug: String
+
+    """name of the branch"""
+    branch: String
+
+    """name of the subgraph"""
+    subgraphName: String!
+  ): Subgraph
   team(id: ID!): Team
   teamBySlug(slug: String!, organizationSlug: String!): Team
 
@@ -1578,7 +1694,13 @@ type SchemaProposalCommentOnLine implements SchemaProposalActivityFeedItem & Sch
   author: User
 
   """The section of the subgraph SDL where the comment is located."""
-  context(contextLines: Int!): String
+  context(
+    """
+    How many lines around the commented line to include. Fewer lines can be
+    returned if the context reaches the start or the end of the schema.
+    """
+    contextLines: Int!
+  ): String
   createdAt: DateTime!
   diffSide: DiffSide!
   id: ID!
