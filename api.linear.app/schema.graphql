@@ -5703,6 +5703,11 @@ type IntegrationTemplatePayload {
   success: Boolean!
 }
 
+input IntegrationUpdateInput {
+  """The settings to update."""
+  settings: IntegrationSettingsInput
+}
+
 input IntercomSettingsInput {
   """
   Whether an internal message should be added when a Linear issue changes status
@@ -9623,13 +9628,22 @@ type Mutation {
   ): DeletePayload!
 
   """[INTERNAL] Updates the integration."""
+  integrationUpdate(
+    """A partial integration object to update the integration with."""
+    input: IntegrationUpdateInput!
+
+    """The identifier of the integration to update."""
+    id: String!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Updates the integration settings."""
   integrationSettingsUpdate(
     """An integration settings object."""
     input: IntegrationSettingsInput!
 
     """The identifier of the integration to update."""
     id: String!
-  ): IntegrationPayload!
+  ): IntegrationPayload! @deprecated(reason: "Use integrationUpdate instead.")
 
   """Generates a webhook for the GitHub commit integration."""
   integrationGithubCommitCreate: GitHubCommitIntegrationPayload!
@@ -10403,6 +10417,9 @@ type Mutation {
 
   """Deletes a customer need."""
   customerNeedDelete(
+    """Whether to keep the attachment associated with the customer need."""
+    keepAttachment: Boolean
+
     """The identifier of the customer need to delete."""
     id: String!
   ): DeletePayload!
@@ -19432,6 +19449,9 @@ type Team implements Node {
 
   """Whether the team is private or not."""
   private: Boolean!
+
+  """[Internal] Facets associated with the team."""
+  facets: [Facet!]!
 
   """Whether the team is managed by SCIM integration."""
   scimManaged: Boolean!
