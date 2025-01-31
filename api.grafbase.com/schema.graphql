@@ -213,11 +213,6 @@ type CurrentPlanLimitReachedError {
   query: Query!
 }
 
-type DailyDeploymentCountLimitExceededError {
-  limit: Int!
-  query: Query!
-}
-
 """RFC3339 formatted date in the UTC time zone denoted by letter 'Z'"""
 scalar DateTime
 
@@ -298,10 +293,6 @@ type DeploymentConnection {
   pageInfo: PageInfo!
 }
 
-type DeploymentDoesNotExistError {
-  query: Query!
-}
-
 """An edge in a connection."""
 type DeploymentEdge {
   """A cursor for use in pagination"""
@@ -329,13 +320,6 @@ input DeploymentFinishedAtFilters {
 
   """To be used in conjunction with with either `range` or `from`."""
   to: DateTime!
-}
-
-union DeploymentRedeployPayload = DailyDeploymentCountLimitExceededError | DeploymentDoesNotExistError | DeploymentRedeploySuccess | NotAllowedError
-
-type DeploymentRedeploySuccess {
-  deployment: Deployment!
-  query: Query!
 }
 
 enum DeploymentStatus {
@@ -483,7 +467,7 @@ type Graph implements Node {
     traceId: ID!
   ): Request
   requests(after: String, before: String, first: Int, last: Int, filters: RequestFilters!): RequestConnection
-  schemaChecks(after: String, first: Int, branch: String): SchemaCheckConnection!
+  schemaChecks(after: String, before: String, first: Int, last: Int, branch: String): SchemaCheckConnection!
   schemaProposals(after: String, first: Int): SchemaProposalConnection!
   slug: String!
 }
@@ -899,12 +883,6 @@ type Mutation {
 
   """Delete a subgraph"""
   deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
-
-  """Create a new deployment for an existing graph."""
-  deploymentRedeploy(
-    """ID of the deployment"""
-    id: ID!
-  ): DeploymentRedeployPayload!
   endpointConfigUpdate(input: EndpointConfigUpdateInput!): EndpointConfigUpdatePayload!
   graphAddOwner(graphId: ID!, ownerId: ID!): GraphAddOwnerPayload!
 
