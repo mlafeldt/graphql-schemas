@@ -1605,6 +1605,15 @@ type CustomerPayload {
   success: Boolean!
 }
 
+"""Issue customer sorting options."""
+input CustomerSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 """Customer sorting options."""
 input CustomerSortInput {
   """Sort by name"""
@@ -8056,6 +8065,9 @@ input IssueSortInput {
   """Sort by label"""
   label: LabelSort
 
+  """Sort by label group"""
+  labelGroup: LabelGroupSort
+
   """Sort by SLA status"""
   slaStatus: SlaStatusSort
 
@@ -8091,6 +8103,9 @@ input IssueSortInput {
 
   """Sort by workflow state type"""
   workflowState: WorkflowStateSort
+
+  """Sort by customer"""
+  customer: CustomerSort
 }
 
 type IssueTitleSuggestionFromCustomerRequestPayload {
@@ -8295,6 +8310,18 @@ scalar JSON
 The `JSONObject` scalar type represents arbitrary values as *embedded* JSON
 """
 scalar JSONObject
+
+"""Issue label-group sorting options."""
+input LabelGroupSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+
+  """The label-group id to sort by"""
+  labelGroupId: String!
+}
 
 """A label notification subscription."""
 type LabelNotificationSubscription implements NotificationSubscription & Entity & Node {
