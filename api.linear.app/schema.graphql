@@ -1365,15 +1365,13 @@ type CustomerNeed implements Node {
   """The attachment this need is referencing."""
   attachment: Attachment
 
+  """The project attachment this need is referencing."""
+  projectAttachment: ProjectAttachment
+
   """
   Whether the customer need is important or not. 0 = Not important, 1 = Important.
   """
   priority: Float!
-
-  """
-  [DEPRECATED] Optional URL to the source of the customer need. Used when manually creating a need.
-  """
-  url: String @deprecated(reason: "Use attachment.url instead")
 
   """The need content in markdown format."""
   body: String
@@ -1383,6 +1381,9 @@ type CustomerNeed implements Node {
 
   """The creator of the customer need."""
   creator: User
+
+  """The URL of the underlying attachment, if any"""
+  url: String
 }
 
 """A generic payload return from entity archive mutations."""
@@ -4087,6 +4088,9 @@ enum FrequencyResolutionType {
 type FrontAttachmentPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
+
+  """The issue attachment that was created."""
+  attachment: Attachment!
 
   """Whether the operation was successful."""
   success: Boolean!
@@ -14178,6 +14182,44 @@ type ProjectArchivePayload implements ArchivePayload {
   entity: Project
 }
 
+"""[INTERNAL] Project attachment"""
+type ProjectAttachment implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """Title of the attachment."""
+  title: String!
+
+  """Optional subtitle of the attachment"""
+  subtitle: String
+
+  """URL of the attachment."""
+  url: String!
+
+  """The creator of the attachment."""
+  creator: User
+
+  """Custom metadata related to the attachment."""
+  metadata: JSONObject!
+
+  """Information about the extermal source which created the attachment."""
+  source: JSONObject
+}
+
 """Project filtering options."""
 input ProjectCollectionFilter {
   """Comparator for the identifier."""
@@ -18437,6 +18479,7 @@ input RelationExistsComparator {
 
 """Features release channel."""
 enum ReleaseChannel {
+  development
   internal
   beta
   preRelease
@@ -18753,7 +18796,7 @@ input SentrySettingsInput {
   organizationSlug: String!
 
   """The ID of the Sentry organization being connected."""
-  organizationId: Int!
+  organizationId: ID!
 
   """Whether Sentry issues resolving completes Linear issues."""
   resolvingCompletesIssues: Boolean!
@@ -19450,6 +19493,11 @@ type Team implements Node {
   inviteHash: String!
 
   """
+  Whether the team should inherit its estimation settings from its parent. Only applies to sub-teams.
+  """
+  inheritIssueEstimation: Boolean!
+
+  """
   The issue estimation type to use. Must be one of "notUsed", "exponential", "fibonacci", "linear", "tShirt".
   """
   issueEstimationType: String!
@@ -19466,7 +19514,7 @@ type Team implements Node {
   """Whether to add additional points to the estimate scale."""
   issueEstimationExtended: Boolean!
 
-  """What to use as an default estimate for unestimated issues."""
+  """What to use as a default estimate for unestimated issues."""
   defaultIssueEstimate: Float!
 
   """Whether triage mode is enabled for the team or not."""
@@ -20338,6 +20386,11 @@ input TeamUpdateInput {
 
   """The timezone of the team."""
   timezone: String
+
+  """
+  Whether the team should inherit estimation settings from its parent. Only applies to sub-teams.
+  """
+  inheritIssueEstimation: Boolean
 
   """
   The issue estimation type to use. Must be one of "notUsed", "exponential", "fibonacci", "linear", "tShirt".
