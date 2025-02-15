@@ -3341,10 +3341,10 @@ type Draft implements Node {
   """The project update for which this is a draft comment."""
   projectUpdate: ProjectUpdate
 
-  """[INTERNAL] The initiative for which this is a draft initiative update."""
+  """The initiative for which this is a draft initiative update."""
   initiative: Initiative
 
-  """[INTERNAL] The initiative update for which this is a draft comment."""
+  """The initiative update for which this is a draft comment."""
   initiativeUpdate: InitiativeUpdate
 
   """The post for which this is a draft comment."""
@@ -4546,22 +4546,22 @@ type Initiative implements Node {
   archivedAt: DateTime
 
   """
-  [Internal] The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
   """
   updateReminderFrequencyInWeeks: Float
 
   """
-  [Internal] The frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  The frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
   """
   updateReminderFrequency: Float
 
-  """[Internal] The resolution of the reminder frequency."""
+  """The resolution of the reminder frequency."""
   frequencyResolution: FrequencyResolutionType!
 
-  """[Internal] The day at which to prompt for updates."""
+  """The day at which to prompt for updates."""
   updateRemindersDay: Day
 
-  """[Internal] The hour at which to prompt for updates."""
+  """The hour at which to prompt for updates."""
   updateRemindersHour: Float
 
   """The name of the initiative."""
@@ -4603,13 +4603,13 @@ type Initiative implements Node {
   """The status of the initiative. One of Planned, Active, Completed"""
   status: InitiativeStatus!
 
-  """[ALPHA] The last initiative update posted for this initiative."""
+  """The last initiative update posted for this initiative."""
   lastUpdate: InitiativeUpdate
 
-  """[ALPHA] The health of the initiative."""
+  """The health of the initiative."""
   health: InitiativeUpdateHealthType
 
-  """[ALPHA] The time at which the initiative health was updated."""
+  """The time at which the initiative health was updated."""
   healthUpdatedAt: DateTime
 
   """The time at which the initiative was moved into active status."""
@@ -4678,12 +4678,10 @@ type Initiative implements Node {
     orderBy: PaginationOrderBy
   ): EntityExternalLinkConnection!
 
-  """
-  [Internal] Settings for all integrations associated with that initiative.
-  """
+  """Settings for all integrations associated with that initiative."""
   integrationsSettings: IntegrationsSettings
 
-  """[Internal] History entries associated with the initiative."""
+  """History entries associated with the initiative."""
   history(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -4749,13 +4747,11 @@ input InitiativeCollectionFilter {
   """Filters that the initiative creator must satisfy."""
   creator: UserFilter
 
-  """
-  [Internal] Comparator for the initiative health: onTrack, atRisk, offTrack
-  """
+  """Comparator for the initiative health: onTrack, atRisk, offTrack"""
   health: StringComparator
 
   """
-  [Internal] Comparator for the initiative health (with age): onTrack, atRisk, offTrack, outdated, noUpdate
+  Comparator for the initiative health (with age): onTrack, atRisk, offTrack, outdated, noUpdate
   """
   healthWithAge: StringComparator
 
@@ -4849,13 +4845,11 @@ input InitiativeFilter {
   """Filters that the initiative creator must satisfy."""
   creator: UserFilter
 
-  """
-  [Internal] Comparator for the initiative health: onTrack, atRisk, offTrack
-  """
+  """Comparator for the initiative health: onTrack, atRisk, offTrack"""
   health: StringComparator
 
   """
-  [Internal] Comparator for the initiative health (with age): onTrack, atRisk, offTrack, outdated, noUpdate
+  Comparator for the initiative health (with age): onTrack, atRisk, offTrack, outdated, noUpdate
   """
   healthWithAge: StringComparator
 
@@ -4866,7 +4860,7 @@ input InitiativeFilter {
   or: [InitiativeFilter!]
 }
 
-"""[Internal] A initiative history containing relevant change events."""
+"""A initiative history containing relevant change events."""
 type InitiativeHistory implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -5016,7 +5010,7 @@ type InitiativeNotification implements Notification & Entity & Node {
   """Related initiative ID."""
   initiativeId: String!
 
-  """[Internal] Related initiative update ID."""
+  """Related initiative update ID."""
   initiativeUpdateId: String
 }
 
@@ -5189,7 +5183,7 @@ input InitiativeToProjectUpdateInput {
   sortOrder: Float
 }
 
-"""[ALPHA] An initiative update."""
+"""An initiative update."""
 type InitiativeUpdate implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -5239,6 +5233,100 @@ type InitiativeUpdate implements Node {
 
   """Whether initiative update diff should be hidden."""
   isDiffHidden: Boolean!
+
+  """The URL to the initiative update."""
+  url: String!
+
+  """Whether the initiative update is stale."""
+  isStale: Boolean!
+
+  """The diff between the current update and the previous one."""
+  diff: JSONObject
+
+  """
+  The diff between the current update and the previous one, formatted as markdown.
+  """
+  diffMarkdown: String
+}
+
+"""A generic payload return from entity archive mutations."""
+type InitiativeUpdateArchivePayload implements ArchivePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The archived/unarchived entity. Null if entity was deleted."""
+  entity: InitiativeUpdate
+}
+
+type InitiativeUpdateConnection {
+  edges: [InitiativeUpdateEdge!]!
+  nodes: [InitiativeUpdate!]!
+  pageInfo: PageInfo!
+}
+
+input InitiativeUpdateCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The content of the update in markdown format."""
+  body: String
+
+  """[Internal] The content of the update as a Prosemirror document."""
+  bodyData: JSON
+
+  """The health of the initiative at the time of the update."""
+  health: InitiativeUpdateHealthType
+
+  """The initiative to associate the update with."""
+  initiativeId: String!
+
+  """
+  Whether the diff between the current update and the previous one should be hidden.
+  """
+  isDiffHidden: Boolean
+}
+
+type InitiativeUpdateEdge {
+  node: InitiativeUpdate!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""Options for filtering initiative updates."""
+input InitiativeUpdateFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Filters that the initiative update creator must satisfy."""
+  user: UserFilter
+
+  """Filters that the initiative update initiative must satisfy."""
+  initiative: InitiativeFilter
+
+  """Filters that the initiative updates reactions must satisfy."""
+  reactions: ReactionCollectionFilter
+
+  """
+  Compound filters, all of which need to be matched by the InitiativeUpdate.
+  """
+  and: [InitiativeUpdateFilter!]
+
+  """
+  Compound filters, one of which need to be matched by the InitiativeUpdate.
+  """
+  or: [InitiativeUpdateFilter!]
 }
 
 """The health type when the update is created."""
@@ -5284,23 +5372,58 @@ input InitiativeUpdateInput {
   content: String
 
   """
-  [Internal] The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
   """
   updateReminderFrequencyInWeeks: Float
 
   """
-  [Internal] The frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  The frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
   """
   updateReminderFrequency: Float
 
-  """[Internal] The frequency resolution."""
+  """The frequency resolution."""
   frequencyResolution: FrequencyResolutionType
 
-  """[Internal] The day at which to prompt for updates."""
+  """The day at which to prompt for updates."""
   updateRemindersDay: Day
 
-  """[Internal] The hour at which to prompt for updates."""
+  """The hour at which to prompt for updates."""
   updateRemindersHour: Int
+}
+
+type InitiativeUpdatePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The initiative update that was created."""
+  initiativeUpdate: InitiativeUpdate!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+type InitiativeUpdateReminderPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input InitiativeUpdateUpdateInput {
+  """The content of the update in markdown format."""
+  body: String
+
+  """The content of the update as a Prosemirror document."""
+  bodyData: JSON
+
+  """The health of the initiative at the time of the update."""
+  health: InitiativeUpdateHealthType
+
+  """
+  Whether the diff between the current update and the previous one should be hidden.
+  """
+  isDiffHidden: Boolean
 }
 
 """An integration with an external service."""
@@ -6788,6 +6911,9 @@ input IssueFilter {
 type IssueFilterSuggestionPayload {
   """The json filter that is suggested."""
   filter: JSONObject
+
+  """The log id of the prompt, that created this filter."""
+  logId: String
 }
 
 """A record of changes to an issue."""
@@ -10087,6 +10213,44 @@ type Mutation {
     input: IntegrationRequestInput!
   ): IntegrationRequestPayload!
 
+  """Creates a initiative update."""
+  initiativeUpdateCreate(
+    """The initiative update object to create."""
+    input: InitiativeUpdateCreateInput!
+  ): InitiativeUpdatePayload!
+
+  """Updates an update."""
+  initiativeUpdateUpdate(
+    """A data to update the update with."""
+    input: InitiativeUpdateUpdateInput!
+
+    """The identifier of the update to update."""
+    id: String!
+  ): InitiativeUpdatePayload!
+
+  """Archives an initiative update."""
+  initiativeUpdateArchive(
+    """The identifier of the initiative update to archive."""
+    id: String!
+  ): InitiativeUpdateArchivePayload!
+
+  """Create a notification to remind a user about an initiative update."""
+  createInitiativeUpdateReminder(
+    """
+    The user identifier to whom the notification will be sent. By default, it is set to the initiative owner.
+    """
+    userId: String
+
+    """The identifier of the initiative to remind about."""
+    initiativeId: String!
+  ): InitiativeUpdateReminderPayload!
+
+  """Unarchives an initiative update."""
+  initiativeUpdateUnarchive(
+    """The identifier of the initiative update to unarchive."""
+    id: String!
+  ): InitiativeUpdateArchivePayload!
+
   """Creates a new initiativeToProject join."""
   initiativeToProjectCreate(
     """The properties of the initiativeToProject to create."""
@@ -10975,6 +11139,9 @@ type Mutation {
 
     """Optional attachment ID that may be provided through the API."""
     id: String
+
+    """Optional fallback URL to use if the Jira issue cannot be found."""
+    url: String
   ): AttachmentPayload!
 
   """Deletes an issue attachment."""
@@ -11382,9 +11549,7 @@ input NotificationEntityInput {
   """The id of the project update related to the notification."""
   projectUpdateId: String
 
-  """
-  [Internal] The id of the initiative update related to the notification.
-  """
+  """The id of the initiative update related to the notification."""
   initiativeUpdateId: String
 
   """The id of the OAuth client approval related to the notification."""
@@ -11584,7 +11749,7 @@ input NotificationUpdateInput {
   """The id of the project update related to the notification."""
   projectUpdateId: String
 
-  """[Internal] The id of the project update related to the notification."""
+  """The id of the project update related to the notification."""
   initiativeUpdateId: String
 }
 
@@ -13510,6 +13675,9 @@ type Post implements Node {
 
   """The type of the post."""
   type: PostType
+
+  """The log id of the ai response."""
+  evalLogId: String
 }
 
 """[Internal] A post related notification."""
@@ -13662,22 +13830,22 @@ type Project implements Node {
   archivedAt: DateTime
 
   """
-  [Internal] The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
   """
   updateReminderFrequencyInWeeks: Float
 
   """
-  [Internal] The frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  The frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
   """
   updateReminderFrequency: Float
 
-  """[Internal] The resolution of the reminder frequency."""
+  """The resolution of the reminder frequency."""
   frequencyResolution: FrequencyResolutionType!
 
-  """[Internal] The day at which to prompt for updates."""
+  """The day at which to prompt for updates."""
   updateRemindersDay: Day
 
-  """[Internal] The hour at which to prompt for updates."""
+  """The hour at which to prompt for updates."""
   updateRemindersHour: Float
 
   """The project's name."""
@@ -14540,6 +14708,9 @@ input ProjectFilter {
 type ProjectFilterSuggestionPayload {
   """The json filter that is suggested."""
   filter: JSONObject
+
+  """The log id of the prompt, that created this filter."""
+  logId: String
 }
 
 """An history associated with a project."""
@@ -15035,7 +15206,7 @@ type ProjectNotification implements Notification & Entity & Node {
   """The project update related to the notification."""
   projectUpdate: ProjectUpdate
 
-  """[Internal] The initiative update related to the notification."""
+  """The initiative update related to the notification."""
   initiativeUpdate: InitiativeUpdate
 
   """The comment related to the notification."""
@@ -15282,22 +15453,22 @@ type ProjectSearchResult implements Node {
   archivedAt: DateTime
 
   """
-  [Internal] The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
   """
   updateReminderFrequencyInWeeks: Float
 
   """
-  [Internal] The frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  The frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
   """
   updateReminderFrequency: Float
 
-  """[Internal] The resolution of the reminder frequency."""
+  """The resolution of the reminder frequency."""
   frequencyResolution: FrequencyResolutionType!
 
-  """[Internal] The day at which to prompt for updates."""
+  """The day at which to prompt for updates."""
   updateRemindersDay: Day
 
-  """[Internal] The hour at which to prompt for updates."""
+  """The hour at which to prompt for updates."""
   updateRemindersHour: Float
 
   """The project's name."""
@@ -16214,22 +16385,22 @@ input ProjectUpdateInput {
   projectUpdateRemindersPausedUntilAt: DateTime
 
   """
-  [Internal] The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  The n-weekly frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
   """
   updateReminderFrequencyInWeeks: Float
 
   """
-  [Internal] The frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
+  The frequency at which to prompt for updates. When not set, reminders are inherited from workspace.
   """
   updateReminderFrequency: Float
 
-  """[Internal] The frequency resolution."""
+  """The frequency resolution."""
   frequencyResolution: FrequencyResolutionType
 
-  """[Internal] The day at which to prompt for updates."""
+  """The day at which to prompt for updates."""
   updateRemindersDay: Day
 
-  """[Internal] The hour at which to prompt for updates."""
+  """The hour at which to prompt for updates."""
   updateRemindersHour: Int
 
   """The identifier of the project lead."""
@@ -17641,6 +17812,42 @@ type Query {
     integrationId: String!
   ): IntegrationHasScopesPayload!
 
+  """All  InitiativeUpdates."""
+  initiativeUpdates(
+    """Filter returned initiative updates."""
+    filter: InitiativeUpdateFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): InitiativeUpdateConnection!
+
+  """A specific  initiative update."""
+  initiativeUpdate(
+    """The identifier of the  initiative update to retrieve."""
+    id: String!
+  ): InitiativeUpdate!
+
   """returns a list of initiative to project entities."""
   initiativeToProjects(
     """A cursor to be used with last for backward pagination."""
@@ -18360,7 +18567,7 @@ type Reaction implements Node {
   """The project update that the reaction is associated with."""
   projectUpdate: ProjectUpdate
 
-  """[Internal] The initiative update that the reaction is associated with."""
+  """The initiative update that the reaction is associated with."""
   initiativeUpdate: InitiativeUpdate
 
   """The post that the reaction is associated with."""
@@ -18421,7 +18628,7 @@ input ReactionCreateInput {
   """The project update to associate the reaction with."""
   projectUpdateId: String
 
-  """[Internal] The update to associate the reaction with."""
+  """The update to associate the reaction with."""
   initiativeUpdateId: String
 
   """The issue to associate the reaction with."""
@@ -19643,7 +19850,7 @@ type Team implements Node {
   """
   markedAsDuplicateWorkflowState: WorkflowState
 
-  """[INTERNAL] Whether new users should join this team by default."""
+  """[Internal] Whether new users should join this team by default."""
   joinByDefault: Boolean
 
   """Calendar feed URL (iCal) for cycles."""
@@ -20872,7 +21079,7 @@ type TriageResponsibilityManualSelection {
   userIds: [String!]!
 
   """
-  [INTERNAL] The index of the current userId used for the assign action when having more than one user.
+  [Internal] The index of the current userId used for the assign action when having more than one user.
   """
   assignmentIndex: Int
 }
@@ -20883,7 +21090,7 @@ input TriageResponsibilityManualSelectionInput {
   userIds: [String!]!
 
   """
-  [INTERNAL] The index of the current userId used for the assign action when having more than one user.
+  [Internal] The index of the current userId used for the assign action when having more than one user.
   """
   assignmentIndex: Int
 }
