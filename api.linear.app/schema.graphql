@@ -1228,6 +1228,15 @@ type CustomerConnection {
   pageInfo: PageInfo!
 }
 
+"""[ALPHA] Issue customer count sorting options."""
+input CustomerCountSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 """Customer creation date sorting options."""
 input CustomerCreatedAtSort {
   """Whether nulls should be sorted first or last"""
@@ -1604,6 +1613,15 @@ type CustomerPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""[ALPHA] Issue customer revenue sorting options."""
+input CustomerRevenueSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
 }
 
 """Issue customer sorting options."""
@@ -2635,7 +2653,7 @@ input CycleSort {
   order: PaginationSortOrder
 
   """
-  When set to true, cycles wil be ordered with a custom order. Current cycle
+  When set to true, cycles will be ordered with a custom order. Current cycle
   comes first, followed by upcoming cycles in ASC order, followed by previous
   cycles in DESC order.
   """
@@ -8248,8 +8266,14 @@ input IssueSortInput {
   """Sort by workflow state type"""
   workflowState: WorkflowStateSort
 
-  """Sort by customer"""
+  """Sort by customer name"""
   customer: CustomerSort
+
+  """Sort by customer revenue"""
+  customerRevenue: CustomerRevenueSort
+
+  """Sort by number of customers associated with the issue"""
+  customerCount: CustomerCountSort
 }
 
 type IssueTitleSuggestionFromCustomerRequestPayload {
@@ -8535,7 +8559,7 @@ type LabelNotificationSubscription implements NotificationSubscription & Entity 
   notificationSubscriptionTypes: [String!]!
 }
 
-"""Issue sorting options."""
+"""Issue label sorting options."""
 input LabelSort {
   """Whether nulls should be sorted first or last"""
   nulls: PaginationNulls = last
