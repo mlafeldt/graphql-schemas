@@ -107,6 +107,11 @@ type AlreadyMemberError {
   query: Query!
 }
 
+type BadWasmModuleError {
+  error: String!
+  query: Query!
+}
+
 type Branch implements Node {
   activeDeployment: Deployment
   analytics(filters: GraphAnalyticsFilters!): GraphAnalytics
@@ -197,6 +202,7 @@ type CannotUseInvitationsWithSSO {
 
 type CompositionCheckError {
   message: String!
+  severity: SchemaCheckErrorSeverity!
   title: String!
 }
 
@@ -409,6 +415,39 @@ union EndpointConfigUpdatePayload = GraphDoesNotExistError | Query
 type ErrorCountByCode {
   code: String!
   count: Int!
+}
+
+type Extension implements Node {
+  id: ID!
+  name: String!
+}
+
+enum ExtensionKind {
+  FIELD_RESOLVER
+  AUTHENTICATOR
+}
+
+union ExtensionPublishPayload = BadWasmModuleError | ExtensionPublishSuccess | ExtensionValidationError | ExtensionVersionAlreadyExistsError
+
+type ExtensionPublishSuccess {
+  extensionVersion: ExtensionVersion!
+  query: Query!
+}
+
+type ExtensionValidationError {
+  error: String!
+  query: Query!
+}
+
+type ExtensionVersion {
+  createdAt: DateTime!
+  extension: Extension!
+  kind: ExtensionKind!
+  version: SemverVersion!
+}
+
+type ExtensionVersionAlreadyExistsError {
+  query: Query!
 }
 
 type FederatedGraphCompositionError {
@@ -884,6 +923,11 @@ type Mutation {
   """Delete a subgraph"""
   deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
   endpointConfigUpdate(input: EndpointConfigUpdateInput!): EndpointConfigUpdatePayload!
+
+  """
+  Publish a version of an extension to the registry. If the extension does not already exist, it will be created.
+  """
+  extensionPublish(manifest: VersionedExtensionManifest!, wasmModule: Upload!): ExtensionPublishPayload!
   graphAddOwner(graphId: ID!, ownerId: ID!): GraphAddOwnerPayload!
 
   """Create a new graph without any source for an initial deployment."""
@@ -1205,7 +1249,6 @@ type PublishForbidden {
 }
 
 input PublishInput {
-  url: String!
   schema: String!
   accountSlug: String!
   graphSlug: String
@@ -1213,6 +1256,7 @@ input PublishInput {
   message: String
   branch: String
   subgraph: String!
+  url: String!
 }
 
 """
@@ -2152,6 +2196,8 @@ type SchemaVersionEdge {
   node: SchemaVersion!
 }
 
+scalar SemverVersion
+
 """A Slack channel returned from the Slack API."""
 type SlackChannel {
   id: String!
@@ -2496,6 +2542,8 @@ type TrustedDocumentsSubmitSuccess {
   documents: [TrustedDocument!]!
 }
 
+scalar Upload
+
 input UsageFilters {
   graphSlug: String
 
@@ -2611,4 +2659,6 @@ type ValidationCheckError {
   message: String!
   title: String!
 }
+
+scalar VersionedExtensionManifest
 
