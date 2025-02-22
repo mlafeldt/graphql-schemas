@@ -418,8 +418,34 @@ type ErrorCountByCode {
 }
 
 type Extension implements Node {
+  highestVersion: ExtensionVersion
   id: ID!
   name: String!
+  versions: [ExtensionVersion!]!
+}
+
+type ExtensionConnection {
+  """A list of edges."""
+  edges: [ExtensionEdge!]!
+
+  """A list of nodes."""
+  nodes: [Extension!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type ExtensionEdge {
+  """A cursor for use in pagination"""
+  cursor: String!
+
+  """The item at the end of the edge"""
+  node: Extension!
+}
+
+input ExtensionFilter {
+  namePrefix: String
 }
 
 enum ExtensionKind {
@@ -441,8 +467,15 @@ type ExtensionValidationError {
 
 type ExtensionVersion {
   createdAt: DateTime!
+  description: String!
   extension: Extension!
+  homepageUrl: Url
   kind: ExtensionKind!
+  license: String
+  publishedBy: User
+  readme: String
+  repositoryUrl: Url
+  sdl: String
   version: SemverVersion!
 }
 
@@ -1301,6 +1334,8 @@ type Query {
     """ID of the deployment"""
     id: ID!
   ): Deployment
+  extensionVersionByNameAndVersionRequirement(extensionName: String!, versionRequirement: SemverVersionRequirement!): ExtensionVersion
+  extensions(after: String, first: Int, filter: ExtensionFilter): ExtensionConnection!
 
   """Get a graph by account slug and slug of the graph itself."""
   graphByAccountSlug(
@@ -1857,8 +1892,8 @@ type SchemaProposalConnection {
 
 input SchemaProposalCreateInput {
   title: String!
-  branchId: ID!
   description: String
+  branchId: ID!
 }
 
 union SchemaProposalCreatePayload = SchemaProposalCreateSuccess
@@ -1889,8 +1924,8 @@ type SchemaProposalEdge {
 
 input SchemaProposalEditInput {
   subgraphs: [SchemaProposalEditSubgraph!]!
-  schemaProposalId: ID!
   description: String
+  schemaProposalId: ID!
 }
 
 type SchemaProposalEditParserError {
@@ -2197,6 +2232,8 @@ type SchemaVersionEdge {
 }
 
 scalar SemverVersion
+
+scalar SemverVersionRequirement
 
 """A Slack channel returned from the Slack API."""
 type SlackChannel {
@@ -2543,6 +2580,11 @@ type TrustedDocumentsSubmitSuccess {
 }
 
 scalar Upload
+
+"""
+URL is a String implementing the [URL Standard](http://url.spec.whatwg.org/)
+"""
+scalar Url
 
 input UsageFilters {
   graphSlug: String
