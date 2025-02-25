@@ -2712,7 +2712,7 @@ input DateComparator {
   gte: DateTimeOrDuration
 }
 
-"""[INTERNAL] By which resolution is a date defined."""
+"""By which resolution is a date defined."""
 enum DateResolutionType {
   month
   quarter
@@ -12302,6 +12302,9 @@ input NullableProjectFilter {
   """Filters that the project's customer needs must satisfy."""
   needs: CustomerNeedCollectionFilter
 
+  """Count of customers"""
+  customerCount: NumberComparator
+
   """Filter based on the existence of the relation."""
   null: Boolean
 
@@ -13905,13 +13908,13 @@ type Project implements Node {
   """The estimated start date of the project."""
   startDate: TimelessDate
 
-  """[INTERNAL] The resolution of the project's start date."""
+  """The resolution of the project's start date."""
   startDateResolution: DateResolutionType
 
   """The estimated completion date of the project."""
   targetDate: TimelessDate
 
-  """[INTERNAL] The resolution of the project's estimated completion date."""
+  """The resolution of the project's estimated completion date."""
   targetDateResolution: DateResolutionType
 
   """The time at which the project was moved into started state."""
@@ -13974,10 +13977,10 @@ type Project implements Node {
   """The number of in progress estimation points after each week."""
   inProgressScopeHistory: [Float!]!
 
-  """[Internal] The progress history of the project."""
+  """[INTERNAL] The progress history of the project."""
   progressHistory: JSONObject!
 
-  """[Internal] The current progress of the project."""
+  """[INTERNAL] The current progress of the project."""
   currentProgress: JSONObject!
 
   """Whether to send new issue notifications to Slack."""
@@ -14520,6 +14523,9 @@ input ProjectCollectionFilter {
   """Filters that the project's customer needs must satisfy."""
   needs: CustomerNeedCollectionFilter
 
+  """Count of customers"""
+  customerCount: NumberComparator
+
   """Compound filters, all of which need to be matched by the project."""
   and: [ProjectCollectionFilter!]
 
@@ -14584,13 +14590,13 @@ input ProjectCreateInput {
   """The planned start date of the project."""
   startDate: TimelessDate
 
-  """[INTERNAL] The resolution of the project's start date."""
+  """The resolution of the project's start date."""
   startDateResolution: DateResolutionType
 
   """The planned target date of the project."""
   targetDate: TimelessDate
 
-  """[INTERNAL] The resolution of the project's estimated completion date."""
+  """The resolution of the project's estimated completion date."""
   targetDateResolution: DateResolutionType
 
   """The sort order for the project within shared views."""
@@ -14721,6 +14727,9 @@ input ProjectFilter {
 
   """Filters that the project's customer needs must satisfy."""
   needs: CustomerNeedCollectionFilter
+
+  """Count of customers"""
+  customerCount: NumberComparator
 
   """Compound filters, all of which need to be matched by the project."""
   and: [ProjectFilter!]
@@ -15528,13 +15537,13 @@ type ProjectSearchResult implements Node {
   """The estimated start date of the project."""
   startDate: TimelessDate
 
-  """[INTERNAL] The resolution of the project's start date."""
+  """The resolution of the project's start date."""
   startDateResolution: DateResolutionType
 
   """The estimated completion date of the project."""
   targetDate: TimelessDate
 
-  """[INTERNAL] The resolution of the project's estimated completion date."""
+  """The resolution of the project's estimated completion date."""
   targetDateResolution: DateResolutionType
 
   """The time at which the project was moved into started state."""
@@ -15597,10 +15606,10 @@ type ProjectSearchResult implements Node {
   """The number of in progress estimation points after each week."""
   inProgressScopeHistory: [Float!]!
 
-  """[Internal] The progress history of the project."""
+  """[INTERNAL] The progress history of the project."""
   progressHistory: JSONObject!
 
-  """[Internal] The current progress of the project."""
+  """[INTERNAL] The current progress of the project."""
   currentProgress: JSONObject!
 
   """Whether to send new issue notifications to Slack."""
@@ -16436,13 +16445,13 @@ input ProjectUpdateInput {
   """The planned start date of the project."""
   startDate: TimelessDate
 
-  """[INTERNAL] The resolution of the project's start date."""
+  """The resolution of the project's start date."""
   startDateResolution: DateResolutionType
 
   """The planned target date of the project."""
   targetDate: TimelessDate
 
-  """[INTERNAL] The resolution of the project's estimated completion date."""
+  """The resolution of the project's estimated completion date."""
   targetDateResolution: DateResolutionType
 
   """The date when the project was completed."""
