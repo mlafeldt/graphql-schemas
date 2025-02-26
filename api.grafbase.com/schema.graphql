@@ -421,7 +421,14 @@ type Extension implements Node {
   highestVersion: ExtensionVersion
   id: ID!
   name: String!
+  owners: [User!]
   versions: [ExtensionVersion!]!
+}
+
+union ExtensionAddOwnerPayload = ExtensionAddOwnerSuccess | ExtensionDoesNotExistError | ExtensionUnauthorized
+
+type ExtensionAddOwnerSuccess {
+  query: Query!
 }
 
 type ExtensionConnection {
@@ -433,6 +440,10 @@ type ExtensionConnection {
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
+}
+
+type ExtensionDoesNotExistError {
+  query: Query!
 }
 
 """An edge in a connection."""
@@ -453,10 +464,21 @@ enum ExtensionKind {
   AUTHENTICATOR
 }
 
-union ExtensionPublishPayload = BadWasmModuleError | ExtensionPublishSuccess | ExtensionValidationError | ExtensionVersionAlreadyExistsError
+union ExtensionPublishPayload = BadWasmModuleError | ExtensionPublishSuccess | ExtensionUnauthorized | ExtensionValidationError | ExtensionVersionAlreadyExistsError
 
 type ExtensionPublishSuccess {
   extensionVersion: ExtensionVersion!
+  query: Query!
+}
+
+union ExtensionRemoveOwnerPayload = ExtensionDoesNotExistError | ExtensionRemoveOwnerSuccess | ExtensionUnauthorized
+
+type ExtensionRemoveOwnerSuccess {
+  query: Query!
+}
+
+type ExtensionUnauthorized {
+  message: String!
   query: Query!
 }
 
@@ -481,6 +503,17 @@ type ExtensionVersion {
 
 type ExtensionVersionAlreadyExistsError {
   query: Query!
+}
+
+type ExtensionVersionDoesNotExistError {
+  query: Query!
+}
+
+union ExtensionVersionMatch = ExtensionDoesNotExistError | ExtensionVersion | ExtensionVersionDoesNotExistError
+
+input ExtensionVersionRequirement {
+  version: SemverVersionRequirement!
+  extensionName: String!
 }
 
 type FederatedGraphCompositionError {
@@ -956,11 +989,13 @@ type Mutation {
   """Delete a subgraph"""
   deleteSubgraph(input: DeleteSubgraphInput!): DeleteSubgraphPayload!
   endpointConfigUpdate(input: EndpointConfigUpdateInput!): EndpointConfigUpdatePayload!
+  extensionAddOwner(extensionName: String!, userId: ID!): ExtensionAddOwnerPayload
 
   """
   Publish a version of an extension to the registry. If the extension does not already exist, it will be created.
   """
-  extensionPublish(manifest: VersionedExtensionManifest!, wasmModule: Upload!): ExtensionPublishPayload!
+  extensionPublish(manifest: VersionedExtensionManifest!, wasmModule: Upload!): ExtensionPublishPayload
+  extensionRemoveOwner(extensionName: String!, userId: ID!): ExtensionRemoveOwnerPayload
   graphAddOwner(graphId: ID!, ownerId: ID!): GraphAddOwnerPayload!
 
   """Create a new graph without any source for an initial deployment."""
@@ -1334,7 +1369,14 @@ type Query {
     """ID of the deployment"""
     id: ID!
   ): Deployment
-  extensionVersionByNameAndVersionRequirement(extensionName: String!, versionRequirement: SemverVersionRequirement!): ExtensionVersion
+  extensionByName(name: String!): Extension
+
+  """
+  Looks for extension versions that match the requirements.
+  
+  The results are returned in the same order as the requirements.
+  """
+  extensionVersionsByVersionRequirement(requirements: [ExtensionVersionRequirement!]!): [ExtensionVersionMatch!]
   extensions(after: String, first: Int, filter: ExtensionFilter): ExtensionConnection!
 
   """Get a graph by account slug and slug of the graph itself."""
