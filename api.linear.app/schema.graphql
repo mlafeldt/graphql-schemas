@@ -537,6 +537,9 @@ type AuthenticationSessionResponse {
   """Used web browser."""
   browserType: String
 
+  """Service used for logging in."""
+  service: String
+
   """When was the session last seen"""
   lastActiveAt: DateTime
 
@@ -4203,6 +4206,103 @@ input FavoriteUpdateInput {
 
   """The name of the favorite folder."""
   folderName: String
+}
+
+"""[Internal] Feed subscription to a project, team, or initiative."""
+type FeedSubscription implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The user who is subscribing."""
+  user: User!
+
+  """
+  Whether the user is subscribed (true) or unsubscribed (false) to the entity.
+  """
+  isSubscribed: Boolean!
+
+  """Whether the user is subscribed to projects under the entity."""
+  isSubscribedToSubProjects: Boolean
+
+  """The team being subscribed to."""
+  team: Team
+
+  """The project being subscribed to."""
+  project: Project
+
+  """The initiative being subscribed to."""
+  initiative: Initiative
+}
+
+type FeedSubscriptionConnection {
+  edges: [FeedSubscriptionEdge!]!
+  nodes: [FeedSubscription!]!
+  pageInfo: PageInfo!
+}
+
+input FeedSubscriptionCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The identifier of the user to subscribe to."""
+  userId: String!
+
+  """The identifier of the project to subscribe to."""
+  projectId: String
+
+  """The identifier of the team to subscribe to."""
+  teamId: String
+
+  """The identifier of the initiative to subscribe to."""
+  initiativeId: String
+
+  """Whether the user is subscribed to the entity"""
+  isSubscribed: Boolean
+
+  """Whether the user is subscribed to all sub-projects for the entity"""
+  isSubscribedToSubProjects: Boolean
+}
+
+type FeedSubscriptionEdge {
+  node: FeedSubscription!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type FeedSubscriptionPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The feed subscription that was created or updated."""
+  feedSubscription: FeedSubscription!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input FeedSubscriptionUpdateInput {
+  """Whether the user is subscribed to the entity"""
+  isSubscribed: Boolean
+
+  """Whether the user is subscribed to all sub-projects for the entity"""
+  isSubscribedToSubProjects: Boolean
 }
 
 """Cadence to generate feed summary"""
@@ -10525,6 +10625,29 @@ type Mutation {
     """URL of the file to be uploaded to Linear."""
     url: String!
   ): ImageUploadFromUrlPayload!
+
+  """Creates a new feed subscription for a initiative, project or team."""
+  feedSubscriptionCreate(
+    """The subscription object to create."""
+    input: FeedSubscriptionCreateInput!
+  ): FeedSubscriptionPayload!
+
+  """Updates a feed subscription."""
+  feedSubscriptionUpdate(
+    """
+    A partial feed subscription object to update the feed subscription with.
+    """
+    input: FeedSubscriptionUpdateInput!
+
+    """The identifier of the feed subscription to update."""
+    id: String!
+  ): FeedSubscriptionPayload!
+
+  """Deletes a feed subscription reference."""
+  feedSubscriptionDelete(
+    """The identifier of the feed subscription reference to delete."""
+    id: String!
+  ): DeletePayload! @deprecated(reason: "Update `feedSubscription.active` to `false` instead.")
 
   """Creates a new favorite (project, cycle etc)."""
   favoriteCreate(
@@ -18057,6 +18180,36 @@ type Query {
 
   """One specific initiative."""
   initiative(id: String!): Initiative!
+
+  """The user's feed subscriptions."""
+  feedSubscriptions(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): FeedSubscriptionConnection!
+
+  """One specific feed subscription."""
+  feedSubscription(id: String!): FeedSubscription!
 
   """The user's favorites."""
   favorites(
