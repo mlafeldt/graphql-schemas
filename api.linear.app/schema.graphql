@@ -1719,6 +1719,79 @@ input CustomerNeedUpdateInput {
   attachmentUrl: String
 }
 
+"""A customer notification subscription."""
+type CustomerNotificationSubscription implements NotificationSubscription & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The user that subscribed to receive notifications."""
+  subscriber: User!
+
+  """The customer subscribed to."""
+  customer: Customer!
+
+  """
+  The contextual custom view associated with the notification subscription.
+  """
+  customView: CustomView
+
+  """
+  The contextual cycle view associated with the notification subscription.
+  """
+  cycle: Cycle
+
+  """
+  The contextual label view associated with the notification subscription.
+  """
+  label: IssueLabel
+
+  """
+  The contextual project view associated with the notification subscription.
+  """
+  project: Project
+
+  """
+  The contextual initiative view associated with the notification subscription.
+  """
+  initiative: Initiative
+
+  """The team associated with the notification subscription."""
+  team: Team
+
+  """The user view associated with the notification subscription."""
+  user: User
+
+  """
+  The type of view to which the notification subscription context is associated with.
+  """
+  contextViewType: ContextViewType
+
+  """
+  The type of user view to which the notification subscription context is associated with.
+  """
+  userContextViewType: UserContextViewType
+
+  """Whether the subscription is active or not."""
+  active: Boolean!
+
+  """The type of subscription."""
+  notificationSubscriptionTypes: [String!]!
+}
+
 type CustomerPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -2294,6 +2367,9 @@ type CustomViewNotificationSubscription implements NotificationSubscription & En
   """The user that subscribed to receive notifications."""
   subscriber: User!
 
+  """The customer associated with the notification subscription."""
+  customer: Customer
+
   """The custom view subscribed to."""
   customView: CustomView!
 
@@ -2667,6 +2743,9 @@ type CycleNotificationSubscription implements NotificationSubscription & Entity 
 
   """The user that subscribed to receive notifications."""
   subscriber: User!
+
+  """The customer associated with the notification subscription."""
+  customer: Customer
 
   """
   The contextual custom view associated with the notification subscription.
@@ -5272,6 +5351,9 @@ type InitiativeNotificationSubscription implements NotificationSubscription & En
   """The user that subscribed to receive notifications."""
   subscriber: User!
 
+  """The customer associated with the notification subscription."""
+  customer: Customer
+
   """
   The contextual custom view associated with the notification subscription.
   """
@@ -5483,6 +5565,36 @@ type InitiativeUpdate implements Node {
   The diff between the current update and the previous one, formatted as markdown.
   """
   diffMarkdown: String
+
+  """Comments associated with the initiative update."""
+  comments(
+    """Filter returned comments."""
+    filter: CommentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CommentConnection!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -8737,6 +8849,9 @@ type LabelNotificationSubscription implements NotificationSubscription & Entity 
   """The user that subscribed to receive notifications."""
   subscriber: User!
 
+  """The customer associated with the notification subscription."""
+  customer: Customer
+
   """
   The contextual custom view associated with the notification subscription.
   """
@@ -11875,6 +11990,9 @@ interface NotificationSubscription {
   """The user that subscribed to receive notifications."""
   subscriber: User!
 
+  """The customer associated with the notification subscription."""
+  customer: Customer
+
   """
   The contextual custom view associated with the notification subscription.
   """
@@ -11932,11 +12050,17 @@ input NotificationSubscriptionCreateInput {
   """
   id: String
 
+  """The identifier of the customer to subscribe to."""
+  customerId: String
+
   """The identifier of the custom view to subscribe to."""
   customViewId: String
 
   """The identifier of the cycle to subscribe to."""
   cycleId: String
+
+  """The identifier of the initiative to subscribe to."""
+  initiativeId: String
 
   """The identifier of the label to subscribe to."""
   labelId: String
@@ -11949,9 +12073,6 @@ input NotificationSubscriptionCreateInput {
 
   """The identifier of the user to subscribe to."""
   userId: String
-
-  """The identifier of the initiative to subscribe to."""
-  initiativeId: String
 
   """
   The type of view to which the notification subscription context is associated with.
@@ -15510,6 +15631,9 @@ type ProjectNotificationSubscription implements NotificationSubscription & Entit
 
   """The user that subscribed to receive notifications."""
   subscriber: User!
+
+  """The customer associated with the notification subscription."""
+  customer: Customer
 
   """
   The contextual custom view associated with the notification subscription.
@@ -20791,6 +20915,9 @@ type TeamNotificationSubscription implements NotificationSubscription & Entity &
   """The user that subscribed to receive notifications."""
   subscriber: User!
 
+  """The customer associated with the notification subscription."""
+  customer: Customer
+
   """
   The contextual custom view associated with the notification subscription.
   """
@@ -21981,6 +22108,9 @@ type UserNotificationSubscription implements NotificationSubscription & Entity &
 
   """The user that subscribed to receive notifications."""
   subscriber: User!
+
+  """The customer associated with the notification subscription."""
+  customer: Customer
 
   """
   The contextual custom view associated with the notification subscription.
