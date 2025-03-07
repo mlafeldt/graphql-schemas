@@ -9596,6 +9596,27 @@ type Mutation {
     id: String!
   ): ProjectMilestoneMovePayload!
 
+  """Creates a new project attachment"""
+  projectAttachmentCreate(
+    """The attachment object to create."""
+    input: ProjectAttachmentCreateInput!
+  ): ProjectAttachmentPayload!
+
+  """Updates an existing project attachment."""
+  projectAttachmentUpdate(
+    """A partial project attachment object to update the attachment with."""
+    input: ProjectAttachmentUpdateInput!
+
+    """The identifier of the project attachment to update."""
+    id: String!
+  ): ProjectAttachmentPayload!
+
+  """Deletes a project attachment."""
+  projectAttachmentDelete(
+    """The identifier of the project attachment to delete."""
+    id: String!
+  ): DeletePayload!
+
   """Updates the user's organization."""
   organizationUpdate(
     """A partial organization object to update the organization with."""
@@ -14029,6 +14050,9 @@ type Post implements Node {
   """[Internal] The content of the post as a Prosemirror document."""
   bodyData: String!
 
+  """[Internal] The written update data used to compose the written post."""
+  writtenSummaryData: JSONObject
+
   """The update content summarized for audio consumption."""
   audioSummary: String
 
@@ -14722,6 +14746,9 @@ type Project implements Node {
 
   """[DEPRECATED] The type of the state."""
   state: String! @deprecated(reason: "Use project.status instead")
+
+  """The priority of the project as a label."""
+  priorityLabel: String!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -14772,6 +14799,111 @@ type ProjectAttachment implements Node {
 
   """Information about the external source which created the attachment."""
   source: JSONObject
+
+  """The project this attachment belongs to."""
+  project: Project!
+}
+
+type ProjectAttachmentConnection {
+  edges: [ProjectAttachmentEdge!]!
+  nodes: [ProjectAttachment!]!
+  pageInfo: PageInfo!
+}
+
+input ProjectAttachmentCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The attachment title."""
+  title: String!
+
+  """The attachment subtitle."""
+  subtitle: String
+
+  """
+  Attachment location which is also used as an unique identifier for the attachment.
+  """
+  url: String!
+
+  """The project to associate the attachment with."""
+  projectId: String!
+
+  """Attachment metadata object with string and number values."""
+  metadata: JSONObject
+
+  """Note to be persisted alongside the attachent, in a CustomerNeed"""
+  noteBody: String
+
+  """
+  Create attachment as a user with the provided name. This option is only
+  available to OAuth applications creating attachments in `actor=application` mode.
+  """
+  createAsUser: String
+}
+
+type ProjectAttachmentEdge {
+  node: ProjectAttachment!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""ProjectAttachment filtering options."""
+input ProjectAttachmentFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the title."""
+  title: StringComparator
+
+  """Comparator for the subtitle."""
+  subtitle: NullableStringComparator
+
+  """Comparator for the url."""
+  url: StringComparator
+
+  """Filters that the attachments creator must satisfy."""
+  creator: NullableUserFilter
+
+  """
+  Compound filters, all of which need to be matched by the project attachment.
+  """
+  and: [ProjectAttachmentFilter!]
+
+  """
+  Compound filters, one of which need to be matched by the project attachment.
+  """
+  or: [ProjectAttachmentFilter!]
+}
+
+type ProjectAttachmentPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The project attachment that was created."""
+  attachment: ProjectAttachment!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input ProjectAttachmentUpdateInput {
+  """The attachment title."""
+  title: String!
+
+  """The attachment subtitle."""
+  subtitle: String
+
+  """Attachment metadata object with string and number values."""
+  metadata: JSONObject
 }
 
 """Project filtering options."""
@@ -16355,6 +16487,9 @@ type ProjectSearchResult implements Node {
   """[DEPRECATED] The type of the state."""
   state: String! @deprecated(reason: "Use project.status instead")
 
+  """The priority of the project as a label."""
+  priorityLabel: String!
+
   """Metadata related to search result."""
   metadata: JSONObject!
 }
@@ -17794,6 +17929,39 @@ type Query {
 
   """One specific project milestone."""
   projectMilestone(id: String!): ProjectMilestone!
+
+  """All project attachments."""
+  projectAttachments(
+    """Filter returned attachments."""
+    filter: ProjectAttachmentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectAttachmentConnection!
+
+  """One specific project attachment."""
+  projectAttachment(id: String!): ProjectAttachment!
 
   """The user's organization."""
   organization: Organization!
