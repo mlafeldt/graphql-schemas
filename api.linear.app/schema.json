@@ -2607,6 +2607,34 @@
             "deprecationReason": null
           },
           {
+            "name": "defaultFeedSummarySchedule",
+            "description": "Default schedule for how often feed summaries are generated.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "FeedSummarySchedule",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "feedEnabled",
+            "description": "Whether the organization has enabled the feed feature.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "slaDayCount",
             "description": "[DEPRECATED] Which day count to use for SLA calculations.",
             "args": [],
@@ -3347,6 +3375,35 @@
           },
           {
             "name": "public",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "FeedSummarySchedule",
+        "description": "Cadence to generate feed summary",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "daily",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "weekly",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "never",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -32774,22 +32831,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "project",
-            "description": "The project this attachment belongs to.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Project",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -44714,124 +44755,6 @@
             "deprecationReason": null
           },
           {
-            "name": "projectAttachments",
-            "description": "All project attachments.",
-            "args": [
-              {
-                "name": "filter",
-                "description": "Filter returned attachments.",
-                "type": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectAttachmentFilter",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "before",
-                "description": "A cursor to be used with last for backward pagination.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "after",
-                "description": "A cursor to be used with first for forward pagination",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "first",
-                "description": "The number of items to forward paginate (used with after). Defaults to 50.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "last",
-                "description": "The number of items to backward paginate (used with before). Defaults to 50.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "includeArchived",
-                "description": "Should archived resources be included (default: false)",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Boolean",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "orderBy",
-                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt.",
-                "type": {
-                  "kind": "ENUM",
-                  "name": "PaginationOrderBy",
-                  "ofType": null
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectAttachmentConnection",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectAttachment",
-            "description": "One specific project attachment.",
-            "args": [
-              {
-                "name": "id",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectAttachment",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "organization",
             "description": "The user's organization.",
             "args": [],
@@ -55461,241 +55384,6 @@
       },
       {
         "kind": "OBJECT",
-        "name": "ProjectAttachmentConnection",
-        "description": null,
-        "fields": [
-          {
-            "name": "edges",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "ProjectAttachmentEdge",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "nodes",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "ProjectAttachment",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "pageInfo",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "PageInfo",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "ProjectAttachmentEdge",
-        "description": null,
-        "fields": [
-          {
-            "name": "node",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectAttachment",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "cursor",
-            "description": "Used in `before` and `after` args",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ProjectAttachmentFilter",
-        "description": "ProjectAttachment filtering options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "Comparator for the identifier.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Comparator for the created at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "Comparator for the updated at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "title",
-            "description": "Comparator for the title.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "subtitle",
-            "description": "Comparator for the subtitle.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableStringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "url",
-            "description": "Comparator for the url.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "creator",
-            "description": "Filters that the attachments creator must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableUserFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "and",
-            "description": "Compound filters, all of which need to be matched by the project attachment.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectAttachmentFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "or",
-            "description": "Compound filters, one of which need to be matched by the project attachment.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectAttachmentFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
         "name": "OrganizationExistsPayload",
         "description": null,
         "fields": [
@@ -64724,113 +64412,6 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "ProjectMilestoneMovePayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectAttachmentCreate",
-            "description": "Creates a new project attachment",
-            "args": [
-              {
-                "name": "input",
-                "description": "The attachment object to create.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "ProjectAttachmentCreateInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectAttachmentPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectAttachmentUpdate",
-            "description": "Updates an existing project attachment.",
-            "args": [
-              {
-                "name": "input",
-                "description": "A partial project attachment object to update the attachment with.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "ProjectAttachmentUpdateInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "id",
-                "description": "The identifier of the project attachment to update.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectAttachmentPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectAttachmentDelete",
-            "description": "Deletes a project attachment.",
-            "args": [
-              {
-                "name": "id",
-                "description": "The identifier of the project attachment to delete.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "DeletePayload",
                 "ofType": null
               }
             },
@@ -74403,6 +73984,12 @@
             "deprecationReason": null
           },
           {
+            "name": "subIssues",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "allIssues",
             "description": null,
             "isDeprecated": false,
@@ -74421,37 +74008,7 @@
             "deprecationReason": null
           },
           {
-            "name": "customRoadmap",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "roadmap",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "roadmaps",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "roadmapAll",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "roadmapClosed",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "roadmapBacklog",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -74608,6 +74165,36 @@
           },
           {
             "name": "workspaceMembers",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "customRoadmap",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "roadmap",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "roadmaps",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "roadmapClosed",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "roadmapBacklog",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -75198,35 +74785,6 @@
         ],
         "interfaces": null,
         "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "ENUM",
-        "name": "FeedSummarySchedule",
-        "description": "Cadence to generate feed summary",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "daily",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "weekly",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "never",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
         "possibleTypes": null
       },
       {
@@ -80639,213 +80197,6 @@
       },
       {
         "kind": "OBJECT",
-        "name": "ProjectAttachmentPayload",
-        "description": null,
-        "fields": [
-          {
-            "name": "lastSyncId",
-            "description": "The identifier of the last sync operation.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "attachment",
-            "description": "The project attachment that was created.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectAttachment",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ProjectAttachmentCreateInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "title",
-            "description": "The attachment title.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "subtitle",
-            "description": "The attachment subtitle.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "url",
-            "description": "Attachment location which is also used as an unique identifier for the attachment.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "projectId",
-            "description": "The project to associate the attachment with.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "metadata",
-            "description": "Attachment metadata object with string and number values.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "JSONObject",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "noteBody",
-            "description": "Note to be persisted alongside the attachent, in a CustomerNeed",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createAsUser",
-            "description": "Create attachment as a user with the provided name. This option is only available to OAuth applications creating attachments in `actor=application` mode.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ProjectAttachmentUpdateInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "title",
-            "description": "The attachment title.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "subtitle",
-            "description": "The attachment subtitle.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "metadata",
-            "description": "Attachment metadata object with string and number values.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "JSONObject",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
         "name": "OrganizationPayload",
         "description": null,
         "fields": [
@@ -81175,6 +80526,26 @@
             "type": {
               "kind": "SCALAR",
               "name": "JSONObject",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "feedEnabled",
+            "description": "Whether the organization has enabled the feed feature.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "defaultFeedSummarySchedule",
+            "description": "Default schedule for how often feed summaries are generated.",
+            "type": {
+              "kind": "ENUM",
+              "name": "FeedSummarySchedule",
               "ofType": null
             },
             "defaultValue": null
@@ -83530,6 +82901,12 @@
           },
           {
             "name": "related",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "similar",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
