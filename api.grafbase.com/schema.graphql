@@ -442,6 +442,13 @@ type ExtensionConnection {
   pageInfo: PageInfo!
 }
 
+enum ExtensionDefaultPermission {
+  NETWORK
+  STDOUT
+  STDERR
+  ENVIRONMENT_VARIABLES
+}
+
 type ExtensionDoesNotExistError {
   query: Query!
 }
@@ -461,7 +468,8 @@ input ExtensionFilter {
 
 enum ExtensionKind {
   FIELD_RESOLVER
-  AUTHENTICATOR
+  AUTHENTICATOR @deprecated(reason: "Replaced by AUTHENTICATION")
+  AUTHENTICATION
   AUTHORIZATION
 }
 
@@ -490,14 +498,18 @@ type ExtensionValidationError {
 
 type ExtensionVersion {
   createdAt: DateTime!
+  defaultPermissions: [ExtensionDefaultPermission!]
+  definitionsSdl: String
   description: String!
   extension: Extension!
   homepageUrl: Url
   kind: ExtensionKind!
   license: String
+  minimumCompatibleGatewayVersion: SemverVersion
   publishedBy: User
   readme: String
   repositoryUrl: Url
+  sdkVersion: SemverVersion!
   sdl: String
   version: SemverVersion!
 }
