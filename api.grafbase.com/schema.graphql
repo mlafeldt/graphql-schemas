@@ -562,6 +562,7 @@ type FieldMetricsTimeSeriesDataPoint {
 
 enum GrafbasePlan {
   TRIAL
+  GROWTH
   ENTERPRISE
 }
 
@@ -1662,13 +1663,13 @@ enum SchemaChangeType {
 type SchemaCheck {
   compositionCheckErrors: [CompositionCheckError!]!
   createdAt: DateTime!
+  diagnostics: [SchemaCheckDiagnostic!]!
   errorCount: Int!
   gitCommit: SchemaCheckGitCommit
   id: ID!
   lintCheckErrors: [LintCheckError!]!
   operationCheckErrors: [OperationCheckError!]!
   proposalCheckErrors: [ProposalCheckError!]!
-  publishedSchemaVersion: ID @deprecated(reason: "This was never populated with relevant data")
   schema: String!
   subgraphName: String
   validationCheckErrors: [ValidationCheckError!]!
@@ -1693,6 +1694,12 @@ input SchemaCheckCreateInput {
   branch: String
   subgraphName: String
   gitCommit: SchemaCheckGitCommitInput
+}
+
+type SchemaCheckDiagnostic {
+  message: String!
+  severity: SchemaCheckErrorSeverity!
+  step: SchemaCheckStep!
 }
 
 """An edge in a connection."""
@@ -1728,6 +1735,14 @@ input SchemaCheckGitCommitInput {
 }
 
 union SchemaCheckPayload = GraphBranchDoesNotExistError | GraphDoesNotExistError | SchemaCheck | SubgraphNameMissingOnFederatedGraphError
+
+enum SchemaCheckStep {
+  VALIDATION
+  COMPOSITION
+  OPERATION
+  LINT
+  PROPOSAL
+}
 
 type SchemaProposal {
   """The whole activity feed."""
@@ -1916,9 +1931,9 @@ type SchemaProposalCommentThreadCreateSuccess {
 }
 
 enum SchemaProposalCommentThreadLocation {
+  PROPOSAL
   LINE
   SDL
-  PROPOSAL
 }
 
 union SchemaProposalCommentThreadResolvePayload = SchemaProposalCommentThreadResolveSuccess
