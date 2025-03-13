@@ -59,6 +59,13 @@ type ApiKey implements Node {
 
   """The label of the API key."""
   label: String!
+
+  """
+  The sync groups that this API key requests access to. If null, the API key has
+  access to all sync groups the user has access to. The final set of sync groups
+  is computed as the intersection of these requested groups with the user's base sync groups.
+  """
+  requestedSyncGroups: [String!]
 }
 
 type ApiKeyConnection {
@@ -78,6 +85,12 @@ input ApiKeyCreateInput {
 
   """The API key value."""
   key: String!
+
+  """
+  Optional list of team IDs to scope this API key to. If not provided, the API
+  key will have access to all teams the user has access to.
+  """
+  teamIds: [String!]
 }
 
 type ApiKeyEdge {
@@ -96,6 +109,17 @@ type ApiKeyPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+input ApiKeyUpdateInput {
+  """The new label for the API key."""
+  label: String
+
+  """
+  Optional list of team IDs to scope this API key to. If not provided, the API
+  key's existing team scoping will not be changed.
+  """
+  teamIds: [String!]
 }
 
 """Public information of the OAuth application."""
@@ -11542,6 +11566,15 @@ type Mutation {
     """The identifier of the API key to delete."""
     id: String!
   ): DeletePayload!
+
+  """[INTERNAL] Updates an API key's allowed teams."""
+  apiKeyUpdate(
+    """The update input."""
+    input: ApiKeyUpdateInput!
+
+    """The identifier of the API key to update."""
+    id: String!
+  ): ApiKeyPayload!
 }
 
 """Customer name sorting options."""
