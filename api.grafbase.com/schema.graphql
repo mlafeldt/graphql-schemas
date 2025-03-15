@@ -219,6 +219,22 @@ type CurrentPlanLimitReachedError {
   query: Query!
 }
 
+type CustomCheckWebhook {
+  createdAt: DateTime!
+  createdBy: User
+
+  """The headers sent to the webhook with custom check events."""
+  headers: [HttpHeader!]!
+  id: ID!
+
+  """The url called as part of custom checks."""
+  url: Url!
+}
+
+type CustomCheckWebhookNotFoundError {
+  query: Query!
+}
+
 """RFC3339 formatted date in the UTC time zone denoted by letter 'Z'"""
 scalar DateTime
 
@@ -572,6 +588,9 @@ type Graph implements Node {
   branch(name: String): Branch
   branches(after: String, before: String, first: Int, last: Int): BranchConnection!
   createdAt: DateTime!
+
+  """Webhooks for custom schema checks."""
+  customCheckWebhooks: [CustomCheckWebhook!]
   id: ID!
   operationChecksConfiguration: GraphOperationCheckConfiguration!
   owners: [Team!]!
@@ -814,6 +833,16 @@ type GraphUpdateSuccess {
   query: Query!
 }
 
+type HttpHeader {
+  name: String!
+  value: String!
+}
+
+input HttpHeaderInput {
+  name: String!
+  value: String!
+}
+
 interface InboxMessage {
   createdAt: DateTime!
   id: ID!
@@ -1045,6 +1074,14 @@ type Mutation {
 
   """Run checks against the given schema"""
   schemaCheckCreate(input: SchemaCheckCreateInput!): SchemaCheckPayload!
+
+  """
+  Create a SchemaCheckCustomWebhook for a specific graph. Must be issued while logged in as a user.
+  """
+  schemaCheckCustomWebhookCreate(input: SchemaCheckCustomWebhookCreateInput!): SchemaCheckCustomWebhookCreatePayload
+
+  """Delete a [CustomCheckWebhook] by id."""
+  schemaCheckCustomWebhookDelete(id: ID!): SchemaCheckCustomWebhookDeletePayload
   schemaProposalApprove(input: SchemaProposalApproveInput!): SchemaProposalApprovePayload!
   schemaProposalCommentReply(parentCommentId: ID!, text: String!): SchemaProposalCommentReplyPayload!
   schemaProposalCommentThreadCreate(input: SchemaProposalCommentThreadCreateInput!): SchemaProposalCommentThreadCreatePayload!
@@ -1336,9 +1373,9 @@ input PublishInput {
   graphSlug: String
   projectSlug: String
   message: String
+  url: String
   branch: String
   subgraph: String!
-  url: String
 }
 
 """
@@ -1689,11 +1726,33 @@ type SchemaCheckConnection {
 input SchemaCheckCreateInput {
   schema: String!
   accountSlug: String!
-  graphSlug: String
-  projectSlug: String
+  graphSlug: String!
   branch: String
-  subgraphName: String
+  subgraphName: String!
   gitCommit: SchemaCheckGitCommitInput
+}
+
+input SchemaCheckCustomWebhookCreateInput {
+  """The webhook URL that will be called when a schema check is created."""
+  url: Url!
+
+  """The headers to be sent with the webhook request."""
+  headers: [HttpHeaderInput!]
+
+  """The graph the schema checks apply to."""
+  graphId: ID!
+}
+
+union SchemaCheckCustomWebhookCreatePayload = SchemaCheckCustomWebhookCreateSuccess
+
+type SchemaCheckCustomWebhookCreateSuccess {
+  query: Query!
+}
+
+union SchemaCheckCustomWebhookDeletePayload = CustomCheckWebhookNotFoundError | SchemaCheckCustomWebhookDeleteSuccess
+
+type SchemaCheckCustomWebhookDeleteSuccess {
+  query: Query!
 }
 
 type SchemaCheckDiagnostic {
@@ -1742,6 +1801,7 @@ enum SchemaCheckStep {
   OPERATION
   LINT
   PROPOSAL
+  CUSTOM
 }
 
 type SchemaProposal {
