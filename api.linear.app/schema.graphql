@@ -1365,6 +1365,15 @@ input CustomerFilter {
   or: [CustomerFilter!]
 }
 
+"""[ALPHA] Issue customer important count sorting options."""
+input CustomerImportantCountSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 """
 A customer need, expressed through a reference to an issue, project, or comment.
 """
@@ -8638,6 +8647,9 @@ input IssueSortInput {
 
   """Sort by number of customers associated with the issue"""
   customerCount: CustomerCountSort
+
+  """Sort by number of important customers associated with the issue"""
+  customerImportantCount: CustomerImportantCountSort
 }
 
 type IssueTitleSuggestionFromCustomerRequestPayload {
@@ -14124,6 +14136,9 @@ type Post implements Node {
 
   """The log id of the ai response."""
   evalLogId: String
+
+  """Schedule used to create a post summary."""
+  feedSummaryScheduleAtCreate: FeedSummarySchedule
 }
 
 """[Internal] A post related notification."""
@@ -17260,11 +17275,11 @@ type Query {
   ): Webhook!
 
   """
-  [INTERNAL] Webhook failure events for a webhook that belongs to an OAuth application. (last 50)
+  [INTERNAL] Webhook failure events for webhooks that belong to an OAuth application. (last 50)
   """
   failuresForOauthWebhooks(
-    """The identifier of the webhook to retrieve failures for."""
-    webhookId: String!
+    """The identifier of the OAuth client to retrieve failures for."""
+    oauthClientId: String!
   ): [WebhookFailureEvent!]!
 
   """The user's settings."""
