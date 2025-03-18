@@ -3034,6 +3034,9 @@ type Document implements Node {
   """The initiative that the document is associated with."""
   initiative: Initiative
 
+  """[Internal] The team that the document is associated with."""
+  team: Team
+
   """The document's unique URL slug."""
   slugId: String!
 
@@ -3214,6 +3217,9 @@ input DocumentCreateInput {
 
   """[Internal] Related initiative for the document."""
   initiativeId: String
+
+  """[Internal] Related team for the document."""
+  teamId: String
 
   """The ID of the last template applied to the document."""
   lastAppliedTemplateId: String
@@ -3441,6 +3447,9 @@ type DocumentSearchResult implements Node {
   """The initiative that the document is associated with."""
   initiative: Initiative
 
+  """[Internal] The team that the document is associated with."""
+  team: Team
+
   """The document's unique URL slug."""
   slugId: String!
 
@@ -3529,6 +3538,9 @@ input DocumentUpdateInput {
 
   """[Internal] Related initiative for the document."""
   initiativeId: String
+
+  """[Internal] Related team for the document."""
+  teamId: String
 
   """The ID of the last template applied to the document."""
   lastAppliedTemplateId: String
@@ -3891,11 +3903,14 @@ input EntityExternalLinkCreateInput {
   """The label for the link."""
   label: String!
 
-  """Related initiative link."""
+  """The initiative associated with the link."""
   initiativeId: String
 
-  """Related project link."""
+  """The project associated with the link."""
   projectId: String
+
+  """The team associated with the link."""
+  teamId: String
 
   """The order of the item in the entities resources list."""
   sortOrder: Float
@@ -5443,6 +5458,84 @@ type InitiativePayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""A relation representing the dependency between two initiatives."""
+type InitiativeRelation implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The parent initiative."""
+  initiative: Initiative!
+
+  """The child initiative."""
+  relatedInitiative: Initiative!
+
+  """The last user who created or modified the relation."""
+  user: User
+
+  """The sort order of the relation within the initiative."""
+  sortOrder: Float!
+}
+
+type InitiativeRelationConnection {
+  edges: [InitiativeRelationEdge!]!
+  nodes: [InitiativeRelation!]!
+  pageInfo: PageInfo!
+}
+
+input InitiativeRelationCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The identifier of the parent initiative."""
+  initiativeId: String!
+
+  """The identifier of the child initiative."""
+  relatedInitiativeId: String!
+
+  """The sort order of the initiative relation."""
+  sortOrder: Float
+}
+
+type InitiativeRelationEdge {
+  node: InitiativeRelation!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type InitiativeRelationPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The initiative relation that was created or updated."""
+  initiativeRelation: InitiativeRelation!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+"""The properties of the initiativeRelation to update."""
+input InitiativeRelationUpdateInput {
+  """The sort order of the initiative relation."""
+  sortOrder: Float
 }
 
 enum InitiativeStatus {
@@ -10696,6 +10789,27 @@ type Mutation {
   """Deletes (trashes) an initiative."""
   initiativeDelete(
     """The identifier of the initiative to delete."""
+    id: String!
+  ): DeletePayload!
+
+  """Creates a new initiative relation."""
+  initiativeRelationCreate(
+    """The initiative relation to create."""
+    input: InitiativeRelationCreateInput!
+  ): InitiativeRelationPayload!
+
+  """Updates an initiative relation."""
+  initiativeRelationUpdate(
+    """The properties of the initiative relation to update."""
+    input: InitiativeRelationUpdateInput!
+
+    """The identifier of the initiative relation to update."""
+    id: String!
+  ): DeletePayload!
+
+  """Deletes an initiative relation."""
+  initiativeRelationDelete(
+    """The identifier of the initiative relation to delete."""
     id: String!
   ): DeletePayload!
 
@@ -18394,6 +18508,36 @@ type Query {
   """One specific initiative."""
   initiative(id: String!): Initiative!
 
+  """All initiative relationships."""
+  initiativeRelations(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): InitiativeRelationConnection!
+
+  """One specific initiative relation."""
+  initiativeRelation(id: String!): ProjectRelation!
+
   """The user's feed subscriptions."""
   feedSubscriptions(
     """A cursor to be used with last for backward pagination."""
@@ -21766,6 +21910,9 @@ type User implements Node {
   Whether the user is a guest in the workspace and limited to accessing a subset of teams.
   """
   guest: Boolean!
+
+  """Whether the user is an app."""
+  app: Boolean!
 
   """Whether the user account is active or disabled (suspended)."""
   active: Boolean!
