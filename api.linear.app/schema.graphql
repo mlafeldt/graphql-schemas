@@ -60,6 +60,9 @@ type ApiKey implements Node {
   """The label of the API key."""
   label: String!
 
+  """Scopes associated with the API key."""
+  scope: [String!]
+
   """
   The sync groups that this API key requests access to. If null, the API key has
   access to all sync groups the user has access to. The final set of sync groups
@@ -87,10 +90,12 @@ input ApiKeyCreateInput {
   key: String!
 
   """
-  Optional list of team IDs to scope this API key to. If not provided, the API
-  key will have access to all teams the user has access to.
+  List of team IDs to restrict this API key to. Default is all teams the user has access to.
   """
   teamIds: [String!]
+
+  """Scopes the API key has access to. Default is all scopes."""
+  scope: [String!]
 }
 
 type ApiKeyEdge {
@@ -116,10 +121,12 @@ input ApiKeyUpdateInput {
   label: String
 
   """
-  Optional list of team IDs to scope this API key to. If not provided, the API
-  key's existing team scoping will not be changed.
+  List of team IDs to restrict this API key to. Default is all teams the user has access to.
   """
   teamIds: [String!]
+
+  """Scopes the API key has access to. Default is all scopes."""
+  scope: [String!]
 }
 
 """Public information of the OAuth application."""
@@ -153,6 +160,18 @@ input ApproximateNeedCountSort {
 
   """The order for the individual sort"""
   order: PaginationSortOrder
+}
+
+"""[INTERNAL] Details of the app user's existing token."""
+type AppUserAuthentication {
+  """The timestamp at which the token was created."""
+  createdAt: DateTime!
+
+  """The scopes that the token has."""
+  scope: [String!]!
+
+  """Whether the application has requested custom sync groups."""
+  requestedSyncGroups: Boolean!
 }
 
 """A generic payload return from entity archive or deletion mutations."""
@@ -22145,10 +22164,16 @@ type UserAuthorizedApplication {
   """Whether the application supports app users."""
   appUserEnabled: Boolean!
 
+  """Details of the app user's existing token, if any."""
+  appUserAuthentication: AppUserAuthentication
+
   """
   Error associated with the application needing to be requested for approval in the workspace.
   """
   approvalErrorCode: String
+
+  """Whether the application can only be added to public teams."""
+  canBeAddedToPublicTeamsOnly: Boolean
 }
 
 """User filtering options."""
