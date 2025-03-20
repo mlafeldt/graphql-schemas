@@ -3240,6 +3240,9 @@ input DocumentCreateInput {
   """[Internal] Related team for the document."""
   teamId: String
 
+  """[Internal] The resource folder containing the document."""
+  resourceFolderId: String
+
   """The ID of the last template applied to the document."""
   lastAppliedTemplateId: String
 
@@ -3560,6 +3563,9 @@ input DocumentUpdateInput {
 
   """[Internal] Related team for the document."""
   teamId: String
+
+  """[Internal] The resource folder containing the document."""
+  resourceFolderId: String
 
   """The ID of the last template applied to the document."""
   lastAppliedTemplateId: String
@@ -3928,8 +3934,11 @@ input EntityExternalLinkCreateInput {
   """The project associated with the link."""
   projectId: String
 
-  """The team associated with the link."""
+  """[Internal] The team associated with the link."""
   teamId: String
+
+  """[Internal] The resource folder containing the link."""
+  resourceFolderId: String
 
   """The order of the item in the entities resources list."""
   sortOrder: Float
@@ -3962,6 +3971,9 @@ input EntityExternalLinkUpdateInput {
 
   """The order of the item in the entities resources list."""
   sortOrder: Float
+
+  """[Internal] The resource folder containing the link."""
+  resourceFolderId: String
 }
 
 """Comparator for estimates."""
@@ -6484,6 +6496,9 @@ type Issue implements Node {
   """The time until an issue will be snoozed in Triage view."""
   snoozedUntilAt: DateTime
 
+  """[Internal] The activity summary information for this issue."""
+  activitySummary: JSONObject
+
   """[ALPHA] The document content representing this issue description."""
   documentContent: DocumentContent
 
@@ -8332,6 +8347,9 @@ type IssueSearchResult implements Node {
   """The time until an issue will be snoozed in Triage view."""
   snoozedUntilAt: DateTime
 
+  """[Internal] The activity summary information for this issue."""
+  activitySummary: JSONObject
+
   """[ALPHA] The document content representing this issue description."""
   documentContent: DocumentContent
 
@@ -10054,6 +10072,12 @@ type Mutation {
     """Description to update the issue with. """
     description: String!
 
+    """The identifier of the issue to update."""
+    id: String!
+  ): IssuePayload!
+
+  """Updates the summary of an issue."""
+  updateIssueSummary(
     """The identifier of the issue to update."""
     id: String!
   ): IssuePayload!
@@ -12477,7 +12501,7 @@ input NullableCycleFilter {
   """Filter based on the existence of the relation."""
   null: Boolean
 
-  """Compound filters, one of which need to be matched by the cycle."""
+  """Compound filters, all of which need to be matched by the cycle."""
   and: [NullableCycleFilter!]
 
   """Compound filters, one of which need to be matched by the cycle."""
@@ -17164,6 +17188,44 @@ input ProjectUpdateUpdateInput {
   isDiffHidden: Boolean
 }
 
+"""[Internal] A pull request in a version control system."""
+type PullRequest implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The title of the pull request."""
+  title: String!
+
+  """The number of the pull request in the version control system."""
+  number: Float!
+
+  """The source branch of the pull request."""
+  sourceBranch: String!
+
+  """The target branch of the pull request."""
+  targetBranch: String!
+
+  """The URL of the pull request in the version control system."""
+  url: String!
+
+  """The status of the pull request."""
+  status: PullRequestStatus!
+}
+
 """[Internal] A pull request related notification."""
 type PullRequestNotification implements Notification & Entity & Node {
   """
@@ -17274,11 +17336,24 @@ type PullRequestNotification implements Notification & Entity & Node {
 
   """Related pull request."""
   pullRequestId: String!
+
+  """The pull request related to the notification."""
+  pullRequest: PullRequest!
 }
 
 enum PullRequestReviewTool {
   source
   graphite
+}
+
+"""The status of a pull request."""
+enum PullRequestStatus {
+  draft
+  open
+  inReview
+  approved
+  merged
+  closed
 }
 
 """A user's web or mobile push notification subscription."""
@@ -22748,6 +22823,7 @@ enum ViewType {
   roadmapAll
   initiative
   initiativeOverview
+  initiativeOverviewSubInitiatives
   initiatives
   initiativesPlanned
   initiativesCompleted
