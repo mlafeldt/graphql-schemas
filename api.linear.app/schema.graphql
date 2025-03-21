@@ -172,6 +172,9 @@ type AppUserAuthentication {
 
   """Whether the application has requested custom sync groups."""
   requestedSyncGroups: Boolean!
+
+  """The user that authorized the application, if known."""
+  authorizingUser: AuthorizingUser
 }
 
 """A generic payload return from entity archive or deletion mutations."""
@@ -697,6 +700,15 @@ type AuthorizedApplication {
 
   """Whether or not webhooks are enabled for the application."""
   webhooksEnabled: Boolean!
+}
+
+"""Details of the app user's authorizing user."""
+type AuthorizingUser {
+  """The user's full name."""
+  name: String!
+
+  """The user's display name."""
+  displayName: String!
 }
 
 type AuthResolverResponse {
@@ -10076,7 +10088,7 @@ type Mutation {
     id: String!
   ): IssuePayload!
 
-  """Updates the summary of an issue."""
+  """[INTERNAL] Updates the summary of an issue."""
   updateIssueSummary(
     """The identifier of the issue to update."""
     id: String!
