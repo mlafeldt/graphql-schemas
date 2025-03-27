@@ -1632,19 +1632,6 @@ input CustomerNeedFilter {
 
 """[Internal] A customer need related notification."""
 type CustomerNeedNotification implements Notification & Entity & Node {
-  """
-  Related comment ID. Null if the notification is not related to a comment.
-  """
-  commentId: String
-
-  """
-  Related parent comment ID. Null if the notification is not related to a comment.
-  """
-  parentCommentId: String
-
-  """Name of the reaction emoji related to the notification."""
-  reactionEmoji: String
-
   """The unique identifier of the entity."""
   id: ID!
 
@@ -1740,6 +1727,12 @@ type CustomerNeedNotification implements Notification & Entity & Node {
 
   """Related customer need."""
   customerNeedId: String!
+
+  """The issue related to the notification."""
+  relatedIssue: Issue
+
+  """The project related to the notification."""
+  relatedProject: Project
 }
 
 type CustomerNeedPayload {
@@ -13147,11 +13140,6 @@ type OauthClientApproval implements Node {
   """The scopes the app has requested."""
   scopes: [String!]!
 
-  """
-  Whether the approval is for an app user allowed access to public teams only.
-  """
-  publicTeamsOnly: Boolean
-
   """The reason the person wants to install this OAuth client."""
   requestReason: String
 
@@ -17617,6 +17605,21 @@ type Query {
   """One specific team membership."""
   teamMembership(id: String!): TeamMembership!
 
+  """[ALPHA] Search for various resources using natural language."""
+  semanticSearch(
+    """Search query to look for."""
+    query: String!
+
+    """The types of results to return (default: all)."""
+    types: [SemanticSearchResultType!]
+
+    """The maximum number of results to return (default: 10)."""
+    maxResults: Int
+
+    """Whether to include archived results in the search (default: false)."""
+    includeArchived: Boolean
+  ): SemanticSearchPayload!
+
   """Search documents."""
   searchDocuments(
     """A cursor to be used with last for backward pagination."""
@@ -19610,6 +19613,41 @@ input RoadmapUpdateInput {
   color: String
 }
 
+"""[ALPHA] Payload returned by semantic search."""
+type SemanticSearchPayload {
+  enabled: Boolean!
+  results: [SemanticSearchResult!]!
+}
+
+"""[ALPHA] A semantic search result reference."""
+type SemanticSearchResult implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The type of the semantic search result."""
+  type: SemanticSearchResultType!
+
+  """The issue related to the semantic search result."""
+  issue: Issue
+
+  """The project related to the semantic search result."""
+  project: Project
+
+  """The initiative related to the semantic search result."""
+  initiative: Initiative
+
+  """The document related to the semantic search result."""
+  document: Document
+}
+
+"""[ALPHA] The type of the semantic search result."""
+enum SemanticSearchResultType {
+  issue
+  project
+  initiative
+  document
+}
+
 enum SendStrategy {
   desktopThenPush
   desktopAndPush
@@ -20822,7 +20860,7 @@ type TeamArchivePayload implements ArchivePayload {
   entity: Team
 }
 
-"""Roadmap collection filtering options."""
+"""Team collection filtering options."""
 input TeamCollectionFilter {
   """Comparator for the identifier."""
   id: IDComparator
@@ -20833,16 +20871,16 @@ input TeamCollectionFilter {
   """Comparator for the updated at date."""
   updatedAt: DateComparator
 
-  """Compound filters, all of which need to be matched by the roadmap."""
+  """Compound filters, all of which need to be matched by the team."""
   and: [TeamCollectionFilter!]
 
-  """Compound filters, one of which need to be matched by the roadmap."""
+  """Compound filters, one of which need to be matched by the team."""
   or: [TeamCollectionFilter!]
 
-  """Filters that needs to be matched by some roadmaps."""
+  """Filters that needs to be matched by some teams."""
   some: TeamFilter
 
-  """Filters that needs to be matched by all roadmaps."""
+  """Filters that needs to be matched by all teams."""
   every: TeamFilter
 
   """Comparator for the collection length."""
@@ -22114,9 +22152,6 @@ type UserAuthorizedApplication {
   Error associated with the application needing to be requested for approval in the workspace.
   """
   approvalErrorCode: String
-
-  """Whether the application can only be added to public teams."""
-  canBeAddedToPublicTeamsOnly: Boolean
 }
 
 """User filtering options."""
@@ -22753,9 +22788,16 @@ type Webhook implements Node {
 
   """
   The team that the webhook is associated with. If null, the webhook is
-  associated with all public teams of the organization.
+  associated with all public teams of the organization or multiple teams.
   """
   team: Team
+
+  """
+  [INTERNAL] The teams that the webhook is associated with. Used to represent a
+  webhook that targets multiple teams, potentially in addition to all public
+  teams of the organization.
+  """
+  teamIds: [String!]
 
   """
   Whether the Webhook is enabled for all public teams, including teams created after the webhook was created.

@@ -1081,6 +1081,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "SemanticSearchResult",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "DocumentSearchResult",
             "ofType": null
           },
@@ -19792,7 +19797,7 @@
       {
         "kind": "INPUT_OBJECT",
         "name": "TeamCollectionFilter",
-        "description": "Roadmap collection filtering options.",
+        "description": "Team collection filtering options.",
         "fields": null,
         "inputFields": [
           {
@@ -19827,7 +19832,7 @@
           },
           {
             "name": "and",
-            "description": "Compound filters, all of which need to be matched by the roadmap.",
+            "description": "Compound filters, all of which need to be matched by the team.",
             "type": {
               "kind": "LIST",
               "name": null,
@@ -19845,7 +19850,7 @@
           },
           {
             "name": "or",
-            "description": "Compound filters, one of which need to be matched by the roadmap.",
+            "description": "Compound filters, one of which need to be matched by the team.",
             "type": {
               "kind": "LIST",
               "name": null,
@@ -19863,7 +19868,7 @@
           },
           {
             "name": "some",
-            "description": "Filters that needs to be matched by some roadmaps.",
+            "description": "Filters that needs to be matched by some teams.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "TeamFilter",
@@ -19873,7 +19878,7 @@
           },
           {
             "name": "every",
-            "description": "Filters that needs to be matched by all roadmaps.",
+            "description": "Filters that needs to be matched by all teams.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "TeamFilter",
@@ -34964,12 +34969,32 @@
           },
           {
             "name": "team",
-            "description": "The team that the webhook is associated with. If null, the webhook is associated with all public teams of the organization.",
+            "description": "The team that the webhook is associated with. If null, the webhook is associated with all public teams of the organization or multiple teams.",
             "args": [],
             "type": {
               "kind": "OBJECT",
               "name": "Team",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "teamIds",
+            "description": "[INTERNAL] The teams that the webhook is associated with. Used to represent a webhook that targets multiple teams, potentially in addition to all public teams of the organization.",
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -40773,18 +40798,6 @@
             "deprecationReason": null
           },
           {
-            "name": "publicTeamsOnly",
-            "description": "Whether the approval is for an app user allowed access to public teams only.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "requestReason",
             "description": "The reason the person wants to install this OAuth client.",
             "args": [],
@@ -41717,42 +41730,6 @@
         "description": "[Internal] A customer need related notification.",
         "fields": [
           {
-            "name": "commentId",
-            "description": "Related comment ID. Null if the notification is not related to a comment.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "parentCommentId",
-            "description": "Related parent comment ID. Null if the notification is not related to a comment.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "reactionEmoji",
-            "description": "Name of the reaction emoji related to the notification.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "id",
             "description": "The unique identifier of the entity.",
             "args": [],
@@ -42116,6 +42093,30 @@
                 "name": "String",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "relatedIssue",
+            "description": "The issue related to the notification.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Issue",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "relatedProject",
+            "description": "The project related to the notification.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Project",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -43856,6 +43857,75 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "TeamMembership",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "semanticSearch",
+            "description": "[ALPHA] Search for various resources using natural language.",
+            "args": [
+              {
+                "name": "query",
+                "description": "Search query to look for.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "types",
+                "description": "The types of results to return (default: all).",
+                "type": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "SemanticSearchResultType",
+                      "ofType": null
+                    }
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "maxResults",
+                "description": "The maximum number of results to return (default: 10).",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeArchived",
+                "description": "Whether to include archived results in the search (default: false).",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "SemanticSearchPayload",
                 "ofType": null
               }
             },
@@ -50518,6 +50588,189 @@
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "SemanticSearchPayload",
+        "description": "[ALPHA] Payload returned by semantic search.",
+        "fields": [
+          {
+            "name": "enabled",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "results",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "SemanticSearchResult",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "SemanticSearchResult",
+        "description": "[ALPHA] A semantic search result reference.",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The unique identifier of the entity.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "type",
+            "description": "The type of the semantic search result.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "SemanticSearchResultType",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issue",
+            "description": "The issue related to the semantic search result.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Issue",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "project",
+            "description": "The project related to the semantic search result.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Project",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "initiative",
+            "description": "The initiative related to the semantic search result.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Initiative",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "document",
+            "description": "The document related to the semantic search result.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Document",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "SemanticSearchResultType",
+        "description": "[ALPHA] The type of the semantic search result.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "issue",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "project",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "initiative",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "document",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -61707,18 +61960,6 @@
             "type": {
               "kind": "SCALAR",
               "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "canBeAddedToPublicTeamsOnly",
-            "description": "Whether the application can only be added to public teams.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
               "ofType": null
             },
             "isDeprecated": false,
