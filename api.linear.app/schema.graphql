@@ -2934,6 +2934,70 @@ input CycleUpdateInput {
   completedAt: DateTime
 }
 
+"""
+[Internal] A dashboard, usually a collection of widgets to display several insights at once.
+"""
+type Dashboard implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The dashboard's unique URL slug."""
+  slugId: String!
+
+  """The name of the dashboard."""
+  name: String!
+
+  """The description of the dashboard."""
+  description: String
+
+  """The icon of the dashboard."""
+  icon: String
+
+  """The color of the icon of the dashboard."""
+  color: String
+
+  """Whether the dashboard is shared with everyone in the organization."""
+  shared: Boolean!
+
+  """The organization of the dashboard."""
+  organization: Organization!
+
+  """The user who created the dashboard."""
+  creator: User
+
+  """The user who last updated the dashboard."""
+  updatedBy: User
+
+  """The owner of the dashboard."""
+  owner: User
+
+  """The filter applied to all dashboard widgets showing issues data."""
+  issueFilter: JSONObject
+
+  """The filter applied to all dashboard widgets showing projects data."""
+  projectFilter: JSONObject
+
+  """The layout of the widgets on the dashboard."""
+  layout: JSONObject!
+
+  """The widgets on the dashboard."""
+  widgets: JSONObject!
+}
+
 """Comparator for dates."""
 input DateComparator {
   """Equals constraint."""
@@ -4254,6 +4318,9 @@ type Favorite implements Node {
   """The favorited customer."""
   customer: Customer
 
+  """The favorited dashboard."""
+  dashboard: Dashboard
+
   """URL of the favorited entity. Folders return 'null' value."""
   url: String
 
@@ -4341,6 +4408,9 @@ input FavoriteCreateInput {
 
   """The identifier of the customer to favorite."""
   customerId: String
+
+  """The identifier of the dashboard to favorite."""
+  dashboardId: String
 }
 
 type FavoriteEdge {
@@ -21378,6 +21448,11 @@ input TeamUpdateInput {
 
   """The parent team ID."""
   parentId: String
+
+  """
+  [Internal] Whether the team should inherit workflow statuses from its parent.
+  """
+  inheritWorkflowStatuses: Boolean
 }
 
 """A template object used for creating entities faster."""
