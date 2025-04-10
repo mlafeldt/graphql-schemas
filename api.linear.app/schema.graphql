@@ -689,6 +689,15 @@ type AuthorizedApplication {
   """Application name."""
   name: String!
 
+  """Description of the application."""
+  description: String
+
+  """Developer of the application."""
+  developer: String
+
+  """Developer URL of the application."""
+  developerUrl: String
+
   """Image of the application."""
   imageUrl: String
 
@@ -19176,6 +19185,14 @@ type Query {
   """
   workspaceAuthorizedApplications: [WorkspaceAuthorizedApplication!]!
 
+  """
+  [INTERNAL] Get a specific non-internal authorized application (with limited fields) for a workspace
+  """
+  workspaceAuthorizedApplication(
+    """The client ID of the application."""
+    clientId: String!
+  ): WorkspaceAuthorizedApplicationWithMemberships!
+
   """All API keys for the user."""
   apiKeys(
     """A cursor to be used with last for backward pagination."""
@@ -23211,6 +23228,15 @@ type WorkspaceAuthorizedApplication {
   """Application name."""
   name: String!
 
+  """Description of the application."""
+  description: String
+
+  """Developer of the application."""
+  developer: String
+
+  """Developer URL of the application."""
+  developerUrl: String
+
   """Image of the application."""
   imageUrl: String
 
@@ -23231,6 +23257,19 @@ type WorkspaceAuthorizedApplication {
 
   """
   UserIds and membership dates of everyone who has authorized the application with the set of scopes.
+  """
+  memberships: [AuthMembership!]!
+}
+
+"""
+[INTERNAL] Public information of the OAuth application with its memberships
+"""
+type WorkspaceAuthorizedApplicationWithMemberships {
+  """Details of the OAuth application"""
+  client: AuthorizedApplication!
+
+  """
+  UserIds and membership dates of everyone who has authorized the application
   """
   memberships: [AuthMembership!]!
 }
