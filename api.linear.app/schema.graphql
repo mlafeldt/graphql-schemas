@@ -9704,6 +9704,24 @@ type Mutation {
     id: String!
   ): ProjectArchivePayload!
 
+  """[Internal] Adds a label to a project."""
+  projectAddLabel(
+    """The identifier of the label to add."""
+    labelId: String!
+
+    """The identifier of the project to add the label to."""
+    id: String!
+  ): ProjectPayload!
+
+  """[Internal] Removes a label from a project."""
+  projectRemoveLabel(
+    """The identifier of the label to remove."""
+    labelId: String!
+
+    """The identifier of the project to remove the label from."""
+    id: String!
+  ): ProjectPayload!
+
   """Creates a new project relation."""
   projectRelationCreate(
     """The project relation to create."""
@@ -14821,6 +14839,33 @@ type Project implements Node {
     orderBy: PaginationOrderBy
   ): ProjectHistoryConnection!
 
+  """[Internal] Labels associated with this project."""
+  labels(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectLabelConnection!
+
   """
   The overall progress of the project. This is the (completed estimate points +
   0.25 * in progress estimate points) / total estimate points.
@@ -15345,6 +15390,58 @@ type ProjectHistoryConnection {
 
 type ProjectHistoryEdge {
   node: ProjectHistory!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""Labels that can be associated with projects."""
+type ProjectLabel implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The label's name."""
+  name: String!
+
+  """The label's description."""
+  description: String
+
+  """The label's color as a HEX string."""
+  color: String!
+
+  """Whether the label is a group."""
+  isGroup: Boolean!
+  organization: Organization!
+
+  """The user who created the label."""
+  creator: User
+
+  """The parent label."""
+  parent: ProjectLabel
+}
+
+type ProjectLabelConnection {
+  edges: [ProjectLabelEdge!]!
+  nodes: [ProjectLabel!]!
+  pageInfo: PageInfo!
+}
+
+type ProjectLabelEdge {
+  node: ProjectLabel!
 
   """Used in `before` and `after` args"""
   cursor: String!
@@ -16458,6 +16555,33 @@ type ProjectSearchResult implements Node {
     """
     orderBy: PaginationOrderBy
   ): ProjectHistoryConnection!
+
+  """[Internal] Labels associated with this project."""
+  labels(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectLabelConnection!
 
   """
   The overall progress of the project. This is the (completed estimate points +
@@ -21057,6 +21181,11 @@ input TeamCreateInput {
   Whether the team should inherit estimation settings from its parent. Only applies to sub-teams.
   """
   inheritIssueEstimation: Boolean
+
+  """
+  [Internal] Whether the team should inherit workflow statuses from its parent.
+  """
+  inheritWorkflowStatuses: Boolean
 
   """
   The issue estimation type to use. Must be one of "notUsed", "exponential", "fibonacci", "linear", "tShirt".
