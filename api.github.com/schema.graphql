@@ -170,6 +170,30 @@ interface Actor {
   url: URI!
 }
 
+"""The connection type for Actor."""
+type ActorConnection {
+  """A list of edges."""
+  edges: [ActorEdge]
+
+  """A list of nodes."""
+  nodes: [Actor]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type ActorEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: Actor
+}
+
 """Location information for an actor"""
 type ActorLocation {
   """City"""
@@ -984,6 +1008,23 @@ type ArchiveRepositoryPayload {
 
 """An object that can have users assigned to it."""
 interface Assignable {
+  """A list of actors assigned to this object."""
+  assignedActors(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): AssigneeConnection!
+
   """A list of Users assigned to this object."""
   assignees(
     """Returns the elements in the list that come after the specified cursor."""
@@ -1000,6 +1041,26 @@ interface Assignable {
     """Returns the last _n_ elements from the list."""
     last: Int
   ): UserConnection!
+
+  """A list of suggested actors to assign to this object"""
+  suggestedActors(
+    """If provided, searches users by login or profile name"""
+    query: String
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): AssigneeConnection!
 }
 
 """Represents an 'assigned' event on any assignable object."""
@@ -1025,6 +1086,30 @@ type AssignedEvent implements Node {
 
 """Types that can be assigned to issues."""
 union Assignee = Bot | Mannequin | Organization | User
+
+"""The connection type for Assignee."""
+type AssigneeConnection {
+  """A list of edges."""
+  edges: [AssigneeEdge]
+
+  """A list of nodes."""
+  nodes: [Assignee]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type AssigneeEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: Assignee
+}
 
 """An entry in the audit log."""
 interface AuditEntry {
@@ -12183,6 +12268,23 @@ type Issue implements Assignable & Closable & Comment & Deletable & Labelable & 
   """Reason that the conversation was locked."""
   activeLockReason: LockReason
 
+  """A list of actors assigned to this object."""
+  assignedActors(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): AssigneeConnection!
+
   """A list of Users assigned to this object."""
   assignees(
     """Returns the elements in the list that come after the specified cursor."""
@@ -12519,6 +12621,26 @@ type Issue implements Assignable & Closable & Comment & Deletable & Labelable & 
 
   """Summary of the state of an issue's sub-issues"""
   subIssuesSummary: SubIssuesSummary!
+
+  """A list of suggested actors to assign to this object"""
+  suggestedActors(
+    """If provided, searches users by login or profile name"""
+    query: String
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): AssigneeConnection!
 
   """A list of events, comments, commits, etc. associated with the issue."""
   timeline(
@@ -16560,6 +16682,12 @@ type Mutation {
     """Parameters for ReorderEnvironment"""
     input: ReorderEnvironmentInput!
   ): ReorderEnvironmentPayload
+
+  """Replaces all actors for assignable object."""
+  replaceActorsForAssignable(
+    """Parameters for ReplaceActorsForAssignable"""
+    input: ReplaceActorsForAssignableInput!
+  ): ReplaceActorsForAssignablePayload
 
   """Reprioritizes a sub-issue to a different position in the parent list."""
   reprioritizeSubIssue(
@@ -24391,6 +24519,23 @@ type PullRequest implements Assignable & Closable & Comment & Labelable & Lockab
   """The number of additions in this pull request."""
   additions: Int!
 
+  """A list of actors assigned to this object."""
+  assignedActors(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): AssigneeConnection!
+
   """A list of Users assigned to this object."""
   assignees(
     """Returns the elements in the list that come after the specified cursor."""
@@ -24923,6 +25068,26 @@ type PullRequest implements Assignable & Closable & Comment & Labelable & Lockab
 
   """Check and Status rollup information for the PR's head ref."""
   statusCheckRollup: StatusCheckRollup
+
+  """A list of suggested actors to assign to this object"""
+  suggestedActors(
+    """If provided, searches users by login or profile name"""
+    query: String
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): AssigneeConnection!
 
   """
   A list of reviewer suggestions based on commit history and past review comments.
@@ -28182,6 +28347,27 @@ type ReorderEnvironmentPayload {
   environment: Environment
 }
 
+"""Autogenerated input type of ReplaceActorsForAssignable"""
+input ReplaceActorsForAssignableInput {
+  """A unique identifier for the client performing the mutation."""
+  clientMutationId: String
+
+  """The id of the assignable object to replace the assignees for."""
+  assignableId: ID!
+
+  """The ids of the actors to replace the existing assignees."""
+  actorIds: [ID!]!
+}
+
+"""Autogenerated return type of ReplaceActorsForAssignable."""
+type ReplaceActorsForAssignablePayload {
+  """The item that was assigned."""
+  assignable: Assignable
+
+  """A unique identifier for the client performing the mutation."""
+  clientMutationId: String
+}
+
 """Audit log entry for a repo.access event."""
 type RepoAccessAuditEntry implements AuditEntry & Node & OrganizationAuditEntryData & RepositoryAuditEntryData {
   """The action name"""
@@ -30783,6 +30969,36 @@ type Repository implements Node & PackageOwner & ProjectOwner & ProjectV2Recent 
     last: Int
   ): SubmoduleConnection!
 
+  """
+  A list of suggested actors that can be attributed to content in this repository.
+  """
+  suggestedActors(
+    """Search actors with query on user name and login."""
+    query: String
+
+    """
+    A comma separated list of login names to filter actors by. Only the first 10 logins will be used.
+    """
+    loginNames: String
+
+    """A list of capabilities to filter actors by."""
+    capabilities: [RepositorySuggestedActorFilter!]!
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): ActorConnection!
+
   """Temporary authentication token for cloning this repository."""
   tempCloneToken: String
 
@@ -32151,6 +32367,15 @@ enum RepositoryRuleType {
   both the commit and the reference being updated.
   """
   CODE_SCANNING
+}
+
+"""The possible filters for suggested actors in a repository"""
+enum RepositorySuggestedActorFilter {
+  """Actors that can be assigned to issues and pull requests"""
+  CAN_BE_ASSIGNED
+
+  """Actors that can be the author of issues and pull requests"""
+  CAN_BE_AUTHOR
 }
 
 """A repository-topic connects a repository to a topic."""
