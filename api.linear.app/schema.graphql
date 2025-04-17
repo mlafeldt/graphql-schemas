@@ -865,11 +865,11 @@ type Comment implements Node {
   """
   quotedText: String
 
-  """[Internal] Summary for comment thread."""
-  summaryText: String
-
   """Emoji reaction summary, grouped by emoji type."""
   reactionData: JSONObject!
+
+  """[Internal] A generated summary of the comment thread."""
+  threadSummary: JSONObject
 
   """Comment's URL."""
   url: String!
@@ -15032,6 +15032,11 @@ type ProjectAttachment implements Node {
 
   """Information about the external source which created the attachment."""
   source: JSONObject
+
+  """
+  An accessor helper to source.type, defines the source type of the attachment.
+  """
+  sourceType: String
 }
 
 """Project filtering options."""
@@ -16903,6 +16908,7 @@ input ProjectStatusUpdateInput {
 
 """Different tabs available inside a project."""
 enum ProjectTab {
+  customers
   documents
   issues
 }
@@ -19049,7 +19055,13 @@ type Query {
   ): CustomerNeedConnection!
 
   """One specific customer need"""
-  customerNeed(id: String!): CustomerNeed!
+  customerNeed(
+    """The identifier of the need to retrieve."""
+    id: String
+
+    """The hash of the need to retrieve."""
+    hash: String
+  ): CustomerNeed!
 
   """Suggests issue title based on a customer request."""
   issueTitleSuggestionFromCustomerRequest(request: String!): IssueTitleSuggestionFromCustomerRequestPayload!
