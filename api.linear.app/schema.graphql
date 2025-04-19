@@ -1291,6 +1291,11 @@ type Customer implements Node {
   """The customer's unique URL slug."""
   slugId: String!
 
+  """
+  The ID of the main source, when a customer has multiple sources. Must be one of externalIds.
+  """
+  mainSourceId: String
+
   """The integration that manages the Customer."""
   integration: Integration
 }
@@ -2182,6 +2187,11 @@ input CustomerUpdateInput {
 
   """The URL of the customer's logo."""
   logoUrl: String
+
+  """
+  The main source of the customer, for customers with multiple sources. Must be one of externalIds.
+  """
+  mainSourceId: String
 }
 
 input CustomerUpsertInput {
@@ -7144,6 +7154,9 @@ input IssueCreateInput {
   """
   slaBreachesAt: DateTime
 
+  """[Internal] The timestamp at which the issue's SLA was started."""
+  slaStartedAt: DateTime
+
   """
   The identifier of a template the issue should be created from. If other values
   are provided in the input, they will override template values.
@@ -8870,6 +8883,9 @@ input IssueUpdateInput {
   [Internal] The timestamp at which an issue will be considered in breach of SLA.
   """
   slaBreachesAt: DateTime
+
+  """[Internal] The timestamp at which the issue's SLA was started."""
+  slaStartedAt: DateTime
 
   """The time until an issue will be snoozed in Triage view."""
   snoozedUntilAt: DateTime
