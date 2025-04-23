@@ -1359,6 +1359,11 @@ input CustomerCreateInput {
 
   """The URL of the customer's logo."""
   logoUrl: String
+
+  """
+  The main source of the customer, for customers with multiple sources. Must be one of externalIds.
+  """
+  mainSourceId: String
 }
 
 type CustomerEdge {
@@ -6505,6 +6510,11 @@ type Issue implements Node {
   """The time until an issue will be snoozed in Triage view."""
   snoozedUntilAt: DateTime
 
+  """
+  [Internal] The time at which the most recent suggestions for this issue were generated.
+  """
+  suggestionsGeneratedAt: DateTime
+
   """[Internal] The activity summary information for this issue."""
   activitySummary: JSONObject
 
@@ -8362,6 +8372,11 @@ type IssueSearchResult implements Node {
   """The time until an issue will be snoozed in Triage view."""
   snoozedUntilAt: DateTime
 
+  """
+  [Internal] The time at which the most recent suggestions for this issue were generated.
+  """
+  suggestionsGeneratedAt: DateTime
+
   """[Internal] The activity summary information for this issue."""
   activitySummary: JSONObject
 
@@ -8795,6 +8810,9 @@ input IssueSortInput {
 
   """Sort by number of important customers associated with the issue"""
   customerImportantCount: CustomerImportantCountSort
+
+  """Sort by the root issue"""
+  rootIssue: RootIssueSort
 }
 
 type IssueTitleSuggestionFromCustomerRequestPayload {
@@ -9544,7 +9562,7 @@ type Mutation {
   roadmapCreate(
     """The properties of the roadmap to create."""
     input: RoadmapCreateInput!
-  ): RoadmapPayload!
+  ): RoadmapPayload! @deprecated(reason: "Roadmaps are deprecated, use initiatives instead.")
 
   """Updates a roadmap."""
   roadmapUpdate(
@@ -9553,25 +9571,25 @@ type Mutation {
 
     """The identifier of the roadmap to update."""
     id: String!
-  ): RoadmapPayload!
+  ): RoadmapPayload! @deprecated(reason: "Roadmaps are deprecated, use initiatives instead.")
 
   """Archives a roadmap."""
   roadmapArchive(
     """The identifier of the roadmap to archive."""
     id: String!
-  ): RoadmapArchivePayload!
+  ): RoadmapArchivePayload! @deprecated(reason: "Roadmaps are deprecated, use initiatives instead.")
 
   """Unarchives a roadmap."""
   roadmapUnarchive(
     """The identifier of the roadmap to unarchive."""
     id: String!
-  ): RoadmapArchivePayload!
+  ): RoadmapArchivePayload! @deprecated(reason: "Roadmaps are deprecated, use initiatives instead.")
 
   """Deletes a roadmap."""
   roadmapDelete(
     """The identifier of the roadmap to delete."""
     id: String!
-  ): DeletePayload!
+  ): DeletePayload! @deprecated(reason: "Roadmaps are deprecated, use initiatives instead.")
 
   """Create CSV export report for the organization."""
   createCsvExportReport(includePrivateTeamIds: [String!]): CreateCsvExportReportPayload!
@@ -18098,10 +18116,10 @@ type Query {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
-  ): RoadmapConnection!
+  ): RoadmapConnection! @deprecated(reason: "Roadmaps are deprecated, use initiatives instead.")
 
   """One specific roadmap."""
-  roadmap(id: String!): Roadmap!
+  roadmap(id: String!): Roadmap! @deprecated(reason: "Roadmaps are deprecated, use initiatives instead.")
 
   """The status of the rate limiter."""
   rateLimitStatus: RateLimitPayload!
@@ -19928,6 +19946,18 @@ input RoadmapUpdateInput {
 
   """The roadmap's color."""
   color: String
+}
+
+"""Issue root-issue sorting options."""
+input RootIssueSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+
+  """The sort to apply to the root issues"""
+  sort: IssueSortInput!
 }
 
 """[ALPHA] Payload returned by semantic search."""
