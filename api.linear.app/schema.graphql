@@ -2289,6 +2289,9 @@ type CustomView implements Node {
   """The filter applied to projects in the custom view."""
   projectFilterData: JSONObject
 
+  """The filter applied to feed items in the custom view."""
+  feedItemFilterData: JSONObject
+
   """Whether the custom view is shared with everyone in the organization."""
   shared: Boolean!
 
@@ -3788,6 +3791,9 @@ type EmailIntakeAddress implements Node {
   """Whether the email address is enabled."""
   enabled: Boolean!
 
+  """Whether email replies are enabled."""
+  repliesEnabled: Boolean!
+
   """The template that the email address is associated with."""
   template: Template
 
@@ -3834,7 +3840,10 @@ input EmailIntakeAddressUpdateInput {
   Whether the email address is currently enabled. If set to false, the email
   address will be disabled and no longer accept incoming emails.
   """
-  enabled: Boolean!
+  enabled: Boolean
+
+  """Whether email replies are enabled."""
+  repliesEnabled: Boolean
 }
 
 input EmailUnsubscribeInput {
@@ -4223,6 +4232,9 @@ type Facet implements Node {
 
   """The owning initiative."""
   sourceInitiative: Initiative
+
+  """The owning feed user."""
+  sourceFeedUser: User
 
   """The owning page."""
   sourcePage: FacetPageSource
@@ -17970,9 +17982,6 @@ type Query {
     """Search string to look for."""
     term: String!
 
-    """Size of search snippet to return (default: 100)"""
-    snippetSize: Float
-
     """Should associated comments be searched (default: false)."""
     includeComments: Boolean
 
@@ -18008,9 +18017,6 @@ type Query {
 
     """Search string to look for."""
     term: String!
-
-    """Size of search snippet to return (default: 100)"""
-    snippetSize: Float
 
     """Should associated comments be searched (default: false)."""
     includeComments: Boolean
@@ -18050,9 +18056,6 @@ type Query {
 
     """Search string to look for."""
     term: String!
-
-    """Size of search snippet to return (default: 100)"""
-    snippetSize: Float
 
     """Should associated comments be searched (default: false)."""
     includeComments: Boolean
