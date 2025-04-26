@@ -25037,6 +25037,12 @@
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "feed",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "possibleTypes": null
@@ -52358,9 +52364,17 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,
@@ -70810,6 +70824,16 @@
             "description": "Manually update Google Sheets data.",
             "args": [
               {
+                "name": "type",
+                "description": "The type of export.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
                 "name": "id",
                 "description": "The identifier of the Google Sheets integration to update.",
                 "type": {
@@ -82878,6 +82902,16 @@
               "ofType": null
             },
             "defaultValue": null
+          },
+          {
+            "name": "aiAddonEnabled",
+            "description": "[INTERNAL] Whether the organization has enabled the AI add-on.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -86944,49 +86978,118 @@
         "inputFields": [
           {
             "name": "spreadsheetId",
-            "description": null,
+            "description": "[Deprecated] The ID of the exported Google Sheet.",
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "defaultValue": null
           },
           {
             "name": "spreadsheetUrl",
-            "description": null,
+            "description": "[Deprecated] The URL of the exported Google Sheet.",
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "defaultValue": null
           },
           {
             "name": "sheetId",
-            "description": null,
+            "description": "[Deprecated] The ID of the target sheet (tab) within the Google Sheet.",
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
             },
             "defaultValue": null
           },
           {
             "name": "updatedIssuesAt",
-            "description": null,
+            "description": "[Deprecated] The date of the most recent export.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "issue",
+            "description": "The export settings for issues.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "GoogleSheetsExportSettings",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "project",
+            "description": "The export settings for projects.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "GoogleSheetsExportSettings",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "GoogleSheetsExportSettings",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "enabled",
+            "description": "Whether the export is enabled.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "spreadsheetId",
+            "description": "The ID of the exported Google Sheet.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "spreadsheetUrl",
+            "description": "The URL of the exported Google Sheet.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "sheetId",
+            "description": "The ID of the target sheet (tab) within the Google Sheet.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "The date of the most recent export.",
             "type": {
               "kind": "SCALAR",
               "name": "DateTime",
@@ -93509,12 +93612,159 @@
             "defaultValue": null
           },
           {
+            "name": "feedItemFilterData",
+            "description": "The feed item filter applied to issues in the custom view.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "FeedItemFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "shared",
             "description": "Whether the custom view is shared with everyone in the organization.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
               "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "FeedItemFilter",
+        "description": "Feed item filtering options",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "author",
+            "description": "Filters that the feed item author must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updateType",
+            "description": "Comparator for the update type: initiative, project",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updateHealth",
+            "description": "Comparator for the project or initiative update health: onTrack, atRisk, offTrack",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectUpdate",
+            "description": "Filters that the feed item's project update must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectUpdateFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "relatedInitiatives",
+            "description": "Filters that the related feed item initiatives must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "InitiativeCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "relatedTeams",
+            "description": "Filters that the related feed item team must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "TeamCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the feed item.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "FeedItemFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the feed item.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "FeedItemFilter",
+                  "ofType": null
+                }
+              }
             },
             "defaultValue": null
           }
@@ -93625,6 +93875,16 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "ProjectFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "feedItemFilterData",
+            "description": "The feed item filter applied to issues in the custom view.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "FeedItemFilter",
               "ofType": null
             },
             "defaultValue": null

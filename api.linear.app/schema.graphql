@@ -202,7 +202,7 @@ type ArchiveResponse {
   """
   Whether the dependencies for the model objects are included in the archive.
   """
-  includesDependencies: Boolean!
+  includesDependencies: [String!]!
 }
 
 type AsksChannelConnectPayload {
@@ -2419,6 +2419,9 @@ input CustomViewCreateInput {
   """The project filter applied to issues in the custom view."""
   projectFilterData: ProjectFilter
 
+  """The feed item filter applied to issues in the custom view."""
+  feedItemFilterData: FeedItemFilter
+
   """Whether the custom view is shared with everyone in the organization."""
   shared: Boolean
 }
@@ -2558,6 +2561,9 @@ input CustomViewUpdateInput {
 
   """The project filter applied to issues in the custom view."""
   projectFilterData: ProjectFilter
+
+  """The feed item filter applied to issues in the custom view."""
+  feedItemFilterData: FeedItemFilter
 
   """Whether the custom view is shared with everyone in the organization."""
   shared: Boolean
@@ -4246,6 +4252,7 @@ type Facet implements Node {
 enum FacetPageSource {
   projects
   teamIssues
+  feed
 }
 
 """User favorites presented in the sidebar."""
@@ -4481,6 +4488,44 @@ input FavoriteUpdateInput {
 
   """The name of the favorite folder."""
   folderName: String
+}
+
+"""Feed item filtering options"""
+input FeedItemFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Filters that the feed item author must satisfy."""
+  author: UserFilter
+
+  """Comparator for the update type: initiative, project"""
+  updateType: StringComparator
+
+  """
+  Comparator for the project or initiative update health: onTrack, atRisk, offTrack
+  """
+  updateHealth: StringComparator
+
+  """Filters that the feed item's project update must satisfy."""
+  projectUpdate: ProjectUpdateFilter
+
+  """Filters that the related feed item initiatives must satisfy."""
+  relatedInitiatives: InitiativeCollectionFilter
+
+  """Filters that the related feed item team must satisfy."""
+  relatedTeams: TeamCollectionFilter
+
+  """Compound filters, all of which need to be matched by the feed item."""
+  and: [FeedItemFilter!]
+
+  """Compound filters, one of which need to be matched by the feed item."""
+  or: [FeedItemFilter!]
 }
 
 """Cadence to generate feed summary"""
@@ -4878,11 +4923,41 @@ enum GitLinkKind {
   links
 }
 
+input GoogleSheetsExportSettings {
+  """Whether the export is enabled."""
+  enabled: Boolean
+
+  """The ID of the exported Google Sheet."""
+  spreadsheetId: String
+
+  """The URL of the exported Google Sheet."""
+  spreadsheetUrl: String
+
+  """The ID of the target sheet (tab) within the Google Sheet."""
+  sheetId: Float
+
+  """The date of the most recent export."""
+  updatedAt: DateTime
+}
+
 input GoogleSheetsSettingsInput {
-  spreadsheetId: String!
-  spreadsheetUrl: String!
-  sheetId: Float!
+  """[Deprecated] The ID of the exported Google Sheet."""
+  spreadsheetId: String
+
+  """[Deprecated] The URL of the exported Google Sheet."""
+  spreadsheetUrl: String
+
+  """[Deprecated] The ID of the target sheet (tab) within the Google Sheet."""
+  sheetId: Float
+
+  """[Deprecated] The date of the most recent export."""
   updatedIssuesAt: DateTime
+
+  """The export settings for issues."""
+  issue: GoogleSheetsExportSettings
+
+  """The export settings for projects."""
+  project: GoogleSheetsExportSettings
 }
 
 input GoogleUserAccountAuthInput {
@@ -10748,6 +10823,9 @@ type Mutation {
 
   """Manually update Google Sheets data."""
   refreshGoogleSheetsData(
+    """The type of export."""
+    type: String
+
     """The identifier of the Google Sheets integration to update."""
     id: String!
   ): IntegrationPayload!
@@ -14149,6 +14227,9 @@ input OrganizationUpdateInput {
 
   """Default schedule for how often feed summaries are generated."""
   defaultFeedSummarySchedule: FeedSummarySchedule
+
+  """[INTERNAL] Whether the organization has enabled the AI add-on."""
+  aiAddonEnabled: Boolean
 }
 
 """Customer owner sorting options."""
