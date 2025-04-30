@@ -5252,6 +5252,9 @@ input InitiativeCollectionFilter {
   """
   healthWithAge: StringComparator
 
+  """Filters that the initiative must be an ancestor of."""
+  ancestors: InitiativeCollectionFilter
+
   """Compound filters, all of which need to be matched by the initiative."""
   and: [InitiativeCollectionFilter!]
 
@@ -5352,6 +5355,9 @@ input InitiativeFilter {
   Comparator for the initiative health (with age): onTrack, atRisk, offTrack, outdated, noUpdate
   """
   healthWithAge: StringComparator
+
+  """Filters that the initiative must be an ancestor of."""
+  ancestors: InitiativeCollectionFilter
 
   """Compound filters, all of which need to be matched by the initiative."""
   and: [InitiativeFilter!]
@@ -7890,6 +7896,9 @@ type IssueLabel implements Node {
 
   """The label's color as a HEX string."""
   color: String!
+
+  """Whether this label is considered to be a group."""
+  isGroup: Boolean!
   organization: Organization! @deprecated(reason: "Workspace labels are identified by their team being null.")
 
   """
@@ -7965,9 +7974,6 @@ type IssueLabel implements Node {
     """
     orderBy: PaginationOrderBy
   ): IssueLabelConnection!
-
-  """Whether this label is considered to be a group."""
-  isGroup: Boolean!
 }
 
 """Issue label filtering options."""
@@ -14555,6 +14561,16 @@ input PrioritySort {
   noPriorityFirst: Boolean = false
 }
 
+"""
+[Internal] The scope of product intelligence suggestion data for a team.
+"""
+enum ProductIntelligenceScope {
+  workspace
+  teamHierarchy
+  team
+  none
+}
+
 """A project."""
 type Project implements Node {
   """The unique identifier of the entity."""
@@ -17389,6 +17405,9 @@ input ProjectUpdateInput {
   The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
   """
   priority: Int
+
+  """The identifiers of the project labels associated with this project."""
+  labelIds: [String!]
 }
 
 type ProjectUpdatePayload {
@@ -21453,6 +21472,11 @@ input TeamCreateInput {
 
   """The parent team ID."""
   parentId: String
+
+  """
+  [Internal] The scope of product intelligence suggestion data for the team.
+  """
+  productIntelligenceScope: ProductIntelligenceScope
 }
 
 type TeamEdge {
@@ -21815,6 +21839,11 @@ input TeamUpdateInput {
   [Internal] Whether the team should inherit workflow statuses from its parent.
   """
   inheritWorkflowStatuses: Boolean
+
+  """
+  [Internal] The scope of product intelligence suggestion data for the team.
+  """
+  productIntelligenceScope: ProductIntelligenceScope
 }
 
 """A template object used for creating entities faster."""
