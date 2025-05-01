@@ -8911,6 +8911,9 @@ input IssueSortInput {
 
   """Sort by the root issue"""
   rootIssue: RootIssueSort
+
+  """[ALPHA] Sort by number of links associated with the issue"""
+  linkCount: LinkCountSort
 }
 
 type IssueTitleSuggestionFromCustomerRequestPayload {
@@ -9220,6 +9223,15 @@ input LaunchDarklySettingsInput {
 
   """The environment of the LaunchDarkly integration."""
   environment: String!
+}
+
+"""[ALPHA] Issue link count sorting options."""
+input LinkCountSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
 }
 
 type LogoutResponse {
@@ -23570,6 +23582,9 @@ input WorkflowStateSort {
 
   """The order for the individual sort"""
   order: PaginationSortOrder
+
+  """Whether to sort closed issues by recency"""
+  closedIssuesOrderedByRecency: Boolean = false
 }
 
 input WorkflowStateUpdateInput {
