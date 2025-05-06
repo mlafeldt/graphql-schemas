@@ -3180,6 +3180,93 @@
             "deprecationReason": null
           },
           {
+            "name": "projectLabels",
+            "description": "[Internal] Project labels associated with the organization.",
+            "args": [
+              {
+                "name": "filter",
+                "description": "Filter returned project labels.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectLabelFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "A cursor to be used with last for backward pagination.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "after",
+                "description": "A cursor to be used with first for forward pagination",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "The number of items to forward paginate (used with after). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "The number of items to backward paginate (used with before). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeArchived",
+                "description": "Should archived resources be included (default: false)",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt.",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "PaginationOrderBy",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectLabelConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "customerCount",
             "description": "Number of customers in the organization.",
             "args": [],
@@ -9481,6 +9568,16 @@
             "name": "labels",
             "description": "[Internal] Labels associated with this project.",
             "args": [
+              {
+                "name": "filter",
+                "description": "Filter returned project labels.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectLabelFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
               {
                 "name": "before",
                 "description": "A cursor to be used with last for backward pagination.",
@@ -17010,6 +17107,16 @@
             "defaultValue": null
           },
           {
+            "name": "isGroup",
+            "description": "Comparator for whether the label is a group label.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "BooleanComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "creator",
             "description": "Filters that the issue labels creator must satisfy.",
             "type": {
@@ -17289,6 +17396,16 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "isGroup",
+            "description": "Comparator for whether the label is a group label.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "BooleanComparator",
               "ofType": null
             },
             "defaultValue": null
@@ -30928,6 +31045,123 @@
             "ofType": null
           }
         ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectLabelFilter",
+        "description": "[Internal] Project label filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "Comparator for the name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "isGroup",
+            "description": "Comparator for whether the label is a group label.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "BooleanComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "creator",
+            "description": "Filters that the project labels creator must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableUserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "parent",
+            "description": "Filters that the project label's parent label must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectLabelFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the label.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectLabelFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the label.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectLabelFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },
@@ -54117,6 +54351,16 @@
             "name": "labels",
             "description": "[Internal] Labels associated with this project.",
             "args": [
+              {
+                "name": "filter",
+                "description": "Filter returned project labels.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectLabelFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
               {
                 "name": "before",
                 "description": "A cursor to be used with last for backward pagination.",
@@ -91712,6 +91956,22 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "customerRequestsEnabled",
+            "description": "Whether issues created from that email address will be turned into customer requests.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -91785,6 +92045,16 @@
           {
             "name": "repliesEnabled",
             "description": "Whether email replies are enabled.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "customerRequestsEnabled",
+            "description": "Whether customer requests are enabled.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
