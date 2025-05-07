@@ -12955,6 +12955,16 @@
             "defaultValue": null
           },
           {
+            "name": "labels",
+            "description": "[Internal] Filters that project labels must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectLabelCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "searchableContent",
             "description": "[Internal] Comparator for the project's content.",
             "type": {
@@ -13957,6 +13967,16 @@
             "defaultValue": null
           },
           {
+            "name": "labels",
+            "description": "[Internal] Filters that project labels must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectLabelCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "searchableContent",
             "description": "[Internal] Comparator for the project's content.",
             "type": {
@@ -14416,26 +14436,142 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "ContentComparator",
-        "description": "[Internal] Comparator for content.",
+        "name": "ProjectLabelCollectionFilter",
+        "description": "Project label filtering options.",
         "fields": null,
         "inputFields": [
           {
-            "name": "contains",
-            "description": "[Internal] Contains constraint.",
+            "name": "id",
+            "description": "Comparator for the identifier.",
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
               "ofType": null
             },
             "defaultValue": null
           },
           {
-            "name": "notContains",
-            "description": "[Internal] Not-contains constraint.",
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "Comparator for the name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "isGroup",
+            "description": "Comparator for whether the label is a group label.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "BooleanComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "creator",
+            "description": "Filters that the project labels creator must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableUserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "parent",
+            "description": "Filters that the project label's parent label must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectLabelFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the label.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectLabelCollectionFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the label.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectLabelCollectionFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "some",
+            "description": "Filters that needs to be matched by some project labels.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectLabelCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "every",
+            "description": "Filters that needs to be matched by all project labels.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectLabelFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "length",
+            "description": "Comparator for the collection length.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NumberComparator",
               "ofType": null
             },
             "defaultValue": null
@@ -14447,125 +14583,8 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "NullableDateComparator",
-        "description": "Comparator for optional dates.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "eq",
-            "description": "Equals constraint.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTimeOrDuration",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "neq",
-            "description": "Not-equals constraint.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTimeOrDuration",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "in",
-            "description": "In-array constraint.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "DateTimeOrDuration",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "nin",
-            "description": "Not-in-array constraint.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "DateTimeOrDuration",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "null",
-            "description": "Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "lt",
-            "description": "Less-than constraint. Matches any values that are less than the given value.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTimeOrDuration",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "lte",
-            "description": "Less-than-or-equal constraint. Matches any values that are less than or equal to the given value.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTimeOrDuration",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "gt",
-            "description": "Greater-than constraint. Matches any values that are greater than the given value.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTimeOrDuration",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "gte",
-            "description": "Greater-than-or-equal constraint. Matches any values that are greater than or equal to the given value.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTimeOrDuration",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "RelationExistsComparator",
-        "description": "Comparator for relation existence.",
+        "name": "BooleanComparator",
+        "description": "Comparator for booleans.",
         "fields": null,
         "inputFields": [
           {
@@ -14595,211 +14614,7 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "ProjectUpdatesCollectionFilter",
-        "description": "Collection filtering options for filtering projects by project updates.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "Comparator for the identifier.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Comparator for the created at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "Comparator for the updated at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "health",
-            "description": "Comparator for the project update health.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "and",
-            "description": "Compound filters, all of which need to be matched by the project update.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectUpdatesCollectionFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "or",
-            "description": "Compound filters, one of which need to be matched by the update.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectUpdatesCollectionFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "some",
-            "description": "Filters that needs to be matched by some updates.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectUpdatesFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "every",
-            "description": "Filters that needs to be matched by all updates.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectUpdatesFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "length",
-            "description": "Comparator for the collection length.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NumberComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ProjectUpdatesFilter",
-        "description": "Options for filtering projects by project updates.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "Comparator for the identifier.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Comparator for the created at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "Comparator for the updated at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "health",
-            "description": "Comparator for the project update health.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "and",
-            "description": "Compound filters, all of which need to be matched by the project updates.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectUpdatesFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "or",
-            "description": "Compound filters, one of which need to be matched by the project updates.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectUpdatesFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "UserFilter",
+        "name": "NullableUserFilter",
         "description": "User filtering options.",
         "fields": null,
         "inputFields": [
@@ -14924,6 +14739,16 @@
             "defaultValue": null
           },
           {
+            "name": "null",
+            "description": "Filter based on the existence of the relation.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "and",
             "description": "Compound filters, all of which need to be matched by the user.",
             "type": {
@@ -14934,7 +14759,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "INPUT_OBJECT",
-                  "name": "UserFilter",
+                  "name": "NullableUserFilter",
                   "ofType": null
                 }
               }
@@ -14952,41 +14777,10 @@
                 "name": null,
                 "ofType": {
                   "kind": "INPUT_OBJECT",
-                  "name": "UserFilter",
+                  "name": "NullableUserFilter",
                   "ofType": null
                 }
               }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "BooleanComparator",
-        "description": "Comparator for booleans.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "eq",
-            "description": "Equals constraint.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "neq",
-            "description": "Not equals constraint.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
             },
             "defaultValue": null
           }
@@ -15452,6 +15246,46 @@
             "defaultValue": null
           },
           {
+            "name": "leadTime",
+            "description": "[Internal] Lead time (created -> completed) comparator.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDurationComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "cycleTime",
+            "description": "[Internal] Cycle time (started -> completed) comparator.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDurationComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "ageTime",
+            "description": "[Internal] Age (created -> now) comparator, defined if the issue is still open.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDurationComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "triageTime",
+            "description": "[Internal] Triage time (entered triaged -> triaged) comparator.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDurationComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "and",
             "description": "Compound filters, all of which need to be matched by the issue.",
             "type": {
@@ -15874,6 +15708,123 @@
       },
       {
         "kind": "INPUT_OBJECT",
+        "name": "NullableDateComparator",
+        "description": "Comparator for optional dates.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "eq",
+            "description": "Equals constraint.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTimeOrDuration",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "neq",
+            "description": "Not-equals constraint.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTimeOrDuration",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "in",
+            "description": "In-array constraint.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "DateTimeOrDuration",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "nin",
+            "description": "Not-in-array constraint.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "DateTimeOrDuration",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "null",
+            "description": "Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "lt",
+            "description": "Less-than constraint. Matches any values that are less than the given value.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTimeOrDuration",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "lte",
+            "description": "Less-than-or-equal constraint. Matches any values that are less than or equal to the given value.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTimeOrDuration",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "gt",
+            "description": "Greater-than constraint. Matches any values that are greater than the given value.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTimeOrDuration",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "gte",
+            "description": "Greater-than-or-equal constraint. Matches any values that are greater than or equal to the given value.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTimeOrDuration",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
         "name": "CyclePeriodComparator",
         "description": "Comparator for period when issue was added to a cycle.",
         "fields": null,
@@ -16101,183 +16052,6 @@
         "description": "Represents a date in ISO 8601 format or a duration. Accepts shortcuts like `2021` to represent midnight Fri Jan 01 2021. Also accepts ISO 8601 durations strings (e.g '-P2W1D'), which are not converted to dates.",
         "fields": null,
         "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "NullableUserFilter",
-        "description": "User filtering options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "Comparator for the identifier.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Comparator for the created at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "Comparator for the updated at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "name",
-            "description": "Comparator for the user's name.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "displayName",
-            "description": "Comparator for the user's display name.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "email",
-            "description": "Comparator for the user's email.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "active",
-            "description": "Comparator for the user's activity status.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "BooleanComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "assignedIssues",
-            "description": "Filters that the users assigned issues must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IssueCollectionFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "admin",
-            "description": "Comparator for the user's admin status.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "BooleanComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "invited",
-            "description": "Comparator for the user's invited status.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "BooleanComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "app",
-            "description": "Comparator for the user's app status.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "BooleanComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "isMe",
-            "description": "Filter based on the currently authenticated user. Set to true to filter for the authenticated user, false for any other user.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "BooleanComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "null",
-            "description": "Filter based on the existence of the relation.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "and",
-            "description": "Compound filters, all of which need to be matched by the user.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "NullableUserFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "or",
-            "description": "Compound filters, one of which need to be matched by the user.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "NullableUserFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          }
-        ],
         "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
@@ -17010,6 +16784,46 @@
             "defaultValue": null
           },
           {
+            "name": "leadTime",
+            "description": "[Internal] Lead time (created -> completed) comparator.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDurationComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "cycleTime",
+            "description": "[Internal] Cycle time (started -> completed) comparator.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDurationComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "ageTime",
+            "description": "[Internal] Age (created -> now) comparator, defined if the issue is still open.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDurationComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "triageTime",
+            "description": "[Internal] Triage time (entered triaged -> triaged) comparator.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDurationComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "null",
             "description": "Filter based on the existence of the relation.",
             "type": {
@@ -17670,6 +17484,173 @@
               "kind": "INPUT_OBJECT",
               "name": "NumberComparator",
               "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "UserFilter",
+        "description": "User filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "Comparator for the user's name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "displayName",
+            "description": "Comparator for the user's display name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "email",
+            "description": "Comparator for the user's email.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "active",
+            "description": "Comparator for the user's activity status.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "BooleanComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "assignedIssues",
+            "description": "Filters that the users assigned issues must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IssueCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "admin",
+            "description": "Comparator for the user's admin status.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "BooleanComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "invited",
+            "description": "Comparator for the user's invited status.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "BooleanComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "app",
+            "description": "Comparator for the user's app status.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "BooleanComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "isMe",
+            "description": "Filter based on the currently authenticated user. Set to true to filter for the authenticated user, false for any other user.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "BooleanComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the user.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "UserFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the user.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "UserFilter",
+                  "ofType": null
+                }
+              }
             },
             "defaultValue": null
           }
@@ -19429,6 +19410,16 @@
             "defaultValue": null
           },
           {
+            "name": "labels",
+            "description": "[Internal] Filters that project labels must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectLabelCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "searchableContent",
             "description": "[Internal] Comparator for the project's content.",
             "type": {
@@ -19738,6 +19729,272 @@
                 "ofType": {
                   "kind": "INPUT_OBJECT",
                   "name": "NullableProjectFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ContentComparator",
+        "description": "[Internal] Comparator for content.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "contains",
+            "description": "[Internal] Contains constraint.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "notContains",
+            "description": "[Internal] Not-contains constraint.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "RelationExistsComparator",
+        "description": "Comparator for relation existence.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "eq",
+            "description": "Equals constraint.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "neq",
+            "description": "Not equals constraint.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectUpdatesCollectionFilter",
+        "description": "Collection filtering options for filtering projects by project updates.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "health",
+            "description": "Comparator for the project update health.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the project update.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectUpdatesCollectionFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the update.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectUpdatesCollectionFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "some",
+            "description": "Filters that needs to be matched by some updates.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectUpdatesFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "every",
+            "description": "Filters that needs to be matched by all updates.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectUpdatesFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "length",
+            "description": "Comparator for the collection length.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NumberComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectUpdatesFilter",
+        "description": "Options for filtering projects by project updates.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "health",
+            "description": "Comparator for the project update health.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the project updates.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectUpdatesFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the project updates.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectUpdatesFilter",
                   "ofType": null
                 }
               }
@@ -22218,6 +22475,133 @@
       },
       {
         "kind": "INPUT_OBJECT",
+        "name": "NullableDurationComparator",
+        "description": "Nullable comparator for optional durations.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "eq",
+            "description": "Equals constraint.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Duration",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "neq",
+            "description": "Not-equals constraint.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Duration",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "in",
+            "description": "In-array constraint.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Duration",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "nin",
+            "description": "Not-in-array constraint.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Duration",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "null",
+            "description": "Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "lt",
+            "description": "Less-than constraint. Matches any values that are less than the given value.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Duration",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "lte",
+            "description": "Less-than-or-equal constraint. Matches any values that are less than or equal to the given value.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Duration",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "gt",
+            "description": "Greater-than constraint. Matches any values that are greater than the given value.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Duration",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "gte",
+            "description": "Greater-than-or-equal constraint. Matches any values that are greater than or equal to the given value.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Duration",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "SCALAR",
+        "name": "Duration",
+        "description": "Represents a duration in ISO 8601 format. Accepts ISO 8601 duration strings or integers in milliseconds.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
         "name": "IssueFilter",
         "description": "Issue filtering options.",
         "fields": null,
@@ -22673,6 +23057,46 @@
             "defaultValue": null
           },
           {
+            "name": "leadTime",
+            "description": "[Internal] Lead time (created -> completed) comparator.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDurationComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "cycleTime",
+            "description": "[Internal] Cycle time (started -> completed) comparator.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDurationComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "ageTime",
+            "description": "[Internal] Age (created -> now) comparator, defined if the issue is still open.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDurationComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "triageTime",
+            "description": "[Internal] Triage time (entered triaged -> triaged) comparator.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDurationComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "and",
             "description": "Compound filters, all of which need to be matched by the issue.",
             "type": {
@@ -22702,6 +23126,123 @@
                 "ofType": {
                   "kind": "INPUT_OBJECT",
                   "name": "IssueFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectLabelFilter",
+        "description": "[Internal] Project label filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "Comparator for the name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "isGroup",
+            "description": "Comparator for whether the label is a group label.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "BooleanComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "creator",
+            "description": "Filters that the project labels creator must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableUserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "parent",
+            "description": "Filters that the project label's parent label must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectLabelFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the label.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectLabelFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the label.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectLabelFilter",
                   "ofType": null
                 }
               }
@@ -31045,123 +31586,6 @@
             "ofType": null
           }
         ],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ProjectLabelFilter",
-        "description": "[Internal] Project label filtering options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "Comparator for the identifier.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Comparator for the created at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "Comparator for the updated at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "name",
-            "description": "Comparator for the name.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "StringComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "isGroup",
-            "description": "Comparator for whether the label is a group label.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "BooleanComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "creator",
-            "description": "Filters that the project labels creator must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NullableUserFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "parent",
-            "description": "Filters that the project label's parent label must satisfy.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ProjectLabelFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "and",
-            "description": "Compound filters, all of which need to be matched by the label.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectLabelFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "or",
-            "description": "Compound filters, one of which need to be matched by the label.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectLabelFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },
