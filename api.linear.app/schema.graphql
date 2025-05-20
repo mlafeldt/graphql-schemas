@@ -6200,6 +6200,7 @@ input IntegrationSettingsInput {
   pagerDuty: PagerDutyInput
   launchDarkly: LaunchDarklySettingsInput
   jiraPersonal: JiraPersonalSettingsInput
+  salesforce: SalesforceSettingsInput
 }
 
 """The configuration of all integrations for different entities."""
@@ -10949,6 +10950,18 @@ type Mutation {
 
   """Enables Loom integration for the organization."""
   integrationLoom: IntegrationPayload! @deprecated(reason: "Not available.")
+
+  """Integrates the organization with Salesforce."""
+  integrationSalesforce(
+    """The Salesforce OAuth code."""
+    code: String!
+
+    """The Salesforce installation subdomain."""
+    subdomain: String!
+
+    """The Salesforce OAuth redirect URI."""
+    redirectUri: String!
+  ): IntegrationPayload!
 
   """Deletes an integration."""
   integrationDelete(
@@ -20308,6 +20321,40 @@ input RootIssueSort {
 
   """The sort to apply to the root issues"""
   sort: IssueSortInput!
+}
+
+input SalesforceSettingsInput {
+  """
+  Whether an internal message should be added when a Linear issue changes status
+  (for status types except completed or canceled).
+  """
+  sendNoteOnStatusChange: Boolean
+
+  """
+  Whether an internal message should be added when someone comments on an issue.
+  """
+  sendNoteOnComment: Boolean
+
+  """
+  Whether a ticket should be automatically reopened when its linked Linear issue is completed.
+  """
+  automateTicketReopeningOnCompletion: Boolean
+
+  """
+  Whether a ticket should be automatically reopened when its linked Linear issue is cancelled.
+  """
+  automateTicketReopeningOnCancellation: Boolean
+
+  """
+  Whether a ticket should be automatically reopened when a comment is posted on its linked Linear issue
+  """
+  automateTicketReopeningOnComment: Boolean
+
+  """The Salesforce subdomain."""
+  subdomain: String
+
+  """The Salesforce instance URL."""
+  url: String
 }
 
 """[ALPHA] Payload returned by semantic search."""
