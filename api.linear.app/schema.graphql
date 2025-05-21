@@ -281,6 +281,11 @@ type Attachment implements Node {
   """
   groupBySource: Boolean!
 
+  """
+  The issue this attachment was originally created on. Will be undefined if the attachment hasn't been moved.
+  """
+  originalIssue: Issue
+
   """The issue this attachment belongs to."""
   issue: Issue!
 
@@ -1482,6 +1487,11 @@ type CustomerNeed implements Node {
 
   """The creator of the customer need."""
   creator: User
+
+  """
+  The issue this customer need was originally created on. Will be undefined if the customer need hasn't been moved.
+  """
+  originalIssue: Issue
 
   """The URL of the underlying attachment, if any"""
   url: String
@@ -4161,6 +4171,50 @@ input EstimateSort {
 
   """The order for the individual sort"""
   order: PaginationSortOrder
+}
+
+"""Information about an external entity."""
+type ExternalEntityInfo {
+  """The id of the external entity."""
+  id: String!
+
+  """The name of the service this entity is synced with."""
+  service: ExternalSyncService!
+
+  """Metadata about the external entity."""
+  metadata: ExternalEntityInfoMetadata
+}
+
+"""Metadata about the external GitHub entity."""
+type ExternalEntityInfoGithubMetadata {
+  """The repository name."""
+  repo: String
+
+  """The owner of the repository."""
+  owner: String
+
+  """The number of the issue."""
+  number: Float
+}
+
+"""Metadata about the external Jira entity."""
+type ExternalEntityInfoJiraMetadata {
+  """The key of the Jira issue."""
+  issueKey: String
+
+  """The id of the Jira project."""
+  projectId: String
+
+  """The id of the Jira issue type."""
+  issueTypeId: String
+}
+
+union ExternalEntityInfoMetadata = ExternalEntityInfoGithubMetadata | ExternalEntityInfoJiraMetadata
+
+"""The service that syncs an external entity to Linear."""
+enum ExternalSyncService {
+  jira
+  github
 }
 
 """
@@ -6946,6 +7000,38 @@ type Issue implements Node {
     orderBy: PaginationOrderBy
   ): AttachmentConnection!
 
+  """
+  Attachments previously associated with the issue before being moved to another issue.
+  """
+  formerAttachments(
+    """Filter returned attachments."""
+    filter: AttachmentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AttachmentConnection!
+
   """The issue's description in markdown format."""
   description: String
 
@@ -6984,6 +7070,41 @@ type Issue implements Node {
     """
     orderBy: PaginationOrderBy
   ): CustomerNeedConnection!
+
+  """
+  Customer needs previously associated with the issue before being moved to another issue.
+  """
+  formerNeeds(
+    """Filter returned needs."""
+    filter: CustomerNeedFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CustomerNeedConnection!
+
+  """The external services the issue is synced with."""
+  syncedWith: [ExternalEntityInfo!]
 }
 
 """A generic payload return from entity archive mutations."""
@@ -8842,6 +8963,38 @@ type IssueSearchResult implements Node {
     orderBy: PaginationOrderBy
   ): AttachmentConnection!
 
+  """
+  Attachments previously associated with the issue before being moved to another issue.
+  """
+  formerAttachments(
+    """Filter returned attachments."""
+    filter: AttachmentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AttachmentConnection!
+
   """The issue's description in markdown format."""
   description: String
 
@@ -8880,6 +9033,41 @@ type IssueSearchResult implements Node {
     """
     orderBy: PaginationOrderBy
   ): CustomerNeedConnection!
+
+  """
+  Customer needs previously associated with the issue before being moved to another issue.
+  """
+  formerNeeds(
+    """Filter returned needs."""
+    filter: CustomerNeedFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CustomerNeedConnection!
+
+  """The external services the issue is synced with."""
+  syncedWith: [ExternalEntityInfo!]
 
   """Metadata related to search result."""
   metadata: JSONObject!
@@ -21766,6 +21954,11 @@ input TeamCreateInput {
   parentId: String
 
   """
+  [Internal] Whether the team should inherit its product intelligence scope from its parent. Only applies to sub-teams.
+  """
+  inheritProductIntelligenceScope: Boolean
+
+  """
   [Internal] The scope of product intelligence suggestion data for the team.
   """
   productIntelligenceScope: ProductIntelligenceScope
@@ -22134,6 +22327,11 @@ input TeamUpdateInput {
   [Internal] Whether the team should inherit workflow statuses from its parent.
   """
   inheritWorkflowStatuses: Boolean
+
+  """
+  [Internal] Whether the team should inherit its product intelligence scope from its parent. Only applies to sub-teams.
+  """
+  inheritProductIntelligenceScope: Boolean
 
   """
   [Internal] The scope of product intelligence suggestion data for the team.
