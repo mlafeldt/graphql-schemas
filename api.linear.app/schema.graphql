@@ -69,6 +69,9 @@ type ApiKey implements Node {
   is computed as the intersection of these requested groups with the user's base sync groups.
   """
   requestedSyncGroups: [String!]
+
+  """Organization the API key belongs to."""
+  organization: Organization!
 }
 
 type ApiKeyConnection {
@@ -4430,6 +4433,9 @@ type Favorite implements Node {
   """The favorited label."""
   label: IssueLabel
 
+  """[Internal] The favorited project label."""
+  projectLabel: ProjectLabel
+
   """The favorited user."""
   user: User
 
@@ -4517,6 +4523,9 @@ input FavoriteCreateInput {
 
   """The identifier of the label to favorite."""
   labelId: String
+
+  """[Internal] The identifier of the label to favorite."""
+  projectLabelId: String
 
   """The identifier of the user to favorite."""
   userId: String
@@ -5154,6 +5163,9 @@ type Initiative implements Node {
 
   """A flag that indicates whether the initiative is in the trash bin."""
   trashed: Boolean
+
+  """[Internal] Facets associated with the initiative."""
+  facets: [Facet!]!
 
   """The estimated completion date of the initiative."""
   targetDate: TimelessDate
@@ -13873,6 +13885,9 @@ type Organization implements Node {
   """Rolling 30-day total upload volume for the organization, in megabytes."""
   periodUploadVolume: Float!
 
+  """[Internal] Facets associated with the organization."""
+  facets: [Facet!]!
+
   """
   How git branches are formatted. If null, default formatting will be used.
   """
@@ -14599,6 +14614,9 @@ input OrganizationUpdateInput {
 
   """[INTERNAL] Whether the organization has enabled the AI add-on."""
   aiAddonEnabled: Boolean
+
+  """[INTERNAL] Whether the organization has enabled the member API keys."""
+  personalApiKeysEnabled: Boolean
 }
 
 """Customer owner sorting options."""
@@ -14990,6 +15008,9 @@ type Project implements Node {
 
   """The project lead."""
   lead: User
+
+  """[Internal] Facets associated with the project."""
+  facets: [Facet!]!
 
   """The time until which project update reminders are paused."""
   projectUpdateRemindersPausedUntilAt: DateTime
@@ -16825,6 +16846,9 @@ type ProjectSearchResult implements Node {
 
   """The project lead."""
   lead: User
+
+  """[Internal] Facets associated with the project."""
+  facets: [Facet!]!
 
   """The time until which project update reminders are paused."""
   projectUpdateRemindersPausedUntilAt: DateTime
