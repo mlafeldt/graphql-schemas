@@ -1819,6 +1819,20 @@ input CustomerNeedUpdateInput {
   attachmentUrl: String
 }
 
+type CustomerNeedUpdatePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The customer need that was created or updated."""
+  need: CustomerNeed!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The related customer needs that were updated."""
+  updatedRelatedNeeds: [CustomerNeed!]!
+}
+
 """A customer notification subscription."""
 type CustomerNotificationSubscription implements NotificationSubscription & Entity & Node {
   """The unique identifier of the entity."""
@@ -11617,7 +11631,7 @@ type Mutation {
 
     """The identifier of the customer need to update."""
     id: String!
-  ): CustomerNeedPayload!
+  ): CustomerNeedUpdatePayload!
 
   """Deletes a customer need."""
   customerNeedDelete(
