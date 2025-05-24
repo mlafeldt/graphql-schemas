@@ -5210,6 +5210,11 @@ type Initiative implements Node {
 
   """Projects associated with the initiative."""
   projects(
+    """
+    [ALPHA] Whether to include projects from sub-initiatives. Defaults to true.
+    """
+    includeSubInitiatives: Boolean
+
     """Filter returned projects."""
     filter: ProjectFilter
 
@@ -5294,6 +5299,36 @@ type Initiative implements Node {
     """
     orderBy: PaginationOrderBy
   ): InitiativeHistoryConnection!
+
+  """[ALPHA] Sub-initiatives associated with the initiative."""
+  subInitiatives(
+    """Filter returned sub-initiatives."""
+    filter: InitiativeFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): InitiativeConnection!
 
   """The initiative's content in markdown format."""
   content: String
@@ -7131,6 +7166,62 @@ type Issue implements Node {
 
   """The external services the issue is synced with."""
   syncedWith: [ExternalEntityInfo!]
+
+  """[Internal] Product intelligence suggestions for the issue."""
+  suggestions(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueSuggestionConnection!
+
+  """
+  [Internal] Incoming product intelligence relation suggestions for the issue.
+  """
+  incomingSuggestions(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueSuggestionConnection!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -9095,6 +9186,62 @@ type IssueSearchResult implements Node {
   """The external services the issue is synced with."""
   syncedWith: [ExternalEntityInfo!]
 
+  """[Internal] Product intelligence suggestions for the issue."""
+  suggestions(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueSuggestionConnection!
+
+  """
+  [Internal] Incoming product intelligence relation suggestions for the issue.
+  """
+  incomingSuggestions(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueSuggestionConnection!
+
   """Metadata related to search result."""
   metadata: JSONObject!
 }
@@ -9176,6 +9323,75 @@ input IssueSortInput {
 
   """[ALPHA] Sort by number of links associated with the issue"""
   linkCount: LinkCountSort
+}
+
+type IssueSuggestion implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+  issue: Issue!
+  issueId: String!
+  type: IssueSuggestionType!
+  state: IssueSuggestionState!
+  stateChangedAt: DateTime!
+  metadata: IssueSuggestionMetadata
+  suggestedIssue: Issue
+  suggestedIssueId: String
+  suggestedTeam: Team
+  suggestedProject: Project
+  suggestedUser: User
+  suggestedUserId: String
+  suggestedLabel: IssueLabel
+  suggestedLabelId: String
+}
+
+type IssueSuggestionConnection {
+  edges: [IssueSuggestionEdge!]!
+  nodes: [IssueSuggestion!]!
+  pageInfo: PageInfo!
+}
+
+type IssueSuggestionEdge {
+  node: IssueSuggestion!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type IssueSuggestionMetadata {
+  score: Float
+  classification: String
+  reasons: [String!]
+  evalLogId: String
+}
+
+enum IssueSuggestionState {
+  active
+  stale
+  accepted
+  dismissed
+}
+
+enum IssueSuggestionType {
+  team
+  project
+  assignee
+  label
+  similarIssue
+  relatedIssue
 }
 
 type IssueTitleSuggestionFromCustomerRequestPayload {
@@ -13982,6 +14198,9 @@ type Organization implements Node {
 
   """Whether team creation is restricted to admins."""
   restrictTeamCreationToAdmins: Boolean
+
+  """Whether label creation, update, and deletion is restricted to admins."""
+  restrictLabelManagementToAdmins: Boolean
 
   """[ALPHA] Theme settings for the organization."""
   themeSettings: JSONObject
