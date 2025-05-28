@@ -920,6 +920,9 @@ type Comment implements Node {
 
   """Reactions associated with the comment."""
   reactions: [Reaction!]!
+
+  """The external services the issue is synced with."""
+  syncedWith: [ExternalEntityInfo!]
 }
 
 """Comment filtering options."""
@@ -1988,7 +1991,7 @@ type CustomerStatus implements Node {
   color: String!
 
   """The type of the customer status."""
-  type: CustomerStatusType!
+  type: CustomerStatusType! @deprecated(reason: "Customer statuses are no longer grouped by type.")
 
   """Description of the status."""
   description: String
@@ -2001,6 +2004,25 @@ type CustomerStatusConnection {
   edges: [CustomerStatusEdge!]!
   nodes: [CustomerStatus!]!
   pageInfo: PageInfo!
+}
+
+input CustomerStatusCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The name of the status."""
+  name: String!
+
+  """The UI color of the status as a HEX string."""
+  color: String!
+
+  """Description of the status."""
+  description: String
+
+  """The position of the status in the workspace's customer flow."""
+  position: Float
 }
 
 type CustomerStatusEdge {
@@ -2047,6 +2069,17 @@ input CustomerStatusFilter {
   or: [CustomerStatusFilter!]
 }
 
+type CustomerStatusPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The customer status that was created or updated."""
+  status: CustomerStatus!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
 """Customer status sorting options."""
 input CustomerStatusSort {
   """Whether nulls should be sorted first or last"""
@@ -2060,6 +2093,20 @@ input CustomerStatusSort {
 enum CustomerStatusType {
   active
   inactive
+}
+
+input CustomerStatusUpdateInput {
+  """The name of the status."""
+  name: String
+
+  """The UI color of the status as a HEX string."""
+  color: String
+
+  """Description of the status."""
+  description: String
+
+  """The position of the status in the workspace's customer flow."""
+  position: Float
 }
 
 """A customer tier."""
@@ -3037,6 +3084,9 @@ type Dashboard implements Node {
 
   """The color of the icon of the dashboard."""
   color: String
+
+  """The sort order of the dashboard within the organization or its team."""
+  sortOrder: Float!
 
   """Whether the dashboard is shared with everyone in the organization."""
   shared: Boolean!
@@ -4226,12 +4276,25 @@ type ExternalEntityInfoJiraMetadata {
   issueTypeId: String
 }
 
-union ExternalEntityInfoMetadata = ExternalEntityInfoGithubMetadata | ExternalEntityInfoJiraMetadata
+union ExternalEntityInfoMetadata = ExternalEntityInfoGithubMetadata | ExternalEntityInfoJiraMetadata | ExternalEntitySlackMetadata
+
+"""Metadata about the external Slack entity."""
+type ExternalEntitySlackMetadata {
+  """The id of the Slack channel."""
+  channelId: String
+
+  """The name of the Slack channel."""
+  channelName: String
+
+  """The URL of the Slack message."""
+  messageUrl: String
+}
 
 """The service that syncs an external entity to Linear."""
 enum ExternalSyncService {
   jira
   github
+  slack
 }
 
 """
@@ -11785,6 +11848,27 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """Creates a new customer status."""
+  customerStatusCreate(
+    """The CustomerStatus object to create."""
+    input: CustomerStatusCreateInput!
+  ): CustomerStatusPayload!
+
+  """Updates a customer status."""
+  customerStatusUpdate(
+    """A partial CustomerStatus object to update the CustomerStatus with."""
+    input: CustomerStatusUpdateInput!
+
+    """The identifier of the customer status to update."""
+    id: String!
+  ): CustomerStatusPayload!
+
+  """Deletes a customer status."""
+  customerStatusDelete(
+    """The identifier of the customer status to delete."""
+    id: String!
+  ): DeletePayload!
+
   """Creates a new customer."""
   customerCreate(
     """The customer to create."""
@@ -14199,7 +14283,9 @@ type Organization implements Node {
   """Whether team creation is restricted to admins."""
   restrictTeamCreationToAdmins: Boolean
 
-  """Whether label creation, update, and deletion is restricted to admins."""
+  """
+  Whether workspace label creation, update, and deletion is restricted to admins.
+  """
   restrictLabelManagementToAdmins: Boolean
 
   """[ALPHA] Theme settings for the organization."""
@@ -14824,6 +14910,9 @@ input OrganizationUpdateInput {
 
   """Whether team creation is restricted to admins."""
   restrictTeamCreationToAdmins: Boolean
+
+  """Whether label creation is restricted to admins."""
+  restrictLabelManagementToAdmins: Boolean
 
   """
   IP restriction configurations controlling allowed access the workspace.
