@@ -200,6 +200,11 @@ type CannotDeleteProductionBranchError {
   query: Query!
 }
 
+type CannotUseInvitationsWithSso {
+  query: Query!
+}
+
+"""This type is deprecated. Use CannotUseInvitationWithSso instead."""
 type CannotUseInvitationsWithSSO {
   query: Query!
 }
@@ -287,6 +292,8 @@ type Deployment implements Node {
   finishedAt: DateTime
   id: ID!
   isRedeployable: Boolean!
+  message: String
+  schemaVersion: SchemaVersion
   startedAt: DateTime
   status: DeploymentStatus!
   steps: [DeploymentStep!]!
@@ -877,7 +884,7 @@ input InviteAcceptInput {
   id: ID!
 }
 
-union InviteAcceptPayload = AlreadyMemberError | CannotUseInvitationsWithSSO | InviteAcceptSuccess | InviteDoesNotExistError
+union InviteAcceptPayload = AlreadyMemberError | CannotUseInvitationsWithSSO | CannotUseInvitationsWithSso | InviteAcceptSuccess | InviteDoesNotExistError
 
 type InviteAcceptSuccess {
   member: Member!
@@ -936,7 +943,7 @@ input InviteSendInput {
   organizationId: ID!
 }
 
-union InviteSendPayload = CannotUseInvitationsWithSSO | InvalidEmailAddressError | InviteSendSuccess | NotAllowedToSendInvitesError | OrganizationDoesNotExistError
+union InviteSendPayload = CannotUseInvitationsWithSSO | CannotUseInvitationsWithSso | InvalidEmailAddressError | InviteSendSuccess | NotAllowedToSendInvitesError | OrganizationDoesNotExistError
 
 type InviteSendSuccess {
   invite: Invite!
