@@ -921,7 +921,7 @@ type Comment implements Node {
   """Reactions associated with the comment."""
   reactions: [Reaction!]!
 
-  """The external services the issue is synced with."""
+  """The external services the comment is synced with."""
   syncedWith: [ExternalEntityInfo!]
 }
 
@@ -1014,14 +1014,14 @@ input CommentCreateInput {
 
   """
   Create comment as a user with the provided name. This option is only available
-  to OAuth applications creating comments in `actor=application` mode.
+  to OAuth applications creating comments in `actor=app` mode.
   """
   createAsUser: String
 
   """
   Provide an external user avatar URL. Can only be used in conjunction with the
   `createAsUser` options. This option is only available to OAuth applications
-  creating comments in `actor=application` mode.
+  creating comments in `actor=app` mode.
   """
   displayIconUrl: String
 
@@ -1612,14 +1612,14 @@ input CustomerNeedCreateInput {
 
   """
   Create need as a user with the provided name. This option is only available to
-  OAuth applications creating needs in `actor=application` mode.
+  OAuth applications creating needs in `actor=app` mode.
   """
   createAsUser: String
 
   """
   Provide an external user avatar URL. Can only be used in conjunction with the
   `createAsUser` options. This option is only available to OAuth applications
-  creating needs in `actor=application` mode.
+  creating needs in `actor=app` mode.
   """
   displayIconUrl: String
 }
@@ -1991,7 +1991,7 @@ type CustomerStatus implements Node {
   color: String!
 
   """The type of the customer status."""
-  type: CustomerStatusType! @deprecated(reason: "Customer statuses are no longer grouped by type.")
+  type: CustomerStatusType @deprecated(reason: "Customer statuses are no longer grouped by type.")
 
   """Description of the status."""
   description: String
@@ -3108,9 +3108,6 @@ type Dashboard implements Node {
 
   """The filter applied to all dashboard widgets showing projects data."""
   projectFilter: JSONObject
-
-  """The layout of the widgets on the dashboard."""
-  layout: JSONObject!
 
   """The widgets on the dashboard."""
   widgets: JSONObject!
@@ -4280,6 +4277,9 @@ union ExternalEntityInfoMetadata = ExternalEntityInfoGithubMetadata | ExternalEn
 
 """Metadata about the external Slack entity."""
 type ExternalEntitySlackMetadata {
+  """Whether the entity originated from Slack (not Linear)."""
+  isFromSlack: Boolean!
+
   """The id of the Slack channel."""
   channelId: String
 
@@ -7566,14 +7566,14 @@ input IssueCreateInput {
 
   """
   Create issue as a user with the provided name. This option is only available
-  to OAuth applications creating issues in `actor=application` mode.
+  to OAuth applications creating issues in `actor=app` mode.
   """
   createAsUser: String
 
   """
   Provide an external user avatar URL. Can only be used in conjunction with the
   `createAsUser` options. This option is only available to OAuth applications
-  creating comments in `actor=application` mode.
+  creating comments in `actor=app` mode.
   """
   displayIconUrl: String
 
@@ -12132,14 +12132,14 @@ type Mutation {
   attachmentLinkURL(
     """
     Create attachment as a user with the provided name. This option is only
-    available to OAuth applications creating attachments in `actor=application` mode.
+    available to OAuth applications creating attachments in `actor=app` mode.
     """
     createAsUser: String
 
     """
     Provide an external user avatar URL. Can only be used in conjunction with
     the `createAsUser` options. This option is only available to OAuth
-    applications creating comments in `actor=application` mode.
+    applications creating comments in `actor=app` mode.
     """
     displayIconUrl: String
 
@@ -12160,14 +12160,14 @@ type Mutation {
   attachmentLinkGitLabMR(
     """
     Create attachment as a user with the provided name. This option is only
-    available to OAuth applications creating attachments in `actor=application` mode.
+    available to OAuth applications creating attachments in `actor=app` mode.
     """
     createAsUser: String
 
     """
     Provide an external user avatar URL. Can only be used in conjunction with
     the `createAsUser` options. This option is only available to OAuth
-    applications creating comments in `actor=application` mode.
+    applications creating comments in `actor=app` mode.
     """
     displayIconUrl: String
 
@@ -12196,14 +12196,14 @@ type Mutation {
   attachmentLinkGitHubIssue(
     """
     Create attachment as a user with the provided name. This option is only
-    available to OAuth applications creating attachments in `actor=application` mode.
+    available to OAuth applications creating attachments in `actor=app` mode.
     """
     createAsUser: String
 
     """
     Provide an external user avatar URL. Can only be used in conjunction with
     the `createAsUser` options. This option is only available to OAuth
-    applications creating comments in `actor=application` mode.
+    applications creating comments in `actor=app` mode.
     """
     displayIconUrl: String
 
@@ -12224,14 +12224,14 @@ type Mutation {
   attachmentLinkGitHubPR(
     """
     Create attachment as a user with the provided name. This option is only
-    available to OAuth applications creating attachments in `actor=application` mode.
+    available to OAuth applications creating attachments in `actor=app` mode.
     """
     createAsUser: String
 
     """
     Provide an external user avatar URL. Can only be used in conjunction with
     the `createAsUser` options. This option is only available to OAuth
-    applications creating comments in `actor=application` mode.
+    applications creating comments in `actor=app` mode.
     """
     displayIconUrl: String
 
@@ -12255,14 +12255,14 @@ type Mutation {
   attachmentLinkZendesk(
     """
     Create attachment as a user with the provided name. This option is only
-    available to OAuth applications creating attachments in `actor=application` mode.
+    available to OAuth applications creating attachments in `actor=app` mode.
     """
     createAsUser: String
 
     """
     Provide an external user avatar URL. Can only be used in conjunction with
     the `createAsUser` options. This option is only available to OAuth
-    applications creating comments in `actor=application` mode.
+    applications creating comments in `actor=app` mode.
     """
     displayIconUrl: String
 
@@ -12286,14 +12286,14 @@ type Mutation {
   attachmentLinkDiscord(
     """
     Create attachment as a user with the provided name. This option is only
-    available to OAuth applications creating attachments in `actor=application` mode.
+    available to OAuth applications creating attachments in `actor=app` mode.
     """
     createAsUser: String
 
     """
     Provide an external user avatar URL. Can only be used in conjunction with
     the `createAsUser` options. This option is only available to OAuth
-    applications creating comments in `actor=application` mode.
+    applications creating comments in `actor=app` mode.
     """
     displayIconUrl: String
 
@@ -12328,14 +12328,14 @@ type Mutation {
   attachmentLinkSlack(
     """
     Create attachment as a user with the provided name. This option is only
-    available to OAuth applications creating attachments in `actor=application` mode.
+    available to OAuth applications creating attachments in `actor=app` mode.
     """
     createAsUser: String
 
     """
     Provide an external user avatar URL. Can only be used in conjunction with
     the `createAsUser` options. This option is only available to OAuth
-    applications creating comments in `actor=application` mode.
+    applications creating comments in `actor=app` mode.
     """
     displayIconUrl: String
 
@@ -12361,14 +12361,14 @@ type Mutation {
   attachmentLinkFront(
     """
     Create attachment as a user with the provided name. This option is only
-    available to OAuth applications creating attachments in `actor=application` mode.
+    available to OAuth applications creating attachments in `actor=app` mode.
     """
     createAsUser: String
 
     """
     Provide an external user avatar URL. Can only be used in conjunction with
     the `createAsUser` options. This option is only available to OAuth
-    applications creating comments in `actor=application` mode.
+    applications creating comments in `actor=app` mode.
     """
     displayIconUrl: String
 
@@ -12389,14 +12389,14 @@ type Mutation {
   attachmentLinkIntercom(
     """
     Create attachment as a user with the provided name. This option is only
-    available to OAuth applications creating attachments in `actor=application` mode.
+    available to OAuth applications creating attachments in `actor=app` mode.
     """
     createAsUser: String
 
     """
     Provide an external user avatar URL. Can only be used in conjunction with
     the `createAsUser` options. This option is only available to OAuth
-    applications creating comments in `actor=application` mode.
+    applications creating comments in `actor=app` mode.
     """
     displayIconUrl: String
 
@@ -12420,14 +12420,14 @@ type Mutation {
   attachmentLinkJiraIssue(
     """
     Create attachment as a user with the provided name. This option is only
-    available to OAuth applications creating attachments in `actor=application` mode.
+    available to OAuth applications creating attachments in `actor=app` mode.
     """
     createAsUser: String
 
     """
     Provide an external user avatar URL. Can only be used in conjunction with
     the `createAsUser` options. This option is only available to OAuth
-    applications creating comments in `actor=application` mode.
+    applications creating comments in `actor=app` mode.
     """
     displayIconUrl: String
 
@@ -24038,6 +24038,7 @@ enum ViewType {
   backlog
   subIssues
   allIssues
+  dashboards
   customView
   customViews
   roadmapAll
