@@ -1990,14 +1990,14 @@ type CustomerStatus implements Node {
   """The UI color of the status as a HEX string."""
   color: String!
 
-  """The type of the customer status."""
-  type: CustomerStatusType @deprecated(reason: "Customer statuses are no longer grouped by type.")
-
   """Description of the status."""
   description: String
 
   """The position of the status in the workspace's customers flow."""
   position: Float!
+
+  """The type of the customer status."""
+  type: CustomerStatusType @deprecated(reason: "Customer statuses are no longer grouped by type.")
 }
 
 type CustomerStatusConnection {
@@ -2089,7 +2089,7 @@ input CustomerStatusSort {
   order: PaginationSortOrder
 }
 
-"""A type of customer status."""
+"""[DEPRECATED] A type of customer status."""
 enum CustomerStatusType {
   active
   inactive
@@ -11191,6 +11191,9 @@ type Mutation {
   """Disconnects the organization from Intercom."""
   integrationIntercomDelete: IntegrationPayload!
 
+  """[INTERNAL] Refreshes the customer data attributes from Intercom."""
+  integrationIntercomCustomerDataAttributesRefresh: IntegrationPayload!
+
   """[DEPRECATED] Updates settings on the Intercom integration."""
   integrationIntercomSettingsUpdate(
     """
@@ -13597,6 +13600,11 @@ input NullableProjectFilter {
   """
   healthWithAge: StringComparator
 
+  """
+  [ALPHA] Comparator for the project activity type: buzzin, active, some, none
+  """
+  activityType: StringComparator
+
   """Comparator for filtering projects with relations."""
   hasRelatedRelations: RelationExistsComparator
 
@@ -15970,6 +15978,11 @@ input ProjectCollectionFilter {
   """
   healthWithAge: StringComparator
 
+  """
+  [ALPHA] Comparator for the project activity type: buzzin, active, some, none
+  """
+  activityType: StringComparator
+
   """Comparator for filtering projects with relations."""
   hasRelatedRelations: RelationExistsComparator
 
@@ -16182,6 +16195,11 @@ input ProjectFilter {
   Comparator for the project health (with age): onTrack, atRisk, offTrack, outdated, noUpdate
   """
   healthWithAge: StringComparator
+
+  """
+  [ALPHA] Comparator for the project activity type: buzzin, active, some, none
+  """
+  activityType: StringComparator
 
   """Comparator for filtering projects with relations."""
   hasRelatedRelations: RelationExistsComparator
@@ -23423,6 +23441,9 @@ type User implements Node {
 
   """[DEPRECATED] Unique hash for the user to be used in invite URLs."""
   inviteHash: String! @deprecated(reason: "This hash is not in use anymore, this value will always be empty.")
+
+  """The user's GitHub user ID."""
+  gitHubUserId: String
 }
 
 type UserAdminPayload {
