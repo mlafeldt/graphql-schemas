@@ -6275,6 +6275,11 @@ type IntegrationConnection {
   pageInfo: PageInfo!
 }
 
+input IntegrationCustomerDataAttributesRefreshInput {
+  """The integration service to refresh customer data attributes from."""
+  service: String!
+}
+
 type IntegrationEdge {
   node: Integration!
 
@@ -11191,8 +11196,13 @@ type Mutation {
   """Disconnects the organization from Intercom."""
   integrationIntercomDelete: IntegrationPayload!
 
-  """[INTERNAL] Refreshes the customer data attributes from Intercom."""
-  integrationIntercomCustomerDataAttributesRefresh: IntegrationPayload!
+  """
+  [INTERNAL] Refreshes the customer data attributes from the specified integration service.
+  """
+  integrationCustomerDataAttributesRefresh(
+    """The integration service to refresh customer data attributes from."""
+    input: IntegrationCustomerDataAttributesRefreshInput!
+  ): IntegrationPayload!
 
   """[DEPRECATED] Updates settings on the Intercom integration."""
   integrationIntercomSettingsUpdate(
@@ -12448,6 +12458,34 @@ type Mutation {
 
     """Optional fallback URL to use if the Jira issue cannot be found."""
     url: String
+  ): AttachmentPayload!
+
+  """Link an existing Salesforce case to an issue."""
+  attachmentLinkSalesforce(
+    """
+    Create attachment as a user with the provided name. This option is only
+    available to OAuth applications creating attachments in `actor=app` mode.
+    """
+    createAsUser: String
+
+    """
+    Provide an external user avatar URL. Can only be used in conjunction with
+    the `createAsUser` options. This option is only available to OAuth
+    applications creating comments in `actor=app` mode.
+    """
+    displayIconUrl: String
+
+    """The title to use for the attachment."""
+    title: String
+
+    """The issue for which to link the Salesforce case."""
+    issueId: String!
+
+    """Optional attachment ID that may be provided through the API."""
+    id: String
+
+    """The URL of the Salesforce case to link."""
+    url: String!
   ): AttachmentPayload!
 
   """Deletes an issue attachment."""
