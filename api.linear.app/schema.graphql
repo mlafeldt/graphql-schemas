@@ -1996,6 +1996,9 @@ type CustomerStatus implements Node {
   """The position of the status in the workspace's customers flow."""
   position: Float!
 
+  """The display name of the status."""
+  displayName: String
+
   """The type of the customer status."""
   type: CustomerStatusType @deprecated(reason: "Customer statuses are no longer grouped by type.")
 }
@@ -8400,6 +8403,9 @@ input IssueLabelCollectionFilter {
   """Filters that the issue label's parent label must satisfy."""
   parent: IssueLabelFilter
 
+  """Filter based on the existence of the relation."""
+  null: Boolean
+
   """Compound filters, all of which need to be matched by the label."""
   and: [IssueLabelCollectionFilter!]
 
@@ -14424,6 +14430,9 @@ type Organization implements Node {
   """Whether the organization has enabled the feed feature."""
   feedEnabled: Boolean!
 
+  """[INTERNAL] Whether the organization has enabled the AI add-on."""
+  aiAddonEnabled: Boolean!
+
   """[DEPRECATED] Which day count to use for SLA calculations."""
   slaDayCount: SLADayCountType! @deprecated(reason: "No longer in use")
 
@@ -16494,6 +16503,9 @@ input ProjectLabelCollectionFilter {
 
   """Filters that the project label's parent label must satisfy."""
   parent: ProjectLabelFilter
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
 
   """Compound filters, all of which need to be matched by the label."""
   and: [ProjectLabelCollectionFilter!]
@@ -24621,6 +24633,9 @@ type WorkspaceAuthorizedApplicationWithMemberships {
   UserIds and membership dates of everyone who has authorized the application
   """
   memberships: [AuthMembership!]!
+
+  """Total number of members that authorized the application."""
+  totalMembers: Float!
 }
 
 input ZendeskSettingsInput {
