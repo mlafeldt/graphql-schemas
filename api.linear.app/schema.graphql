@@ -2420,6 +2420,9 @@ type CustomView implements Node {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
+
+    """[INTERNAL] Sort returned projects."""
+    sort: [ProjectSortInput!]
   ): ProjectConnection!
 
   """Issues associated with the custom view."""
@@ -5313,6 +5316,9 @@ type Initiative implements Node {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
+
+    """[INTERNAL] Sort returned projects."""
+    sort: [ProjectSortInput!]
   ): ProjectConnection!
 
   """Links associated with the initiative."""
@@ -10193,6 +10199,82 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """Creates a new project."""
+  projectCreate(
+    """Whether to connect a Slack channel to the project."""
+    connectSlackChannel: Boolean
+
+    """The issue object to create."""
+    input: ProjectCreateInput!
+  ): ProjectPayload!
+
+  """Updates a project."""
+  projectUpdate(
+    """A partial project object to update the project with."""
+    input: ProjectUpdateInput!
+
+    """
+    The identifier of the project to update. Also the identifier from the URL is accepted.
+    """
+    id: String!
+  ): ProjectPayload!
+
+  """
+  [INTERNAL] Updates all projects currently assigned to to a project status to a new project status.
+  """
+  projectReassignStatus(
+    """The identifier of the new project status to update the projects to."""
+    newProjectStatusId: String!
+
+    """
+    The identifier of the project status with which projects will be updated.
+    """
+    originalProjectStatusId: String!
+  ): SuccessPayload!
+
+  """Deletes (trashes) a project."""
+  projectDelete(
+    """The identifier of the project to delete."""
+    id: String!
+  ): ProjectArchivePayload!
+
+  """Archives a project."""
+  projectArchive(
+    """Whether to trash the project."""
+    trash: Boolean
+
+    """
+    The identifier of the project to archive. Also the identifier from the URL is accepted.
+    """
+    id: String!
+  ): ProjectArchivePayload! @deprecated(reason: "Deprecated in favor of projectDelete.")
+
+  """Unarchives a project."""
+  projectUnarchive(
+    """
+    The identifier of the project to restore. Also the identifier from the URL is accepted.
+    """
+    id: String!
+  ): ProjectArchivePayload!
+
+  """[Internal] Adds a label to a project."""
+  projectAddLabel(
+    """The identifier of the label to add."""
+    labelId: String!
+
+    """The identifier of the project to add the label to."""
+    id: String!
+  ): ProjectPayload!
+
+  """[Internal] Removes a label from a project."""
+  projectRemoveLabel(
+    """The identifier of the label to remove."""
+    labelId: String!
+
+    """The identifier of the project to remove the label from."""
+    id: String!
+  ): ProjectPayload!
+
   """
   Creates a new team. The user who creates the team will automatically be added as a member to the newly created team.
   """
@@ -10417,82 +10499,6 @@ type Mutation {
     """The identifier of the project status to unarchive."""
     id: String!
   ): ProjectStatusArchivePayload!
-
-  """Creates a new project."""
-  projectCreate(
-    """Whether to connect a Slack channel to the project."""
-    connectSlackChannel: Boolean
-
-    """The issue object to create."""
-    input: ProjectCreateInput!
-  ): ProjectPayload!
-
-  """Updates a project."""
-  projectUpdate(
-    """A partial project object to update the project with."""
-    input: ProjectUpdateInput!
-
-    """
-    The identifier of the project to update. Also the identifier from the URL is accepted.
-    """
-    id: String!
-  ): ProjectPayload!
-
-  """
-  [INTERNAL] Updates all projects currently assigned to to a project status to a new project status.
-  """
-  projectReassignStatus(
-    """The identifier of the new project status to update the projects to."""
-    newProjectStatusId: String!
-
-    """
-    The identifier of the project status with which projects will be updated.
-    """
-    originalProjectStatusId: String!
-  ): SuccessPayload!
-
-  """Deletes (trashes) a project."""
-  projectDelete(
-    """The identifier of the project to delete."""
-    id: String!
-  ): ProjectArchivePayload!
-
-  """Archives a project."""
-  projectArchive(
-    """Whether to trash the project."""
-    trash: Boolean
-
-    """
-    The identifier of the project to archive. Also the identifier from the URL is accepted.
-    """
-    id: String!
-  ): ProjectArchivePayload! @deprecated(reason: "Deprecated in favor of projectDelete.")
-
-  """Unarchives a project."""
-  projectUnarchive(
-    """
-    The identifier of the project to restore. Also the identifier from the URL is accepted.
-    """
-    id: String!
-  ): ProjectArchivePayload!
-
-  """[Internal] Adds a label to a project."""
-  projectAddLabel(
-    """The identifier of the label to add."""
-    labelId: String!
-
-    """The identifier of the project to add the label to."""
-    id: String!
-  ): ProjectPayload!
-
-  """[Internal] Removes a label from a project."""
-  projectRemoveLabel(
-    """The identifier of the label to remove."""
-    labelId: String!
-
-    """The identifier of the project to remove the label from."""
-    id: String!
-  ): ProjectPayload!
 
   """Creates a new project relation."""
   projectRelationCreate(
@@ -16578,6 +16584,15 @@ input ProjectLabelFilter {
   or: [ProjectLabelFilter!]
 }
 
+"""Project manual order sorting options."""
+input ProjectManualSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 """A milestone for a project."""
 type ProjectMilestone implements Node {
   """The unique identifier of the entity."""
@@ -16903,6 +16918,15 @@ input ProjectMilestoneUpdateInput {
   projectId: String
 }
 
+"""Project name sorting options."""
+input ProjectNameSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 """A project related notification."""
 type ProjectNotification implements Notification & Entity & Node {
   """
@@ -17124,6 +17148,18 @@ type ProjectPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""Project priority sorting options."""
+input ProjectPrioritySort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+
+  """Whether to consider no priority as the highest or lowest priority"""
+  noPriorityFirst: Boolean = false
 }
 
 """A relation between two projects."""
@@ -17878,6 +17914,27 @@ input ProjectSort {
   order: PaginationSortOrder
 }
 
+"""Project sorting options."""
+input ProjectSortInput {
+  """Sort by project name"""
+  name: ProjectNameSort
+
+  """Sort by project status"""
+  status: ProjectStatusSort
+
+  """Sort by project priority"""
+  priority: ProjectPrioritySort
+
+  """Sort by manual order"""
+  manual: ProjectManualSort
+
+  """Sort by project target date"""
+  targetDate: TargetDateSort
+
+  """Sort by project start date"""
+  startDate: StartDateSort
+}
+
 """A project status."""
 type ProjectStatus implements Node {
   """The unique identifier of the entity."""
@@ -18027,6 +18084,15 @@ type ProjectStatusPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""Project status sorting options."""
+input ProjectStatusSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
 }
 
 """A type of project status."""
@@ -18889,6 +18955,45 @@ type Query {
     integrationType: String!
   ): [Template!]!
 
+  """All projects."""
+  projects(
+    """Filter returned projects."""
+    filter: ProjectFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+
+    """[INTERNAL] Sort returned projects."""
+    sort: [ProjectSortInput!]
+  ): ProjectConnection!
+
+  """One specific project."""
+  project(id: String!): Project!
+
+  """Suggests filters for a project view based on a text prompt."""
+  projectFilterSuggestion(prompt: String!): ProjectFilterSuggestionPayload!
+
   """
   All teams whose issues can be accessed by the user. This might be different
   from `administrableTeams`, which also includes teams whose settings can be
@@ -19269,42 +19374,6 @@ type Query {
 
   """One specific project status."""
   projectStatus(id: String!): ProjectStatus!
-
-  """All projects."""
-  projects(
-    """Filter returned projects."""
-    filter: ProjectFilter
-
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): ProjectConnection!
-
-  """One specific project."""
-  project(id: String!): Project!
-
-  """Suggests filters for a project view based on a text prompt."""
-  projectFilterSuggestion(prompt: String!): ProjectFilterSuggestionPayload!
 
   """All project relationships."""
   projectRelations(
@@ -20480,6 +20549,16 @@ type Query {
   workspaceAuthorizedApplications: [WorkspaceAuthorizedApplication!]!
 
   """
+  [INTERNAL] Get non-internal authorized applications for a workspace, including each application's app user.
+  """
+  workspaceAuthorizedApplicationsWithAppUser(
+    """
+    Client IDs of specific applications to return. If not provided, all workspace-authorized applications will be returned.
+    """
+    clientIds: [String!]
+  ): [WorkspaceAuthorizedApplicationWithAppUser!]!
+
+  """
   [INTERNAL] Get a specific non-internal authorized application (with limited fields) for a workspace
   """
   workspaceAuthorizedApplication(
@@ -21503,6 +21582,15 @@ type SsoUrlFromEmailResponse {
   samlSsoUrl: String!
 }
 
+"""Project start date sorting options."""
+input StartDateSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 """Comparator for strings."""
 input StringArrayComparator {
   """Length of the array. Matches any values that have the given length."""
@@ -21727,6 +21815,15 @@ type SyncedExternalThread {
   Whether a connected personal integration is required to comment in this thread.
   """
   isPersonalIntegrationRequired: Boolean!
+}
+
+"""Project target date sorting options."""
+input TargetDateSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
 }
 
 """An organizational unit that contains issues."""
@@ -22149,6 +22246,9 @@ type Team implements Node {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
+
+    """[INTERNAL] Sort returned projects."""
+    sort: [ProjectSortInput!]
   ): ProjectConnection!
 
   """The states that define the workflow associated with the team."""
@@ -24641,6 +24741,46 @@ type WorkspaceAuthorizedApplication {
   UserIds and membership dates of everyone who has authorized the application with the set of scopes.
   """
   memberships: [AuthMembership!]!
+}
+
+"""
+[INTERNAL] Public information of the OAuth application, plus the app user and aggregate membership count.
+"""
+type WorkspaceAuthorizedApplicationWithAppUser {
+  """Application name."""
+  name: String!
+
+  """Description of the application."""
+  description: String
+
+  """Developer of the application."""
+  developer: String
+
+  """Developer URL of the application."""
+  developerUrl: String
+
+  """Image of the application."""
+  imageUrl: String
+
+  """Scopes that are authorized for this application for a given user."""
+  scope: [String!]!
+
+  """OAuth application's ID."""
+  appId: String!
+
+  """OAuth application's client ID."""
+  clientId: String!
+
+  """Whether or not webhooks are enabled for the application."""
+  webhooksEnabled: Boolean!
+
+  """
+  Total number of members (including the app user, if it exists) that authorized the application.
+  """
+  totalMembers: Float!
+
+  """The app user associated with this client, if one exists."""
+  appUser: AuthMembership
 }
 
 """
