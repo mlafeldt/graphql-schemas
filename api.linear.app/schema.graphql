@@ -2389,6 +2389,9 @@ type CustomView implements Node {
   """The model name of the custom view."""
   modelName: String!
 
+  """[INTERNAL] The facet associated with the custom view."""
+  facet: Facet
+
   """The team associated with the custom view."""
   team: Team
 
@@ -2522,6 +2525,42 @@ type CustomViewEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Custom view filtering options."""
+input CustomViewFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the custom view name."""
+  name: StringComparator
+
+  """Comparator for the custom view model name."""
+  modelName: StringComparator
+
+  """Filters that the custom view's team must satisfy."""
+  team: NullableTeamFilter
+
+  """Filters that the custom view creator must satisfy."""
+  creator: UserFilter
+
+  """Comparator for whether the custom view is shared."""
+  shared: BooleanComparator
+
+  """[INTERNAL] Filter based on whether the custom view has a facet."""
+  hasFacet: Boolean
+
+  """Compound filters, all of which need to be matched by the custom view."""
+  and: [CustomViewFilter!]
+
+  """Compound filters, one of which need to be matched by the custom view."""
+  or: [CustomViewFilter!]
 }
 
 type CustomViewHasSubscribersPayload {
@@ -15062,6 +15101,9 @@ input OrganizationUpdateInput {
   """Whether label creation is restricted to admins."""
   restrictLabelManagementToAdmins: Boolean
 
+  """Whether agent invocation is restricted to full workspace members."""
+  restrictAgentInvocationToMembers: Boolean
+
   """
   IP restriction configurations controlling allowed access the workspace.
   """
@@ -20286,6 +20328,9 @@ type Query {
 
   """Custom views for the user."""
   customViews(
+    """Filter returned custom views."""
+    filter: CustomViewFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
