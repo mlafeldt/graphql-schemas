@@ -33,6 +33,274 @@ type ActorBot {
   avatarUrl: String
 }
 
+"""An activity within an agent context."""
+type AgentActivity implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The agent context this activity belongs to."""
+  agentContext: AgentContext!
+
+  """The type of the activity."""
+  type: AgentActivityType!
+
+  """The content of the activity"""
+  content: AgentActivityContent!
+}
+
+"""Content for an action activity (tool call or action)."""
+type AgentActivityActionContent {
+  """The type of activity."""
+  type: AgentActivityType!
+
+  """The action being performed."""
+  action: String!
+
+  """The parameters for the action, e.g. a file path, a keyword, etc."""
+  parameter: String!
+
+  """The result of the action in Markdown format."""
+  result: String
+}
+
+type AgentActivityConnection {
+  edges: [AgentActivityEdge!]!
+  nodes: [AgentActivity!]!
+  pageInfo: PageInfo!
+}
+
+"""Content for different types of agent activities."""
+union AgentActivityContent = AgentActivityObservationContent | AgentActivityActionContent | AgentActivityResponseContent | AgentActivityErrorContent
+
+input AgentActivityCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The agent context this activity belongs to."""
+  agentContextId: String!
+
+  """The type of the activity."""
+  type: AgentActivityType!
+
+  """The content payload of the agent activity."""
+  content: JSONObject!
+}
+
+type AgentActivityEdge {
+  node: AgentActivity!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""Content for an error activity."""
+type AgentActivityErrorContent {
+  """The type of activity."""
+  type: AgentActivityType!
+
+  """The error message in Markdown format."""
+  body: String!
+}
+
+"""Content for an observation activity (chain of thought)."""
+type AgentActivityObservationContent {
+  """The type of activity."""
+  type: AgentActivityType!
+
+  """The observation content in Markdown format."""
+  body: String!
+}
+
+type AgentActivityPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The agent activity that was created or updated."""
+  agentActivity: AgentActivity!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+"""Content for a response activity (markdown-like completion)."""
+type AgentActivityResponseContent {
+  """The type of activity."""
+  type: AgentActivityType!
+
+  """The response body in Markdown format."""
+  body: String!
+}
+
+"""The type of an agent activity."""
+enum AgentActivityType {
+  observation
+  action
+  response
+  error
+}
+
+"""A context for agent activities and state management."""
+type AgentContext implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The user that created this agent context."""
+  creator: User
+
+  """The agent user that is associated with this agent context."""
+  appUser: User!
+
+  """The comment this agent context is associated with."""
+  comment: Comment
+
+  """The issue this agent context is associated with."""
+  issue: Issue
+
+  """The current status of the agent context."""
+  status: AgentContextStatus!
+
+  """The time the agent context started working."""
+  startedAt: DateTime
+
+  """The time the agent context ended."""
+  endedAt: DateTime
+
+  """The type of the agent context."""
+  type: AgentContextType!
+
+  """Activities associated with this agent context."""
+  activities(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): [AgentActivity!]!
+
+  """External links associated with this agent context."""
+  links: [EntityExternalLink!]!
+
+  """A summary of the activities in this context."""
+  summary: String
+
+  """Metadata about the external source that created this agent context."""
+  sourceMetadata: JSON
+}
+
+type AgentContextConnection {
+  edges: [AgentContextEdge!]!
+  nodes: [AgentContext!]!
+  pageInfo: PageInfo!
+}
+
+input AgentContextCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The comment this agent context is associated with."""
+  commentId: String!
+
+  """The type of the agent context."""
+  type: AgentContextType!
+
+  """The user who created this agent context."""
+  creatorId: String!
+
+  """
+  URL to the external source where this agent context was created (e.g., Slack thread, GitHub comment).
+  """
+  sourceUrl: String!
+}
+
+type AgentContextEdge {
+  node: AgentContext!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+type AgentContextPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The agent context that was created or updated."""
+  agentContext: AgentContext!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+"""The status of an agent context."""
+enum AgentContextStatus {
+  pending
+  active
+  complete
+  awaitingInput
+}
+
+"""The type of an agent context."""
+enum AgentContextType {
+  commentThread
+}
+
+input AgentContextUpdateInput {
+  """The current status of the agent context."""
+  status: AgentContextStatus
+
+  """The summary of the agent context."""
+  summary: String
+}
+
 input AirbyteConfigurationInput {
   """Linear export API key."""
   apiKey: String!
@@ -12627,6 +12895,27 @@ type Mutation {
     """The identifier of the API key to update."""
     id: String!
   ): ApiKeyPayload!
+
+  """Creates an agent context."""
+  agentContextCreate(
+    """The agent context object to create."""
+    input: AgentContextCreateInput!
+  ): AgentContextPayload!
+
+  """Updates an agent context."""
+  agentContextUpdate(
+    """The agent context object to update."""
+    input: AgentContextUpdateInput!
+
+    """The identifier of the agent context to update."""
+    id: String!
+  ): AgentContextPayload!
+
+  """Creates an agent activity."""
+  agentActivityCreate(
+    """The agent activity object to create."""
+    input: AgentActivityCreateInput!
+  ): AgentActivityPayload!
 }
 
 """Customer name sorting options."""
@@ -20637,6 +20926,72 @@ type Query {
     """
     orderBy: PaginationOrderBy
   ): ApiKeyConnection!
+
+  """All agent contexts."""
+  agentContexts(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AgentContextConnection!
+
+  """A specific agent context."""
+  agentContext(
+    """The identifier of the agent context to retrieve."""
+    id: String!
+  ): AgentContext!
+
+  """All agent activities."""
+  agentActivities(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AgentActivityConnection!
+
+  """A specific agent activity."""
+  agentActivity(
+    """The identifier of the agent activity to retrieve."""
+    id: String!
+  ): AgentActivity!
 }
 
 type RateLimitPayload {
