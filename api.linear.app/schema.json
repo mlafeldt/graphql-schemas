@@ -1776,6 +1776,93 @@
             "deprecationReason": null
           },
           {
+            "name": "supervisedIssues",
+            "description": "Issues delegated to an agent by the user.",
+            "args": [
+              {
+                "name": "filter",
+                "description": "Filter returned issues.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "IssueFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "A cursor to be used with last for backward pagination.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "after",
+                "description": "A cursor to be used with first for forward pagination",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "The number of items to forward paginate (used with after). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "The number of items to backward paginate (used with before). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeArchived",
+                "description": "Should archived resources be included (default: false)",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt.",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "PaginationOrderBy",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "createdIssues",
             "description": "Issues created by the user.",
             "args": [
@@ -6527,6 +6614,18 @@
           {
             "name": "assignee",
             "description": "The user to whom the issue is assigned to.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "User",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "supervisor",
+            "description": "The user who has delegated this issue to be completed by an agent.",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -52976,7 +53075,7 @@
           },
           {
             "name": "applicationInfoWithMembershipsByIds",
-            "description": "[INTERNAL] Get information for a list of applications with memberships",
+            "description": "[DEPRECATED] [INTERNAL] Get information for a list of applications with memberships",
             "args": [
               {
                 "name": "clientIds",
@@ -53018,8 +53117,8 @@
                 }
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "Use more efficient `workspaceAuthorizedApplicationsWithAppUser` and `workspaceAuthorizedApplication` instead."
           },
           {
             "name": "applicationWithAuthorization",
@@ -53120,7 +53219,7 @@
           },
           {
             "name": "workspaceAuthorizedApplications",
-            "description": "[INTERNAL] Get non-internal authorized applications (with limited fields) for a workspace",
+            "description": "[DEPRECATED] [INTERNAL] Get non-internal authorized applications (with limited fields) for a workspace",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -53139,8 +53238,8 @@
                 }
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "Use more efficient `workspaceAuthorizedApplicationsWithAppUser` and `workspaceAuthorizedApplication` instead."
           },
           {
             "name": "workspaceAuthorizedApplicationsWithAppUser",
@@ -58346,6 +58445,18 @@
           {
             "name": "assignee",
             "description": "The user to whom the issue is assigned to.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "User",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "supervisor",
+            "description": "The user who has delegated this issue to be completed by an agent.",
             "args": [],
             "type": {
               "kind": "OBJECT",

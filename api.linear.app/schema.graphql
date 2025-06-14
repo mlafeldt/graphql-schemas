@@ -7171,6 +7171,9 @@ type Issue implements Node {
   """The user to whom the issue is assigned to."""
   assignee: User
 
+  """The user who has delegated this issue to be completed by an agent."""
+  supervisor: User
+
   """The user who snoozed the issue."""
   snoozedBy: User
 
@@ -9242,6 +9245,9 @@ type IssueSearchResult implements Node {
 
   """The user to whom the issue is assigned to."""
   assignee: User
+
+  """The user who has delegated this issue to be completed by an agent."""
+  supervisor: User
 
   """The user who snoozed the issue."""
   snoozedBy: User
@@ -20851,11 +20857,13 @@ type Query {
     ids: [String!]!
   ): [Application!]!
 
-  """[INTERNAL] Get information for a list of applications with memberships"""
+  """
+  [DEPRECATED] [INTERNAL] Get information for a list of applications with memberships
+  """
   applicationInfoWithMembershipsByIds(
     """The client IDs to look up."""
     clientIds: [String!]!
-  ): [WorkspaceAuthorizedApplication!]!
+  ): [WorkspaceAuthorizedApplication!]! @deprecated(reason: "Use more efficient `workspaceAuthorizedApplicationsWithAppUser` and `workspaceAuthorizedApplication` instead.")
 
   """
   Get information for an application and whether a user has approved it for the given scopes.
@@ -20878,9 +20886,9 @@ type Query {
   authorizedApplications: [AuthorizedApplication!]!
 
   """
-  [INTERNAL] Get non-internal authorized applications (with limited fields) for a workspace
+  [DEPRECATED] [INTERNAL] Get non-internal authorized applications (with limited fields) for a workspace
   """
-  workspaceAuthorizedApplications: [WorkspaceAuthorizedApplication!]!
+  workspaceAuthorizedApplications: [WorkspaceAuthorizedApplication!]! @deprecated(reason: "Use more efficient `workspaceAuthorizedApplicationsWithAppUser` and `workspaceAuthorizedApplication` instead.")
 
   """
   [INTERNAL] Get non-internal authorized applications for a workspace, including each application's app user.
@@ -23962,6 +23970,36 @@ type User implements Node {
 
   """Issues assigned to the user."""
   assignedIssues(
+    """Filter returned issues."""
+    filter: IssueFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueConnection!
+
+  """Issues delegated to an agent by the user."""
+  supervisedIssues(
     """Filter returned issues."""
     filter: IssueFilter
 
