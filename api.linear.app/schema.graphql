@@ -1936,7 +1936,7 @@ input CustomerNeedFilter {
   or: [CustomerNeedFilter!]
 }
 
-"""[Internal] A customer need related notification."""
+"""A customer need related notification."""
 type CustomerNeedNotification implements Notification & Entity & Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -2039,6 +2039,9 @@ type CustomerNeedNotification implements Notification & Entity & Node {
 
   """The project related to the notification."""
   relatedProject: Project
+
+  """The customer need related to the notification."""
+  customerNeed: CustomerNeed!
 }
 
 type CustomerNeedPayload {
@@ -2102,6 +2105,108 @@ type CustomerNeedUpdatePayload {
 
   """The related customer needs that were updated."""
   updatedRelatedNeeds: [CustomerNeed!]!
+}
+
+"""A customer related notification."""
+type CustomerNotification implements Notification & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """Notification type."""
+  type: String!
+
+  """The user that caused the notification."""
+  actor: User
+
+  """The external user that caused the notification."""
+  externalUserActor: ExternalUser
+
+  """The user that received the notification."""
+  user: User!
+
+  """
+  The time at when the user marked the notification as read. Null, if the the user hasn't read the notification
+  """
+  readAt: DateTime
+
+  """
+  The time at when an email reminder for this notification was sent to the user. Null, if no email
+      reminder has been sent.
+  """
+  emailedAt: DateTime
+
+  """
+  The time until a notification will be snoozed. After that it will appear in the inbox again.
+  """
+  snoozedUntilAt: DateTime
+
+  """The time at which a notification was unsnoozed.."""
+  unsnoozedAt: DateTime
+
+  """[Internal] URL to the target of the notification."""
+  url: String!
+
+  """[Internal] Inbox URL for the notification."""
+  inboxUrl: String!
+
+  """[Internal] Notification title."""
+  title: String!
+
+  """[Internal] Notification subtitle."""
+  subtitle: String!
+
+  """[Internal] If notification actor was Linear."""
+  isLinearActor: Boolean!
+
+  """[Internal] Notification avatar URL."""
+  actorAvatarUrl: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorInitials: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorAvatarColor: String!
+
+  """[Internal] Issue's status type for issue notifications."""
+  issueStatusType: String
+
+  """[Internal] Project update health for new updates."""
+  projectUpdateHealth: String
+
+  """
+  [Internal] Notifications with the same grouping key will be grouped together in the UI.
+  """
+  groupingKey: String!
+
+  """
+  [Internal] Priority of the notification with the same grouping key. Higher
+  number means higher priority. If priority is the same, notifications should be
+  sorted by `createdAt`.
+  """
+  groupingPriority: Float!
+
+  """The bot that caused the notification."""
+  botActor: ActorBot
+
+  """Related customer."""
+  customerId: String!
+
+  """The customer related to the notification."""
+  customer: Customer!
 }
 
 """A customer notification subscription."""
@@ -2665,6 +2770,11 @@ type CustomView implements Node {
 
   """Projects associated with the custom view."""
   projects(
+    """
+    Include projects from sub-teams when the custom view is associated with a team.
+    """
+    includeSubTeams: Boolean = false
+
     """Filter returned projects."""
     filter: ProjectFilter
 
@@ -2698,6 +2808,11 @@ type CustomView implements Node {
 
   """Issues associated with the custom view."""
   issues(
+    """
+    Include issues from sub-teams when the custom view is associated with a team.
+    """
+    includeSubTeams: Boolean = false
+
     """Filter returned issues."""
     filter: IssueFilter
 
@@ -6031,6 +6146,23 @@ type InitiativeNotification implements Notification & Entity & Node {
 
   """Related initiative update ID."""
   initiativeUpdateId: String
+
+  """The initiative related to the notification."""
+  initiative: Initiative
+
+  """The document related to the notification."""
+  document: Document
+
+  """The initiative update related to the notification."""
+  initiativeUpdate: InitiativeUpdate
+
+  """The comment related to the notification."""
+  comment: Comment
+
+  """
+  The parent comment related to the notification, if a notification is a reply comment notification.
+  """
+  parentComment: Comment
 }
 
 """An initiative notification subscription."""
@@ -13072,6 +13204,7 @@ enum NotificationCategory {
   appsAndIntegrations
   triage
   customers
+  feed
   system
 }
 
@@ -13118,6 +13251,9 @@ type NotificationCategoryPreferences {
 
   """The preferences for customer notifications."""
   customers: NotificationChannelPreferences!
+
+  """The preferences for feed summary notifications."""
+  feed: NotificationChannelPreferences!
 }
 
 input NotificationCategoryPreferencesInput {
@@ -13159,6 +13295,9 @@ input NotificationCategoryPreferencesInput {
 
   """The preferences for notifications about customers."""
   customers: PartialNotificationChannelPreferencesInput
+
+  """The preferences for notifications about feed summaries."""
+  feed: PartialNotificationChannelPreferencesInput
 }
 
 """The delivery channels a user can receive notifications in."""
@@ -15614,7 +15753,7 @@ type Post implements Node {
   feedSummaryScheduleAtCreate: FeedSummarySchedule
 }
 
-"""[Internal] A post related notification."""
+"""A post related notification."""
 type PostNotification implements Notification & Entity & Node {
   """
   Related comment ID. Null if the notification is not related to a comment.
@@ -17384,17 +17523,11 @@ type ProjectNotification implements Notification & Entity & Node {
   """The project related to the notification."""
   project: Project!
 
-  """The initiative related to the notification."""
-  initiative: Initiative
-
   """The document related to the notification."""
   document: Document
 
   """The project update related to the notification."""
   projectUpdate: ProjectUpdate
-
-  """The initiative update related to the notification."""
-  initiativeUpdate: InitiativeUpdate
 
   """The comment related to the notification."""
   comment: Comment
@@ -18900,7 +19033,7 @@ type PullRequest implements Node {
   status: PullRequestStatus!
 }
 
-"""[Internal] A pull request related notification."""
+"""A pull request related notification."""
 type PullRequestNotification implements Notification & Entity & Node {
   """
   Related comment ID. Null if the notification is not related to a comment.
