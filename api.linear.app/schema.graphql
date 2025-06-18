@@ -2860,6 +2860,15 @@ type CustomViewConnection {
   pageInfo: PageInfo!
 }
 
+"""Custom view creation date sorting options."""
+input CustomViewCreatedAtSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 input CustomViewCreateInput {
   """
   The identifier in UUID v4 format. If none is provided, the backend will generate one.
@@ -2951,6 +2960,15 @@ type CustomViewHasSubscribersPayload {
   hasSubscribers: Boolean!
 }
 
+"""Custom view name sorting options."""
+input CustomViewNameSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 """A custom view notification subscription."""
 type CustomViewNotificationSubscription implements NotificationSubscription & Entity & Node {
   """The unique identifier of the entity."""
@@ -3033,6 +3051,17 @@ type CustomViewPayload {
   success: Boolean!
 }
 
+input CustomViewSortInput {
+  """Sort by custom view name."""
+  name: CustomViewNameSort
+
+  """Sort by custom view creation date."""
+  createdAt: CustomViewCreatedAtSort
+
+  """Sort by custom view update date."""
+  updatedAt: CustomViewUpdatedAtSort
+}
+
 type CustomViewSuggestionPayload {
   """The suggested view name."""
   name: String
@@ -3042,6 +3071,15 @@ type CustomViewSuggestionPayload {
 
   """The suggested view icon."""
   icon: String
+}
+
+"""Custom view update date sorting options."""
+input CustomViewUpdatedAtSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
 }
 
 input CustomViewUpdateInput {
@@ -4312,6 +4350,12 @@ type EmailIntakeAddress implements Node {
   """Unique email address user name (before @) used for incoming email."""
   address: String!
 
+  """The email address used to forward emails to the intake address."""
+  forwardingEmailAddress: String
+
+  """The name to be used for outgoing emails."""
+  senderName: String
+
   """Whether the email address is enabled."""
   enabled: Boolean!
 
@@ -4342,6 +4386,12 @@ input EmailIntakeAddressCreateInput {
   """
   id: String
 
+  """The email address used to forward emails to the intake address."""
+  forwardingEmailAddress: String
+
+  """The name to be used for outgoing emails."""
+  senderName: String
+
   """
   The identifier or key of the team this email address will intake issues for.
   """
@@ -4351,6 +4401,9 @@ input EmailIntakeAddressCreateInput {
   The identifier of the template this email address will intake issues for.
   """
   templateId: String
+
+  """Whether email replies are enabled."""
+  repliesEnabled: Boolean
 }
 
 type EmailIntakeAddressPayload {
@@ -4370,6 +4423,12 @@ input EmailIntakeAddressUpdateInput {
   address will be disabled and no longer accept incoming emails.
   """
   enabled: Boolean
+
+  """The email address used to forward emails to the intake address."""
+  forwardingEmailAddress: String
+
+  """The name to be used for outgoing emails."""
+  senderName: String
 
   """Whether email replies are enabled."""
   repliesEnabled: Boolean
@@ -5829,6 +5888,9 @@ type Initiative implements Node {
     """
     orderBy: PaginationOrderBy
   ): InitiativeConnection!
+
+  """[ALPHA] Parent initiative associated with the initiative."""
+  parentInitiative: Initiative
 
   """The initiative's content in markdown format."""
   content: String
@@ -20782,6 +20844,9 @@ type Query {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
+
+    """[INTERNAL] Sort returned custom views."""
+    sort: [CustomViewSortInput!]
   ): CustomViewConnection!
 
   """One specific custom view."""
