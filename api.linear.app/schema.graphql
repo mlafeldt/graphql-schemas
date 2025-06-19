@@ -4350,6 +4350,9 @@ type EmailIntakeAddress implements Node {
   """Unique email address user name (before @) used for incoming email."""
   address: String!
 
+  """The type of the email address."""
+  type: EmailIntakeAddressType
+
   """The email address used to forward emails to the intake address."""
   forwardingEmailAddress: String
 
@@ -4386,6 +4389,11 @@ input EmailIntakeAddressCreateInput {
   """
   id: String
 
+  """
+  The type of the email address. If not provided, the backend will default to team or template.
+  """
+  type: EmailIntakeAddressType
+
   """The email address used to forward emails to the intake address."""
   forwardingEmailAddress: String
 
@@ -4417,6 +4425,13 @@ type EmailIntakeAddressPayload {
   success: Boolean!
 }
 
+"""The type of the email address."""
+enum EmailIntakeAddressType {
+  team
+  template
+  asks
+}
+
 input EmailIntakeAddressUpdateInput {
   """
   Whether the email address is currently enabled. If set to false, the email
@@ -4432,6 +4447,16 @@ input EmailIntakeAddressUpdateInput {
 
   """Whether email replies are enabled."""
   repliesEnabled: Boolean
+
+  """
+  The identifier or key of the team this email address will intake issues for.
+  """
+  teamId: String
+
+  """
+  The identifier of the template this email address will intake issues for.
+  """
+  templateId: String
 
   """Whether customer requests are enabled."""
   customerRequestsEnabled: Boolean
