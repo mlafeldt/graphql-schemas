@@ -2844,6 +2844,41 @@ type CustomView implements Node {
     sort: [IssueSortInput!]
   ): IssueConnection!
 
+  """Feed items associated with the custom view."""
+  updates(
+    """
+    Include updates from sub-teams when the custom view is associated with a team.
+    """
+    includeSubTeams: Boolean = false
+
+    """Filter returned feed items."""
+    filter: FeedItemFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): FeedItemConnection!
+
   """The current users view preferences for this custom view."""
   userViewPreferences: ViewPreferences
 
@@ -4374,6 +4409,9 @@ type EmailIntakeAddress implements Node {
   """The organization that the email address is associated with."""
   organization: Organization!
 
+  """The SES domain identity that the email address is associated with."""
+  sesDomainIdentity: SesDomainIdentity
+
   """The user who created the email intake address."""
   creator: User
 
@@ -5166,6 +5204,57 @@ input FavoriteUpdateInput {
   folderName: String
 }
 
+"""[Internal] An item in a users feed."""
+type FeedItem implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The organization that will see this feed item."""
+  organization: Organization!
+
+  """The user that will see this feed item."""
+  user: User
+
+  """The team that will see this feed item."""
+  team: Team
+
+  """The project update that is in the feed."""
+  projectUpdate: ProjectUpdate
+
+  """The initiative update that is in the feed."""
+  initiativeUpdate: InitiativeUpdate
+
+  """The post that is in the feed."""
+  post: Post
+}
+
+type FeedItemConnection {
+  edges: [FeedItemEdge!]!
+  nodes: [FeedItem!]!
+  pageInfo: PageInfo!
+}
+
+type FeedItemEdge {
+  node: FeedItem!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
 """Feed item filtering options"""
 input FeedItemFilter {
   """Comparator for the identifier."""
@@ -5180,7 +5269,7 @@ input FeedItemFilter {
   """Filters that the feed item author must satisfy."""
   author: UserFilter
 
-  """Comparator for the update type: initiative, project"""
+  """Comparator for the update type: initiative, project, team"""
   updateType: StringComparator
 
   """
@@ -20634,6 +20723,9 @@ type Query {
     id: String!
   ): Emoji!
 
+  """One specific email intake address."""
+  emailIntakeAddress(id: String!): EmailIntakeAddress!
+
   """All documents in the workspace."""
   documents(
     """Filter returned documents."""
@@ -21822,6 +21914,61 @@ input SentrySettingsInput {
 
   """Whether Sentry issues unresolving reopens Linear issues."""
   unresolvingReopensIssues: Boolean!
+}
+
+"""SES domain identity used for sending emails from a custom domain."""
+type SesDomainIdentity implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The domain of the SES domain identity."""
+  domain: String!
+
+  """The AWS region of the SES domain identity."""
+  region: String!
+
+  """The organization of the SES domain identity."""
+  organization: Organization!
+
+  """The user who created the SES domain identity."""
+  creator: User
+
+  """
+  Whether the domain is fully verified and can be used for sending emails.
+  """
+  canSendFromCustomDomain: Boolean!
+
+  """The DNS records for the SES domain identity."""
+  dnsRecords: [SesDomainIdentityDnsRecord!]!
+}
+
+"""A DNS record for a SES domain identity."""
+type SesDomainIdentityDnsRecord {
+  """The type of the DNS record."""
+  type: String!
+
+  """The name of the DNS record."""
+  name: String!
+
+  """The content of the DNS record."""
+  content: String!
+
+  """Whether the DNS record is verified in the domain's DNS configuration."""
+  isVerified: Boolean!
 }
 
 """Customer size sorting options."""
