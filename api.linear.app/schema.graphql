@@ -3086,12 +3086,26 @@ type CustomViewPayload {
   success: Boolean!
 }
 
+"""
+Custom view shared status sorting options. Ascending order puts shared views last.
+"""
+input CustomViewSharedSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 input CustomViewSortInput {
   """Sort by custom view name."""
   name: CustomViewNameSort
 
   """Sort by custom view creation date."""
   createdAt: CustomViewCreatedAtSort
+
+  """Sort by custom view shared status."""
+  shared: CustomViewSharedSort
 
   """Sort by custom view update date."""
   updatedAt: CustomViewUpdatedAtSort
@@ -4501,7 +4515,7 @@ input EmailIntakeAddressUpdateInput {
 }
 
 input EmailUnsubscribeInput {
-  """Email type to unsubscribed from."""
+  """Email type to unsubscribe from."""
   type: String!
 
   """The user's email validation token."""
