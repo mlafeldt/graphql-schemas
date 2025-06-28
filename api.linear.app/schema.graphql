@@ -56,7 +56,7 @@ type AgentActivity implements Node {
   agentContext: AgentContext!
 
   """The type of the activity."""
-  type: AgentActivityType!
+  type: AgentActivityType
 
   """The content of the activity"""
   content: AgentActivityContent!
@@ -5737,6 +5737,9 @@ input GoogleSheetsSettingsInput {
 
   """The export settings for projects."""
   project: GoogleSheetsExportSettings
+
+  """The export settings for initiatives."""
+  initiative: GoogleSheetsExportSettings
 }
 
 input GoogleUserAccountAuthInput {
@@ -7493,8 +7496,13 @@ type Issue implements Node {
   """The user to whom the issue is assigned to."""
   assignee: User
 
-  """The user who has delegated this issue to be completed by an agent."""
+  """
+  [DEPRECATED] [Internal] The user who has delegated this issue to be completed by an agent.
+  """
   supervisor: User
+
+  """[Internal] The agent that is delegated to complete this issue."""
+  delegate: User
 
   """The user who snoozed the issue."""
   snoozedBy: User
@@ -9568,8 +9576,13 @@ type IssueSearchResult implements Node {
   """The user to whom the issue is assigned to."""
   assignee: User
 
-  """The user who has delegated this issue to be completed by an agent."""
+  """
+  [DEPRECATED] [Internal] The user who has delegated this issue to be completed by an agent.
+  """
   supervisor: User
+
+  """[Internal] The agent that is delegated to complete this issue."""
+  delegate: User
 
   """The user who snoozed the issue."""
   snoozedBy: User
@@ -10188,6 +10201,9 @@ input IssueUpdateInput {
 
   """The identifier of the user to assign the issue to."""
   assigneeId: String
+
+  """[Internal] The identifier of the agent user to delegate the issue to."""
+  delegateId: String
 
   """The identifier of the parent issue."""
   parentId: String
