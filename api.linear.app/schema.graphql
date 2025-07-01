@@ -55,11 +55,11 @@ type AgentActivity implements Node {
   """The agent context this activity belongs to."""
   agentContext: AgentContext!
 
-  """The type of the activity."""
-  type: AgentActivityType
-
   """The content of the activity"""
   content: AgentActivityContent!
+
+  """The comment that contains the content of this activity, if any."""
+  sourceComment: Comment
 }
 
 """Content for an action activity (tool call or action)."""
@@ -84,7 +84,7 @@ type AgentActivityConnection {
 }
 
 """Content for different types of agent activities."""
-union AgentActivityContent = AgentActivityObservationContent | AgentActivityActionContent | AgentActivityResponseContent | AgentActivityErrorContent
+union AgentActivityContent = AgentActivityObservationContent | AgentActivityActionContent | AgentActivityResponseContent | AgentActivityUserInputContent | AgentActivityErrorContent
 
 input AgentActivityCreateInput {
   """
@@ -94,9 +94,6 @@ input AgentActivityCreateInput {
 
   """The agent context this activity belongs to."""
   agentContextId: String!
-
-  """The type of the activity."""
-  type: AgentActivityType!
 
   """The content payload of the agent activity."""
   content: JSONObject!
@@ -138,13 +135,13 @@ type AgentActivityPayload {
   success: Boolean!
 }
 
-"""Content for a response activity (markdown-like completion)."""
+"""Content for a response activity."""
 type AgentActivityResponseContent {
   """The type of activity."""
   type: AgentActivityType!
 
-  """The response body in Markdown format."""
-  body: String!
+  """The ID of the comment this response references."""
+  sourceCommentId: String!
 }
 
 """The type of an agent activity."""
@@ -152,7 +149,20 @@ enum AgentActivityType {
   observation
   action
   response
+  userInput
   error
+}
+
+"""Content for a user input activity."""
+type AgentActivityUserInputContent {
+  """The type of activity."""
+  type: AgentActivityType!
+
+  """The ID of the comment this user input is sourced from."""
+  sourceCommentId: String
+
+  """The user input body."""
+  body: String
 }
 
 """A context for agent activities and state management."""
@@ -6018,6 +6028,9 @@ type Initiative implements Node {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
+
+    """[INTERNAL] Sort returned initiatives."""
+    sort: [InitiativeSortInput!]
   ): InitiativeConnection!
 
   """[ALPHA] Parent initiative associated with the initiative."""
@@ -6096,6 +6109,15 @@ type InitiativeConnection {
   edges: [InitiativeEdge!]!
   nodes: [Initiative!]!
   pageInfo: PageInfo!
+}
+
+"""Initiative creation date sorting options."""
+input InitiativeCreatedAtSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
 }
 
 """The properties of the initiative to create."""
@@ -6187,6 +6209,24 @@ input InitiativeFilter {
   or: [InitiativeFilter!]
 }
 
+"""Initiative health sorting options."""
+input InitiativeHealthSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
+"""Initiative health update date sorting options."""
+input InitiativeHealthUpdatedAtSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 """A initiative history containing relevant change events."""
 type InitiativeHistory implements Node {
   """The unique identifier of the entity."""
@@ -6224,6 +6264,24 @@ type InitiativeHistoryEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Initiative manual sorting options."""
+input InitiativeManualSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
+"""Initiative name sorting options."""
+input InitiativeNameSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
 }
 
 """An initiative related notification."""
@@ -6429,6 +6487,15 @@ type InitiativeNotificationSubscription implements NotificationSubscription & En
   notificationSubscriptionTypes: [String!]!
 }
 
+"""Initiative owner sorting options."""
+input InitiativeOwnerSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 """The payload returned by the initiative mutations."""
 type InitiativePayload {
   """The identifier of the last sync operation."""
@@ -6519,6 +6586,33 @@ input InitiativeRelationUpdateInput {
   sortOrder: Float
 }
 
+"""Initiative sorting options."""
+input InitiativeSortInput {
+  """Sort by initiative name."""
+  name: InitiativeNameSort
+
+  """Sort by manual order."""
+  manual: InitiativeManualSort
+
+  """Sort by initiative update date."""
+  updatedAt: InitiativeUpdatedAtSort
+
+  """Sort by initiative creation date."""
+  createdAt: InitiativeCreatedAtSort
+
+  """Sort by initiative target date."""
+  targetDate: InitiativeTargetDateSort
+
+  """Sort by initiative health status."""
+  health: InitiativeHealthSort
+
+  """Sort by initiative health update date."""
+  healthUpdatedAt: InitiativeHealthUpdatedAtSort
+
+  """Sort by initiative owner name."""
+  owner: InitiativeOwnerSort
+}
+
 enum InitiativeStatus {
   Planned
   Active
@@ -6529,6 +6623,15 @@ enum InitiativeStatus {
 enum InitiativeTab {
   overview
   projects
+}
+
+"""Initiative target date sorting options."""
+input InitiativeTargetDateSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
 }
 
 """Join table between projects and initiatives."""
@@ -6747,6 +6850,15 @@ input InitiativeUpdateCreateInput {
   Whether the diff between the current update and the previous one should be hidden.
   """
   isDiffHidden: Boolean
+}
+
+"""Initiative update date sorting options."""
+input InitiativeUpdatedAtSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
 }
 
 type InitiativeUpdateEdge {
@@ -10524,7 +10636,7 @@ input ManualSort {
   order: PaginationSortOrder
 }
 
-"""A meeting that can be attached to different entities."""
+"""[Internal] A meeting that can be attached to different entities."""
 type Meeting implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -16892,6 +17004,15 @@ type ProjectConnection {
   pageInfo: PageInfo!
 }
 
+"""Project creation date sorting options."""
+input ProjectCreatedAtSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 input ProjectCreateInput {
   """
   The identifier in UUID v4 format. If none is provided, the backend will generate one.
@@ -18609,6 +18730,12 @@ input ProjectSortInput {
 
   """Sort by project start date"""
   startDate: StartDateSort
+
+  """Sort by project creation date"""
+  createdAt: ProjectCreatedAtSort
+
+  """Sort by project update date"""
+  updatedAt: ProjectUpdatedAtSort
 }
 
 """A project status."""
@@ -18947,6 +19074,15 @@ input ProjectUpdateCreateInput {
   Whether the diff between the current update and the previous one should be hidden.
   """
   isDiffHidden: Boolean
+}
+
+"""Project update date sorting options."""
+input ProjectUpdatedAtSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
 }
 
 type ProjectUpdateEdge {
@@ -20619,6 +20755,9 @@ type Query {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
+
+    """[INTERNAL] Sort returned initiatives."""
+    sort: [InitiativeSortInput!]
   ): InitiativeConnection!
 
   """One specific initiative."""
