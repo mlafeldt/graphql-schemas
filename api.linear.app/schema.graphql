@@ -3714,6 +3714,15 @@ enum Day {
   Saturday
 }
 
+"""Issue delegate sorting options."""
+input DelegateSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 input DeleteOrganizationInput {
   """The deletion code to confirm operation."""
   deletionCode: String!
@@ -5090,7 +5099,7 @@ type Favorite implements Node {
   """The favorited label."""
   label: IssueLabel
 
-  """[Internal] The favorited project label."""
+  """The favorited project label."""
   projectLabel: ProjectLabel
 
   """The favorited user."""
@@ -5181,7 +5190,7 @@ input FavoriteCreateInput {
   """The identifier of the label to favorite."""
   labelId: String
 
-  """[Internal] The identifier of the label to favorite."""
+  """The identifier of the label to favorite."""
   projectLabelId: String
 
   """The identifier of the user to favorite."""
@@ -5907,9 +5916,7 @@ type Initiative implements Node {
 
   """Projects associated with the initiative."""
   projects(
-    """
-    [ALPHA] Whether to include projects from sub-initiatives. Defaults to true.
-    """
+    """Whether to include projects from sub-initiatives. Defaults to true."""
     includeSubInitiatives: Boolean
 
     """Filter returned projects."""
@@ -6000,7 +6007,7 @@ type Initiative implements Node {
     orderBy: PaginationOrderBy
   ): InitiativeHistoryConnection!
 
-  """[ALPHA] Sub-initiatives associated with the initiative."""
+  """Sub-initiatives associated with the initiative."""
   subInitiatives(
     """Filter returned sub-initiatives."""
     filter: InitiativeFilter
@@ -6033,7 +6040,7 @@ type Initiative implements Node {
     sort: [InitiativeSortInput!]
   ): InitiativeConnection!
 
-  """[ALPHA] Parent initiative associated with the initiative."""
+  """Parent initiative associated with the initiative."""
   parentInitiative: Initiative
 
   """The initiative's content in markdown format."""
@@ -8149,6 +8156,9 @@ input IssueCollectionFilter {
   """Filters that the issues assignee must satisfy."""
   assignee: NullableUserFilter
 
+  """[Internal] Filters that the issues delegate must satisfy."""
+  delegate: NullableUserFilter
+
   """Filters that the last applied template must satisfy."""
   lastAppliedTemplate: NullableTemplateFilter
 
@@ -8585,6 +8595,9 @@ input IssueFilter {
 
   """Filters that the issues assignee must satisfy."""
   assignee: NullableUserFilter
+
+  """[Internal] Filters that the issues delegate must satisfy."""
+  delegate: NullableUserFilter
 
   """Filters that the last applied template must satisfy."""
   lastAppliedTemplate: NullableTemplateFilter
@@ -9064,6 +9077,9 @@ type IssueLabel implements Node {
 
   """Whether the label is a group."""
   isGroup: Boolean!
+
+  """The date when the label was last applied to an issue or project."""
+  lastAppliedAt: DateTime
   organization: Organization! @deprecated(reason: "Workspace labels are identified by their team being null.")
 
   """
@@ -10190,6 +10206,9 @@ input IssueSortInput {
   """Sort by assignee name"""
   assignee: AssigneeSort
 
+  """Sort by delegate name"""
+  delegate: DelegateSort
+
   """Sort by Project name"""
   project: ProjectSort
 
@@ -11020,7 +11039,7 @@ type Mutation {
     id: String!
   ): ProjectArchivePayload!
 
-  """[Internal] Adds a label to a project."""
+  """Adds a label to a project."""
   projectAddLabel(
     """The identifier of the label to add."""
     labelId: String!
@@ -11029,7 +11048,7 @@ type Mutation {
     id: String!
   ): ProjectPayload!
 
-  """[Internal] Removes a label from a project."""
+  """Removes a label from a project."""
   projectRemoveLabel(
     """The identifier of the label to remove."""
     labelId: String!
@@ -11320,6 +11339,27 @@ type Mutation {
     """The identifier of the project milestone to move."""
     id: String!
   ): ProjectMilestoneMovePayload!
+
+  """Creates a new project label."""
+  projectLabelCreate(
+    """The project label to create."""
+    input: ProjectLabelCreateInput!
+  ): ProjectLabelPayload!
+
+  """Updates a project label."""
+  projectLabelUpdate(
+    """A partial label object to update."""
+    input: ProjectLabelUpdateInput!
+
+    """The identifier of the label to update."""
+    id: String!
+  ): ProjectLabelPayload!
+
+  """Deletes a project label."""
+  projectLabelDelete(
+    """The identifier of the label to delete."""
+    id: String!
+  ): DeletePayload!
 
   """Updates the user's organization."""
   organizationUpdate(
@@ -14312,6 +14352,9 @@ input NullableIssueFilter {
   """Filters that the issues assignee must satisfy."""
   assignee: NullableUserFilter
 
+  """[Internal] Filters that the issues delegate must satisfy."""
+  delegate: NullableUserFilter
+
   """Filters that the last applied template must satisfy."""
   lastAppliedTemplate: NullableTemplateFilter
 
@@ -14502,7 +14545,7 @@ input NullableProjectFilter {
   """Comparator for the projects priority."""
   priority: NullableNumberComparator
 
-  """[Internal] Filters that project labels must satisfy."""
+  """Filters that project labels must satisfy."""
   labels: ProjectLabelCollectionFilter
 
   """[Internal] Comparator for the project's content."""
@@ -15407,7 +15450,7 @@ type Organization implements Node {
     orderBy: PaginationOrderBy
   ): IssueLabelConnection!
 
-  """[Internal] Project labels associated with the organization."""
+  """Project labels associated with the organization."""
   projectLabels(
     """Filter returned project labels."""
     filter: ProjectLabelFilter
@@ -16639,7 +16682,7 @@ type Project implements Node {
     orderBy: PaginationOrderBy
   ): ProjectHistoryConnection!
 
-  """[Internal] Labels associated with this project."""
+  """Labels associated with this project."""
   labels(
     """Filter returned project labels."""
     filter: ProjectLabelFilter
@@ -16889,7 +16932,7 @@ input ProjectCollectionFilter {
   """Comparator for the projects priority."""
   priority: NullableNumberComparator
 
-  """[Internal] Filters that project labels must satisfy."""
+  """Filters that project labels must satisfy."""
   labels: ProjectLabelCollectionFilter
 
   """[Internal] Comparator for the project's content."""
@@ -17116,7 +17159,7 @@ input ProjectFilter {
   """Comparator for the projects priority."""
   priority: NullableNumberComparator
 
-  """[Internal] Filters that project labels must satisfy."""
+  """Filters that project labels must satisfy."""
   labels: ProjectLabelCollectionFilter
 
   """[Internal] Comparator for the project's content."""
@@ -17263,7 +17306,7 @@ type ProjectHistoryEdge {
   cursor: String!
 }
 
-"""[Internal] Labels that can be associated with projects."""
+"""Labels that can be associated with projects."""
 type ProjectLabel implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -17293,6 +17336,9 @@ type ProjectLabel implements Node {
 
   """Whether the label is a group."""
   isGroup: Boolean!
+
+  """The date when the label was last applied to an issue or project."""
+  lastAppliedAt: DateTime
   organization: Organization!
 
   """The user who created the label."""
@@ -17300,6 +17346,69 @@ type ProjectLabel implements Node {
 
   """The parent label."""
   parent: ProjectLabel
+
+  """Projects associated with the label."""
+  projects(
+    """Filter returned projects."""
+    filter: ProjectFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+
+    """[INTERNAL] Sort returned projects."""
+    sort: [ProjectSortInput!]
+  ): ProjectConnection!
+
+  """Children of the label."""
+  children(
+    """Filter returned project labels."""
+    filter: ProjectLabelFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectLabelConnection!
 }
 
 """Project label filtering options."""
@@ -17350,6 +17459,28 @@ type ProjectLabelConnection {
   pageInfo: PageInfo!
 }
 
+input ProjectLabelCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The name of the label."""
+  name: String!
+
+  """The description of the label."""
+  description: String
+
+  """The color of the label."""
+  color: String
+
+  """The identifier of the parent label."""
+  parentId: String
+
+  """Whether the label is a group."""
+  isGroup: Boolean
+}
+
 type ProjectLabelEdge {
   node: ProjectLabel!
 
@@ -17357,7 +17488,7 @@ type ProjectLabelEdge {
   cursor: String!
 }
 
-"""[Internal] Project label filtering options."""
+"""Project label filtering options."""
 input ProjectLabelFilter {
   """Comparator for the identifier."""
   id: IDComparator
@@ -17385,6 +17516,31 @@ input ProjectLabelFilter {
 
   """Compound filters, one of which need to be matched by the label."""
   or: [ProjectLabelFilter!]
+}
+
+type ProjectLabelPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The label that was created or updated."""
+  projectLabel: ProjectLabel!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input ProjectLabelUpdateInput {
+  """The name of the label."""
+  name: String
+
+  """The description of the label."""
+  description: String
+
+  """The identifier of the parent label."""
+  parentId: String
+
+  """The color of the label."""
+  color: String
 }
 
 """Project manual order sorting options."""
@@ -18523,7 +18679,7 @@ type ProjectSearchResult implements Node {
     orderBy: PaginationOrderBy
   ): ProjectHistoryConnection!
 
-  """[Internal] Labels associated with this project."""
+  """Labels associated with this project."""
   labels(
     """Filter returned project labels."""
     filter: ProjectLabelFilter
@@ -19229,9 +19385,7 @@ input ProjectUpdateInput {
   """
   priority: Int
 
-  """
-  [Internal] The identifiers of the project labels associated with this project.
-  """
+  """The identifiers of the project labels associated with this project."""
   labelIds: [String!]
 }
 
@@ -20249,6 +20403,39 @@ type Query {
 
   """One specific project milestone."""
   projectMilestone(id: String!): ProjectMilestone!
+
+  """All project labels."""
+  projectLabels(
+    """Filter returned project labels."""
+    filter: ProjectLabelFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectLabelConnection!
+
+  """One specific label."""
+  projectLabel(id: String!): ProjectLabel!
 
   """The user's organization."""
   organization: Organization!
@@ -25215,9 +25402,7 @@ input ViewPreferencesCreateInput {
   """The label these view preferences are associated with."""
   labelId: String
 
-  """
-  [Internal] The project label these view preferences are associated with.
-  """
+  """The project label these view preferences are associated with."""
   projectLabelId: String
 
   """The custom view these view preferences are associated with."""
