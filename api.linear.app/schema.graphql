@@ -84,7 +84,7 @@ type AgentActivityConnection {
 }
 
 """Content for different types of agent activities."""
-union AgentActivityContent = AgentActivityObservationContent | AgentActivityActionContent | AgentActivityResponseContent | AgentActivityUserInputContent | AgentActivityErrorContent
+union AgentActivityContent = AgentActivityObservationContent | AgentActivityActionContent | AgentActivityResponseContent | AgentActivityPromptContent | AgentActivityErrorContent | AgentActivityElicitationContent
 
 input AgentActivityCreateInput {
   """
@@ -104,6 +104,15 @@ type AgentActivityEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Content for an elicitation activity."""
+type AgentActivityElicitationContent {
+  """The type of activity."""
+  type: AgentActivityType!
+
+  """The elicitation message in Markdown format."""
+  body: String!
 }
 
 """Content for an error activity."""
@@ -135,6 +144,18 @@ type AgentActivityPayload {
   success: Boolean!
 }
 
+"""Content for a prompt activity."""
+type AgentActivityPromptContent {
+  """The type of activity."""
+  type: AgentActivityType!
+
+  """The ID of the comment this prompt is sourced from."""
+  sourceCommentId: String
+
+  """A message requesting additional information or action from user."""
+  body: String
+}
+
 """Content for a response activity."""
 type AgentActivityResponseContent {
   """The type of activity."""
@@ -149,20 +170,9 @@ enum AgentActivityType {
   observation
   action
   response
-  userInput
+  elicitation
   error
-}
-
-"""Content for a user input activity."""
-type AgentActivityUserInputContent {
-  """The type of activity."""
-  type: AgentActivityType!
-
-  """The ID of the comment this user input is sourced from."""
-  sourceCommentId: String
-
-  """The user input body."""
-  body: String
+  prompt
 }
 
 """A context for agent activities and state management."""
@@ -1595,7 +1605,7 @@ type CustomerConnection {
   pageInfo: PageInfo!
 }
 
-"""[ALPHA] Issue customer count sorting options."""
+"""Issue customer count sorting options."""
 input CustomerCountSort {
   """Whether nulls should be sorted first or last"""
   nulls: PaginationNulls = last
@@ -1710,7 +1720,7 @@ input CustomerFilter {
   or: [CustomerFilter!]
 }
 
-"""[ALPHA] Issue customer important count sorting options."""
+"""Issue customer important count sorting options."""
 input CustomerImportantCountSort {
   """Whether nulls should be sorted first or last"""
   nulls: PaginationNulls = last
@@ -2303,7 +2313,7 @@ type CustomerPayload {
   success: Boolean!
 }
 
-"""[ALPHA] Issue customer revenue sorting options."""
+"""Issue customer revenue sorting options."""
 input CustomerRevenueSort {
   """Whether nulls should be sorted first or last"""
   nulls: PaginationNulls = last
@@ -8975,7 +8985,7 @@ type IssueImport implements Node {
   teamName: String
 
   """The id for the user that started the job."""
-  creatorId: String!
+  creatorId: String
 
   """The service from which data will be imported."""
   service: String!
@@ -17282,6 +17292,15 @@ type ProjectFilterSuggestionPayload {
   logId: String
 }
 
+"""Project health sorting options."""
+input ProjectHealthSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 """An history associated with a project."""
 type ProjectHistory implements Node {
   """The unique identifier of the entity."""
@@ -17556,6 +17575,15 @@ input ProjectLabelUpdateInput {
 
   """The color of the label."""
   color: String
+}
+
+"""Project lead sorting options."""
+input ProjectLeadSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
 }
 
 """Project manual order sorting options."""
@@ -18907,6 +18935,12 @@ input ProjectSortInput {
 
   """Sort by project update date"""
   updatedAt: ProjectUpdatedAtSort
+
+  """Sort by project health status."""
+  health: ProjectHealthSort
+
+  """Sort by project lead name."""
+  lead: ProjectLeadSort
 }
 
 """A project status."""
