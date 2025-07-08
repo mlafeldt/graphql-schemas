@@ -129,6 +129,9 @@ type Branch implements Node {
   latestDeployment: Deployment
   name: String!
   operationChecksEnabled: Boolean!
+
+  """Whether usage data should be ignored when running operation checks."""
+  operationChecksIgnoreUsageData: Boolean!
   schema: String
   schemaProposals(after: String, first: Int, filter: SchemaProposalFilter!): SchemaProposalConnection!
   schemaProposalsConfiguration: SchemaProposalsConfiguration!
@@ -179,7 +182,17 @@ enum BranchEnvironment {
 }
 
 input BranchUpdateInput {
+  """
+  Toggle whether operation checks are run along with other schema checks.
+  """
   operationChecksEnabled: Boolean
+
+  """
+  When this is enabled, operation checks will not take usage data into account.
+  Any change that is theoretically breaking (like making a required output field
+  optional) will be considered breaking.
+  """
+  operationChecksIgnoreUsageData: Boolean
   schemaProposalsConfiguration: SchemaProposalsConfigurationUpdateInput
   accountSlug: String!
   graphSlug: String
