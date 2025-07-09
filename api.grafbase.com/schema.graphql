@@ -196,7 +196,6 @@ input BranchUpdateInput {
   schemaProposalsConfiguration: SchemaProposalsConfigurationUpdateInput
   accountSlug: String!
   graphSlug: String
-  projectSlug: String
   branchSlug: String!
   trustedDocumentsEnforce: Boolean
   trustedDocumentsBypassHeaderName: String
@@ -263,7 +262,6 @@ type DeleteSubgraphDeploymentFailure {
 input DeleteSubgraphInput {
   accountSlug: String!
   graphSlug: String
-  projectSlug: String
   message: String
   branch: String!
   subgraph: String!
@@ -1047,9 +1045,6 @@ type Mutation {
 
     """name of the branch"""
     branchName: String!
-
-    """slug of the project"""
-    projectSlug: String
   ): BranchDeletePayload!
   branchSchemaProposalsConfiguredReviewerAdd(input: SchemaProposalsConfiguredReviewerAddInput!): SchemaProposalsConfiguredReviewerAddPayload!
   branchSchemaProposalsConfiguredReviewerRemove(input: SchemaProposalsConfiguredReviewerRemoveInput!): SchemaProposalsConfiguredReviewerRemovePayload!
@@ -1153,7 +1148,7 @@ type Mutation {
   teamCreate(name: String!, organizationId: ID!): TeamCreatePayload!
   teamDelete(teamId: ID!): TeamDeletePayload!
   teamRemoveMember(teamId: ID!, memberId: ID!): TeamRemoveMemberPayload!
-  trustedDocumentsSubmit(accountSlug: String, graphSlug: String, projectSlug: String, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
+  trustedDocumentsSubmit(accountSlug: String, graphSlug: String, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
 
   """Delete the user."""
   userDelete: UserDeletePayload!
@@ -1400,7 +1395,6 @@ input PublishInput {
   schema: String!
   accountSlug: String!
   graphSlug: String
-  projectSlug: String
   message: String
   url: String
   branch: String
@@ -1440,9 +1434,6 @@ type Query {
 
     """slug of the graph"""
     graphSlug: String
-
-    """slug of the project"""
-    projectSlug: String
   ): Branch
 
   """Get deployment by ID."""
@@ -1506,9 +1497,6 @@ type Query {
 
     """graph slug"""
     graphSlug: String
-
-    """project slug"""
-    projectSlug: String
 
     """name of the branch"""
     branch: String
