@@ -60,6 +60,9 @@ type AgentActivity implements Node {
 
   """The comment ID this activity is linked to."""
   sourceCommentId: String
+
+  """The comment that this activity is linked to."""
+  sourceComment: Comment
 }
 
 """Content for an action activity (tool call or action)."""
@@ -95,7 +98,10 @@ input AgentActivityCreateInput {
   """The agent context this activity belongs to."""
   agentContextId: String!
 
-  """The content payload of the agent activity."""
+  """
+  The content payload of the agent activity. This object is not strictly typed.
+  See https://linear.app/developers/agents for typing details.
+  """
   content: JSONObject!
 }
 
@@ -4505,6 +4511,9 @@ input EmailIntakeAddressCreateInput {
 
   """Whether email replies are enabled."""
   repliesEnabled: Boolean
+
+  """Whether customer requests are enabled."""
+  customerRequestsEnabled: Boolean
 }
 
 type EmailIntakeAddressPayload {
@@ -5133,6 +5142,9 @@ type Favorite implements Node {
   """The favorited dashboard."""
   dashboard: Dashboard
 
+  """The favorited pull request."""
+  pullRequest: PullRequest
+
   """URL of the favorited entity. Folders return 'null' value."""
   url: String
 
@@ -5226,6 +5238,9 @@ input FavoriteCreateInput {
 
   """The identifier of the dashboard to favorite."""
   dashboardId: String
+
+  """The identifier of the pull request to favorite."""
+  pullRequestId: String
 }
 
 type FavoriteEdge {
@@ -24773,8 +24788,8 @@ type User implements Node {
     orderBy: PaginationOrderBy
   ): IssueConnection!
 
-  """Issues delegated to an agent by the user."""
-  supervisedIssues(
+  """[Internal] Issues delegated to this user."""
+  delegatedIssues(
     """Filter returned issues."""
     filter: IssueFilter
 
