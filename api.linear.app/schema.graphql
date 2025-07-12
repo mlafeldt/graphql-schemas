@@ -53,15 +53,15 @@ type AgentActivity implements Node {
   archivedAt: DateTime
 
   """The agent context this activity belongs to."""
-  agentContext: AgentContext!
+  agentContext: AgentContext
+
+  """The agent session this activity belongs to."""
+  agentSession: AgentSession!
 
   """The content of the activity"""
   content: AgentActivityContent!
 
-  """The comment ID this activity is linked to."""
-  sourceCommentId: String
-
-  """The comment that this activity is linked to."""
+  """The comment this activity is linked to."""
   sourceComment: Comment
 }
 
@@ -95,8 +95,8 @@ input AgentActivityCreateInput {
   """
   id: String
 
-  """The agent context this activity belongs to."""
-  agentContextId: String!
+  """The agent session this activity belongs to."""
+  agentSessionId: String!
 
   """
   The content payload of the agent activity. This object is not strictly typed.
@@ -178,7 +178,7 @@ enum AgentActivityType {
   prompt
 }
 
-"""A context for agent activities and state management."""
+"""[DEPRECATED] A context for agent activities and state management."""
 type AgentContext implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -210,7 +210,7 @@ type AgentContext implements Node {
   issue: Issue
 
   """The current status of the agent context."""
-  status: AgentContextStatus!
+  status: AgentSessionStatus!
 
   """The time the agent context started working."""
   startedAt: DateTime
@@ -219,7 +219,7 @@ type AgentContext implements Node {
   endedAt: DateTime
 
   """The type of the agent context."""
-  type: AgentContextType!
+  type: AgentSessionType!
 
   """Activities associated with this agent context."""
   activities(
@@ -274,7 +274,7 @@ input AgentContextCreateInput {
   commentId: String!
 
   """The type of the agent context."""
-  type: AgentContextType!
+  type: AgentSessionType!
 
   """The user who created this agent context."""
   creatorId: String!
@@ -303,25 +303,119 @@ type AgentContextPayload {
   success: Boolean!
 }
 
-"""The status of an agent context."""
-enum AgentContextStatus {
+input AgentContextUpdateInput {
+  """The current status of the agent context."""
+  status: AgentSessionStatus
+
+  """The summary of the agent context."""
+  summary: String
+}
+
+"""A session for agent activities and state management."""
+type AgentSession implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The user that created this agent session."""
+  creator: User
+
+  """The agent user that is associated with this agent session."""
+  appUser: User!
+
+  """The comment this agent session is associated with."""
+  comment: Comment
+
+  """The issue this agent session is associated with."""
+  issue: Issue
+
+  """The current status of the agent session."""
+  status: AgentSessionStatus!
+
+  """The time the agent session started."""
+  startedAt: DateTime
+
+  """The time the agent session ended."""
+  endedAt: DateTime
+
+  """The type of the agent session."""
+  type: AgentSessionType!
+
+  """Activities associated with this agent session."""
+  activities(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): [AgentActivity!]!
+
+  """External links associated with this agent session."""
+  links: [EntityExternalLink!]!
+
+  """A summary of the activities in this session."""
+  summary: String
+
+  """Metadata about the external source that created this agent session."""
+  sourceMetadata: JSON
+}
+
+type AgentSessionConnection {
+  edges: [AgentSessionEdge!]!
+  nodes: [AgentSession!]!
+  pageInfo: PageInfo!
+}
+
+type AgentSessionEdge {
+  node: AgentSession!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""The status of an agent session."""
+enum AgentSessionStatus {
   pending
   active
   complete
   awaitingInput
+  error
 }
 
-"""The type of an agent context."""
-enum AgentContextType {
+"""The type of an agent session."""
+enum AgentSessionType {
   commentThread
-}
-
-input AgentContextUpdateInput {
-  """The current status of the agent context."""
-  status: AgentContextStatus
-
-  """The summary of the agent context."""
-  summary: String
 }
 
 input AirbyteConfigurationInput {
@@ -6082,6 +6176,39 @@ type Initiative implements Node {
 
   """The initiative's content in markdown format."""
   content: String
+
+  """The content of the initiative description."""
+  documentContent: DocumentContent
+
+  """Documents associated with the initiative."""
+  documents(
+    """Filter returned documents."""
+    filter: DocumentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): DocumentConnection!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -7616,9 +7743,6 @@ type Issue implements Node {
   """[Internal] The activity summary information for this issue."""
   activitySummary: JSONObject
 
-  """[ALPHA] The document content representing this issue description."""
-  documentContent: DocumentContent
-
   """Id of the labels associated with this issue."""
   labelIds: [String!]!
 
@@ -7657,7 +7781,7 @@ type Issue implements Node {
   """
   supervisor: User
 
-  """[Internal] The agent that is delegated to complete this issue."""
+  """The app user that is delegated to work on this issue."""
   delegate: User
 
   """The user who snoozed the issue."""
@@ -7978,6 +8102,9 @@ type Issue implements Node {
   """[Internal] The issue's description content as YJS state."""
   descriptionState: String
 
+  """[ALPHA] The document content representing this issue description."""
+  documentContent: DocumentContent
+
   """Reactions associated with the issue."""
   reactions: [Reaction!]!
 
@@ -8193,7 +8320,7 @@ input IssueCollectionFilter {
   """Filters that the issues assignee must satisfy."""
   assignee: NullableUserFilter
 
-  """[Internal] Filters that the issues delegate must satisfy."""
+  """Filters that the issue's delegate must satisfy."""
   delegate: NullableUserFilter
 
   """Filters that the last applied template must satisfy."""
@@ -8642,7 +8769,7 @@ input IssueFilter {
   """Filters that the issues assignee must satisfy."""
   assignee: NullableUserFilter
 
-  """[Internal] Filters that the issues delegate must satisfy."""
+  """Filters that the issue's delegate must satisfy."""
   delegate: NullableUserFilter
 
   """Filters that the last applied template must satisfy."""
@@ -9714,9 +9841,6 @@ type IssueSearchResult implements Node {
   """[Internal] The activity summary information for this issue."""
   activitySummary: JSONObject
 
-  """[ALPHA] The document content representing this issue description."""
-  documentContent: DocumentContent
-
   """Id of the labels associated with this issue."""
   labelIds: [String!]!
 
@@ -9755,7 +9879,7 @@ type IssueSearchResult implements Node {
   """
   supervisor: User
 
-  """[Internal] The agent that is delegated to complete this issue."""
+  """The app user that is delegated to work on this issue."""
   delegate: User
 
   """The user who snoozed the issue."""
@@ -10075,6 +10199,9 @@ type IssueSearchResult implements Node {
 
   """[Internal] The issue's description content as YJS state."""
   descriptionState: String
+
+  """[ALPHA] The document content representing this issue description."""
+  documentContent: DocumentContent
 
   """Reactions associated with the issue."""
   reactions: [Reaction!]!
@@ -14398,7 +14525,7 @@ input NullableIssueFilter {
   """Filters that the issues assignee must satisfy."""
   assignee: NullableUserFilter
 
-  """[Internal] Filters that the issues delegate must satisfy."""
+  """Filters that the issue's delegate must satisfy."""
   delegate: NullableUserFilter
 
   """Filters that the last applied template must satisfy."""
@@ -16344,9 +16471,6 @@ type Project implements Node {
   """The project's description."""
   description: String!
 
-  """The content of the project description."""
-  documentContent: DocumentContent
-
   """The project's unique URL slug."""
   slugId: String!
 
@@ -16775,6 +16899,9 @@ type Project implements Node {
 
   """[Internal] The project's content as YJS state."""
   contentState: String
+
+  """The content of the project description."""
+  documentContent: DocumentContent
 
   """Comments associated with the project overview."""
   comments(
@@ -18359,9 +18486,6 @@ type ProjectSearchResult implements Node {
   """The project's description."""
   description: String!
 
-  """The content of the project description."""
-  documentContent: DocumentContent
-
   """The project's unique URL slug."""
   slugId: String!
 
@@ -18790,6 +18914,9 @@ type ProjectSearchResult implements Node {
 
   """[Internal] The project's content as YJS state."""
   contentState: String
+
+  """The content of the project description."""
+  documentContent: DocumentContent
 
   """Comments associated with the project overview."""
   comments(
@@ -21675,6 +21802,39 @@ type Query {
     """
     orderBy: PaginationOrderBy
   ): ApiKeyConnection!
+
+  """All agent sessions."""
+  agentSessions(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AgentSessionConnection!
+
+  """A specific agent session."""
+  agentSession(
+    """The identifier of the agent session to retrieve."""
+    id: String!
+  ): AgentSession!
 
   """All agent contexts."""
   agentContexts(
@@ -24794,7 +24954,7 @@ type User implements Node {
     orderBy: PaginationOrderBy
   ): IssueConnection!
 
-  """[Internal] Issues delegated to this user."""
+  """Issues delegated to this user."""
   delegatedIssues(
     """Filter returned issues."""
     filter: IssueFilter
