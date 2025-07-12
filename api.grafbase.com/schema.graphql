@@ -30,10 +30,9 @@ input AccessTokenCreateInput {
   graphScopes: [ID!]
   expiresAt: DateTime
   kind: AccessTokenKind! = USER
-  projectScopes: [ID!]
 }
 
-union AccessTokenCreatePayload = AccessTokenCreateSuccess | AccountIdMissingForAccountAccessTokenError | CouldNotFindGraphsError | CouldNotFindProjectsError | GraphScopeLimitExceededError | InvalidAccountError | ProjectScopeLimitExceededError | TokenLimitExceededError | UserAccessTokensCannotBeScopedToAProjectError
+union AccessTokenCreatePayload = AccessTokenCreateSuccess | AccountIdMissingForAccountAccessTokenError | CouldNotFindGraphsError | GraphScopeLimitExceededError | InvalidAccountError | TokenLimitExceededError | UserAccessTokensCannotBeScopedToAGraphError | UserAccessTokensCannotBeScopedToAProjectError
 
 type AccessTokenCreateSuccess {
   jwt: String!
@@ -202,7 +201,7 @@ input BranchUpdateInput {
   trustedDocumentsBypassHeaderValue: String
 }
 
-union BranchUpdatePayload = GraphDoesNotExistError | ProjectDoesNotExistError | Query
+union BranchUpdatePayload = GraphDoesNotExistError | Query
 
 type CannotBeRenamedError {
   query: Query!
@@ -224,10 +223,6 @@ type CompositionCheckError {
 
 type CouldNotFindGraphsError {
   unknownGraphIds: [ID!]!
-}
-
-type CouldNotFindProjectsError {
-  unknownProjectIds: [ID!]!
 }
 
 type CurrentPlanLimitReachedError {
@@ -268,7 +263,7 @@ input DeleteSubgraphInput {
   dryRun: Boolean!
 }
 
-union DeleteSubgraphPayload = DeleteSubgraphDeploymentFailure | DeleteSubgraphSuccess | FederatedGraphCompositionError | GraphBranchDoesNotExistError | GraphDoesNotExistError | GraphNotFederatedError | ProjectBranchDoesNotExistError | ProjectDoesNotExistError | ProjectNotFederatedError | SubgraphNotFoundError
+union DeleteSubgraphPayload = DeleteSubgraphDeploymentFailure | DeleteSubgraphSuccess | FederatedGraphCompositionError | GraphBranchDoesNotExistError | GraphDoesNotExistError | GraphNotFederatedError | SubgraphNotFoundError
 
 type DeleteSubgraphSuccess {
   query: Query!
@@ -1361,22 +1356,6 @@ type PersonalAccountUpdateSuccess {
   query: Query!
 }
 
-type ProjectBranchDoesNotExistError {
-  query: Query!
-}
-
-type ProjectDoesNotExistError {
-  query: Query!
-}
-
-type ProjectNotFederatedError {
-  query: Query!
-}
-
-type ProjectScopeLimitExceededError {
-  query: Query!
-}
-
 type ProposalCheckError {
   message: String!
   title: String!
@@ -1409,7 +1388,7 @@ type PublishNoChange {
   query: Query!
 }
 
-union PublishPayload = FederatedGraphCompositionError | GraphDoesNotExistError | ProjectDoesNotExistError | PublishDeploymentFailure | PublishForbidden | PublishNoChange | PublishSuccess | SchemaRegistryBranchDoesNotExistError
+union PublishPayload = FederatedGraphCompositionError | GraphDoesNotExistError | PublishDeploymentFailure | PublishForbidden | PublishNoChange | PublishSuccess | SchemaRegistryBranchDoesNotExistError
 
 type PublishSuccess {
   query: Query!
@@ -2422,7 +2401,7 @@ type SlackNotification {
   id: String!
 }
 
-union SlackNotificationCreatePayload = ProjectDoesNotExistError | SlackNotification
+union SlackNotificationCreatePayload = GraphDoesNotExistError | SlackNotification
 
 union SlackNotificationDeletePayload = Query
 
@@ -2732,7 +2711,7 @@ input TrustedDocumentInput {
   documentText: String!
 }
 
-union TrustedDocumentsSubmitPayload = GraphDoesNotExistError | OldAccessTokenError | ProjectDoesNotExistError | ReusedIds | TrustedDocumentsSubmitSuccess
+union TrustedDocumentsSubmitPayload = GraphDoesNotExistError | OldAccessTokenError | ReusedIds | TrustedDocumentsSubmitSuccess
 
 type TrustedDocumentsSubmitSuccess {
   count: Int!
@@ -2811,6 +2790,10 @@ type User implements Node {
   name: String!
   organizationMemberships: [Member!]!
   organizations(after: String, before: String, first: Int, last: Int): OrganizationConnection!
+}
+
+type UserAccessTokensCannotBeScopedToAGraphError {
+  query: Query!
 }
 
 type UserAccessTokensCannotBeScopedToAProjectError {
