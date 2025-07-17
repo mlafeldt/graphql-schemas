@@ -87,7 +87,7 @@ type AgentActivityConnection {
 }
 
 """Content for different types of agent activities."""
-union AgentActivityContent = AgentActivityObservationContent | AgentActivityActionContent | AgentActivityResponseContent | AgentActivityPromptContent | AgentActivityErrorContent | AgentActivityElicitationContent
+union AgentActivityContent = AgentActivityThoughtContent | AgentActivityActionContent | AgentActivityResponseContent | AgentActivityPromptContent | AgentActivityErrorContent | AgentActivityElicitationContent
 
 input AgentActivityCreateInput {
   """
@@ -130,15 +130,6 @@ type AgentActivityErrorContent {
   body: String!
 }
 
-"""Content for an observation activity (chain of thought)."""
-type AgentActivityObservationContent {
-  """The type of activity."""
-  type: AgentActivityType!
-
-  """The observation content in Markdown format."""
-  body: String!
-}
-
 type AgentActivityPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -168,9 +159,18 @@ type AgentActivityResponseContent {
   body: String!
 }
 
+"""Content for a thought activity."""
+type AgentActivityThoughtContent {
+  """The type of activity."""
+  type: AgentActivityType!
+
+  """The thought content in Markdown format."""
+  body: String!
+}
+
 """The type of an agent activity."""
 enum AgentActivityType {
-  observation
+  thought
   action
   response
   elicitation
@@ -411,6 +411,7 @@ enum AgentSessionStatus {
   complete
   awaitingInput
   error
+  stale
 }
 
 """The type of an agent session."""
@@ -9053,6 +9054,12 @@ type IssueHistory implements Node {
 
   """The new project created from the issue."""
   toConvertedProject: Project
+
+  """The app user from whom the issue delegation was transferred."""
+  fromDelegate: User
+
+  """The app user to whom the issue delegation was transferred."""
+  toDelegate: User
 
   """The project that the issue was moved from."""
   fromProject: Project
@@ -26242,5 +26249,10 @@ input ZendeskSettingsInput {
   [INTERNAL] Temporary flag indicating if the integration has the necessary scopes for Customers
   """
   canReadCustomers: Boolean
+
+  """
+  [INTERNAL] Flag indicating if the integration supports OAuth refresh tokens
+  """
+  supportsOAuthRefresh: Boolean
 }
 
