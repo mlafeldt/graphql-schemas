@@ -5929,6 +5929,67 @@ input IDComparator {
   nin: [ID!]
 }
 
+"""An identity provider."""
+type IdentityProvider implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """Whether SAML authentication is enabled for organization."""
+  samlEnabled: Boolean!
+
+  """Sign in endpoint URL for the identity provider."""
+  ssoEndpoint: String
+
+  """
+  Binding method for authentication call. Can be either `post` (default) or `redirect`.
+  """
+  ssoBinding: String
+
+  """
+  The algorithm of the Signing Certificate. Can be one of `sha1`, `sha256` (default), or `sha512`.
+  """
+  ssoSignAlgo: String
+
+  """The issuer's custom entity ID."""
+  issuerEntityId: String
+
+  """X.509 Signing Certificate in string form."""
+  ssoSigningCert: String
+
+  """Allowed authentication providers, empty array means all are allowed."""
+  allowedAuthServices: [String!]!
+
+  """
+  The SAML priority used to pick default workspace in SAML SP initiated flow,
+  when same domain is claimed for SAML by multiple workspaces. Lower priority
+  value means higher preference.
+  """
+  priority: Float
+
+  """Whether SCIM provisioning is enabled for organization."""
+  scimEnabled: Boolean!
+
+  """[INTERNAL] SCIM admins group push settings."""
+  adminsGroupPush: JSONObject
+
+  """[INTERNAL] SCIM guests group push settings."""
+  guestsGroupPush: JSONObject
+}
+
 type ImageUploadFromUrlPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -15704,6 +15765,9 @@ type OrganizationDomain implements Node {
   """
   archivedAt: DateTime
 
+  """The identity provider the domain belongs to."""
+  identityProvider: IdentityProvider
+
   """Domain name."""
   name: String!
 
@@ -24876,6 +24940,12 @@ type User implements Node {
 
   """Whether the user is an app."""
   app: Boolean!
+
+  """Whether the user is mentionable."""
+  isMentionable: Boolean!
+
+  """Whether the user is assignable."""
+  isAssignable: Boolean!
 
   """Whether the user account is active or disabled (suspended)."""
   active: Boolean!
