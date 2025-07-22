@@ -41647,6 +41647,18 @@
             "deprecationReason": null
           },
           {
+            "name": "delegateId",
+            "description": "The app user delegated to work on the issue being drafted.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "stateId",
             "description": "The workflow state associated with the draft.",
             "args": [],
@@ -53435,6 +53447,37 @@
             "deprecationReason": null
           },
           {
+            "name": "fetchData",
+            "description": "[Internal] Fetch an arbitrary set of data using natural language query. Be specific about what you want including properties for each entity, sort order, filters, limit and properties.",
+            "args": [
+              {
+                "name": "query",
+                "description": "Natural language query describing what data to fetch.\n    \n    Examples:\n    - \"All issues for the project with id 12345678-1234-1234-1234-123456789abc including comments\"\n    - \"The latest project update for each project that's a part of the initiative with id 12345678-1234-1234-1234-123456789abc, including it's sub-initiatives\"",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "FetchDataPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "favorites",
             "description": "The user's favorites.",
             "args": [
@@ -56002,6 +56045,16 @@
             "name": "agentActivities",
             "description": "All agent activities.",
             "args": [
+              {
+                "name": "filter",
+                "description": "Filter returned agent activities.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "AgentActivityFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
               {
                 "name": "before",
                 "description": "A cursor to be used with last for backward pagination.",
@@ -65485,6 +65538,45 @@
       },
       {
         "kind": "OBJECT",
+        "name": "FetchDataPayload",
+        "description": null,
+        "fields": [
+          {
+            "name": "data",
+            "description": "The fetched data based on the natural language query.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSONObject",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the fetch operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "ExternalUserConnection",
         "description": null,
         "fields": [
@@ -70995,6 +71087,16 @@
             "description": "Activities associated with this agent session.",
             "args": [
               {
+                "name": "filter",
+                "description": "Filter returned agent activities.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "AgentActivityFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
                 "name": "before",
                 "description": "A cursor to be used with last for backward pagination.",
                 "type": {
@@ -71068,25 +71170,13 @@
             "deprecationReason": null
           },
           {
-            "name": "links",
-            "description": "External links associated with this agent session.",
+            "name": "externalLink",
+            "description": "The URL of an external agent-hosted page associated with this session.",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "EntityExternalLink",
-                    "ofType": null
-                  }
-                }
-              }
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -72131,6 +72221,113 @@
         ],
         "inputFields": null,
         "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AgentActivityFilter",
+        "description": "Agent activity filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "agentSessionId",
+            "description": "Comparator for the agent session ID.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "type",
+            "description": "Comparator for the agent activity's content type.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "sourceComment",
+            "description": "Filters that the source comment must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableCommentFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the agent activity.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "AgentActivityFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the agent activity.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "AgentActivityFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },
@@ -84217,6 +84414,51 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "ApiKeyPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentSessionUpdateExternalUrl",
+            "description": "Updates the externalUrl of an agent session, which is an agent-hosted page associated with this session.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The agent session object to update.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AgentSessionUpdateExternalUrlInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the agent session to update.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentSessionPayload",
                 "ofType": null
               }
             },
@@ -97378,6 +97620,16 @@
             "defaultValue": null
           },
           {
+            "name": "disableCustomerRequestsAutoCreation",
+            "description": "[ALPHA] Whether customer and customer requests should not be automatically created when conversations are linked to a Linear issue.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "subdomain",
             "description": "The subdomain of the Zendesk organization being connected.",
             "type": {
@@ -97495,6 +97747,16 @@
               "ofType": null
             },
             "defaultValue": null
+          },
+          {
+            "name": "disableCustomerRequestsAutoCreation",
+            "description": "[ALPHA] Whether customer and customer requests should not be automatically created when conversations are linked to a Linear issue.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -97550,6 +97812,16 @@
           {
             "name": "automateTicketReopeningOnComment",
             "description": "Whether a ticket should be automatically reopened when a comment is posted on its linked Linear issue",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "disableCustomerRequestsAutoCreation",
+            "description": "[ALPHA] Whether customer and customer requests should not be automatically created when conversations are linked to a Linear issue.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -97955,6 +98227,16 @@
           {
             "name": "automateTicketReopeningOnComment",
             "description": "Whether a ticket should be automatically reopened when a comment is posted on its linked Linear issue",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "disableCustomerRequestsAutoCreation",
+            "description": "[ALPHA] Whether customer and customer requests should not be automatically created when conversations are linked to a Linear issue.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -105406,6 +105688,86 @@
                   "ofType": null
                 }
               }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AgentSessionPayload",
+        "description": null,
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "The identifier of the last sync operation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentSession",
+            "description": "The agent session that was created or updated.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentSession",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AgentSessionUpdateExternalUrlInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "externalLink",
+            "description": "The URL of an external agent-hosted page associated with this session.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "defaultValue": null
           }
