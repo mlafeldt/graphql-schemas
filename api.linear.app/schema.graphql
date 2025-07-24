@@ -2154,6 +2154,9 @@ type CustomerNeedNotification implements Notification & Entity & Node {
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
 
+  """The category of the notification."""
+  category: NotificationCategory!
+
   """[Internal] URL to the target of the notification."""
   url: String!
 
@@ -2324,6 +2327,9 @@ type CustomerNotification implements Notification & Entity & Node {
 
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
+
+  """The category of the notification."""
+  category: NotificationCategory!
 
   """[Internal] URL to the target of the notification."""
   url: String!
@@ -4256,6 +4262,9 @@ type DocumentNotification implements Notification & Entity & Node {
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
 
+  """The category of the notification."""
+  category: NotificationCategory!
+
   """[Internal] URL to the target of the notification."""
   url: String!
 
@@ -5572,6 +5581,16 @@ input FrontSettingsInput {
   created when conversations are linked to a Linear issue.
   """
   disableCustomerRequestsAutoCreation: Boolean
+
+  """
+  Whether a ticket should be automatically reopened when its linked Linear project is completed.
+  """
+  automateTicketReopeningOnProjectCompletion: Boolean
+
+  """
+  Whether a ticket should be automatically reopened when its linked Linear project is cancelled.
+  """
+  automateTicketReopeningOnProjectCancellation: Boolean
 }
 
 """A trigger that updates the issue status according to Git automations."""
@@ -6012,6 +6031,11 @@ type IdentityProvider implements Node {
   """
   archivedAt: DateTime
 
+  """
+  Whether the identity provider is the default identity provider migrated from organization level settings.
+  """
+  defaultMigrated: Boolean!
+
   """Whether SAML authentication is enabled for organization."""
   samlEnabled: Boolean!
 
@@ -6033,9 +6057,6 @@ type IdentityProvider implements Node {
 
   """X.509 Signing Certificate in string form."""
   ssoSigningCert: String
-
-  """Allowed authentication providers, empty array means all are allowed."""
-  allowedAuthServices: [String!]!
 
   """
   The SAML priority used to pick default workspace in SAML SP initiated flow,
@@ -6643,6 +6664,9 @@ type InitiativeNotification implements Notification & Entity & Node {
 
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
+
+  """The category of the notification."""
+  category: NotificationCategory!
 
   """[Internal] URL to the target of the notification."""
   url: String!
@@ -7763,6 +7787,16 @@ input IntercomSettingsInput {
   created when conversations are linked to a Linear issue.
   """
   disableCustomerRequestsAutoCreation: Boolean
+
+  """
+  Whether a ticket should be automatically reopened when its linked Linear project is completed.
+  """
+  automateTicketReopeningOnProjectCompletion: Boolean
+
+  """
+  Whether a ticket should be automatically reopened when its linked Linear project is cancelled.
+  """
+  automateTicketReopeningOnProjectCancellation: Boolean
 }
 
 """An issue."""
@@ -7913,7 +7947,7 @@ type Issue implements Node {
   """
   supervisor: User
 
-  """The app user that is delegated to work on this issue."""
+  """The agent user that is delegated to work on this issue."""
   delegate: User
 
   """The user who snoozed the issue."""
@@ -8452,7 +8486,7 @@ input IssueCollectionFilter {
   """Filters that the issues assignee must satisfy."""
   assignee: NullableUserFilter
 
-  """Filters that the issue's delegate must satisfy."""
+  """Filters that the issue's delegated agent must satisfy."""
   delegate: NullableUserFilter
 
   """Filters that the last applied template must satisfy."""
@@ -8555,6 +8589,9 @@ input IssueCollectionFilter {
   """Count of customers"""
   customerCount: NumberComparator
 
+  """Count of important customers"""
+  customerImportantCount: NumberComparator
+
   """[Internal] Lead time (created -> completed) comparator."""
   leadTime: NullableDurationComparator
 
@@ -8609,7 +8646,7 @@ input IssueCreateInput {
   """The identifier of the user to assign the issue to."""
   assigneeId: String
 
-  """The identifier of the app user to delegate the issue to."""
+  """The identifier of the agent user to delegate the issue to."""
   delegateId: String
 
   """The identifier of the parent issue."""
@@ -8780,7 +8817,7 @@ type IssueDraft implements Node {
   """The user assigned to the draft."""
   assigneeId: String
 
-  """The app user delegated to work on the issue being drafted."""
+  """The agent user delegated to work on the issue being drafted."""
   delegateId: String
 
   """The workflow state associated with the draft."""
@@ -8904,7 +8941,7 @@ input IssueFilter {
   """Filters that the issues assignee must satisfy."""
   assignee: NullableUserFilter
 
-  """Filters that the issue's delegate must satisfy."""
+  """Filters that the issue's delegated agent must satisfy."""
   delegate: NullableUserFilter
 
   """Filters that the last applied template must satisfy."""
@@ -9006,6 +9043,9 @@ input IssueFilter {
 
   """Count of customers"""
   customerCount: NumberComparator
+
+  """Count of important customers"""
+  customerImportantCount: NumberComparator
 
   """[Internal] Lead time (created -> completed) comparator."""
   leadTime: NullableDurationComparator
@@ -9680,6 +9720,9 @@ type IssueNotification implements Notification & Entity & Node {
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
 
+  """The category of the notification."""
+  category: NotificationCategory!
+
   """[Internal] URL to the target of the notification."""
   url: String!
 
@@ -10023,7 +10066,7 @@ type IssueSearchResult implements Node {
   """
   supervisor: User
 
-  """The app user that is delegated to work on this issue."""
+  """The agent user that is delegated to work on this issue."""
   delegate: User
 
   """The user who snoozed the issue."""
@@ -10650,7 +10693,7 @@ input IssueUpdateInput {
   """The identifier of the user to assign the issue to."""
   assigneeId: String
 
-  """The identifier of the app user to delegate the issue to."""
+  """The identifier of the agent user to delegate the issue to."""
   delegateId: String
 
   """The identifier of the parent issue."""
@@ -13811,6 +13854,9 @@ interface Notification {
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
 
+  """The category of the notification."""
+  category: NotificationCategory!
+
   """[Internal] URL to the target of the notification."""
   url: String!
 
@@ -14685,7 +14731,7 @@ input NullableIssueFilter {
   """Filters that the issues assignee must satisfy."""
   assignee: NullableUserFilter
 
-  """Filters that the issue's delegate must satisfy."""
+  """Filters that the issue's delegated agent must satisfy."""
   delegate: NullableUserFilter
 
   """Filters that the last applied template must satisfy."""
@@ -14787,6 +14833,9 @@ input NullableIssueFilter {
 
   """Count of customers"""
   customerCount: NumberComparator
+
+  """Count of important customers"""
+  customerImportantCount: NumberComparator
 
   """[Internal] Lead time (created -> completed) comparator."""
   leadTime: NullableDurationComparator
@@ -14970,6 +15019,9 @@ input NullableProjectFilter {
 
   """Count of customers"""
   customerCount: NumberComparator
+
+  """Count of important customers"""
+  customerImportantCount: NumberComparator
 
   """Filter based on the existence of the relation."""
   null: Boolean
@@ -15406,6 +15458,9 @@ type OauthClientApprovalNotification implements Notification & Entity & Node {
 
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
+
+  """The category of the notification."""
+  category: NotificationCategory!
 
   """[Internal] URL to the target of the notification."""
   url: String!
@@ -16516,6 +16571,9 @@ type PostNotification implements Notification & Entity & Node {
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
 
+  """The category of the notification."""
+  category: NotificationCategory!
+
   """[Internal] URL to the target of the notification."""
   url: String!
 
@@ -17364,6 +17422,9 @@ input ProjectCollectionFilter {
   """Count of customers"""
   customerCount: NumberComparator
 
+  """Count of important customers"""
+  customerImportantCount: NumberComparator
+
   """Compound filters, all of which need to be matched by the project."""
   and: [ProjectCollectionFilter!]
 
@@ -17590,6 +17651,9 @@ input ProjectFilter {
 
   """Count of customers"""
   customerCount: NumberComparator
+
+  """Count of important customers"""
+  customerImportantCount: NumberComparator
 
   """Compound filters, all of which need to be matched by the project."""
   and: [ProjectFilter!]
@@ -18308,6 +18372,9 @@ type ProjectNotification implements Notification & Entity & Node {
 
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
+
+  """The category of the notification."""
+  category: NotificationCategory!
 
   """[Internal] URL to the target of the notification."""
   url: String!
@@ -19957,6 +20024,9 @@ type PullRequestNotification implements Notification & Entity & Node {
 
   """The time at which a notification was unsnoozed.."""
   unsnoozedAt: DateTime
+
+  """The category of the notification."""
+  category: NotificationCategory!
 
   """[Internal] URL to the target of the notification."""
   url: String!
@@ -22625,6 +22695,16 @@ input SalesforceSettingsInput {
   created when conversations are linked to a Linear issue.
   """
   disableCustomerRequestsAutoCreation: Boolean
+
+  """
+  Whether a ticket should be automatically reopened when its linked Linear project is completed.
+  """
+  automateTicketReopeningOnProjectCompletion: Boolean
+
+  """
+  Whether a ticket should be automatically reopened when its linked Linear project is cancelled.
+  """
+  automateTicketReopeningOnProjectCancellation: Boolean
 
   """The Salesforce subdomain."""
   subdomain: String
@@ -26430,6 +26510,16 @@ input ZendeskSettingsInput {
   created when conversations are linked to a Linear issue.
   """
   disableCustomerRequestsAutoCreation: Boolean
+
+  """
+  Whether a ticket should be automatically reopened when its linked Linear project is completed.
+  """
+  automateTicketReopeningOnProjectCompletion: Boolean
+
+  """
+  Whether a ticket should be automatically reopened when its linked Linear project is cancelled.
+  """
+  automateTicketReopeningOnProjectCancellation: Boolean
 
   """The subdomain of the Zendesk organization being connected."""
   subdomain: String!
