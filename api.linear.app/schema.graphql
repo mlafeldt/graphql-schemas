@@ -63,6 +63,9 @@ type AgentActivity implements Node {
 
   """The comment this activity is linked to."""
   sourceComment: Comment
+
+  """Metadata about the external source that created this agent activity."""
+  sourceMetadata: JSON
 }
 
 """Content for an action activity (tool call or action)."""
@@ -5852,6 +5855,9 @@ enum GithubOrgType {
 input GitHubPersonalSettingsInput {
   """The GitHub user's name."""
   login: String!
+
+  """Whether the integration has code access"""
+  codeAccess: Boolean
 }
 
 input GitHubRepoInput {
@@ -5902,6 +5908,9 @@ input GitHubSettingsInput {
 
   """The type of Github org"""
   orgType: GithubOrgType
+
+  """Whether the integration has code access"""
+  codeAccess: Boolean
 }
 
 type GitLabIntegrationCreatePayload {
@@ -10651,6 +10660,7 @@ type IssueSuggestionMetadata {
   classification: String
   reasons: [String!]
   evalLogId: String
+  rank: Float
 }
 
 enum IssueSuggestionState {
@@ -12309,6 +12319,9 @@ type Mutation {
 
   """Connects the organization with the GitHub App."""
   integrationGithubConnect(
+    """Whether the integration should have code access"""
+    codeAccess: Boolean = false
+
     """The GitHub grant code that's exchanged for OAuth tokens."""
     code: String!
 
