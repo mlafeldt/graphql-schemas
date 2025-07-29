@@ -1083,7 +1083,6 @@ type Mutation {
   organizationDelete(input: OrganizationDeleteInput!): OrganizationDeletePayload!
   organizationSlugUpdate(input: OrganizationSlugUpdateInput!): OrganizationSlugUpdatePayload!
   organizationUpdate(input: OrganizationUpdateInput!): OrganizationUpdatePayload!
-  personalAccountDelete: PersonalAccountDeletePayload! @deprecated(reason: "to be removed")
   personalAccountUpdate(input: PersonalAccountUpdateInput!): PersonalAccountUpdatePayload! @deprecated(reason: "to be removed")
 
   """Publish a new subgraph."""
@@ -1131,6 +1130,9 @@ type Mutation {
 
   """Request a review for a schema proposal from a user or a team."""
   schemaProposalReviewRequestCreate(input: SchemaProposalReviewRequestCreateInput!): SchemaProposalReviewRequestCreatePayload!
+
+  """Update schema proposal metadata (title and description)."""
+  schemaProposalUpdate(input: SchemaProposalUpdateInput!): SchemaProposalUpdatePayload!
   slackIntegrationCreate(input: SlackIntegrationCreateInput!): SlackNotificationCreatePayload!
   slackNotificationDelete(id: String!): SlackNotificationDeletePayload!
 
@@ -1338,13 +1340,6 @@ type PageInfo {
 
   """When paginating backwards, the cursor to continue."""
   startCursor: String
-}
-
-union PersonalAccountDeletePayload = OrganizationOwnershipNotTransferredError | PersonalAccountDeleteSuccess
-
-type PersonalAccountDeleteSuccess {
-  deletedId: ID!
-  query: Query!
 }
 
 input PersonalAccountUpdateInput {
@@ -2298,6 +2293,19 @@ enum SchemaProposalSubgraphStatus {
   EDITED
   DELETED
   UNCHANGED
+}
+
+input SchemaProposalUpdateInput {
+  title: String
+  description: String
+  schemaProposalId: ID!
+}
+
+union SchemaProposalUpdatePayload = SchemaProposalDoesNotExistError | SchemaProposalUpdateSuccess
+
+type SchemaProposalUpdateSuccess {
+  query: Query!
+  schemaProposal: SchemaProposal!
 }
 
 type SchemaRegistryBranchDoesNotExistError {
