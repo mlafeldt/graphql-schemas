@@ -31907,7 +31907,7 @@
       {
         "kind": "OBJECT",
         "name": "Roadmap",
-        "description": "A roadmap for projects.",
+        "description": "[Deprecated] A roadmap for projects.",
         "fields": [
           {
             "name": "id",
@@ -36287,6 +36287,12 @@
           },
           {
             "name": "githubPersonal",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "githubCodeAccessPersonal",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -42244,6 +42250,18 @@
             "type": {
               "kind": "OBJECT",
               "name": "CustomerNeed",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "team",
+            "description": "The team for which this is a draft post.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Team",
               "ofType": null
             },
             "isDeprecated": false,
@@ -50771,7 +50789,7 @@
           },
           {
             "name": "roadmapToProjects",
-            "description": "Custom views for the user.",
+            "description": null,
             "args": [
               {
                 "name": "before",
@@ -50843,8 +50861,8 @@
                 "ofType": null
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "RoadmapToProject is deprecated, use InitiativeToProject instead."
           },
           {
             "name": "roadmapToProject",
@@ -50874,8 +50892,8 @@
                 "ofType": null
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "RoadmapToProject is deprecated, use InitiativeToProject instead."
           },
           {
             "name": "roadmaps",
@@ -62897,7 +62915,7 @@
       {
         "kind": "OBJECT",
         "name": "RoadmapToProject",
-        "description": "Join table between projects and roadmaps.",
+        "description": "[Deprecated] Join table between projects and roadmaps.",
         "fields": [
           {
             "name": "id",
@@ -75834,6 +75852,37 @@
             "deprecationReason": null
           },
           {
+            "name": "projectLabelsMerge",
+            "description": "Merges multiple project labels into a single label.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The merge input.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "LabelsMergeInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectLabelPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "organizationUpdate",
             "description": "Updates the user's organization.",
             "args": [
@@ -77537,6 +77586,37 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "DeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueLabelsMerge",
+            "description": "Merges multiple issue labels into a single label.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The merge input.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "LabelsMergeInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueLabelPayload",
                 "ofType": null
               }
             },
@@ -92488,6 +92568,53 @@
         "possibleTypes": null
       },
       {
+        "kind": "INPUT_OBJECT",
+        "name": "LabelsMergeInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "fromLabelIds",
+            "description": "The identifiers of the labels to merge.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "toLabelId",
+            "description": "The identifier of the target label.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "OBJECT",
         "name": "OrganizationPayload",
         "description": null,
@@ -96691,6 +96818,16 @@
           },
           {
             "name": "gitHubPersonal",
+            "description": null,
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "GitHubPersonalSettingsInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "githubCodeAccessPersonal",
             "description": null,
             "type": {
               "kind": "INPUT_OBJECT",

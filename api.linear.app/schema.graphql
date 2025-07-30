@@ -4552,6 +4552,9 @@ type Draft implements Node {
 
   """The customer need that this draft is referencing."""
   customerNeed: CustomerNeed
+
+  """The team for which this is a draft post."""
+  team: Team
 }
 
 type DraftConnection {
@@ -7420,6 +7423,7 @@ enum IntegrationService {
   githubCommit
   githubImport
   githubPersonal
+  githubCodeAccessPersonal
   gitlab
   googleCalendarPersonal
   googleSheets
@@ -7461,6 +7465,7 @@ input IntegrationSettingsInput {
   gitHub: GitHubSettingsInput
   gitHubImport: GitHubImportSettingsInput
   gitHubPersonal: GitHubPersonalSettingsInput
+  githubCodeAccessPersonal: GitHubPersonalSettingsInput
   gitLab: GitLabSettingsInput
   sentry: SentrySettingsInput
   zendesk: ZendeskSettingsInput
@@ -10998,6 +11003,14 @@ type LabelNotificationSubscription implements NotificationSubscription & Entity 
   notificationSubscriptionTypes: [String!]!
 }
 
+input LabelsMergeInput {
+  """The identifiers of the labels to merge."""
+  fromLabelIds: [String!]!
+
+  """The identifier of the target label."""
+  toLabelId: String!
+}
+
 """Issue label sorting options."""
 input LabelSort {
   """Whether nulls should be sorted first or last"""
@@ -11744,6 +11757,12 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """Merges multiple project labels into a single label."""
+  projectLabelsMerge(
+    """The merge input."""
+    input: LabelsMergeInput!
+  ): ProjectLabelPayload!
+
   """Updates the user's organization."""
   organizationUpdate(
     """A partial organization object to update the organization with."""
@@ -12111,6 +12130,12 @@ type Mutation {
     """The identifier of the label to delete."""
     id: String!
   ): DeletePayload!
+
+  """Merges multiple issue labels into a single label."""
+  issueLabelsMerge(
+    """The merge input."""
+    input: LabelsMergeInput!
+  ): IssueLabelPayload!
 
   """
   Converts a workspace label to team labels for teams that have issues using the workspace label.
@@ -20656,8 +20681,6 @@ type Query {
     """UUID of a team to use as a boost."""
     teamId: String
   ): IssueSearchPayload!
-
-  """Custom views for the user."""
   roadmapToProjects(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -20682,10 +20705,10 @@ type Query {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
-  ): RoadmapToProjectConnection!
+  ): RoadmapToProjectConnection! @deprecated(reason: "RoadmapToProject is deprecated, use InitiativeToProject instead.")
 
   """One specific roadmapToProject."""
-  roadmapToProject(id: String!): RoadmapToProject!
+  roadmapToProject(id: String!): RoadmapToProject! @deprecated(reason: "RoadmapToProject is deprecated, use InitiativeToProject instead.")
 
   """All roadmaps in the workspace."""
   roadmaps(
@@ -22399,7 +22422,7 @@ input RevenueSort {
   order: PaginationSortOrder
 }
 
-"""A roadmap for projects."""
+"""[Deprecated] A roadmap for projects."""
 type Roadmap implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -22597,7 +22620,7 @@ type RoadmapPayload {
   success: Boolean!
 }
 
-"""Join table between projects and roadmaps."""
+"""[Deprecated] Join table between projects and roadmaps."""
 type RoadmapToProject implements Node {
   """The unique identifier of the entity."""
   id: ID!
