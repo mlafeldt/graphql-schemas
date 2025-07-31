@@ -1151,6 +1151,8 @@ type Mutation {
   """Delete the user."""
   userDelete: UserDeletePayload!
   userUpdate(input: UserUpdateInput!): UserUpdatePayload!
+  zitadelAddRedirect: ZitadelAddRedirectPayload
+  zitadelInit: ZitadelInitPayload
 }
 
 type NameSizeCheckError {
@@ -1184,6 +1186,10 @@ type NotAllowedToSlugUpdateError {
 }
 
 type NotAllowedToUpdateOrganizationError {
+  query: Query!
+}
+
+type NotEnterprisePlatformError {
   query: Query!
 }
 
@@ -1484,6 +1490,7 @@ type Query {
 
   """Give the actual connected user."""
   viewer: User
+  zitadelStatus: ZitadelStatus
 }
 
 type Request implements Node {
@@ -2855,4 +2862,34 @@ type ValidationCheckError {
 }
 
 scalar VersionedExtensionManifest
+
+type ZitadelAddRedirectFailure {
+  error: String
+  query: Query!
+}
+
+union ZitadelAddRedirectPayload = NotEnterprisePlatformError | ZitadelAddRedirectFailure | ZitadelAddRedirectSuccess
+
+type ZitadelAddRedirectSuccess {
+  query: Query!
+}
+
+type ZitadelInitFailure {
+  error: String
+  query: Query!
+}
+
+union ZitadelInitPayload = NotEnterprisePlatformError | ZitadelInitFailure | ZitadelInitSuccess
+
+type ZitadelInitSuccess {
+  query: Query!
+}
+
+type ZitadelStatus {
+  clientId: String
+  idp: Boolean!
+  organizationId: String
+  redirect: Boolean!
+  resources: Boolean!
+}
 
