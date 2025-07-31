@@ -52,9 +52,6 @@ type AgentActivity implements Node {
   """
   archivedAt: DateTime
 
-  """The agent context this activity belongs to."""
-  agentContext: AgentContext
-
   """The agent session this activity belongs to."""
   agentSession: AgentSession!
 
@@ -106,6 +103,22 @@ input AgentActivityCreateInput {
   See https://linear.app/developers/agents for typing details.
   """
   content: JSONObject!
+}
+
+input AgentActivityCreatePromptInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The agent session this activity belongs to."""
+  agentSessionId: String!
+
+  """The content payload of the prompt agent activity."""
+  content: JSONObject!
+
+  """The comment that contains the content of this activity."""
+  sourceCommentId: String!
 }
 
 type AgentActivityEdge {
@@ -210,139 +223,6 @@ enum AgentActivityType {
   elicitation
   error
   prompt
-}
-
-"""[DEPRECATED] A context for agent activities and state management."""
-type AgentContext implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The user that created this agent context."""
-  creator: User
-
-  """The agent user that is associated with this agent context."""
-  appUser: User!
-
-  """The comment this agent context is associated with."""
-  comment: Comment
-
-  """The issue this agent context is associated with."""
-  issue: Issue
-
-  """The current status of the agent context."""
-  status: AgentSessionStatus!
-
-  """The time the agent context started working."""
-  startedAt: DateTime
-
-  """The time the agent context ended."""
-  endedAt: DateTime
-
-  """The type of the agent context."""
-  type: AgentSessionType!
-
-  """Activities associated with this agent context."""
-  activities(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): [AgentActivity!]!
-
-  """External links associated with this agent context."""
-  links: [EntityExternalLink!]!
-
-  """A summary of the activities in this context."""
-  summary: String
-
-  """Metadata about the external source that created this agent context."""
-  sourceMetadata: JSON
-}
-
-type AgentContextConnection {
-  edges: [AgentContextEdge!]!
-  nodes: [AgentContext!]!
-  pageInfo: PageInfo!
-}
-
-input AgentContextCreateInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
-  """The comment this agent context is associated with."""
-  commentId: String!
-
-  """The type of the agent context."""
-  type: AgentSessionType!
-
-  """The user who created this agent context."""
-  creatorId: String!
-
-  """
-  URL to the external source where this agent context was created (e.g., Slack thread, GitHub comment).
-  """
-  sourceUrl: String!
-}
-
-type AgentContextEdge {
-  node: AgentContext!
-
-  """Used in `before` and `after` args"""
-  cursor: String!
-}
-
-type AgentContextPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The agent context that was created or updated."""
-  agentContext: AgentContext!
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-input AgentContextUpdateInput {
-  """The current status of the agent context."""
-  status: AgentSessionStatus
-
-  """The summary of the agent context."""
-  summary: String
 }
 
 """A session for agent activities and state management."""
@@ -2927,6 +2807,9 @@ type CustomView implements Node {
   """The filter applied to projects in the custom view."""
   projectFilterData: JSONObject
 
+  """The filter applied to initiatives in the custom view."""
+  initiativeFilterData: JSONObject
+
   """The filter applied to feed items in the custom view."""
   feedItemFilterData: JSONObject
 
@@ -3064,6 +2947,36 @@ type CustomView implements Node {
 
   """The calculated view preferences values for this custom view."""
   viewPreferencesValues: ViewPreferencesValues
+
+  """Initiatives associated with the custom view."""
+  initiatives(
+    """Filter returned initiatives."""
+    filter: InitiativeFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): InitiativeConnection!
 }
 
 type CustomViewConnection {
@@ -3116,6 +3029,9 @@ input CustomViewCreateInput {
 
   """The project filter applied to issues in the custom view."""
   projectFilterData: ProjectFilter
+
+  """[ALPHA] The initiative filter applied to issues in the custom view."""
+  initiativeFilterData: InitiativeFilter
 
   """The feed item filter applied to issues in the custom view."""
   feedItemFilterData: FeedItemFilter
@@ -3338,6 +3254,9 @@ input CustomViewUpdateInput {
 
   """The project filter applied to issues in the custom view."""
   projectFilterData: ProjectFilter
+
+  """[ALPHA] The initiative filter applied to issues in the custom view."""
+  initiativeFilterData: InitiativeFilter
 
   """The feed item filter applied to issues in the custom view."""
   feedItemFilterData: FeedItemFilter
@@ -5281,9 +5200,6 @@ type Favorite implements Node {
   """The favorited document."""
   document: Document
 
-  """The favorited roadmap."""
-  roadmap: Roadmap
-
   """The favorited initiative."""
   initiative: Initiative
 
@@ -5371,9 +5287,6 @@ input FavoriteCreateInput {
 
   """The identifier of the document to favorite."""
   documentId: String
-
-  """The identifier of the roadmap to favorite."""
-  roadmapId: String
 
   """[INTERNAL] The identifier of the initiative to favorite."""
   initiativeId: String
@@ -5858,9 +5771,6 @@ enum GithubOrgType {
 input GitHubPersonalSettingsInput {
   """The GitHub user's name."""
   login: String!
-
-  """Whether the integration has code access"""
-  codeAccess: Boolean
 }
 
 input GitHubRepoInput {
@@ -12465,6 +12375,9 @@ type Mutation {
 
   """Connect your GitHub account to Linear."""
   integrationGitHubPersonal(
+    """Whether to connect with code access."""
+    codeAccess: Boolean
+
     """The GitHub OAuth code."""
     code: String!
   ): IntegrationPayload!
@@ -13827,25 +13740,16 @@ type Mutation {
     id: String!
   ): AgentSessionPayload!
 
-  """Creates an agent context."""
-  agentContextCreate(
-    """The agent context object to create."""
-    input: AgentContextCreateInput!
-  ): AgentContextPayload!
-
-  """Updates an agent context."""
-  agentContextUpdate(
-    """The agent context object to update."""
-    input: AgentContextUpdateInput!
-
-    """The identifier of the agent context to update."""
-    id: String!
-  ): AgentContextPayload!
-
   """Creates an agent activity."""
   agentActivityCreate(
     """The agent activity object to create."""
     input: AgentActivityCreateInput!
+  ): AgentActivityPayload!
+
+  """Creates a prompt agent activity from Linear user input."""
+  agentActivityCreatePrompt(
+    """The prompt agent activity object to create."""
+    input: AgentActivityCreatePromptInput!
   ): AgentActivityPayload!
 }
 
@@ -22152,39 +22056,6 @@ type Query {
     """The identifier of the agent session to retrieve."""
     id: String!
   ): AgentSession!
-
-  """All agent contexts."""
-  agentContexts(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): AgentContextConnection!
-
-  """A specific agent context."""
-  agentContext(
-    """The identifier of the agent context to retrieve."""
-    id: String!
-  ): AgentContext!
 
   """All agent activities."""
   agentActivities(
