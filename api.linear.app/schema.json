@@ -851,11 +851,6 @@
           },
           {
             "kind": "OBJECT",
-            "name": "Meeting",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
             "name": "Post",
             "ofType": null
           },
@@ -15534,6 +15529,16 @@
             "defaultValue": null
           },
           {
+            "name": "creator",
+            "description": "Filters that the initiative creator must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableUserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "status",
             "description": "Comparator for the initiative status: Planned, Active, Completed",
             "type": {
@@ -15544,11 +15549,11 @@
             "defaultValue": null
           },
           {
-            "name": "creator",
-            "description": "Filters that the initiative creator must satisfy.",
+            "name": "teams",
+            "description": "Filters that the initiative teams must satisfy.",
             "type": {
               "kind": "INPUT_OBJECT",
-              "name": "UserFilter",
+              "name": "TeamCollectionFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -15558,7 +15563,17 @@
             "description": "Filters that the initiative owner must satisfy.",
             "type": {
               "kind": "INPUT_OBJECT",
-              "name": "UserFilter",
+              "name": "NullableUserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "targetDate",
+            "description": "Comparator for the initiative target date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
               "ofType": null
             },
             "defaultValue": null
@@ -15576,6 +15591,16 @@
           {
             "name": "healthWithAge",
             "description": "Comparator for the initiative health (with age): onTrack, atRisk, offTrack, outdated, noUpdate",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "activityType",
+            "description": "Comparator for the initiative activity type.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "StringComparator",
@@ -15666,6 +15691,113 @@
       },
       {
         "kind": "INPUT_OBJECT",
+        "name": "TeamCollectionFilter",
+        "description": "Team collection filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the team.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "TeamCollectionFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which need to be matched by the team.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "TeamCollectionFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "some",
+            "description": "Filters that needs to be matched by some teams.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "TeamFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "every",
+            "description": "Filters that needs to be matched by all teams.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "TeamFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "length",
+            "description": "Comparator for the collection length.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NumberComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
         "name": "InitiativeFilter",
         "description": "Initiative filtering options.",
         "fields": null,
@@ -15721,6 +15853,16 @@
             "defaultValue": null
           },
           {
+            "name": "creator",
+            "description": "Filters that the initiative creator must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableUserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "status",
             "description": "Comparator for the initiative status: Planned, Active, Completed",
             "type": {
@@ -15731,11 +15873,11 @@
             "defaultValue": null
           },
           {
-            "name": "creator",
-            "description": "Filters that the initiative creator must satisfy.",
+            "name": "teams",
+            "description": "Filters that the initiative teams must satisfy.",
             "type": {
               "kind": "INPUT_OBJECT",
-              "name": "UserFilter",
+              "name": "TeamCollectionFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -15745,7 +15887,17 @@
             "description": "Filters that the initiative owner must satisfy.",
             "type": {
               "kind": "INPUT_OBJECT",
-              "name": "UserFilter",
+              "name": "NullableUserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "targetDate",
+            "description": "Comparator for the initiative target date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
               "ofType": null
             },
             "defaultValue": null
@@ -15763,6 +15915,16 @@
           {
             "name": "healthWithAge",
             "description": "Comparator for the initiative health (with age): onTrack, atRisk, offTrack, outdated, noUpdate",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "activityType",
+            "description": "Comparator for the initiative activity type.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "StringComparator",
@@ -16037,113 +16199,6 @@
                   "ofType": null
                 }
               }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "TeamCollectionFilter",
-        "description": "Team collection filtering options.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "Comparator for the identifier.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Comparator for the created at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "Comparator for the updated at date.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "DateComparator",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "and",
-            "description": "Compound filters, all of which need to be matched by the team.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "TeamCollectionFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "or",
-            "description": "Compound filters, one of which need to be matched by the team.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "TeamCollectionFilter",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "some",
-            "description": "Filters that needs to be matched by some teams.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "TeamFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "every",
-            "description": "Filters that needs to be matched by all teams.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "TeamFilter",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "length",
-            "description": "Comparator for the collection length.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NumberComparator",
-              "ofType": null
             },
             "defaultValue": null
           }
@@ -23234,18 +23289,6 @@
             "deprecationReason": null
           },
           {
-            "name": "meeting",
-            "description": "[ALPHA] The meeting that the content is associated with.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "Meeting",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "restoredAt",
             "description": "The time at which the document content was restored from a previous version.",
             "args": [],
@@ -27553,271 +27596,6 @@
             "deprecationReason": null
           }
         ],
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "Meeting",
-        "description": "[Internal] A meeting that can be attached to different entities.",
-        "fields": [
-          {
-            "name": "id",
-            "description": "The unique identifier of the entity.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "createdAt",
-            "description": "The time at which the entity was created.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "DateTime",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't\n    been updated after creation.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "DateTime",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "archivedAt",
-            "description": "The time at which the entity was archived. Null if the entity has not been archived.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTime",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "title",
-            "description": "The meeting title.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "location",
-            "description": "The location of the meeting.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "meetingLink",
-            "description": "The meeting link of the meeting.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "recordingLink",
-            "description": "Link to a recording of the meeting.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "icon",
-            "description": "The icon of the meeting.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "color",
-            "description": "The color of the icon.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "creator",
-            "description": "The user who created the meeting.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "User",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "updatedBy",
-            "description": "The user who last updated the meeting.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "User",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "project",
-            "description": "The project that the meeting is associated with.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "Project",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "initiative",
-            "description": "[Internal] The initiative that the meeting is associated with.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "Initiative",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "startsAt",
-            "description": "The time at which the meeting is set to start.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTime",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "endsAt",
-            "description": "The time at which the meeting is set to end.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTime",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "hiddenAt",
-            "description": "The time at which the meeting was hidden. Null if the entity has not been hidden.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTime",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "trashed",
-            "description": "A flag that indicates whether the meeting is in the trash bin.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "sortOrder",
-            "description": "The order of the item in the resources list.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [
-          {
-            "kind": "INTERFACE",
-            "name": "Node",
-            "ofType": null
-          }
-        ],
-        "enumValues": null,
         "possibleTypes": null
       },
       {
@@ -85394,16 +85172,6 @@
             "defaultValue": null
           },
           {
-            "name": "roadmapId",
-            "description": "The roadmap these view preferences are associated with.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
             "name": "initiativeId",
             "description": "[Internal] The initiative these view preferences are associated with.",
             "type": {
@@ -85616,12 +85384,6 @@
             "deprecationReason": null
           },
           {
-            "name": "roadmapAll",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "initiative",
             "description": null,
             "isDeprecated": false,
@@ -85790,7 +85552,7 @@
             "deprecationReason": null
           },
           {
-            "name": "customRoadmap",
+            "name": "roadmapAll",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -96318,16 +96080,6 @@
             "defaultValue": null
           },
           {
-            "name": "githubCodeAccessPersonal",
-            "description": null,
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "GitHubPersonalSettingsInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
             "name": "gitLab",
             "description": null,
             "type": {
@@ -98382,6 +98134,16 @@
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "defaultTeam",
+            "description": "The Salesforce team to use when a template doesn't specify a team.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "defaultValue": null

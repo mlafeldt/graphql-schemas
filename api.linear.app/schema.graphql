@@ -4002,9 +4002,6 @@ type DocumentContent implements Node {
   """The document that the content is associated with."""
   document: Document
 
-  """[ALPHA] The meeting that the content is associated with."""
-  meeting: Meeting
-
   """
   The time at which the document content was restored from a previous version.
   """
@@ -6309,14 +6306,20 @@ input InitiativeCollectionFilter {
   """Comparator for the initiative slug ID."""
   slugId: StringComparator
 
+  """Filters that the initiative creator must satisfy."""
+  creator: NullableUserFilter
+
   """Comparator for the initiative status: Planned, Active, Completed"""
   status: StringComparator
 
-  """Filters that the initiative creator must satisfy."""
-  creator: UserFilter
+  """Filters that the initiative teams must satisfy."""
+  teams: TeamCollectionFilter
 
   """Filters that the initiative owner must satisfy."""
-  owner: UserFilter
+  owner: NullableUserFilter
+
+  """Comparator for the initiative target date."""
+  targetDate: NullableDateComparator
 
   """Comparator for the initiative health: onTrack, atRisk, offTrack"""
   health: StringComparator
@@ -6325,6 +6328,9 @@ input InitiativeCollectionFilter {
   Comparator for the initiative health (with age): onTrack, atRisk, offTrack, outdated, noUpdate
   """
   healthWithAge: StringComparator
+
+  """Comparator for the initiative activity type."""
+  activityType: StringComparator
 
   """Filters that the initiative must be an ancestor of."""
   ancestors: InitiativeCollectionFilter
@@ -6422,14 +6428,20 @@ input InitiativeFilter {
   """Comparator for the initiative slug ID."""
   slugId: StringComparator
 
+  """Filters that the initiative creator must satisfy."""
+  creator: NullableUserFilter
+
   """Comparator for the initiative status: Planned, Active, Completed"""
   status: StringComparator
 
-  """Filters that the initiative creator must satisfy."""
-  creator: UserFilter
+  """Filters that the initiative teams must satisfy."""
+  teams: TeamCollectionFilter
 
   """Filters that the initiative owner must satisfy."""
-  owner: UserFilter
+  owner: NullableUserFilter
+
+  """Comparator for the initiative target date."""
+  targetDate: NullableDateComparator
 
   """Comparator for the initiative health: onTrack, atRisk, offTrack"""
   health: StringComparator
@@ -6438,6 +6450,9 @@ input InitiativeFilter {
   Comparator for the initiative health (with age): onTrack, atRisk, offTrack, outdated, noUpdate
   """
   healthWithAge: StringComparator
+
+  """Comparator for the initiative activity type."""
+  activityType: StringComparator
 
   """Filters that the initiative must be an ancestor of."""
   ancestors: InitiativeCollectionFilter
@@ -7375,7 +7390,6 @@ input IntegrationSettingsInput {
   gitHub: GitHubSettingsInput
   gitHubImport: GitHubImportSettingsInput
   gitHubPersonal: GitHubPersonalSettingsInput
-  githubCodeAccessPersonal: GitHubPersonalSettingsInput
   gitLab: GitLabSettingsInput
   sentry: SentrySettingsInput
   zendesk: ZendeskSettingsInput
@@ -10959,73 +10973,6 @@ input ManualSort {
 
   """The order for the individual sort"""
   order: PaginationSortOrder
-}
-
-"""[Internal] A meeting that can be attached to different entities."""
-type Meeting implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The meeting title."""
-  title: String!
-
-  """The location of the meeting."""
-  location: String
-
-  """The meeting link of the meeting."""
-  meetingLink: String
-
-  """Link to a recording of the meeting."""
-  recordingLink: String
-
-  """The icon of the meeting."""
-  icon: String
-
-  """The color of the icon."""
-  color: String
-
-  """The user who created the meeting."""
-  creator: User
-
-  """The user who last updated the meeting."""
-  updatedBy: User
-
-  """The project that the meeting is associated with."""
-  project: Project
-
-  """[Internal] The initiative that the meeting is associated with."""
-  initiative: Initiative
-
-  """The time at which the meeting is set to start."""
-  startsAt: DateTime
-
-  """The time at which the meeting is set to end."""
-  endsAt: DateTime
-
-  """
-  The time at which the meeting was hidden. Null if the entity has not been hidden.
-  """
-  hiddenAt: DateTime
-
-  """A flag that indicates whether the meeting is in the trash bin."""
-  trashed: Boolean
-
-  """The order of the item in the resources list."""
-  sortOrder: Float!
 }
 
 """Issue project milestone options."""
@@ -22651,6 +22598,9 @@ input SalesforceSettingsInput {
   either created from Salesforce or linked to Salesforce.
   """
   restrictVisibility: Boolean
+
+  """The Salesforce team to use when a template doesn't specify a team."""
+  defaultTeam: String
 }
 
 """[INTERNAL] Payload returned by semantic search."""
@@ -25841,9 +25791,6 @@ input ViewPreferencesCreateInput {
   """The project these view preferences are associated with."""
   projectId: String
 
-  """The roadmap these view preferences are associated with."""
-  roadmapId: String
-
   """[Internal] The initiative these view preferences are associated with."""
   initiativeId: String
 
@@ -25921,7 +25868,6 @@ enum ViewType {
   dashboards
   customView
   customViews
-  roadmapAll
   initiative
   initiativeOverview
   initiativeOverviewSubInitiatives
@@ -25950,7 +25896,7 @@ enum ViewType {
   feedFollowing
   feedPopular
   workspaceMembers
-  customRoadmap
+  roadmapAll
   roadmap
   roadmaps
   roadmapClosed
