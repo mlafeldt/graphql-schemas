@@ -63,6 +63,11 @@ type AgentActivity implements Node {
 
   """Metadata about the external source that created this agent activity."""
   sourceMetadata: JSON
+
+  """
+  An optional modifier that provides additional instructions on how the activity should be interpreted.
+  """
+  signal: AgentActivitySignal
 }
 
 """Content for an action activity (tool call or action)."""
@@ -204,6 +209,13 @@ type AgentActivityResponseContent {
 
   """The response content in Markdown format."""
   body: String!
+}
+
+"""
+A modifier that provides additional instructions on how the activity should be interpreted.
+"""
+enum AgentActivitySignal {
+  stop
 }
 
 """Content for a thought activity."""
@@ -2817,7 +2829,7 @@ type CustomView implements Node {
   shared: Boolean!
 
   """The custom view's unique URL slug."""
-  slugId: String
+  slugId: String!
 
   """The model name of the custom view."""
   modelName: String!
@@ -4537,6 +4549,9 @@ type EmailIntakeAddress implements Node {
   """Whether email replies are enabled."""
   repliesEnabled: Boolean!
 
+  """Whether the commenter's name is included in the email replies."""
+  useUserNamesInReplies: Boolean!
+
   """The template that the email address is associated with."""
   template: Template
 
@@ -4556,6 +4571,27 @@ type EmailIntakeAddress implements Node {
   Whether issues created from that email address will be turned into customer requests.
   """
   customerRequestsEnabled: Boolean!
+
+  """
+  The auto-reply message for issue created. If not set, the default reply will be used.
+  """
+  issueCreatedAutoReply: String
+
+  """Whether the auto-reply for issue completed is enabled."""
+  issueCompletedAutoReplyEnabled: Boolean!
+
+  """
+  The auto-reply message for issue completed. If not set, the default reply will be used.
+  """
+  issueCompletedAutoReply: String
+
+  """Whether the auto-reply for issue canceled is enabled."""
+  issueCanceledAutoReplyEnabled: Boolean!
+
+  """
+  The auto-reply message for issue canceled. If not set, the default reply will be used.
+  """
+  issueCanceledAutoReply: String
 }
 
 input EmailIntakeAddressCreateInput {
@@ -4587,6 +4623,24 @@ input EmailIntakeAddressCreateInput {
 
   """Whether email replies are enabled."""
   repliesEnabled: Boolean
+
+  """Whether the commenter's name is included in the email replies."""
+  useUserNamesInReplies: Boolean
+
+  """The auto-reply message for issue created."""
+  issueCreatedAutoReply: String
+
+  """Whether the issue completed auto-reply is enabled."""
+  issueCompletedAutoReplyEnabled: Boolean
+
+  """The auto-reply message for issue completed."""
+  issueCompletedAutoReply: String
+
+  """Whether the issue canceled auto-reply is enabled."""
+  issueCanceledAutoReplyEnabled: Boolean
+
+  """The auto-reply message for issue canceled."""
+  issueCanceledAutoReply: String
 
   """Whether customer requests are enabled."""
   customerRequestsEnabled: Boolean
@@ -4623,9 +4677,6 @@ input EmailIntakeAddressUpdateInput {
   """The name to be used for outgoing emails."""
   senderName: String
 
-  """Whether email replies are enabled."""
-  repliesEnabled: Boolean
-
   """
   The identifier or key of the team this email address will intake issues for.
   """
@@ -4635,6 +4686,27 @@ input EmailIntakeAddressUpdateInput {
   The identifier of the template this email address will intake issues for.
   """
   templateId: String
+
+  """Whether email replies are enabled."""
+  repliesEnabled: Boolean
+
+  """Whether the commenter's name is included in the email replies."""
+  useUserNamesInReplies: Boolean
+
+  """The auto-reply message for issue created."""
+  issueCreatedAutoReply: String
+
+  """Whether the issue completed auto-reply is enabled."""
+  issueCompletedAutoReplyEnabled: Boolean
+
+  """Custom auto-reply message for issue completed."""
+  issueCompletedAutoReply: String
+
+  """Whether the issue canceled auto-reply is enabled."""
+  issueCanceledAutoReplyEnabled: Boolean
+
+  """Custom auto-reply message for issue canceled."""
+  issueCanceledAutoReply: String
 
   """Whether customer requests are enabled."""
   customerRequestsEnabled: Boolean
