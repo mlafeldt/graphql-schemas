@@ -6953,6 +6953,7 @@ enum InitiativeStatus {
 enum InitiativeTab {
   overview
   projects
+  updates
 }
 
 """Initiative target date sorting options."""
@@ -17242,7 +17243,7 @@ type ProjectArchivePayload implements ArchivePayload {
   entity: Project
 }
 
-"""[INTERNAL] Project attachment"""
+"""Project attachment"""
 type ProjectAttachment implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -19504,6 +19505,7 @@ enum ProjectTab {
   customers
   documents
   issues
+  updates
 }
 
 """An update associated with a project."""
@@ -20245,6 +20247,9 @@ type Query {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
+
+    """[INTERNAL] Sort returned users."""
+    sort: [UserSortInput!]
   ): UserConnection!
 
   """One specific user."""
@@ -25439,6 +25444,15 @@ enum UserContextViewType {
   assigned
 }
 
+"""User display name sorting options."""
+input UserDisplayNameSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 type UserEdge {
   node: User!
 
@@ -25550,6 +25564,15 @@ enum UserFlagUpdateOperation {
   decr
   clear
   lock
+}
+
+"""User name sorting options."""
+input UserNameSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
 }
 
 """A user notification subscription."""
@@ -25777,6 +25800,15 @@ input UserSettingsUpdateInput {
 
   """[Internal] How often to generate a feed summary."""
   feedSummarySchedule: FeedSummarySchedule
+}
+
+"""User sorting options."""
+input UserSortInput {
+  """Sort by user name"""
+  name: UserNameSort
+
+  """Sort by user display name"""
+  displayName: UserDisplayNameSort
 }
 
 input UserUpdateInput {
