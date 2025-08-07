@@ -61,6 +61,9 @@ type AgentActivity implements Node {
   """The comment this activity is linked to."""
   sourceComment: Comment
 
+  """The user who created this agent activity."""
+  user: User!
+
   """Metadata about the external source that created this agent activity."""
   sourceMetadata: JSON
 
@@ -7477,6 +7480,14 @@ input IntegrationSettingsInput {
   salesforce: SalesforceSettingsInput
 }
 
+type IntegrationSlackWorkspaceNamePayload {
+  """The current name of the Slack workspace."""
+  name: String!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
 """The configuration of all integrations for different entities."""
 type IntegrationsSettings implements Node {
   """The unique identifier of the entity."""
@@ -12499,6 +12510,14 @@ type Mutation {
     """The Slack OAuth code."""
     code: String!
   ): IntegrationPayload!
+
+  """
+  Updates the Slack team's name in Linear for an existing Slack or Asks integration.
+  """
+  integrationSlackOrAsksUpdateSlackTeamName(
+    """The integration ID."""
+    integrationId: String!
+  ): IntegrationSlackWorkspaceNamePayload!
 
   """Integrates your personal notifications with Slack."""
   integrationSlackPersonal(
@@ -19944,6 +19963,27 @@ type PullRequest implements Node {
 
   """The status of the pull request."""
   status: PullRequestStatus!
+
+  """Merge settings for this pull request."""
+  mergeSettings: PullRequestMergeSettings
+}
+
+"""Merge settings for a pull request"""
+type PullRequestMergeSettings {
+  """Whether merge queue is enabled for this repository."""
+  isMergeQueueEnabled: Boolean!
+
+  """Whether squash merge is allowed for this pull request's repository."""
+  squashMergeAllowed: Boolean!
+
+  """Whether auto-merge is allowed for the PR's repository."""
+  autoMergeAllowed: Boolean!
+
+  """Whether rebase merge is allowed for pull requests PR's repository."""
+  rebaseMergeAllowed: Boolean!
+
+  """Whether merge commits are allowed for pull requests PR's repository."""
+  mergeCommitAllowed: Boolean!
 }
 
 """A pull request related notification."""
