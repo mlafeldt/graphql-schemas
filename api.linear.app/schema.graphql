@@ -107,12 +107,20 @@ input AgentActivityCreateInput {
   agentSessionId: String!
 
   """
+  [Internal] An optional modifier that provides additional instructions on how the activity should be interpreted.
+  """
+  signal: AgentActivitySignal
+
+  """
   The content payload of the agent activity. This object is not strictly typed.
   See https://linear.app/developers/agents for typing details.
   """
   content: JSONObject!
 }
 
+"""
+[Internal] Input for creating prompt-type agent activities (created by users).
+"""
 input AgentActivityCreatePromptInput {
   """
   The identifier in UUID v4 format. If none is provided, the backend will generate one.
@@ -122,11 +130,16 @@ input AgentActivityCreatePromptInput {
   """The agent session this activity belongs to."""
   agentSessionId: String!
 
+  """
+  [Internal] An optional modifier that provides additional instructions on how the activity should be interpreted.
+  """
+  signal: AgentActivitySignal
+
   """The content payload of the prompt agent activity."""
   content: JSONObject!
 
   """The comment that contains the content of this activity."""
-  sourceCommentId: String!
+  sourceCommentId: String
 }
 
 type AgentActivityEdge {
@@ -406,6 +419,9 @@ type ApiKey implements Node {
 
   """Organization the API key belongs to."""
   organization: Organization!
+
+  """When the API key was last used."""
+  lastActiveAt: DateTime
 }
 
 type ApiKeyConnection {
@@ -13785,7 +13801,7 @@ type Mutation {
     input: AgentActivityCreateInput!
   ): AgentActivityPayload!
 
-  """Creates a prompt agent activity from Linear user input."""
+  """[Internal] Creates a prompt agent activity from Linear user input."""
   agentActivityCreatePrompt(
     """The prompt agent activity object to create."""
     input: AgentActivityCreatePromptInput!
@@ -19968,7 +19984,14 @@ type PullRequest implements Node {
   mergeSettings: PullRequestMergeSettings
 }
 
-"""Merge settings for a pull request"""
+"""The method used to merge a pull request."""
+enum PullRequestMergeMethod {
+  MERGE
+  REBASE
+  SQUASH
+}
+
+"""[Internal] Merge settings for a pull request"""
 type PullRequestMergeSettings {
   """Whether merge queue is enabled for this repository."""
   isMergeQueueEnabled: Boolean!
@@ -19984,6 +20007,12 @@ type PullRequestMergeSettings {
 
   """Whether merge commits are allowed for pull requests PR's repository."""
   mergeCommitAllowed: Boolean!
+
+  """Whether the branch will be deleted when the pull request is merged."""
+  deleteBranchOnMerge: Boolean!
+
+  """The method used to merge a pull request."""
+  mergeQueueMergeMethod: PullRequestMergeMethod
 }
 
 """A pull request related notification."""

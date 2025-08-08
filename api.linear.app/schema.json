@@ -34051,7 +34051,7 @@
       {
         "kind": "OBJECT",
         "name": "PullRequestMergeSettings",
-        "description": "Merge settings for a pull request",
+        "description": "[Internal] Merge settings for a pull request",
         "fields": [
           {
             "name": "isMergeQueueEnabled",
@@ -34132,11 +34132,68 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "deleteBranchOnMerge",
+            "description": "Whether the branch will be deleted when the pull request is merged.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "mergeQueueMergeMethod",
+            "description": "The method used to merge a pull request.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "PullRequestMergeMethod",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "PullRequestMergeMethod",
+        "description": "The method used to merge a pull request.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "MERGE",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "REBASE",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SQUASH",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -71210,6 +71267,18 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "lastActiveAt",
+            "description": "When the API key was last used.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -84697,7 +84766,7 @@
           },
           {
             "name": "agentActivityCreatePrompt",
-            "description": "Creates a prompt agent activity from Linear user input.",
+            "description": "[Internal] Creates a prompt agent activity from Linear user input.",
             "args": [
               {
                 "name": "input",
@@ -106293,6 +106362,16 @@
             "defaultValue": null
           },
           {
+            "name": "signal",
+            "description": "[Internal] An optional modifier that provides additional instructions on how the activity should be interpreted.",
+            "type": {
+              "kind": "ENUM",
+              "name": "AgentActivitySignal",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "content",
             "description": "The content payload of the agent activity. This object is not strictly typed.\nSee https://linear.app/developers/agents for typing details.",
             "type": {
@@ -106314,7 +106393,7 @@
       {
         "kind": "INPUT_OBJECT",
         "name": "AgentActivityCreatePromptInput",
-        "description": null,
+        "description": "[Internal] Input for creating prompt-type agent activities (created by users).",
         "fields": null,
         "inputFields": [
           {
@@ -106342,6 +106421,16 @@
             "defaultValue": null
           },
           {
+            "name": "signal",
+            "description": "[Internal] An optional modifier that provides additional instructions on how the activity should be interpreted.",
+            "type": {
+              "kind": "ENUM",
+              "name": "AgentActivitySignal",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "content",
             "description": "The content payload of the prompt agent activity.",
             "type": {
@@ -106359,13 +106448,9 @@
             "name": "sourceCommentId",
             "description": "The comment that contains the content of this activity.",
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "defaultValue": null
           }
