@@ -107,7 +107,7 @@ input AgentActivityCreateInput {
   agentSessionId: String!
 
   """
-  [Internal] An optional modifier that provides additional instructions on how the activity should be interpreted.
+  An optional modifier that provides additional instructions on how the activity should be interpreted.
   """
   signal: AgentActivitySignal
 
@@ -131,7 +131,7 @@ input AgentActivityCreatePromptInput {
   agentSessionId: String!
 
   """
-  [Internal] An optional modifier that provides additional instructions on how the activity should be interpreted.
+  An optional modifier that provides additional instructions on how the activity should be interpreted.
   """
   signal: AgentActivitySignal
 
@@ -232,6 +232,7 @@ A modifier that provides additional instructions on how the activity should be i
 """
 enum AgentActivitySignal {
   stop
+  continue
 }
 
 """Content for a thought activity."""
@@ -5535,6 +5536,12 @@ type FetchDataPayload {
   """The fetched data based on the natural language query."""
   data: JSONObject
 
+  """The GraphQL query used to fetch the data."""
+  query: String
+
+  """The filters used to fetch the data."""
+  filters: JSONObject
+
   """Whether the fetch operation was successful."""
   success: Boolean!
 }
@@ -8482,7 +8489,9 @@ input IssueCollectionFilter {
   """Comparator for the issues description."""
   description: NullableStringComparator
 
-  """Comparator for the issues priority."""
+  """
+  Comparator for the issues priority. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  """
   priority: NullableNumberComparator
 
   """Comparator for the issues estimate."""
@@ -8937,7 +8946,9 @@ input IssueFilter {
   """Comparator for the issues description."""
   description: NullableStringComparator
 
-  """Comparator for the issues priority."""
+  """
+  Comparator for the issues priority. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  """
   priority: NullableNumberComparator
 
   """Comparator for the issues estimate."""
@@ -14707,7 +14718,9 @@ input NullableIssueFilter {
   """Comparator for the issues description."""
   description: NullableStringComparator
 
-  """Comparator for the issues priority."""
+  """
+  Comparator for the issues priority. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  """
   priority: NullableNumberComparator
 
   """Comparator for the issues estimate."""
@@ -15214,6 +15227,9 @@ input NullableTeamFilter {
 
   """Comparator for the team description."""
   description: NullableStringComparator
+
+  """Comparator for the team privacy."""
+  private: BooleanComparator
 
   """Filters that the teams issues must satisfy."""
   issues: IssueCollectionFilter
@@ -24271,6 +24287,9 @@ input TeamFilter {
   """Comparator for the team description."""
   description: NullableStringComparator
 
+  """Comparator for the team privacy."""
+  private: BooleanComparator
+
   """Filters that the teams issues must satisfy."""
   issues: IssueCollectionFilter
 
@@ -26375,7 +26394,10 @@ input WorkflowStateFilter {
   """Comparator for the workflow state position."""
   position: NumberComparator
 
-  """Comparator for the workflow state type."""
+  """
+  Comparator for the workflow state type. Possible values are "triage",
+  "backlog", "unstarted", "started", "completed", "canceled".
+  """
   type: StringComparator
 
   """Filters that the workflow states team must satisfy."""
