@@ -4501,6 +4501,11 @@ type Draft implements Node {
   """The customer need that this draft is referencing."""
   customerNeed: CustomerNeed
 
+  """
+  [INTERNAL] Allows for multiple drafts per entity (currently constrained to Pull Requests).
+  """
+  anchor: String
+
   """The team for which this is a draft post."""
   team: Team
 }
@@ -7987,11 +7992,6 @@ type Issue implements Node {
   """The user to whom the issue is assigned to."""
   assignee: User
 
-  """
-  [DEPRECATED] [Internal] The user who has delegated this issue to be completed by an agent.
-  """
-  supervisor: User
-
   """The agent user that is delegated to work on this issue."""
   delegate: User
 
@@ -8569,6 +8569,9 @@ input IssueCollectionFilter {
   """Filters that the issues comments must satisfy."""
   comments: CommentCollectionFilter
 
+  """[Internal] Filters that the issue's suggestions must satisfy."""
+  suggestions: IssueSuggestionCollectionFilter
+
   """Filters that the issues cycle must satisfy."""
   cycle: NullableCycleFilter
 
@@ -9025,6 +9028,9 @@ input IssueFilter {
 
   """Filters that the issues comments must satisfy."""
   comments: CommentCollectionFilter
+
+  """[Internal] Filters that the issue's suggestions must satisfy."""
+  suggestions: IssueSuggestionCollectionFilter
 
   """Filters that the issues cycle must satisfy."""
   cycle: NullableCycleFilter
@@ -10123,11 +10129,6 @@ type IssueSearchResult implements Node {
   """The user to whom the issue is assigned to."""
   assignee: User
 
-  """
-  [DEPRECATED] [Internal] The user who has delegated this issue to be completed by an agent.
-  """
-  supervisor: User
-
   """The agent user that is delegated to work on this issue."""
   delegate: User
 
@@ -10695,6 +10696,51 @@ type IssueSuggestion implements Node {
   suggestedLabelId: String
 }
 
+"""IssueSuggestion collection filtering options."""
+input IssueSuggestionCollectionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the suggestion type."""
+  type: StringComparator
+
+  """Comparator for the suggestion state."""
+  state: StringComparator
+
+  """Filters that the suggested user must satisfy."""
+  suggestedUser: NullableUserFilter
+
+  """Filters that the suggested project must satisfy."""
+  suggestedProject: NullableProjectFilter
+
+  """Filters that the suggested team must satisfy."""
+  suggestedTeam: NullableTeamFilter
+
+  """Filters that the suggested label must satisfy."""
+  suggestedLabel: IssueLabelFilter
+
+  """Compound filters, all of which need to be matched by the suggestion."""
+  and: [IssueSuggestionCollectionFilter!]
+
+  """Compound filters, one of which need to be matched by the suggestion."""
+  or: [IssueSuggestionCollectionFilter!]
+
+  """Filters that needs to be matched by some suggestions."""
+  some: IssueSuggestionFilter
+
+  """Filters that needs to be matched by all suggestions."""
+  every: IssueSuggestionFilter
+
+  """Comparator for the collection length."""
+  length: NumberComparator
+}
+
 type IssueSuggestionConnection {
   edges: [IssueSuggestionEdge!]!
   nodes: [IssueSuggestion!]!
@@ -10706,6 +10752,42 @@ type IssueSuggestionEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""IssueSuggestion filtering options."""
+input IssueSuggestionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the suggestion type."""
+  type: StringComparator
+
+  """Comparator for the suggestion state."""
+  state: StringComparator
+
+  """Filters that the suggested user must satisfy."""
+  suggestedUser: NullableUserFilter
+
+  """Filters that the suggested project must satisfy."""
+  suggestedProject: NullableProjectFilter
+
+  """Filters that the suggested team must satisfy."""
+  suggestedTeam: NullableTeamFilter
+
+  """Filters that the suggested label must satisfy."""
+  suggestedLabel: IssueLabelFilter
+
+  """Compound filters, all of which need to be matched by the suggestion."""
+  and: [IssueSuggestionFilter!]
+
+  """Compound filters, one of which need to be matched by the suggestion."""
+  or: [IssueSuggestionFilter!]
 }
 
 type IssueSuggestionMetadata {
@@ -14797,6 +14879,9 @@ input NullableIssueFilter {
 
   """Filters that the issues comments must satisfy."""
   comments: CommentCollectionFilter
+
+  """[Internal] Filters that the issue's suggestions must satisfy."""
+  suggestions: IssueSuggestionCollectionFilter
 
   """Filters that the issues cycle must satisfy."""
   cycle: NullableCycleFilter
