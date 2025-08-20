@@ -1263,6 +1263,36 @@ type Comment implements Node {
     orderBy: PaginationOrderBy
   ): CommentConnection!
 
+  """Agent session associated with this comment."""
+  agentSession: AgentSession
+
+  """[Internal] Agent sessions associated with this comment."""
+  agentSessions(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AgentSessionConnection!
+
   """The bot that created the comment."""
   botActor: ActorBot
 
@@ -20103,6 +20133,36 @@ type PullRequest implements Node {
 
   """Merge settings for this pull request."""
   mergeSettings: PullRequestMergeSettings
+
+  """[ALPHA] The commits associated with the pull request."""
+  commits: [PullRequestCommit!]!
+}
+
+"""[ALPHA] A pull request commit."""
+type PullRequestCommit {
+  """The Git commit SHA."""
+  sha: String!
+
+  """The full commit message."""
+  message: String!
+
+  """The timestamp when the commit was committed (ISO 8601 string)."""
+  committedAt: String!
+
+  """Number of additions in this commit."""
+  additions: Float!
+
+  """Number of deletions in this commit."""
+  deletions: Float!
+
+  """The number of changed files if available."""
+  changedFiles: Float
+
+  """Linear user IDs for commit authors (includes co-authors)."""
+  authorUserIds: [String!]!
+
+  """External user IDs for commit authors (includes co-authors)."""
+  authorExternalUserIds: [String!]!
 }
 
 """The method used to merge a pull request."""
