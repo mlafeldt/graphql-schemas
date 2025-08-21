@@ -4674,7 +4674,7 @@
           },
           {
             "name": "displayName",
-            "description": "The name of the team including it's parent team name if it has one.",
+            "description": "The name of the team including its parent team name if it has one.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -43767,8 +43767,8 @@
                 "ofType": null
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "Use 'data.generationMetadata' instead"
           },
           {
             "name": "wasLocalDraft",
@@ -50353,42 +50353,6 @@
         "description": "A pull request related notification.",
         "fields": [
           {
-            "name": "commentId",
-            "description": "Related comment ID. Null if the notification is not related to a comment.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "parentCommentId",
-            "description": "Related parent comment ID. Null if the notification is not related to a comment.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "reactionEmoji",
-            "description": "Name of the reaction emoji related to the notification.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "id",
             "description": "The unique identifier of the entity.",
             "args": [],
@@ -50768,6 +50732,18 @@
                 "name": "String",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pullRequestCommentId",
+            "description": "Related pull request comment ID. Null if the notification is not related to a pull request comment.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -85373,6 +85349,68 @@
             "deprecationReason": null
           },
           {
+            "name": "agentSessionCreateOnComment",
+            "description": "Creates a new agent session on a rootcomment.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The agent session object to create.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AgentSessionCreateOnComment",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentSessionPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentSessionCreateOnIssue",
+            "description": "Creates a new agent session on an issue.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The agent session object to create.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AgentSessionCreateOnIssue",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentSessionPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "agentSessionUpdateExternalUrl",
             "description": "Updates the externalUrl of an agent session, which is an agent-hosted page associated with this session.",
             "args": [
@@ -87649,6 +87687,12 @@
           },
           {
             "name": "commandMenuClearShortcutTip",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "slackBotWelcomeMessageShown",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -106932,6 +106976,76 @@
         ],
         "inputFields": null,
         "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AgentSessionCreateOnComment",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "commentId",
+            "description": "The root comment that this session will be associated with.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "externalLink",
+            "description": "The URL of an external agent-hosted page associated with this session.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AgentSessionCreateOnIssue",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "issueId",
+            "description": "The issue that this session will be associated with.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "externalLink",
+            "description": "The URL of an external agent-hosted page associated with this session.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },
