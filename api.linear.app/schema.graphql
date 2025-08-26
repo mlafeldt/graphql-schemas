@@ -996,6 +996,49 @@ enum AuthenticationSessionType {
   android
 }
 
+"""An identity provider."""
+type AuthIdentityProvider {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """
+  Whether the identity provider is the default identity provider migrated from organization level settings.
+  """
+  defaultMigrated: Boolean!
+
+  """Whether SAML authentication is enabled for organization."""
+  samlEnabled: Boolean!
+
+  """Sign in endpoint URL for the identity provider."""
+  ssoEndpoint: String
+
+  """
+  Binding method for authentication call. Can be either `post` (default) or `redirect`.
+  """
+  ssoBinding: String
+
+  """
+  The algorithm of the Signing Certificate. Can be one of `sha1`, `sha256` (default), or `sha512`.
+  """
+  ssoSignAlgo: String
+
+  """The issuer's custom entity ID."""
+  issuerEntityId: String
+
+  """X.509 Signing Certificate in string form."""
+  ssoSigningCert: String
+
+  """
+  The SAML priority used to pick default workspace in SAML SP initiated flow,
+  when same domain is claimed for SAML by multiple workspaces. Lower priority
+  value means higher preference.
+  """
+  priority: Float
+
+  """Whether SCIM provisioning is enabled for organization."""
+  scimEnabled: Boolean!
+}
+
 """[INTERNAL] An OAuth userId/createdDate tuple"""
 type AuthMembership {
   """The user ID the authorization was done for"""
@@ -1163,6 +1206,9 @@ type AuthUser {
 
   """Organization the user belongs to."""
   organization: AuthOrganization!
+
+  """[INTERNAL] Identity provider the user is managed by."""
+  identityProvider: AuthIdentityProvider
 }
 
 """Comparator for booleans."""
@@ -25323,6 +25369,9 @@ type User implements Node {
 
   """The last time the user was seen online."""
   lastSeen: DateTime
+
+  """[INTERNAL] Identity provider the user is managed by."""
+  identityProvider: IdentityProvider
 
   """The initials of the user."""
   initials: String!
