@@ -71,6 +71,11 @@ type AgentActivity implements Node {
   An optional modifier that provides additional instructions on how the activity should be interpreted.
   """
   signal: AgentActivitySignal
+
+  """
+  Whether the activity is ephemeral, and should disappear after the next agent activity.
+  """
+  ephemeral: Boolean!
 }
 
 """Content for an action activity (tool call or action)."""
@@ -116,6 +121,11 @@ input AgentActivityCreateInput {
   See https://linear.app/developers/agents for typing details.
   """
   content: JSONObject!
+
+  """
+  Whether the activity is ephemeral, and should disappear after the next activity. Defaults to false.
+  """
+  ephemeral: Boolean
 }
 
 """
@@ -25627,6 +25637,9 @@ type User implements Node {
     """
     orderBy: PaginationOrderBy
   ): TeamMembershipConnection!
+
+  """Whether this user can access any public team in the organization."""
+  canAccessAnyPublicTeam: Boolean!
 
   """Whether the user is the currently authenticated user."""
   isMe: Boolean!
