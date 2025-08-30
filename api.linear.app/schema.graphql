@@ -5653,6 +5653,11 @@ type FetchDataPayload {
   success: Boolean!
 }
 
+type FileUploadDeletePayload {
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
 """By which resolution is frequency defined."""
 enum FrequencyResolutionType {
   daily
@@ -11466,6 +11471,16 @@ type Mutation {
     id: String!
   ): UserAdminPayload!
 
+  """
+  Unlinks a guest user from their identity provider. Can only be called by an admin when SCIM is enabled.
+  """
+  userUnlinkFromIdentityProvider(
+    """
+    The identifier of the guest user to unlink from their identity provider.
+    """
+    id: String!
+  ): UserAdminPayload!
+
   """Creates a new triage responsibility."""
   triageResponsibilityCreate(
     """The properties of the triage responsibility to create."""
@@ -13152,6 +13167,15 @@ type Mutation {
     """URL of the file to be uploaded to Linear."""
     url: String!
   ): ImageUploadFromUrlPayload!
+
+  """
+  [INTERNAL] Permanently delete an uploaded file by asset URL. This should be
+  used as a last resort and will break comments and documents that reference the asset.
+  """
+  fileUploadDangerouslyDelete(
+    """The asset URL of the uploaded file to delete."""
+    assetUrl: String!
+  ): FileUploadDeletePayload!
 
   """Creates a new favorite (project, cycle etc)."""
   favoriteCreate(
