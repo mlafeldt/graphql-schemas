@@ -72,6 +72,9 @@ type AgentActivity implements Node {
   """
   signal: AgentActivitySignal
 
+  """Metadata about this agent activity's signal."""
+  signalMetadata: JSON
+
   """
   Whether the activity is ephemeral, and should disappear after the next agent activity.
   """
@@ -116,6 +119,9 @@ input AgentActivityCreateInput {
   """
   signal: AgentActivitySignal
 
+  """Metadata about this agent activity's signal."""
+  signalMetadata: JSONObject
+
   """
   The content payload of the agent activity. This object is not strictly typed.
   See https://linear.app/developers/agents for typing details.
@@ -144,6 +150,9 @@ input AgentActivityCreatePromptInput {
   An optional modifier that provides additional instructions on how the activity should be interpreted.
   """
   signal: AgentActivitySignal
+
+  """Metadata about this agent activity's signal."""
+  signalMetadata: JSONObject
 
   """The content payload of the prompt agent activity."""
   content: JSONObject!
@@ -243,6 +252,7 @@ A modifier that provides additional instructions on how the activity should be i
 enum AgentActivitySignal {
   stop
   continue
+  auth
 }
 
 """Content for a thought activity."""
@@ -22304,12 +22314,6 @@ type Query {
     clientId: String!
   ): Application!
 
-  """[INTERNAL] Get basic information for a list of applications."""
-  applicationInfoByIds(
-    """The IDs of the applications."""
-    ids: [String!]!
-  ): [Application!]!
-
   """
   Get information for an application and whether a user has approved it for the given scopes.
   """
@@ -22326,19 +22330,6 @@ type Query {
     """The client ID of the application."""
     clientId: String!
   ): UserAuthorizedApplication!
-
-  """[INTERNAL] Get all authorized applications for a user."""
-  authorizedApplications: [AuthorizedApplication!]!
-
-  """
-  [INTERNAL] Get non-internal authorized applications for a workspace, including each application's app user.
-  """
-  workspaceAuthorizedApplicationsWithAppUser(
-    """
-    Client IDs of specific applications to return. If not provided, all workspace-authorized applications will be returned.
-    """
-    clientIds: [String!]
-  ): [WorkspaceAuthorizedApplicationWithAppUser!]!
 
   """
   [INTERNAL] Get a specific non-internal authorized application (with limited fields) for a workspace
@@ -26701,46 +26692,6 @@ input WorkflowStateUpdateInput {
 
   """The position of the state."""
   position: Float
-}
-
-"""
-[INTERNAL] Public information of the OAuth application, plus the app user and aggregate membership count.
-"""
-type WorkspaceAuthorizedApplicationWithAppUser {
-  """Application name."""
-  name: String!
-
-  """Description of the application."""
-  description: String
-
-  """Developer of the application."""
-  developer: String
-
-  """Developer URL of the application."""
-  developerUrl: String
-
-  """Image of the application."""
-  imageUrl: String
-
-  """Scopes that are authorized for this application for a given user."""
-  scope: [String!]!
-
-  """OAuth application's ID."""
-  appId: String!
-
-  """OAuth application's client ID."""
-  clientId: String!
-
-  """Whether or not webhooks are enabled for the application."""
-  webhooksEnabled: Boolean!
-
-  """
-  Total number of members (including the app user, if it exists) that authorized the application.
-  """
-  totalMembers: Float!
-
-  """The app user associated with this client, if one exists."""
-  appUser: AuthMembership
 }
 
 """
