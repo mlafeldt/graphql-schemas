@@ -10823,6 +10823,7 @@ type IssueSuggestion implements Node {
   type: IssueSuggestionType!
   state: IssueSuggestionState!
   stateChangedAt: DateTime!
+  dismissalReason: String
   metadata: IssueSuggestionMetadata
   suggestedIssue: Issue
   suggestedIssueId: String
@@ -12227,6 +12228,9 @@ type Mutation {
 
   """Subscribes a user to an issue."""
   issueSubscribe(
+    """The email of the user to subscribe, default is the current user."""
+    userEmail: String
+
     """The identifier of the user to subscribe, default is the current user."""
     userId: String
 
@@ -12236,6 +12240,9 @@ type Mutation {
 
   """Unsubscribes a user from an issue."""
   issueUnsubscribe(
+    """The email of the user to unsubscribe, default is the current user."""
+    userEmail: String
+
     """
     The identifier of the user to unsubscribe, default is the current user.
     """
