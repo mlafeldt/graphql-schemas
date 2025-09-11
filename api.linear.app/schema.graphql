@@ -952,6 +952,8 @@ type AuditEntryType {
 
 """Authentication session information."""
 type AuthenticationSessionResponse {
+  """The time at which the entity was created."""
+  createdAt: DateTime!
   id: String!
 
   """Type of application used to authenticate."""
@@ -987,9 +989,6 @@ type AuthenticationSessionResponse {
   """When was the session last seen"""
   lastActiveAt: DateTime
 
-  """Date when the session was created."""
-  createdAt: DateTime!
-
   """Date when the session was last updated."""
   updatedAt: DateTime!
 
@@ -1018,6 +1017,9 @@ enum AuthenticationSessionType {
 
 """An identity provider."""
 type AuthIdentityProvider {
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
   """The unique identifier of the entity."""
   id: ID!
 
@@ -1063,6 +1065,9 @@ type AuthIdentityProvider {
 An organization. Organizations are root-level objects that contain users and teams.
 """
 type AuthOrganization {
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
   """The unique identifier of the entity."""
   id: ID!
 
@@ -1155,6 +1160,8 @@ type AuthResolverResponse {
 
 """A user that has access to the the resources of an organization."""
 type AuthUser {
+  """The time at which the entity was created."""
+  createdAt: DateTime!
   id: ID!
 
   """The user's full name."""
@@ -15549,6 +15556,9 @@ input NullableUserFilter {
   """Comparator for the user's invited status."""
   invited: BooleanComparator
 
+  """Comparator for the user's invited status."""
+  isInvited: BooleanComparator
+
   """Comparator for the user's app status."""
   app: BooleanComparator
 
@@ -20803,7 +20813,7 @@ type Query {
   """One specific team membership."""
   teamMembership(id: String!): TeamMembership!
 
-  """[INTERNAL] Search for various resources using natural language."""
+  """Search for various resources using natural language."""
   semanticSearch(
     """Search query to look for."""
     query: String!
@@ -20811,12 +20821,15 @@ type Query {
     """The types of results to return (default: all)."""
     types: [SemanticSearchResultType!]
 
-    """The maximum number of results to return (default: 10)."""
+    """The maximum number of results to return (default: 50)."""
     maxResults: Int
 
     """Whether to include archived results in the search (default: false)."""
     includeArchived: Boolean
-  ): SemanticSearchPayload! @deprecated(reason: "Use specific search endpoints like searchIssues, searchProjects, searchDocuments instead.")
+
+    """Filters to apply to the semantic search results of each type."""
+    filters: SemanticSearchFilters
+  ): SemanticSearchPayload!
 
   """Search documents."""
   searchDocuments(
@@ -22965,13 +22978,29 @@ input SalesforceSettingsInput {
   defaultTeam: String
 }
 
-"""[INTERNAL] Payload returned by semantic search."""
+"""Filters for semantic search results."""
+input SemanticSearchFilters {
+  """Filters applied to issues."""
+  issues: IssueFilter
+
+  """Filters applied to projects."""
+  projects: ProjectFilter
+
+  """Filters applied to initiatives."""
+  initiatives: InitiativeFilter
+
+  """Filters applied to documents."""
+  documents: DocumentFilter
+}
+
+"""Payload returned by semantic search."""
 type SemanticSearchPayload {
-  enabled: Boolean!
+  """Whether the semantic search is enabled."""
+  enabled: Boolean! @deprecated(reason: "Always true.")
   results: [SemanticSearchResult!]!
 }
 
-"""[INTERNAL] A semantic search result reference."""
+"""A semantic search result reference."""
 type SemanticSearchResult implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -22992,7 +23021,7 @@ type SemanticSearchResult implements Node {
   document: Document
 }
 
-"""[INTERNAL] The type of the semantic search result."""
+"""The type of the semantic search result."""
 enum SemanticSearchResultType {
   issue
   project
@@ -25706,6 +25735,9 @@ input UserCollectionFilter {
   """Comparator for the user's invited status."""
   invited: BooleanComparator
 
+  """Comparator for the user's invited status."""
+  isInvited: BooleanComparator
+
   """Comparator for the user's app status."""
   app: BooleanComparator
 
@@ -25788,6 +25820,9 @@ input UserFilter {
 
   """Comparator for the user's invited status."""
   invited: BooleanComparator
+
+  """Comparator for the user's invited status."""
+  isInvited: BooleanComparator
 
   """Comparator for the user's app status."""
   app: BooleanComparator

@@ -10804,6 +10804,16 @@
             "defaultValue": null
           },
           {
+            "name": "isInvited",
+            "description": "Comparator for the user's invited status.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "BooleanComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "app",
             "description": "Comparator for the user's app status.",
             "type": {
@@ -13029,6 +13039,16 @@
             "defaultValue": null
           },
           {
+            "name": "isInvited",
+            "description": "Comparator for the user's invited status.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "BooleanComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "app",
             "description": "Comparator for the user's app status.",
             "type": {
@@ -13217,6 +13237,16 @@
           },
           {
             "name": "invited",
+            "description": "Comparator for the user's invited status.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "BooleanComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "isInvited",
             "description": "Comparator for the user's invited status.",
             "type": {
               "kind": "INPUT_OBJECT",
@@ -52418,7 +52448,7 @@
           },
           {
             "name": "semanticSearch",
-            "description": "[INTERNAL] Search for various resources using natural language.",
+            "description": "Search for various resources using natural language.",
             "args": [
               {
                 "name": "query",
@@ -52454,7 +52484,7 @@
               },
               {
                 "name": "maxResults",
-                "description": "The maximum number of results to return (default: 10).",
+                "description": "The maximum number of results to return (default: 50).",
                 "type": {
                   "kind": "SCALAR",
                   "name": "Int",
@@ -52471,6 +52501,16 @@
                   "ofType": null
                 },
                 "defaultValue": null
+              },
+              {
+                "name": "filters",
+                "description": "Filters to apply to the semantic search results of each type.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "SemanticSearchFilters",
+                  "ofType": null
+                },
+                "defaultValue": null
               }
             ],
             "type": {
@@ -52482,8 +52522,8 @@
                 "ofType": null
               }
             },
-            "isDeprecated": true,
-            "deprecationReason": "Use specific search endpoints like searchIssues, searchProjects, searchDocuments instead."
+            "isDeprecated": false,
+            "deprecationReason": null
           },
           {
             "name": "searchDocuments",
@@ -59442,11 +59482,11 @@
       {
         "kind": "OBJECT",
         "name": "SemanticSearchPayload",
-        "description": "[INTERNAL] Payload returned by semantic search.",
+        "description": "Payload returned by semantic search.",
         "fields": [
           {
             "name": "enabled",
-            "description": null,
+            "description": "Whether the semantic search is enabled.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -59457,8 +59497,8 @@
                 "ofType": null
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "Always true."
           },
           {
             "name": "results",
@@ -59493,7 +59533,7 @@
       {
         "kind": "OBJECT",
         "name": "SemanticSearchResult",
-        "description": "[INTERNAL] A semantic search result reference.",
+        "description": "A semantic search result reference.",
         "fields": [
           {
             "name": "id",
@@ -59590,7 +59630,7 @@
       {
         "kind": "ENUM",
         "name": "SemanticSearchResultType",
-        "description": "[INTERNAL] The type of the semantic search result.",
+        "description": "The type of the semantic search result.",
         "fields": null,
         "inputFields": null,
         "interfaces": null,
@@ -59620,6 +59660,57 @@
             "deprecationReason": null
           }
         ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "SemanticSearchFilters",
+        "description": "Filters for semantic search results.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "issues",
+            "description": "Filters applied to issues.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IssueFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projects",
+            "description": "Filters applied to projects.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "initiatives",
+            "description": "Filters applied to initiatives.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "InitiativeFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "documents",
+            "description": "Filters applied to documents.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DocumentFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
         "possibleTypes": null
       },
       {
@@ -70842,6 +70933,22 @@
         "description": "A user that has access to the the resources of an organization.",
         "fields": [
           {
+            "name": "createdAt",
+            "description": "The time at which the entity was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "id",
             "description": null,
             "args": [],
@@ -71004,6 +71111,22 @@
         "name": "AuthOrganization",
         "description": "An organization. Organizations are root-level objects that contain users and teams.",
         "fields": [
+          {
+            "name": "createdAt",
+            "description": "The time at which the entity was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "id",
             "description": "The unique identifier of the entity.",
@@ -71260,6 +71383,22 @@
         "description": "An identity provider.",
         "fields": [
           {
+            "name": "createdAt",
+            "description": "The time at which the entity was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "id",
             "description": "The unique identifier of the entity.",
             "args": [],
@@ -71406,6 +71545,22 @@
         "name": "AuthenticationSessionResponse",
         "description": "Authentication session information.",
         "fields": [
+          {
+            "name": "createdAt",
+            "description": "The time at which the entity was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "id",
             "description": null,
@@ -71566,22 +71721,6 @@
               "kind": "SCALAR",
               "name": "DateTime",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Date when the session was created.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "DateTime",
-                "ofType": null
-              }
             },
             "isDeprecated": false,
             "deprecationReason": null
