@@ -1246,6 +1246,17 @@ type Organization implements Account & Node {
   invites(after: String, before: String, first: Int, last: Int): InviteConnection!
   members(after: String, before: String, first: Int, last: Int): MemberConnection!
   name: String!
+
+  """
+  The group name that maps to this organization in the configured OIDC identity provider.
+  """
+  oidcGroupName: String
+
+  """
+  The OIDC identity provider (`iss` / issuer) to take into account when
+  automatically provisioning organization memberships based on the `groups` claim.
+  """
+  oidcIssuer: String
   plan: GrafbasePlan!
   samlDomain: String
   slackIntegration: SlackIntegration
@@ -1324,6 +1335,17 @@ type OrganizationSlugUpdateSuccess {
 input OrganizationUpdateInput {
   id: ID!
   name: String
+
+  """
+  The OIDC identity provider (`iss` / issuer) to take into account when
+  automatically provisioning organization memberships based on the `groups` claim.
+  """
+  oidcIssuer: String
+
+  """
+  The group name that maps to this organization in the configured OIDC identity provider.
+  """
+  oidcGroupName: String
 }
 
 union OrganizationUpdatePayload = NameSizeCheckError | NotAllowedToUpdateOrganizationError | OrganizationDoesNotExistError | OrganizationUpdateSuccess
