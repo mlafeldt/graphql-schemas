@@ -124,7 +124,7 @@ input AgentActivityCreateInput {
 
   """
   The content payload of the agent activity. This object is not strictly typed.
-  See https://linear.app/developers/agents for typing details.
+  See https://linear.app/developers/agent-interaction#activity-content-payload for typing details.
   """
   content: JSONObject!
 
@@ -1029,6 +1029,9 @@ type AuthIdentityProvider {
   """
   defaultMigrated: Boolean!
 
+  """The type of identity provider."""
+  type: IdentityProviderType!
+
   """Whether SAML authentication is enabled for organization."""
   samlEnabled: Boolean!
 
@@ -1229,20 +1232,37 @@ type Comment implements Node {
   """The issue that the comment is associated with."""
   issue: Issue
 
+  """The ID of the issue that the comment is associated with."""
+  issueId: String
+
   """The document content that the comment is associated with."""
   documentContent: DocumentContent
+
+  """The ID of the document content that the comment is associated with."""
+  documentContentId: String
 
   """The project update that the comment is associated with."""
   projectUpdate: ProjectUpdate
 
+  """The ID of the project update that the comment is associated with."""
+  projectUpdateId: String
+
   """The initiative update that the comment is associated with."""
   initiativeUpdate: InitiativeUpdate
+
+  """The ID of the initiative update that the comment is associated with."""
+  initiativeUpdateId: String
 
   """The post that the comment is associated with."""
   post: Post
 
   """The parent comment under which the current comment is nested."""
   parent: Comment
+
+  """
+  The ID of the parent comment under which the current comment is nested.
+  """
+  parentId: String
 
   """The user that resolved the thread."""
   resolvingUser: User
@@ -1252,6 +1272,9 @@ type Comment implements Node {
 
   """The comment that resolved the thread."""
   resolvingComment: Comment
+
+  """The ID of the comment that resolved the thread."""
+  resolvingCommentId: String
 
   """The user who wrote the comment."""
   user: User
@@ -6160,6 +6183,9 @@ type IdentityProvider implements Node {
   """
   defaultMigrated: Boolean!
 
+  """The type of identity provider."""
+  type: IdentityProviderType!
+
   """Whether SAML authentication is enabled for organization."""
   samlEnabled: Boolean!
 
@@ -6197,6 +6223,12 @@ type IdentityProvider implements Node {
 
   """[INTERNAL] SCIM guests group push settings."""
   guestsGroupPush: JSONObject
+}
+
+"""The type of identity provider."""
+enum IdentityProviderType {
+  general
+  webForms
 }
 
 type ImageUploadFromUrlPayload {
@@ -9603,6 +9635,9 @@ type IssueLabel implements Node {
 
   """The date when the label was last applied to an issue or project."""
   lastAppliedAt: DateTime
+
+  """[Internal] When the label was retired."""
+  retiredAt: DateTime
   organization: Organization! @deprecated(reason: "Workspace labels are identified by their team being null.")
 
   """
@@ -9756,6 +9791,9 @@ input IssueLabelCreateInput {
 
   """Whether the label is a group."""
   isGroup: Boolean
+
+  """[Internal] When the label was retired."""
+  retiredAt: DateTime
 }
 
 type IssueLabelEdge {
@@ -9824,6 +9862,9 @@ input IssueLabelUpdateInput {
 
   """Whether the label is a group."""
   isGroup: Boolean
+
+  """[Internal] When the label was retired."""
+  retiredAt: DateTime
 }
 
 """An issue related notification."""
@@ -18017,6 +18058,9 @@ type ProjectLabel implements Node {
 
   """The date when the label was last applied to an issue or project."""
   lastAppliedAt: DateTime
+
+  """[Internal] When the label was retired."""
+  retiredAt: DateTime
   organization: Organization!
 
   """The user who created the label."""
@@ -18222,6 +18266,9 @@ input ProjectLabelUpdateInput {
 
   """Whether the label is a group."""
   isGroup: Boolean
+
+  """[Internal] When the label was retired."""
+  retiredAt: DateTime
 }
 
 """Project lead sorting options."""
@@ -22169,6 +22216,9 @@ type Query {
   ssoUrlFromEmail(
     """Whether the client is the desktop app."""
     isDesktop: Boolean
+
+    """Type of identity provider."""
+    type: IdentityProviderType! = general
 
     """Email to query the SSO login URL by."""
     email: String!
