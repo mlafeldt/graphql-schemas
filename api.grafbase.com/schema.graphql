@@ -110,6 +110,12 @@ type AlreadyMemberError {
   query: Query!
 }
 
+type AuditLogDirectDownloadSuccess {
+  url: Url!
+}
+
+union AuditLogDirectDownloadUrlPayload = AuditLogDirectDownloadSuccess | NotAllowedError | OrganizationDoesNotExistError
+
 type BadWasmModuleError {
   error: String!
   query: Query!
@@ -131,6 +137,9 @@ type Branch implements Node {
 
   """Whether usage data should be ignored when running operation checks."""
   operationChecksIgnoreUsageData: Boolean!
+
+  """Allow breaking changes that are part of an approved schema proposal."""
+  operationChecksSchemaProposalApprovalEnabled: Boolean
   schema: String
   schemaProposals(after: String, first: Int, filter: SchemaProposalFilter!): SchemaProposalConnection!
   schemaProposalsConfiguration: SchemaProposalsConfiguration!
@@ -192,6 +201,9 @@ input BranchUpdateInput {
   optional) will be considered breaking.
   """
   operationChecksIgnoreUsageData: Boolean
+
+  """Allow breaking changes that are part of an approved schema proposal."""
+  operationChecksSchemaProposalApprovalEnabled: Boolean
   schemaProposalsConfiguration: SchemaProposalsConfigurationUpdateInput
   accountSlug: String!
   graphSlug: String
@@ -1435,6 +1447,9 @@ type Query {
     slug: String!
   ): Account
   accountCreationValidate(input: AccountCreationValidateInput!): AccountCreationValidatePayload!
+
+  """Get a graph by account slug and slug of the graph itself."""
+  auditLogDirectDownload(organizationId: ID!, start: DateTime!, end: DateTime): AuditLogDirectDownloadUrlPayload!
 
   """Get branch by account slug, graph slug and the name of the branch."""
   branch(
