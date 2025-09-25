@@ -21481,6 +21481,19 @@ type Query {
     prompt: String!
   ): IssueFilterSuggestionPayload!
 
+  """
+  [Internal] Returns code repositories that are most likely to be relevant for implementing an issue.
+  """
+  issueRepositorySuggestions(
+    """
+    Optional AgentSession ID associated with the issue for which the suggestions are being generated.
+    """
+    agentSessionId: String
+
+    """The ID of the issue to get repository suggestions for."""
+    issueId: String!
+  ): RepositorySuggestionsPayload!
+
   """All issue relationships."""
   issueRelations(
     """A cursor to be used with last for backward pagination."""
@@ -22658,6 +22671,26 @@ enum ReleaseChannel {
   beta
   preRelease
   public
+}
+
+type RepositorySuggestion {
+  """
+  The full name of the repository in owner/name format (e.g., 'linear/linear-app').
+  """
+  repositoryFullName: String!
+
+  """
+  Hostname of the Git service (e.g., 'github.com', 'github.company.com').
+  """
+  hostname: String
+
+  """Confidence score from 0.0 to 1.0."""
+  confidence: Float!
+}
+
+type RepositorySuggestionsPayload {
+  """The suggested repositories."""
+  suggestions: [RepositorySuggestion!]!
 }
 
 """Customer revenue sorting options."""
