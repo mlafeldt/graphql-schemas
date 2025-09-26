@@ -851,6 +851,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "AiPromptRules",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "Post",
             "ofType": null
           },
@@ -2922,7 +2927,23 @@
           },
           {
             "name": "aiAddonEnabled",
-            "description": "[INTERNAL] Whether the organization has enabled the AI add-on.",
+            "description": "[INTERNAL] Whether the organization has enabled the AI add-on (which at this point only includes triage suggestions).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "generatedUpdatesEnabled",
+            "description": "[INTERNAL] Whether the organization has enabled generated updates.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -23941,6 +23962,18 @@
             "deprecationReason": null
           },
           {
+            "name": "aiPromptRules",
+            "description": "The AI prompt rules that the content is associated with.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "AiPromptRules",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "restoredAt",
             "description": "The time at which the document content was restored from a previous version.",
             "args": [],
@@ -28248,6 +28281,95 @@
             "deprecationReason": null
           }
         ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AiPromptRules",
+        "description": "AI prompt rules for a team.",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The unique identifier of the entity.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createdAt",
+            "description": "The time at which the entity was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't\n    been updated after creation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "archivedAt",
+            "description": "The time at which the entity was archived. Null if the entity has not been archived.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updatedBy",
+            "description": "The user who last updated the AI prompt rules.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "User",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
         "possibleTypes": null
       },
       {
@@ -54879,6 +55001,28 @@
                 "defaultValue": null
               },
               {
+                "name": "candidateRepositories",
+                "description": "List of candidate repositories to restrict suggestions to.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "INPUT_OBJECT",
+                        "name": "CandidateRepository",
+                        "ofType": null
+                      }
+                    }
+                  }
+                },
+                "defaultValue": null
+              },
+              {
                 "name": "issueId",
                 "description": "The ID of the issue to get repository suggestions for.",
                 "type": {
@@ -67216,7 +67360,7 @@
         "fields": [
           {
             "name": "repositoryFullName",
-            "description": "The full name of the repository in owner/name format (e.g., 'linear/linear-app').",
+            "description": "The full name of the repository in owner/name format (e.g., 'acme/backend').",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -67261,6 +67405,45 @@
         ],
         "inputFields": null,
         "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "CandidateRepository",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "repositoryFullName",
+            "description": "The full name of the repository in owner/name format (e.g., 'acme/backend').",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "hostname",
+            "description": "Hostname of the Git service (e.g., 'github.com', 'github.company.com').",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },

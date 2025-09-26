@@ -418,6 +418,29 @@ input AgentSessionUpdateExternalUrlInput {
   externalLink: String
 }
 
+"""AI prompt rules for a team."""
+type AiPromptRules implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The user who last updated the AI prompt rules."""
+  updatedBy: User
+}
+
 input AirbyteConfigurationInput {
   """Linear export API key."""
   apiKey: String!
@@ -1205,6 +1228,18 @@ input BooleanComparator {
 
   """Not equals constraint."""
   neq: Boolean
+}
+
+input CandidateRepository {
+  """
+  The full name of the repository in owner/name format (e.g., 'acme/backend').
+  """
+  repositoryFullName: String!
+
+  """
+  Hostname of the Git service (e.g., 'github.com', 'github.company.com').
+  """
+  hostname: String!
 }
 
 """A comment associated with an issue."""
@@ -4132,6 +4167,9 @@ type DocumentContent implements Node {
 
   """The document that the content is associated with."""
   document: Document
+
+  """The AI prompt rules that the content is associated with."""
+  aiPromptRules: AiPromptRules
 
   """
   The time at which the document content was restored from a previous version.
@@ -15974,8 +16012,13 @@ type Organization implements Node {
   """Whether the organization has enabled the feed feature."""
   feedEnabled: Boolean!
 
-  """[INTERNAL] Whether the organization has enabled the AI add-on."""
+  """
+  [INTERNAL] Whether the organization has enabled the AI add-on (which at this point only includes triage suggestions).
+  """
   aiAddonEnabled: Boolean!
+
+  """[INTERNAL] Whether the organization has enabled generated updates."""
+  generatedUpdatesEnabled: Boolean!
 
   """[DEPRECATED] Which day count to use for SLA calculations."""
   slaDayCount: SLADayCountType! @deprecated(reason: "No longer in use")
@@ -21490,6 +21533,9 @@ type Query {
     """
     agentSessionId: String
 
+    """List of candidate repositories to restrict suggestions to."""
+    candidateRepositories: [CandidateRepository!]!
+
     """The ID of the issue to get repository suggestions for."""
     issueId: String!
   ): RepositorySuggestionsPayload!
@@ -22675,7 +22721,7 @@ enum ReleaseChannel {
 
 type RepositorySuggestion {
   """
-  The full name of the repository in owner/name format (e.g., 'linear/linear-app').
+  The full name of the repository in owner/name format (e.g., 'acme/backend').
   """
   repositoryFullName: String!
 
