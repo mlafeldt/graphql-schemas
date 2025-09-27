@@ -11121,7 +11121,9 @@ input JiraConfigurationInput {
   """The Jira personal access token."""
   accessToken: String!
 
-  """The Jira user's email address."""
+  """
+  The Jira user's email address. A username is also accepted on Jira Server / DC.
+  """
   email: String!
 
   """The Jira installation hostname."""
@@ -11204,6 +11206,9 @@ input JiraUpdateInput {
 
   """Webhook secret for a new manual configuration."""
   webhookSecret: String
+
+  """Whether the Jira instance does not support webhook secrets."""
+  noSecret: Boolean
 
   """The Jira personal access token."""
   accessToken: String
@@ -16666,6 +16671,9 @@ input OrganizationUpdateInput {
   """[INTERNAL] Whether the organization has enabled the AI add-on."""
   aiAddonEnabled: Boolean
 
+  """[INTERNAL] Whether the organization has enabled generated updates."""
+  generatedUpdatesEnabled: Boolean
+
   """[INTERNAL] Whether the organization has opted in to AI telemetry."""
   aiTelemetryEnabled: Boolean
 
@@ -21148,14 +21156,6 @@ type Query {
     id: String!
   ): ProjectUpdate!
 
-  """
-  [Internal] AI summary of the latest project updates for the given projects
-  """
-  summarizeProjectUpdates(
-    """The identifiers of the projects to summarize."""
-    ids: [String!]!
-  ): SummaryPayload!
-
   """All project statuses."""
   projectStatuses(
     """A cursor to be used with last for backward pagination."""
@@ -23831,11 +23831,6 @@ type SuccessPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
-}
-
-type SummaryPayload {
-  """Summary for project updates."""
-  summary: String!
 }
 
 """A comment thread that is synced with an external source."""
