@@ -356,6 +356,9 @@ type AgentSession implements Node {
 
   """Metadata about the external source that created this agent session."""
   sourceMetadata: JSON
+
+  """A dynamically updated list of the agent's execution strategy."""
+  plan: JSON
 }
 
 type AgentSessionConnection {
@@ -416,6 +419,14 @@ enum AgentSessionType {
 input AgentSessionUpdateExternalUrlInput {
   """The URL of an external agent-hosted page associated with this session."""
   externalLink: String
+}
+
+input AgentSessionUpdateInput {
+  """The URL of an external agent-hosted page associated with this session."""
+  externalLink: String
+
+  """A dynamically updated list of the agent's execution strategy."""
+  plan: JSONObject
 }
 
 """AI prompt rules for a team."""
@@ -13476,6 +13487,14 @@ type Mutation {
     input: CustomerUpsertInput!
   ): CustomerPayload!
 
+  """
+  Unsyncs a managed customer from the its current data source. External IDs mapping to the external source will be cleared.
+  """
+  customerUnsync(
+    """The identifier of the customer to unsync."""
+    id: String!
+  ): CustomerPayload!
+
   """Creates a new customer need."""
   customerNeedCreate(
     """The customer need to create."""
@@ -13559,6 +13578,11 @@ type Mutation {
 
   """Updates a comment."""
   commentUpdate(
+    """
+    [INTERNAL] Flag to prevent setting editedAt when updating bodyData (used for background uploads).
+    """
+    skipEditedAt: Boolean
+
     """A partial comment object to update the comment with."""
     input: CommentUpdateInput!
 
@@ -14084,6 +14108,15 @@ type Mutation {
   agentSessionUpdateExternalUrl(
     """The agent session object to update."""
     input: AgentSessionUpdateExternalUrlInput!
+
+    """The identifier of the agent session to update."""
+    id: String!
+  ): AgentSessionPayload!
+
+  """Updates an agent session."""
+  agentSessionUpdate(
+    """A partial agent session object to update the agent session with."""
+    input: AgentSessionUpdateInput!
 
     """The identifier of the agent session to update."""
     id: String!
