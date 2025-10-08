@@ -4040,6 +4040,9 @@ type Document implements Node {
   """[Internal] The team that the document is associated with."""
   team: Team
 
+  """The issue that the document is associated with."""
+  issue: Issue
+
   """The document's unique URL slug."""
   slugId: String!
 
@@ -4224,6 +4227,9 @@ input DocumentCreateInput {
   """[Internal] Related team for the document."""
   teamId: String
 
+  """[Internal] Related issue for the document."""
+  issueId: String
+
   """[Internal] The resource folder containing the document."""
   resourceFolderId: String
 
@@ -4266,6 +4272,9 @@ input DocumentFilter {
 
   """Filters that the document's project must satisfy."""
   project: ProjectFilter
+
+  """Filters that the document's issue must satisfy."""
+  issue: IssueFilter
 
   """Filters that the document's initiative must satisfy."""
   initiative: InitiativeFilter
@@ -4459,6 +4468,9 @@ type DocumentSearchResult implements Node {
   """[Internal] The team that the document is associated with."""
   team: Team
 
+  """The issue that the document is associated with."""
+  issue: Issue
+
   """The document's unique URL slug."""
   slugId: String!
 
@@ -4550,6 +4562,9 @@ input DocumentUpdateInput {
 
   """[Internal] Related team for the document."""
   teamId: String
+
+  """[Internal] Related issue for the document."""
+  issueId: String
 
   """[Internal] The resource folder containing the document."""
   resourceFolderId: String
@@ -8182,6 +8197,36 @@ type Issue implements Node {
   """Integration type that created this issue, if applicable."""
   integrationSourceType: IntegrationService
 
+  """Documents associated with the issue."""
+  documents(
+    """Filter returned documents."""
+    filter: DocumentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): DocumentConnection!
+
   """The bot that created the issue, if applicable."""
   botActor: ActorBot
 
@@ -10330,6 +10375,36 @@ type IssueSearchResult implements Node {
 
   """Integration type that created this issue, if applicable."""
   integrationSourceType: IntegrationService
+
+  """Documents associated with the issue."""
+  documents(
+    """Filter returned documents."""
+    filter: DocumentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): DocumentConnection!
 
   """The bot that created the issue, if applicable."""
   botActor: ActorBot
@@ -26090,6 +26165,7 @@ type UserPayload {
 
 """The different permission roles available to users on an organization."""
 enum UserRoleType {
+  owner
   admin
   guest
   user
