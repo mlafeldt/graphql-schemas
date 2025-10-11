@@ -9558,6 +9558,11 @@ type IssueHistory implements Node {
   """The users that were notified of the issue."""
   triageResponsibilityNotifiedUsers: [User!]
 
+  """
+  Boolean indicating if the issue was auto-assigned using the triage responsibility feature.
+  """
+  triageResponsibilityAutoAssigned: Boolean
+
   """The bot that performed the action."""
   botActor: ActorBot
 
@@ -9884,7 +9889,7 @@ input IssueLabelCreateInput {
   """Whether the label is a group."""
   isGroup: Boolean
 
-  """[Internal] When the label was retired."""
+  """When the label was retired."""
   retiredAt: DateTime
 }
 
@@ -9955,7 +9960,7 @@ input IssueLabelUpdateInput {
   """Whether the label is a group."""
   isGroup: Boolean
 
-  """[Internal] When the label was retired."""
+  """When the label was retired."""
   retiredAt: DateTime
 }
 
@@ -12091,6 +12096,18 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """Retires a project label."""
+  projectLabelRetire(
+    """The identifier of the label to retire."""
+    id: String!
+  ): ProjectLabelPayload!
+
+  """Restores a project label."""
+  projectLabelRestore(
+    """The identifier of the label to restore."""
+    id: String!
+  ): ProjectLabelPayload!
+
   """Updates the user's organization."""
   organizationUpdate(
     """A partial organization object to update the organization with."""
@@ -12445,7 +12462,7 @@ type Mutation {
     input: IssueLabelCreateInput!
   ): IssueLabelPayload!
 
-  """Updates an label."""
+  """Updates a label."""
   issueLabelUpdate(
     """
     Whether to replace all team-specific labels with the same name with this updated workspace label (default: false).
@@ -12464,6 +12481,18 @@ type Mutation {
     """The identifier of the label to delete."""
     id: String!
   ): DeletePayload!
+
+  """Retires a label."""
+  issueLabelRetire(
+    """The identifier of the label to retire."""
+    id: String!
+  ): IssueLabelPayload!
+
+  """Restores a label."""
+  issueLabelRestore(
+    """The identifier of the label to restore."""
+    id: String!
+  ): IssueLabelPayload!
 
   """Kicks off a GitHub import job."""
   issueImportCreateGithub(
@@ -16236,7 +16265,9 @@ type Organization implements Node {
   """Number of active users in the organization."""
   userCount: Int!
 
-  """Number of issues in the organization."""
+  """
+  Aproximate number of issues in the organization, including archived ones.
+  """
   createdIssueCount: Int!
 
   """Templates associated with the organization."""
@@ -18364,6 +18395,9 @@ input ProjectLabelCreateInput {
 
   """Whether the label is a group."""
   isGroup: Boolean
+
+  """When the label was retired."""
+  retiredAt: DateTime
 }
 
 type ProjectLabelEdge {
@@ -18430,7 +18464,7 @@ input ProjectLabelUpdateInput {
   """Whether the label is a group."""
   isGroup: Boolean
 
-  """[Internal] When the label was retired."""
+  """When the label was retired."""
   retiredAt: DateTime
 }
 
