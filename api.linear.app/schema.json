@@ -2247,6 +2247,22 @@
             "deprecationReason": null
           },
           {
+            "name": "supportsAgentSessions",
+            "description": "Whether this agent user supports agent sessions.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "inviteHash",
             "description": "[DEPRECATED] Unique hash for the user to be used in invite URLs.",
             "args": [],
@@ -29223,6 +29239,18 @@
           {
             "name": "endedAt",
             "description": "The time the agent session ended.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "dismissedAt",
+            "description": "The time the agent session was dismissed.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -74501,7 +74529,7 @@
           },
           {
             "name": "userPromoteAdmin",
-            "description": "Makes user an admin. Can only be called by an admin.",
+            "description": "Makes user an admin. Can only be called by an admin or owner.",
             "args": [
               {
                 "name": "id",
@@ -74532,7 +74560,7 @@
           },
           {
             "name": "userDemoteAdmin",
-            "description": "Makes user a regular user. Can only be called by an admin.",
+            "description": "Makes user a regular user. Can only be called by an admin or owner.",
             "args": [
               {
                 "name": "id",
@@ -77018,7 +77046,7 @@
           },
           {
             "name": "organizationDeleteChallenge",
-            "description": "Get an organization's delete confirmation token. Administrator privileges required.",
+            "description": "Get an organization's delete confirmation token.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -77034,7 +77062,7 @@
           },
           {
             "name": "organizationDelete",
-            "description": "Delete's an organization. Administrator privileges required.",
+            "description": "Deletes an organization.",
             "args": [
               {
                 "name": "input",
@@ -77065,7 +77093,7 @@
           },
           {
             "name": "organizationCancelDelete",
-            "description": "Cancels the deletion of an organization. Administrator privileges required.",
+            "description": "Cancels the deletion of an organization.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -77081,7 +77109,7 @@
           },
           {
             "name": "organizationStartTrialForPlan",
-            "description": "Starts a trial for the organization on the specified plan type. Administrator privileges required.",
+            "description": "Starts a trial for the organization on the specified plan type.",
             "args": [
               {
                 "name": "input",
@@ -77112,7 +77140,7 @@
           },
           {
             "name": "organizationStartTrial",
-            "description": "[DEPRECATED] Starts a trial for the organization. Administrator privileges required.",
+            "description": "[DEPRECATED] Starts a trial for the organization.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -88623,6 +88651,12 @@
           },
           {
             "name": "slackBotWelcomeMessageShown",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "slackAgentPromoFromCreateNewIssueShown",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -106394,6 +106428,16 @@
               "ofType": null
             },
             "defaultValue": null
+          },
+          {
+            "name": "distinctId",
+            "description": "PostHog distinct ID for analytics correlation.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -107958,7 +108002,7 @@
         "inputFields": [
           {
             "name": "externalLink",
-            "description": "The URL of an external agent-hosted page associated with this session.",
+            "description": "The URL of an external agent-hosted page associated with this session. Only updatable by the OAuth application that owns the session.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -107968,10 +108012,20 @@
           },
           {
             "name": "plan",
-            "description": "A dynamically updated list of the agent's execution strategy.",
+            "description": "A dynamically updated list of the agent's execution strategy. Only updatable by the OAuth application that owns the session.",
             "type": {
               "kind": "SCALAR",
               "name": "JSONObject",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "dismissedAt",
+            "description": "[Internal] The time the agent session was dismissed. Only updatable by internal clients.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
               "ofType": null
             },
             "defaultValue": null
