@@ -484,103 +484,6 @@ input AirbyteConfigurationInput {
   apiKey: String!
 }
 
-"""An API key. Grants access to the user's resources."""
-type ApiKey implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The label of the API key."""
-  label: String!
-
-  """Scopes associated with the API key."""
-  scope: [String!]
-
-  """
-  The sync groups that this API key requests access to. If null, the API key has
-  access to all sync groups the user has access to. The final set of sync groups
-  is computed as the intersection of these requested groups with the user's base sync groups.
-  """
-  requestedSyncGroups: [String!]
-
-  """Organization the API key belongs to."""
-  organization: Organization!
-
-  """When the API key was last used."""
-  lastActiveAt: DateTime
-}
-
-type ApiKeyConnection {
-  edges: [ApiKeyEdge!]!
-  nodes: [ApiKey!]!
-  pageInfo: PageInfo!
-}
-
-input ApiKeyCreateInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
-  """The label for the API key."""
-  label: String!
-
-  """The API key value."""
-  key: String!
-
-  """
-  List of team IDs to restrict this API key to. Default is all teams the user has access to.
-  """
-  teamIds: [String!]
-
-  """Scopes the API key has access to. Default is all scopes."""
-  scope: [String!]
-}
-
-type ApiKeyEdge {
-  node: ApiKey!
-
-  """Used in `before` and `after` args"""
-  cursor: String!
-}
-
-type ApiKeyPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The API key that was created."""
-  apiKey: ApiKey!
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-input ApiKeyUpdateInput {
-  """The new label for the API key."""
-  label: String
-
-  """
-  List of team IDs to restrict this API key to. Default is all teams the user has access to.
-  """
-  teamIds: [String!]
-
-  """Scopes the API key has access to. Default is all scopes."""
-  scope: [String!]
-}
-
 """Public information of the OAuth application."""
 type Application {
   """OAuth application's ID."""
@@ -6301,6 +6204,9 @@ type IdentityProvider implements Node {
   """Whether SCIM provisioning is enabled for organization."""
   scimEnabled: Boolean!
 
+  """[INTERNAL] SCIM owners group push settings."""
+  ownersGroupPush: JSONObject
+
   """[INTERNAL] SCIM admins group push settings."""
   adminsGroupPush: JSONObject
 
@@ -8786,6 +8692,9 @@ input IssueCollectionFilter {
   """Comparator for the issues due date."""
   dueDate: NullableTimelessDateComparator
 
+  """Comparator for the issue's accumulatedStateUpdatedAt date."""
+  accumulatedStateUpdatedAt: NullableDateComparator
+
   """Comparator for the issues snoozed until date."""
   snoozedUntilAt: NullableDateComparator
 
@@ -9248,6 +9157,9 @@ input IssueFilter {
 
   """Comparator for the issues due date."""
   dueDate: NullableTimelessDateComparator
+
+  """Comparator for the issue's accumulatedStateUpdatedAt date."""
+  accumulatedStateUpdatedAt: NullableDateComparator
 
   """Comparator for the issues snoozed until date."""
   snoozedUntilAt: NullableDateComparator
@@ -11621,6 +11533,15 @@ type Mutation {
     """The external service to disconnect."""
     service: String!
   ): UserPayload!
+
+  """Changes the role of a user."""
+  userChangeRole(
+    """The new role for the user."""
+    role: UserRoleType!
+
+    """The identifier of the user"""
+    id: String!
+  ): UserAdminPayload!
 
   """Makes user an admin. Can only be called by an admin or owner."""
   userPromoteAdmin(
@@ -14208,27 +14129,6 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
-  """[INTERNAL] Creates a new API key."""
-  apiKeyCreate(
-    """The api key object to create."""
-    input: ApiKeyCreateInput!
-  ): ApiKeyPayload!
-
-  """[INTERNAL] Deletes an API key."""
-  apiKeyDelete(
-    """The identifier of the API key to delete."""
-    id: String!
-  ): DeletePayload!
-
-  """[INTERNAL] Updates an API key's allowed teams."""
-  apiKeyUpdate(
-    """The update input."""
-    input: ApiKeyUpdateInput!
-
-    """The identifier of the API key to update."""
-    id: String!
-  ): ApiKeyPayload!
-
   """Creates a new agent session on a rootcomment."""
   agentSessionCreateOnComment(
     """The agent session object to create."""
@@ -15216,6 +15116,9 @@ input NullableIssueFilter {
 
   """Comparator for the issues due date."""
   dueDate: NullableTimelessDateComparator
+
+  """Comparator for the issue's accumulatedStateUpdatedAt date."""
+  accumulatedStateUpdatedAt: NullableDateComparator
 
   """Comparator for the issues snoozed until date."""
   snoozedUntilAt: NullableDateComparator
@@ -22619,33 +22522,6 @@ type Query {
     """The client ID of the application."""
     clientId: String!
   ): Application!
-
-  """All API keys for the user."""
-  apiKeys(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): ApiKeyConnection!
 
   """All agent sessions."""
   agentSessions(
