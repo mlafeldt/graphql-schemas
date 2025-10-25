@@ -7633,6 +7633,7 @@ enum IntegrationService {
   sentry
   zendesk
   email
+  mcpServerPersonal
 }
 
 input IntegrationSettingsInput {
@@ -8722,7 +8723,7 @@ input IssueCollectionFilter {
   """Comparator for the issues due date."""
   dueDate: NullableTimelessDateComparator
 
-  """Comparator for the issue's accumulatedStateUpdatedAt date."""
+  """[Internal] Comparator for the issue's accumulatedStateUpdatedAt date."""
   accumulatedStateUpdatedAt: NullableDateComparator
 
   """Comparator for the issues snoozed until date."""
@@ -9188,7 +9189,7 @@ input IssueFilter {
   """Comparator for the issues due date."""
   dueDate: NullableTimelessDateComparator
 
-  """Comparator for the issue's accumulatedStateUpdatedAt date."""
+  """[Internal] Comparator for the issue's accumulatedStateUpdatedAt date."""
   accumulatedStateUpdatedAt: NullableDateComparator
 
   """Comparator for the issues snoozed until date."""
@@ -10870,6 +10871,9 @@ input IssueSortInput {
 
   """Sort by issue due date"""
   dueDate: DueDateSort
+
+  """[Internal] Sort by the accumulated time in the current workflow state"""
+  accumulatedStateUpdatedAt: TimeInStatusSort
 
   """Sort by Cycle start date"""
   cycle: CycleSort
@@ -13113,6 +13117,12 @@ type Mutation {
     id: String!
   ): IntegrationPayload!
 
+  """[INTERNAL] Connects the user's personal account with an MCP server."""
+  integrationMcpServerPersonalConnect(
+    """The URL of the MCP server to connect with."""
+    serverUrl: String!
+  ): IntegrationPayload!
+
   """Deletes an integration."""
   integrationDelete(
     """
@@ -15153,7 +15163,7 @@ input NullableIssueFilter {
   """Comparator for the issues due date."""
   dueDate: NullableTimelessDateComparator
 
-  """Comparator for the issue's accumulatedStateUpdatedAt date."""
+  """[Internal] Comparator for the issue's accumulatedStateUpdatedAt date."""
   accumulatedStateUpdatedAt: NullableDateComparator
 
   """Comparator for the issues snoozed until date."""
@@ -23373,6 +23383,9 @@ input SlackAsksSettingsInput {
   """Whether to show unfurl previews in Slack"""
   shouldUnfurl: Boolean
 
+  """Whether to allow external users to perform actions on unfurls"""
+  externalUserActions: Boolean
+
   """
   The mapping of Slack channel ID => Slack channel name for connected channels.
   """
@@ -23582,6 +23595,9 @@ input SlackSettingsInput {
 
   """Whether to show unfurl previews in Slack"""
   shouldUnfurl: Boolean
+
+  """Whether to allow external users to perform actions on unfurls"""
+  externalUserActions: Boolean
 
   """
   Whether Linear should automatically respond with issue unfurls when an issue identifier is mentioned in a Slack message.
@@ -25246,6 +25262,15 @@ input TemplateUpdateInput {
 
 """Customer tier sorting options."""
 input TierSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
+"""Issue time in status sorting options."""
+input TimeInStatusSort {
   """Whether nulls should be sorted first or last"""
   nulls: PaginationNulls = last
 
