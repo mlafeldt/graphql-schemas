@@ -3872,9 +3872,6 @@ type Dashboard implements Node {
 
   """The widgets on the dashboard."""
   widgets: JSONObject!
-
-  """The team associated with the dashboard."""
-  team: Team
 }
 
 """Comparator for dates."""
@@ -4144,125 +4141,6 @@ type DocumentContent implements Node {
   The time at which the document content was restored from a previous version.
   """
   restoredAt: DateTime
-
-  """Comments associated with the document content."""
-  comments(
-    """Filter returned comments."""
-    filter: CommentFilter
-
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): CommentConnection!
-
-  """[ALPHA] The histories of the document content."""
-  history(
-    """Filter returned document content histories."""
-    filter: DocumentContentHistoryFilter
-
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): DocumentContentHistoryConnection!
-}
-
-"""A document content history for a document."""
-type DocumentContentHistory implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The document content that this history item is associated with."""
-  documentContent: DocumentContent!
-
-  """[Internal] The document content as a Prosemirror document."""
-  contentData: JSONObject
-
-  """IDs of actors whose edits went into this history item."""
-  actorIds: [String!]!
-
-  """
-  The timestamp associated with the DocumentContent when it was originally saved.
-  """
-  contentDataSnapshotAt: DateTime!
-}
-
-type DocumentContentHistoryConnection {
-  edges: [DocumentContentHistoryEdge!]!
-  nodes: [DocumentContentHistory!]!
-  pageInfo: PageInfo!
-}
-
-type DocumentContentHistoryEdge {
-  node: DocumentContentHistory!
-
-  """Used in `before` and `after` args"""
-  cursor: String!
-}
-
-"""Document content history filtering options."""
-input DocumentContentHistoryFilter {
-  """Comparator for the identifier."""
-  id: IDComparator
-
-  """Comparator for the created at date."""
-  createdAt: DateComparator
-
-  """Comparator for the updated at date."""
-  updatedAt: DateComparator
 }
 
 type DocumentContentHistoryPayload {
@@ -9236,31 +9114,6 @@ type IssueDraft implements Node {
 
   """Serialized array of JSONs representing the recurring issue's schedule."""
   schedule: JSONObject
-  labels(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): IssueLabelConnection!
 }
 
 type IssueDraftConnection {
@@ -11102,12 +10955,6 @@ type IssueSuggestion implements Node {
   suggestedUserId: String
   suggestedLabel: IssueLabel
   suggestedLabelId: String
-
-  """The reasons for the suggestion."""
-  reasons: [String!]!
-
-  """Whether the suggestion should be visible."""
-  isVisible: Boolean!
 }
 
 """IssueSuggestion collection filtering options."""
@@ -16249,6 +16096,9 @@ type Organization implements Node {
   """[INTERNAL] SCIM settings."""
   scimSettings: JSONObject
 
+  """Security settings for the organization."""
+  securitySettings: JSONObject!
+
   """Allowed authentication providers, empty array means all are allowed."""
   allowedAuthServices: [String!]!
 
@@ -16844,6 +16694,20 @@ type OrganizationPayload {
   success: Boolean!
 }
 
+input OrganizationSecuritySettingsInput {
+  """The minimum role required to create personal API keys."""
+  personalApiKeysRole: UserRoleType
+
+  """The minimum role required to invite users."""
+  invitationsRole: UserRoleType
+
+  """The minimum role required to create teams."""
+  teamCreationRole: UserRoleType
+
+  """The minimum role required to manage labels."""
+  labelManagementRole: UserRoleType
+}
+
 input OrganizationStartTrialInput {
   """The plan type to trial."""
   planType: String!
@@ -16978,6 +16842,9 @@ input OrganizationUpdateInput {
 
   """Whether the organization has enabled resolved thread AI summaries."""
   aiThreadSummariesEnabled: Boolean
+
+  """The security settings for the organization."""
+  securitySettings: OrganizationSecuritySettingsInput
 }
 
 """Customer owner sorting options."""
@@ -17163,39 +17030,6 @@ type Post implements Node {
 
   """Schedule used to create a post summary."""
   feedSummaryScheduleAtCreate: FeedSummarySchedule
-
-  """Comments associated with the post."""
-  comments(
-    """Filter returned comments."""
-    filter: CommentFilter
-
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): CommentConnection!
-
-  """A URL to the generated audio for the Post."""
-  audioSummaryUrl: String
 }
 
 """A post related notification."""
@@ -17991,12 +17825,6 @@ type ProjectAttachment implements Node {
   An accessor helper to source.type, defines the source type of the attachment.
   """
   sourceType: String
-
-  """The project this attachment belongs to."""
-  project: Project!
-
-  """The body data of the attachment, if any."""
-  bodyData: String
 }
 
 """Project filtering options."""
@@ -26122,9 +25950,6 @@ type User implements Node {
 
   """The user's GitHub user ID."""
   gitHubUserId: String
-
-  """Enabled feature flags for the user."""
-  featureFlags: [String!]!
 }
 
 type UserAdminPayload {
