@@ -128,6 +128,11 @@ input AgentActivityCreateInput {
   signalMetadata: JSONObject
 
   """
+  [Internal] Metadata about user-provided contextual information for this agent activity.
+  """
+  contextualMetadata: JSONObject
+
+  """
   The content payload of the agent activity. This object is not strictly typed.
   See https://linear.app/developers/agent-interaction#activity-content-payload for typing details.
   """
@@ -158,6 +163,11 @@ input AgentActivityCreatePromptInput {
 
   """Metadata about this agent activity's signal."""
   signalMetadata: JSONObject
+
+  """
+  [Internal] Metadata about user-provided contextual information for this agent activity.
+  """
+  contextualMetadata: JSONObject
 
   """The content payload of the prompt agent activity."""
   content: JSONObject!
@@ -5739,6 +5749,9 @@ input FrontSettingsInput {
   Whether a ticket should be automatically reopened when its linked Linear project is cancelled.
   """
   automateTicketReopeningOnProjectCancellation: Boolean
+
+  """Whether Linear Agent should be enabled for this integration."""
+  enableAiIntake: Boolean
 }
 
 """A trigger that updates the issue status according to Git automations."""
@@ -8008,6 +8021,9 @@ input IntercomSettingsInput {
   Whether a ticket should be automatically reopened when its linked Linear project is cancelled.
   """
   automateTicketReopeningOnProjectCancellation: Boolean
+
+  """Whether Linear Agent should be enabled for this integration."""
+  enableAiIntake: Boolean
 }
 
 """An issue."""
@@ -16711,6 +16727,12 @@ input OrganizationSecuritySettingsInput {
 
   """The minimum role required to manage labels."""
   labelManagementRole: UserRoleType
+
+  """The minimum role required to manage API settings."""
+  apiSettingsRole: UserRoleType
+
+  """The minimum role required to import data."""
+  importRole: UserRoleType
 }
 
 input OrganizationStartTrialInput {
@@ -23247,6 +23269,9 @@ input SalesforceSettingsInput {
   """
   automateTicketReopeningOnProjectCancellation: Boolean
 
+  """Whether Linear Agent should be enabled for this integration."""
+  enableAiIntake: Boolean
+
   """The Salesforce subdomain."""
   subdomain: String
 
@@ -26323,6 +26348,9 @@ type UserSettings implements Node {
   """
   subscribedToPrivacyLegalUpdates: Boolean!
 
+  """The user's feed summary schedule preference."""
+  feedSummarySchedule: FeedSummarySchedule
+
   """Whether to show full user names instead of display names."""
   showFullUserNames: Boolean!
 
@@ -27082,6 +27110,9 @@ input ZendeskSettingsInput {
   Whether a ticket should be automatically reopened when its linked Linear project is cancelled.
   """
   automateTicketReopeningOnProjectCancellation: Boolean
+
+  """Whether Linear Agent should be enabled for this integration."""
+  enableAiIntake: Boolean
 
   """The subdomain of the Zendesk organization being connected."""
   subdomain: String!
