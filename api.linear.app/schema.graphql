@@ -7652,6 +7652,7 @@ enum IntegrationService {
   zendesk
   email
   mcpServerPersonal
+  mcpServer
 }
 
 input IntegrationSettingsInput {
@@ -13144,6 +13145,12 @@ type Mutation {
     serverUrl: String!
   ): IntegrationPayload!
 
+  """[INTERNAL] Connects the workspace with an MCP server."""
+  integrationMcpServerConnect(
+    """The URL of the MCP server to connect with."""
+    serverUrl: String!
+  ): IntegrationPayload!
+
   """Deletes an integration."""
   integrationDelete(
     """
@@ -16725,11 +16732,14 @@ input OrganizationSecuritySettingsInput {
   """The minimum role required to create teams."""
   teamCreationRole: UserRoleType
 
-  """The minimum role required to manage labels."""
+  """The minimum role required to manage workspace labels."""
   labelManagementRole: UserRoleType
 
   """The minimum role required to manage API settings."""
   apiSettingsRole: UserRoleType
+
+  """The minimum role required to manage workspace templates."""
+  templateManagementRole: UserRoleType
 
   """The minimum role required to import data."""
   importRole: UserRoleType
@@ -23443,6 +23453,11 @@ input SlackAsksSettingsInput {
   """Whether to show unfurl previews in Slack"""
   shouldUnfurl: Boolean
 
+  """
+  Whether to show unfurls in the default style instead of Work Objects in Slack
+  """
+  shouldUseDefaultUnfurl: Boolean
+
   """Whether to allow external users to perform actions on unfurls"""
   externalUserActions: Boolean
 
@@ -23656,6 +23671,11 @@ input SlackSettingsInput {
   """Whether to show unfurl previews in Slack"""
   shouldUnfurl: Boolean
 
+  """
+  Whether to show unfurls in the default style instead of Work Objects in Slack
+  """
+  shouldUseDefaultUnfurl: Boolean
+
   """Whether to allow external users to perform actions on unfurls"""
   externalUserActions: Boolean
 
@@ -23663,6 +23683,9 @@ input SlackSettingsInput {
   Whether Linear should automatically respond with issue unfurls when an issue identifier is mentioned in a Slack message.
   """
   linkOnIssueIdMention: Boolean!
+
+  """Whether Linear Agent should be enabled for this Slack integration."""
+  enableAgent: Boolean
 }
 
 enum SLADayCountType {
