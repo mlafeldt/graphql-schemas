@@ -5328,6 +5328,19 @@ type Facet implements Node {
   targetCustomView: CustomView
 }
 
+type FacetConnection {
+  edges: [FacetEdge!]!
+  nodes: [Facet!]!
+  pageInfo: PageInfo!
+}
+
+type FacetEdge {
+  node: Facet!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
 enum FacetPageSource {
   projects
   teamIssues
@@ -25990,6 +26003,33 @@ type User implements Node {
     """
     orderBy: PaginationOrderBy
   ): TeamMembershipConnection!
+
+  """[INTERNAL] The user's pinned feeds."""
+  feedFacets(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): FacetConnection!
 
   """Whether this user can access any public team in the organization."""
   canAccessAnyPublicTeam: Boolean!
