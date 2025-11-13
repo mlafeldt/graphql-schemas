@@ -321,6 +321,11 @@ type AgentSession implements Node {
   """The comment this agent session is associated with."""
   comment: Comment
 
+  """
+  The comment that this agent session was spawned from, if from a different thread.
+  """
+  sourceComment: Comment
+
   """The issue this agent session is associated with."""
   issue: Issue
 
@@ -13166,6 +13171,9 @@ type Mutation {
 
   """[INTERNAL] Connects the workspace with an MCP server."""
   integrationMcpServerConnect(
+    """The ID of the team to connect the MCP server to."""
+    teamId: String
+
     """The URL of the MCP server to connect with."""
     serverUrl: String!
   ): IntegrationPayload!
@@ -25320,6 +25328,9 @@ type Template implements Node {
 
   """The original template inherited from."""
   inheritedFrom: Template
+
+  """[Internal] Whether the template has form fields"""
+  hasFormFields: Boolean!
 }
 
 type TemplateConnection {
