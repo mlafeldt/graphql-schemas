@@ -341,6 +341,9 @@ type AgentSession implements Node {
   """The time the agent session was dismissed."""
   dismissedAt: DateTime
 
+  """The user who dismissed the agent session."""
+  dismissedBy: User
+
   """The type of the agent session."""
   type: AgentSessionType!
 
@@ -2217,6 +2220,9 @@ type CustomerNeedNotification implements Notification & Entity & Node {
   """[Internal] Project update health for new updates."""
   projectUpdateHealth: String
 
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
+
   """
   [Internal] Notifications with the same grouping key will be grouped together in the UI.
   """
@@ -2390,6 +2396,9 @@ type CustomerNotification implements Notification & Entity & Node {
 
   """[Internal] Project update health for new updates."""
   projectUpdateHealth: String
+
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
 
   """
   [Internal] Notifications with the same grouping key will be grouped together in the UI.
@@ -4375,6 +4384,9 @@ type DocumentNotification implements Notification & Entity & Node {
 
   """[Internal] Project update health for new updates."""
   projectUpdateHealth: String
+
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
 
   """
   [Internal] Notifications with the same grouping key will be grouped together in the UI.
@@ -6932,6 +6944,9 @@ type InitiativeNotification implements Notification & Entity & Node {
 
   """[Internal] Project update health for new updates."""
   projectUpdateHealth: String
+
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
 
   """
   [Internal] Notifications with the same grouping key will be grouped together in the UI.
@@ -10078,6 +10093,9 @@ type IssueNotification implements Notification & Entity & Node {
 
   """[Internal] Project update health for new updates."""
   projectUpdateHealth: String
+
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
 
   """
   [Internal] Notifications with the same grouping key will be grouped together in the UI.
@@ -14378,6 +14396,9 @@ interface Notification {
   """[Internal] Project update health for new updates."""
   projectUpdateHealth: String
 
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
+
   """
   [Internal] Notifications with the same grouping key will be grouped together in the UI.
   """
@@ -16020,6 +16041,9 @@ type OauthClientApprovalNotification implements Notification & Entity & Node {
   """[Internal] Project update health for new updates."""
   projectUpdateHealth: String
 
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
+
   """
   [Internal] Notifications with the same grouping key will be grouped together in the UI.
   """
@@ -16111,6 +16135,11 @@ type Organization implements Node {
   Whether the Git integration linkback messages should be sent to public repositories.
   """
   gitPublicLinkbackMessagesEnabled: Boolean!
+
+  """
+  Whether issue descriptions should be included in Git integration linkback messages.
+  """
+  gitLinkbackDescriptionsEnabled: Boolean!
 
   """Whether the organization is using a roadmap."""
   roadmapEnabled: Boolean!
@@ -16829,6 +16858,11 @@ input OrganizationUpdateInput {
   """
   gitPublicLinkbackMessagesEnabled: Boolean
 
+  """
+  Whether issue descriptions should be included in Git integration linkback messages.
+  """
+  gitLinkbackDescriptionsEnabled: Boolean
+
   """Whether the organization is using roadmap."""
   roadmapEnabled: Boolean
 
@@ -17226,6 +17260,9 @@ type PostNotification implements Notification & Entity & Node {
 
   """[Internal] Project update health for new updates."""
   projectUpdateHealth: String
+
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
 
   """
   [Internal] Notifications with the same grouping key will be grouped together in the UI.
@@ -19051,6 +19088,9 @@ type ProjectNotification implements Notification & Entity & Node {
   """[Internal] Project update health for new updates."""
   projectUpdateHealth: String
 
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
+
   """
   [Internal] Notifications with the same grouping key will be grouped together in the UI.
   """
@@ -20610,6 +20650,9 @@ type PullRequest implements Node {
   """Merge settings for this pull request."""
   mergeSettings: PullRequestMergeSettings
 
+  """The merge commit created when the PR was merged."""
+  mergeCommit: PullRequestCommit
+
   """[ALPHA] The commits associated with the pull request."""
   commits: [PullRequestCommit!]!
 }
@@ -20754,6 +20797,9 @@ type PullRequestNotification implements Notification & Entity & Node {
 
   """[Internal] Project update health for new updates."""
   projectUpdateHealth: String
+
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
 
   """
   [Internal] Notifications with the same grouping key will be grouped together in the UI.
@@ -23699,6 +23745,7 @@ enum SlackChannelType {
   DirectMessage
   MultiPersonDirectMessage
   Private
+  PrivateGroup
   Public
 }
 
