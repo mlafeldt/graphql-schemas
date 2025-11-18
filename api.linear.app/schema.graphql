@@ -7380,6 +7380,9 @@ type InitiativeUpdate implements Node {
     """
     orderBy: PaginationOrderBy
   ): CommentConnection!
+
+  """Number of comments associated with the initiative update."""
+  commentCount: Int!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -20307,6 +20310,9 @@ type ProjectUpdate implements Node {
     """
     orderBy: PaginationOrderBy
   ): CommentConnection!
+
+  """Number of comments associated with the project update."""
+  commentCount: Int!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -24335,6 +24341,9 @@ type Team implements Node {
   """Whether the team is private or not."""
   private: Boolean!
 
+  """Security settings for the team."""
+  securitySettings: JSONObject!
+
   """[Internal] Facets associated with the team."""
   facets: [Facet!]!
 
@@ -25151,6 +25160,30 @@ type TeamPayload {
   success: Boolean!
 }
 
+"""
+All possible roles within a team in terms of access to team settings and operations.
+"""
+enum TeamRoleType {
+  owner
+  member
+}
+
+input TeamSecuritySettingsInput {
+  """The minimum team role required to manage labels in the team."""
+  labelManagement: TeamRoleType
+
+  """
+  The minimum team role required to manage full workspace members (non-guests) in the team.
+  """
+  memberManagement: TeamRoleType
+
+  """The minimum team role required to manage team settings."""
+  teamManagement: TeamRoleType
+
+  """The minimum team role required to manage templates in the team."""
+  templateManagement: TeamRoleType
+}
+
 """Issue team sorting options."""
 input TeamSort {
   """Whether nulls should be sorted first or last"""
@@ -25321,6 +25354,9 @@ input TeamUpdateInput {
   [Internal] The scope of product intelligence suggestion data for the team.
   """
   productIntelligenceScope: ProductIntelligenceScope
+
+  """The security settings for the team."""
+  securitySettings: TeamSecuritySettingsInput
 }
 
 """A template object used for creating entities faster."""
