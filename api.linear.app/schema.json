@@ -2938,42 +2938,6 @@
             "deprecationReason": null
           },
           {
-            "name": "allowMembersToInvite",
-            "description": "Whether member users are allowed to send invites.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "restrictTeamCreationToAdmins",
-            "description": "Whether team creation is restricted to admins.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "restrictLabelManagementToAdmins",
-            "description": "Whether workspace label creation, update, and deletion is restricted to admins.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "hipaaComplianceEnabled",
             "description": "Whether HIPAA compliance is enabled for organization.",
             "args": [],
@@ -3820,6 +3784,42 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "allowMembersToInvite",
+            "description": "[DEPRECATED] Whether member users are allowed to send invites.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use `securitySettings.invitationsRole` instead."
+          },
+          {
+            "name": "restrictTeamCreationToAdmins",
+            "description": "[DEPRECATED] Whether team creation is restricted to admins.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use `securitySettings.teamCreationRole` instead."
+          },
+          {
+            "name": "restrictLabelManagementToAdmins",
+            "description": "[DEPRECATED] Whether workspace label creation, update, and deletion is restricted to admins.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use `securitySettings.labelManagementRole` instead."
           }
         ],
         "inputFields": null,
@@ -35950,6 +35950,22 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "url",
+            "description": "URL of the customer in Linear.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -42352,7 +42368,7 @@
           },
           {
             "name": "owner",
-            "description": "Whether the user is the owner of the team.",
+            "description": "Whether the user is an owner of the team.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -99012,6 +99028,16 @@
               }
             },
             "defaultValue": null
+          },
+          {
+            "name": "customerVisibility",
+            "description": "Controls who can see and set Customers when creating Asks in Slack.",
+            "type": {
+              "kind": "ENUM",
+              "name": "CustomerVisibilityMode",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -99226,6 +99252,35 @@
         ],
         "interfaces": null,
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "CustomerVisibilityMode",
+        "description": "Mode that controls who can see and set Customers in Slack Asks.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "LinearOnly",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SlackMembers",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SlackMembersAndGuests",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {

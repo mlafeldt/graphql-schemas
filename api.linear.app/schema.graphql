@@ -1778,6 +1778,9 @@ type Customer implements Node {
 
   """The integration that manages the Customer."""
   integration: Integration
+
+  """URL of the customer in Linear."""
+  url: String!
 }
 
 type CustomerConnection {
@@ -2909,6 +2912,13 @@ input CustomerUpsertInput {
 
   """The name tier of the customer. Will be created if doesn't exist"""
   tierName: String
+}
+
+"""Mode that controls who can see and set Customers in Slack Asks."""
+enum CustomerVisibilityMode {
+  LinearOnly
+  SlackMembers
+  SlackMembersAndGuests
 }
 
 """A custom view that has been saved by a user."""
@@ -16210,17 +16220,6 @@ type Organization implements Node {
   """
   previousUrlKeys: [String!]!
 
-  """Whether member users are allowed to send invites."""
-  allowMembersToInvite: Boolean
-
-  """Whether team creation is restricted to admins."""
-  restrictTeamCreationToAdmins: Boolean
-
-  """
-  Whether workspace label creation, update, and deletion is restricted to admins.
-  """
-  restrictLabelManagementToAdmins: Boolean
-
   """Whether HIPAA compliance is enabled for organization."""
   hipaaComplianceEnabled: Boolean!
 
@@ -16470,6 +16469,17 @@ type Organization implements Node {
 
   """Whether the organization is using Customers."""
   customersEnabled: Boolean!
+
+  """[DEPRECATED] Whether member users are allowed to send invites."""
+  allowMembersToInvite: Boolean @deprecated(reason: "Use `securitySettings.invitationsRole` instead.")
+
+  """[DEPRECATED] Whether team creation is restricted to admins."""
+  restrictTeamCreationToAdmins: Boolean @deprecated(reason: "Use `securitySettings.teamCreationRole` instead.")
+
+  """
+  [DEPRECATED] Whether workspace label creation, update, and deletion is restricted to admins.
+  """
+  restrictLabelManagementToAdmins: Boolean @deprecated(reason: "Use `securitySettings.labelManagementRole` instead.")
 }
 
 type OrganizationAcceptedOrExpiredInviteDetailsPayload {
@@ -23565,6 +23575,9 @@ input SlackAsksSettingsInput {
 
   """The user role type that is allowed to manage Asks settings."""
   canAdministrate: UserRoleType!
+
+  """Controls who can see and set Customers when creating Asks in Slack."""
+  customerVisibility: CustomerVisibilityMode
 }
 
 """Tuple for mapping Slack channel IDs to names."""
@@ -25006,7 +25019,7 @@ type TeamMembership implements Node {
   """The team that the membership is associated with."""
   team: Team!
 
-  """Whether the user is the owner of the team."""
+  """Whether the user is an owner of the team."""
   owner: Boolean!
 
   """The order of the item in the users team list."""
