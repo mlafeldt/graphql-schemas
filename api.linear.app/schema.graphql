@@ -2999,7 +2999,7 @@ type CustomView implements Node {
     """
     Include projects from sub-teams when the custom view is associated with a team.
     """
-    includeSubTeams: Boolean = false
+    includeSubTeams: Boolean = true
 
     """Filter returned projects."""
     filter: ProjectFilter
@@ -6523,6 +6523,33 @@ type Initiative implements Node {
     """
     orderBy: PaginationOrderBy
   ): InitiativeHistoryConnection!
+
+  """Initiative updates associated with the initiative."""
+  initiativeUpdates(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): InitiativeUpdateConnection!
 
   """Sub-initiatives associated with the initiative."""
   subInitiatives(
@@ -24815,6 +24842,9 @@ input TeamCollectionFilter {
 
   """Comparator for the collection length."""
   length: NumberComparator
+
+  """Filters that the teams parent must satisfy."""
+  parent: NullableTeamFilter
 }
 
 type TeamConnection {
@@ -25308,12 +25338,12 @@ input TeamUpdateInput {
   autoCloseStateId: String
 
   """
-  [INTERNAL] Whether to automatically close a parent issue in this team if all its sub-issues are closed.
+  Whether to automatically close a parent issue in this team if all its sub-issues are closed.
   """
   autoCloseParentIssues: Boolean
 
   """
-  [INTERNAL] Whether to automatically close all sub-issues when a parent issue in this team is closed.
+  Whether to automatically close all sub-issues when a parent issue in this team is closed.
   """
   autoCloseChildIssues: Boolean
 
