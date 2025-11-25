@@ -8736,6 +8736,25 @@ type Issue implements Node {
   The external user who requested creation of the Asks issue on behalf of the creator.
   """
   asksExternalUserRequester: ExternalUser
+
+  """[ALPHA] The issue's workflow states over time."""
+  stateHistory(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+  ): IssueStateSpanConnection!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -10933,6 +10952,25 @@ type IssueSearchResult implements Node {
   """
   asksExternalUserRequester: ExternalUser
 
+  """[ALPHA] The issue's workflow states over time."""
+  stateHistory(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+  ): IssueStateSpanConnection!
+
   """Metadata related to search result."""
   metadata: JSONObject!
 }
@@ -11020,6 +11058,41 @@ input IssueSortInput {
 
   """[ALPHA] Sort by number of links associated with the issue"""
   linkCount: LinkCountSort
+}
+
+"""
+A continuous period of time during which an issue remained in a specific workflow state.
+"""
+type IssueStateSpan {
+  """The unique identifier of the state span."""
+  id: ID!
+
+  """The workflow state identifier for this span."""
+  stateId: ID!
+
+  """The timestamp when the issue entered this state."""
+  startedAt: DateTime!
+
+  """
+  The timestamp when the issue left this state. Null if the issue is currently in this state.
+  """
+  endedAt: DateTime
+
+  """The workflow state for this span."""
+  state: WorkflowState
+}
+
+type IssueStateSpanConnection {
+  edges: [IssueStateSpanEdge!]!
+  nodes: [IssueStateSpan!]!
+  pageInfo: PageInfo!
+}
+
+type IssueStateSpanEdge {
+  node: IssueStateSpan!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
 }
 
 type IssueSuggestion implements Node {
