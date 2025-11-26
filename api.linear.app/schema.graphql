@@ -13326,6 +13326,17 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """
+  [Internal] Enables Linear Agent Slack workflow access for a Slack integration.
+  """
+  integrationSlackWorkflowAccessUpdate(
+    """Whether to enable workflow access."""
+    enabled: Boolean!
+
+    """The ID of the integration to toggle workflow access for."""
+    integrationId: String!
+  ): IntegrationPayload!
+
   """Requests a currently unavailable integration."""
   integrationRequest(
     """Integration request details."""
@@ -15696,6 +15707,9 @@ input NullableProjectMilestoneFilter {
 
   """Comparator for the project milestone target date."""
   targetDate: NullableDateComparator
+
+  """Filters that the project milestone's project must satisfy."""
+  project: NullableProjectFilter
 
   """Filter based on the existence of the relation."""
   null: Boolean
@@ -18861,6 +18875,9 @@ input ProjectMilestoneCollectionFilter {
   """Comparator for the project milestone target date."""
   targetDate: NullableDateComparator
 
+  """Filters that the project milestone's project must satisfy."""
+  project: NullableProjectFilter
+
   """Compound filters, all of which need to be matched by the milestone."""
   and: [ProjectMilestoneCollectionFilter!]
 
@@ -18933,6 +18950,9 @@ input ProjectMilestoneFilter {
 
   """Comparator for the project milestone target date."""
   targetDate: NullableDateComparator
+
+  """Filters that the project milestone's project must satisfy."""
+  project: NullableProjectFilter
 
   """
   Compound filters, all of which need to be matched by the project milestone.
@@ -24442,6 +24462,11 @@ type Team implements Node {
   """Whether the team is private or not."""
   private: Boolean!
 
+  """
+  Whether all members in the workspace can join the team. Only used for public teams.
+  """
+  allMembersCanJoin: Boolean
+
   """Security settings for the team."""
   securitySettings: JSONObject!
 
@@ -25461,6 +25486,11 @@ input TeamUpdateInput {
 
   """The security settings for the team."""
   securitySettings: TeamSecuritySettingsInput
+
+  """
+  Whether all members in the workspace can join the team. Only used for public teams.
+  """
+  allMembersCanJoin: Boolean
 }
 
 """A template object used for creating entities faster."""
