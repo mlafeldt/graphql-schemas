@@ -12096,13 +12096,13 @@ type Mutation {
   """Create CSV export report for the organization."""
   createCsvExportReport(includePrivateTeamIds: [String!]): CreateCsvExportReportPayload!
 
-  """Creates a new release stage."""
+  """[ALPHA] Creates a new release stage."""
   releaseStageCreate(
     """The ReleaseStage object to create."""
     input: ReleaseStageCreateInput!
   ): ReleaseStagePayload!
 
-  """Updates a release stage."""
+  """[ALPHA] Updates a release stage."""
   releaseStageUpdate(
     """A partial ReleaseStage object to update the ReleaseStage with."""
     input: ReleaseStageUpdateInput!
@@ -12111,25 +12111,25 @@ type Mutation {
     id: String!
   ): ReleaseStagePayload!
 
-  """Archives a release stage."""
+  """[ALPHA] Archives a release stage."""
   releaseStageArchive(
     """The identifier of the release stage to archive."""
     id: String!
   ): ReleaseStageArchivePayload!
 
-  """Unarchives a release stage."""
+  """[ALPHA] Unarchives a release stage."""
   releaseStageUnarchive(
     """The identifier of the release stage to unarchive."""
     id: String!
   ): ReleaseStageArchivePayload!
 
-  """Creates a new release."""
+  """[ALPHA] Creates a new release."""
   releaseCreate(
     """The Release object to create."""
     input: ReleaseCreateInput!
   ): ReleasePayload!
 
-  """Updates a release."""
+  """[ALPHA] Updates a release."""
   releaseUpdate(
     """A partial Release object to update the Release with."""
     input: ReleaseUpdateInput!
@@ -12138,25 +12138,25 @@ type Mutation {
     id: String!
   ): ReleasePayload!
 
-  """Archives a release."""
+  """[ALPHA] Archives a release."""
   releaseArchive(
     """The identifier of the release to archive."""
     id: String!
   ): ReleaseArchivePayload!
 
-  """Unarchives a release."""
+  """[ALPHA] Unarchives a release."""
   releaseUnarchive(
     """The identifier of the release to unarchive."""
     id: String!
   ): ReleaseArchivePayload!
 
-  """Creates a new release pipeline."""
+  """[ALPHA] Creates a new release pipeline."""
   releasePipelineCreate(
     """The ReleasePipeline object to create."""
     input: ReleasePipelineCreateInput!
   ): ReleasePipelinePayload!
 
-  """Updates a release pipeline."""
+  """[ALPHA] Updates a release pipeline."""
   releasePipelineUpdate(
     """A partial ReleasePipeline object to update the ReleasePipeline with."""
     input: ReleasePipelineUpdateInput!
@@ -12165,17 +12165,23 @@ type Mutation {
     id: String!
   ): ReleasePipelinePayload!
 
-  """Archives a release pipeline."""
+  """[ALPHA] Archives a release pipeline."""
   releasePipelineArchive(
     """The identifier of the release pipeline to archive."""
     id: String!
   ): ReleasePipelineArchivePayload!
 
-  """Unarchives a release pipeline."""
+  """[ALPHA] Unarchives a release pipeline."""
   releasePipelineUnarchive(
     """The identifier of the release pipeline to unarchive."""
     id: String!
   ): ReleasePipelineArchivePayload!
+
+  """[ALPHA] Deletes a release pipeline."""
+  releasePipelineDelete(
+    """The identifier of the release pipeline to delete."""
+    id: String!
+  ): DeletePayload!
 
   """Creates a new reaction."""
   reactionCreate(
@@ -18356,6 +18362,15 @@ input ProjectCreateInput {
   """The ID of the last template applied to the project."""
   lastAppliedTemplateId: String
 
+  """The ID of the template to apply when creating the project."""
+  templateId: String
+
+  """
+  When set to true, the default project template of the first team provided will
+  be applied. If templateId is provided, this will be ignored.
+  """
+  useDefaultTemplate: Boolean
+
   """The identifier of the project lead."""
   leadId: String
 
@@ -21646,7 +21661,7 @@ type Query {
   """One specific roadmap."""
   roadmap(id: String!): Roadmap! @deprecated(reason: "Roadmaps are deprecated, use initiatives instead.")
 
-  """All release stages."""
+  """[ALPHA] All release stages."""
   releaseStages(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -21673,10 +21688,10 @@ type Query {
     orderBy: PaginationOrderBy
   ): ReleaseStageConnection!
 
-  """One specific release stage."""
+  """[ALPHA] One specific release stage."""
   releaseStage(id: String!): ReleaseStage!
 
-  """All releases."""
+  """[ALPHA] All releases."""
   releases(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -21703,10 +21718,10 @@ type Query {
     orderBy: PaginationOrderBy
   ): ReleaseConnection!
 
-  """One specific release."""
+  """[ALPHA] One specific release."""
   release(id: String!): Release!
 
-  """All release pipelines."""
+  """[ALPHA] All release pipelines."""
   releasePipelines(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -21733,7 +21748,7 @@ type Query {
     orderBy: PaginationOrderBy
   ): ReleasePipelineConnection!
 
-  """One specific release pipeline."""
+  """[ALPHA] One specific release pipeline."""
   releasePipeline(id: String!): ReleasePipeline!
 
   """The status of the rate limiter."""
@@ -23372,13 +23387,16 @@ input ReleaseCreateInput {
   """The commit SHA associated with this release."""
   commitSha: String
 
-  """The pipeline this release belongs to."""
+  """The identifier of the pipeline this release belongs to."""
   pipelineId: String!
 
   """
   The current stage of the release. Defaults to the first 'planned' stage.
   """
   stageId: String
+
+  """Issue identifiers (e.g. ENG-123) to associate with this release."""
+  issueIdentifiers: [String!]
 }
 
 type ReleaseEdge {
@@ -23424,7 +23442,7 @@ type ReleasePipeline implements Node {
   """The pipeline's unique slug identifier."""
   slugId: String!
 
-  """Stages associated with this pipeline."""
+  """[ALPHA] Stages associated with this pipeline."""
   stages(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -23451,7 +23469,7 @@ type ReleasePipeline implements Node {
     orderBy: PaginationOrderBy
   ): ReleaseStageConnection!
 
-  """Releases associated with this pipeline."""
+  """[ALPHA] Releases associated with this pipeline."""
   releases(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -23569,7 +23587,7 @@ type ReleaseStage implements Node {
   """The pipeline this stage belongs to."""
   pipeline: ReleasePipeline!
 
-  """Releases associated with this stage."""
+  """[ALPHA] Releases associated with this stage."""
   releases(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -23630,7 +23648,7 @@ input ReleaseStageCreateInput {
   """The position of the stage."""
   position: Float!
 
-  """The pipeline this stage belongs to."""
+  """The identifier of the pipeline this stage belongs to."""
   pipelineId: String!
 }
 
@@ -23681,7 +23699,7 @@ input ReleaseUpdateInput {
   """The commit SHA associated with this release."""
   commitSha: String
 
-  """The pipeline this release belongs to."""
+  """The identifier of the pipeline this release belongs to."""
   pipelineId: String
 
   """The current stage of the release."""
