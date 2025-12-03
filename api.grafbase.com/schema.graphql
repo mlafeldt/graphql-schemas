@@ -1,9 +1,3 @@
-"""
-The `_Any` scalar is used to pass representations of entities from external
-services into the root `_entities` field for execution.
-"""
-scalar _Any
-
 type AccessToken implements Node {
   accountId: ID
   createdAt: DateTime!
@@ -401,7 +395,10 @@ type DeploymentSubgraph {
 One side of a two-sided diff. "Old" and "new" are to be taken in the most general sense.
 """
 enum DiffSide {
+  """The left side of the diff."""
   OLD
+
+  """The right side of the diff."""
   NEW
 }
 
@@ -1155,6 +1152,7 @@ type Mutation {
   teamCreate(name: String!, organizationId: ID!): TeamCreatePayload!
   teamDelete(teamId: ID!): TeamDeletePayload!
   teamRemoveMember(teamId: ID!, memberId: ID!): TeamRemoveMemberPayload!
+  trustedDocumentsDelete(accountSlug: String, graphSlug: String, branchSlug: String!, clientName: String!, documentIds: [String!]!): TrustedDocumentsDeletePayload!
   trustedDocumentsSubmit(accountSlug: String, graphSlug: String, branchSlug: String!, clientName: String!, documents: [TrustedDocumentInput!]!): TrustedDocumentsSubmitPayload!
 
   """Delete the user."""
@@ -1533,6 +1531,7 @@ type Query {
   ): Subgraph
   team(id: ID!): Team
   teamBySlug(slug: String!, organizationSlug: String!): Team
+  trustedDocuments(accountSlug: String, graphSlug: String, branchSlug: String!, clientName: String!): TrustedDocumentsPayload!
 
   """Give the actual connected user."""
   viewer: User
@@ -2048,8 +2047,13 @@ type SchemaProposalCommentThreadCreateSuccess {
 }
 
 enum SchemaProposalCommentThreadLocation {
+  """On the schema proposal itself."""
   PROPOSAL
+
+  """On a specific line, in a specific subgraph"""
   LINE
+
+  """On the schema proposal SDL."""
   SDL
 }
 
@@ -2605,7 +2609,10 @@ type TeamRemoveMemberSuccess {
 }
 
 enum TeamRole {
+  """Regular non-admin member."""
   MEMBER
+
+  """__Team__ admin"""
   ADMIN
 }
 
@@ -2772,6 +2779,18 @@ input TrustedDocumentInput {
   documentId: String!
   documentText: String!
 }
+
+union TrustedDocumentsDeletePayload = GraphDoesNotExistError | OldAccessTokenError | TrustedDocumentsDeleteSuccess
+
+type TrustedDocumentsDeleteSuccess {
+  deletedIds: [String!]!
+}
+
+type TrustedDocumentsListSuccess {
+  documents: [TrustedDocument!]!
+}
+
+union TrustedDocumentsPayload = GraphDoesNotExistError | OldAccessTokenError | TrustedDocumentsListSuccess
 
 union TrustedDocumentsSubmitPayload = GraphDoesNotExistError | OldAccessTokenError | ReusedIds | TrustedDocumentsSubmitSuccess
 
