@@ -21054,6 +21054,18 @@ type PullRequestNotification implements Notification & Entity & Node {
   pullRequest: PullRequest!
 }
 
+"""Input for referencing a pull request by repository and number."""
+input PullRequestReferenceInput {
+  """The owner of the repository (e.g., organization or user name)."""
+  repositoryOwner: String!
+
+  """The name of the repository."""
+  repositoryName: String!
+
+  """The pull request number."""
+  number: Float!
+}
+
 enum PullRequestReviewTool {
   source
   graphite
@@ -23397,6 +23409,11 @@ input ReleaseCreateInput {
 
   """Issue identifiers (e.g. ENG-123) to associate with this release."""
   issueIdentifiers: [String!]
+
+  """
+  Pull request references to look up. Issues linked to found PRs will be associated with this release.
+  """
+  pullRequestReferences: [PullRequestReferenceInput!]
 }
 
 type ReleaseEdge {
