@@ -23414,6 +23414,21 @@ input ReleaseCreateInput {
   Pull request references to look up. Issues linked to found PRs will be associated with this release.
   """
   pullRequestReferences: [PullRequestReferenceInput!]
+
+  """Debug information for release creation diagnostics."""
+  debugSink: ReleaseDebugSinkInput
+}
+
+"""Debug sink for release creation diagnostics."""
+input ReleaseDebugSinkInput {
+  """List of commit SHAs that were inspected."""
+  inspectedShas: [String!]!
+
+  """Map of issue identifiers to their source information."""
+  issues: JSONObject!
+
+  """Pull request debug information."""
+  pullRequests: [JSONObject!]!
 }
 
 type ReleaseEdge {
@@ -23595,6 +23610,9 @@ type ReleaseStage implements Node {
   """The name of the stage."""
   name: String!
 
+  """The UI color of the stage as a HEX string."""
+  color: String!
+
   """The type of the stage."""
   type: ReleaseStageType!
 
@@ -23659,6 +23677,9 @@ input ReleaseStageCreateInput {
   """The name of the stage."""
   name: String!
 
+  """The UI color of the stage as a HEX string."""
+  color: String!
+
   """The type of the stage."""
   type: ReleaseStageType!
 
@@ -23698,6 +23719,9 @@ enum ReleaseStageType {
 input ReleaseStageUpdateInput {
   """The name of the stage."""
   name: String
+
+  """The UI color of the stage as a HEX string."""
+  color: String
 
   """The type of the stage."""
   type: ReleaseStageType
