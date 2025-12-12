@@ -9566,6 +9566,12 @@ type IssueHistory implements Node {
   """ID's of labels that were removed."""
   removedLabelIds: [String!]
 
+  """[ALPHA] ID's of releases that the issue was added to."""
+  addedToReleaseIds: [String!]
+
+  """[ALPHA] ID's of releases that the issue was removed from."""
+  removedFromReleaseIds: [String!]
+
   """Changed issue relationships."""
   relationChanges: [IssueRelationHistoryPayload!]
 
@@ -9669,6 +9675,12 @@ type IssueHistory implements Node {
 
   """The labels that were removed from the issue."""
   removedLabels: [IssueLabel!]
+
+  """The releases that the issue was added to."""
+  addedToReleases: [Release!]
+
+  """The releases that the issue was removed from."""
+  removedFromReleases: [Release!]
 }
 
 type IssueHistoryConnection {
@@ -11265,6 +11277,71 @@ type IssueTitleSuggestionFromCustomerRequestPayload {
   logId: String
 }
 
+"""[Internal] Join table between issues and releases."""
+type IssueToRelease implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The issue associated with the release."""
+  issue: Issue!
+
+  """The release associated with the issue."""
+  release: Release!
+}
+
+type IssueToReleaseConnection {
+  edges: [IssueToReleaseEdge!]!
+  nodes: [IssueToRelease!]!
+  pageInfo: PageInfo!
+}
+
+"""[ALPHA] The properties of the issueToRelease to create."""
+input IssueToReleaseCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The identifier of the issue"""
+  issueId: String!
+
+  """The identifier of the release"""
+  releaseId: String!
+}
+
+type IssueToReleaseEdge {
+  node: IssueToRelease!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""[ALPHA] The result of an issueToRelease mutation."""
+type IssueToReleasePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The issueToRelease that was created or updated."""
+  issueToRelease: IssueToRelease!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
 input IssueUpdateInput {
   """The issue title."""
   title: String
@@ -12559,6 +12636,23 @@ type Mutation {
     """The id of the notification to archive."""
     id: String!
   ): NotificationArchivePayload!
+
+  """
+  [ALPHA] Creates a new issueToRelease join, adding an issue to a release.
+  """
+  issueToReleaseCreate(
+    """The properties of the issueToRelease to create."""
+    input: IssueToReleaseCreateInput!
+  ): IssueToReleasePayload!
+
+  """[ALPHA] Deletes an issueToRelease, removing an issue from a release."""
+  issueToReleaseDelete(
+    """The identifier of the release"""
+    releaseId: String!
+
+    """The identifier of the issue"""
+    issueId: String!
+  ): DeletePayload!
 
   """Creates a new issue."""
   issueCreate(
@@ -22073,6 +22167,36 @@ type Query {
   """One specific notification."""
   notification(id: String!): Notification!
 
+  """[ALPHA] Returns a list of issue to release entities."""
+  issueToReleases(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueToReleaseConnection!
+
+  """[ALPHA] One specific issueToRelease."""
+  issueToRelease(id: String!): IssueToRelease!
+
   """All issues."""
   issues(
     """Filter returned issues."""
@@ -23488,6 +23612,9 @@ type ReleasePipeline implements Node {
   """The pipeline's unique slug identifier."""
   slugId: String!
 
+  """The type of the pipeline."""
+  type: ReleasePipelineType!
+
   """[ALPHA] Stages associated with this pipeline."""
   stages(
     """A cursor to be used with last for backward pagination."""
@@ -23574,6 +23701,9 @@ input ReleasePipelineCreateInput {
   The pipeline's unique slug identifier. If not provided, it will be auto-generated.
   """
   slugId: String
+
+  """The type of the pipeline."""
+  type: ReleasePipelineType
 }
 
 type ReleasePipelineEdge {
@@ -23594,12 +23724,21 @@ type ReleasePipelinePayload {
   success: Boolean!
 }
 
+"""A type of release pipeline."""
+enum ReleasePipelineType {
+  continuous
+  scheduled
+}
+
 input ReleasePipelineUpdateInput {
   """The name of the pipeline."""
   name: String
 
   """The pipeline's unique slug identifier."""
   slugId: String
+
+  """The type of the pipeline."""
+  type: ReleasePipelineType
 }
 
 """[Internal] A release stage."""
