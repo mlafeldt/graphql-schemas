@@ -2788,8 +2788,8 @@ input CustomerTierFilter {
   """Comparator for the updated at date."""
   updatedAt: DateComparator
 
-  """Comparator for the customer tier name."""
-  name: StringComparator
+  """Comparator for the customer tier display name."""
+  displayName: StringComparator
 
   """Comparator for the customer tier description."""
   description: StringComparator
@@ -12645,13 +12645,21 @@ type Mutation {
     input: IssueToReleaseCreateInput!
   ): IssueToReleasePayload!
 
-  """[ALPHA] Deletes an issueToRelease, removing an issue from a release."""
-  issueToReleaseDelete(
+  """[ALPHA] Deletes an issueToRelease by issue and release identifiers"""
+  issueToReleaseDeleteByIssueAndRelease(
     """The identifier of the release"""
     releaseId: String!
 
     """The identifier of the issue"""
     issueId: String!
+  ): DeletePayload!
+
+  """
+  [ALPHA] Deletes an issueToRelease by its identifier, removing an issue from a release.
+  """
+  issueToReleaseDelete(
+    """The identifier of the issueToRelease to delete"""
+    id: String!
   ): DeletePayload!
 
   """Creates a new issue."""
