@@ -388,6 +388,12 @@ type AgentSession implements Node {
 
   """A dynamically updated list of the agent's execution strategy."""
   plan: JSON
+
+  """
+  [Internal] A formatted prompt string containing relevant context for the agent
+  session, including issue details, comments, and guidance.
+  """
+  promptContext: String
 }
 
 type AgentSessionConnection {
@@ -5495,6 +5501,12 @@ type Favorite implements Node {
   """The favorited pull request."""
   pullRequest: PullRequest
 
+  """[ALPHA] The favorited release."""
+  release: Release
+
+  """[ALPHA] The favorited release pipeline."""
+  releasePipeline: ReleasePipeline
+
   """URL of the favorited entity. Folders return 'null' value."""
   url: String
 
@@ -5588,6 +5600,12 @@ input FavoriteCreateInput {
 
   """The identifier of the pull request to favorite."""
   pullRequestId: String
+
+  """[ALPHA] The identifier of the release to favorite."""
+  releaseId: String
+
+  """[ALPHA] The identifier of the release pipeline to favorite."""
+  releasePipelineId: String
 }
 
 type FavoriteEdge {
@@ -23515,6 +23533,21 @@ type Release implements Node {
 
   """The release's unique URL slug."""
   slugId: String!
+
+  """The estimated start date of the release."""
+  startDate: TimelessDate
+
+  """The estimated completion date of the release."""
+  targetDate: TimelessDate
+
+  """The time at which the release was started."""
+  startedAt: DateTime
+
+  """The time at which the release was completed."""
+  completedAt: DateTime
+
+  """The time at which the release was canceled."""
+  canceledAt: DateTime
 }
 
 """A generic payload return from entity archive mutations."""
