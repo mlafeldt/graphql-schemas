@@ -380,6 +380,9 @@ type AgentSession implements Node {
   """The URL of an external agent-hosted page associated with this session."""
   externalLink: String
 
+  """URLs of external resources associated with this session."""
+  externalUrls: JSON!
+
   """A summary of the activities in this session."""
   summary: String
 
@@ -394,6 +397,33 @@ type AgentSession implements Node {
   session, including issue details, comments, and guidance.
   """
   promptContext: String
+
+  """[Internal] Pull requests associated with this agent session."""
+  pullRequests(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AgentSessionToPullRequestConnection!
 }
 
 type AgentSessionConnection {
@@ -421,6 +451,9 @@ input AgentSessionCreateOnComment {
 
   """The URL of an external agent-hosted page associated with this session."""
   externalLink: String
+
+  """URLs of external resources associated with this session."""
+  externalUrls: [AgentSessionExternalUrlInput!]
 }
 
 input AgentSessionCreateOnIssue {
@@ -429,6 +462,9 @@ input AgentSessionCreateOnIssue {
 
   """The URL of an external agent-hosted page associated with this session."""
   externalLink: String
+
+  """URLs of external resources associated with this session."""
+  externalUrls: [AgentSessionExternalUrlInput!]
 }
 
 type AgentSessionEdge {
@@ -436,6 +472,15 @@ type AgentSessionEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Input for an external URL associated with an agent session."""
+input AgentSessionExternalUrlInput {
+  """The URL of the external resource."""
+  url: String!
+
+  """Optional label for the URL."""
+  label: String
 }
 
 type AgentSessionPayload {
@@ -459,6 +504,45 @@ enum AgentSessionStatus {
   stale
 }
 
+"""Join table between agent sessions and pull requests."""
+type AgentSessionToPullRequest implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The pull request that the agent session is associated with."""
+  pullRequest: PullRequest!
+
+  """The agent session that the pull request is associated with."""
+  agentSession: AgentSession!
+}
+
+type AgentSessionToPullRequestConnection {
+  edges: [AgentSessionToPullRequestEdge!]!
+  nodes: [AgentSessionToPullRequest!]!
+  pageInfo: PageInfo!
+}
+
+type AgentSessionToPullRequestEdge {
+  node: AgentSessionToPullRequest!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
 """The type of an agent session."""
 enum AgentSessionType {
   commentThread
@@ -467,6 +551,17 @@ enum AgentSessionType {
 input AgentSessionUpdateExternalUrlInput {
   """The URL of an external agent-hosted page associated with this session."""
   externalLink: String
+
+  """
+  URLs of external resources associated with this session. Replaces existing URLs.
+  """
+  externalUrls: [AgentSessionExternalUrlInput!]
+
+  """URLs of external resources to be added to this session."""
+  addedExternalUrls: [AgentSessionExternalUrlInput!]
+
+  """URLs to be removed from this session."""
+  removedExternalUrls: [String!]
 }
 
 input AgentSessionUpdateInput {
@@ -475,6 +570,23 @@ input AgentSessionUpdateInput {
   updatable by the OAuth application that owns the session.
   """
   externalLink: String
+
+  """
+  URLs of external resources associated with this session. Replaces existing
+  URLs. Only updatable by the OAuth application that owns the session. If
+  supplied, addedExternalUrls and removedExternalUrls are ignored.
+  """
+  externalUrls: [AgentSessionExternalUrlInput!]
+
+  """
+  URLs of external resources to be added to this session. Only updatable by the OAuth application that owns the session.
+  """
+  addedExternalUrls: [AgentSessionExternalUrlInput!]
+
+  """
+  URLs to be removed from this session. Only updatable by the OAuth application that owns the session.
+  """
+  removedExternalUrls: [String!]
 
   """
   A dynamically updated list of the agent's execution strategy. Only updatable
@@ -592,6 +704,14 @@ type AsksChannelConnectPayload {
 
   """Whether the bot needs to be manually added to the channel."""
   addBot: Boolean!
+}
+
+type AsksWebFormsAuthResponse {
+  """User email."""
+  email: String!
+
+  """User display name."""
+  name: String!
 }
 
 """Issue assignee sorting options."""
@@ -14163,6 +14283,12 @@ type Mutation {
     input: TokenUserAccountAuthInput!
   ): AuthResolverResponse!
 
+  """Authenticate a user to the Asks web forms app."""
+  asksWebFormsAuth(
+    """The magic login code."""
+    token: String!
+  ): AsksWebFormsAuthResponse!
+
   """
   Authenticates a user account via email and authentication token for SAML.
   """
@@ -23611,6 +23737,12 @@ input ReleaseCreateInput {
 
   """Debug information for release creation diagnostics."""
   debugSink: ReleaseDebugSinkInput
+
+  """The estimated start date of the release."""
+  startDate: TimelessDate
+
+  """The estimated completion date of the release."""
+  targetDate: TimelessDate
 }
 
 """Debug sink for release creation diagnostics."""
@@ -23954,6 +24086,12 @@ input ReleaseUpdateInput {
 
   """The current stage of the release."""
   stageId: String
+
+  """The estimated start date of the release."""
+  startDate: TimelessDate
+
+  """The estimated completion date of the release."""
+  targetDate: TimelessDate
 }
 
 type RepositorySuggestion {
@@ -26320,6 +26458,9 @@ input TeamUpdateInput {
   Whether all members in the workspace can join the team. Only used for public teams.
   """
   allMembersCanJoin: Boolean
+
+  """[Internal] When the team was retired."""
+  retiredAt: DateTime
 }
 
 """A template object used for creating entities faster."""
