@@ -378,7 +378,7 @@ type AgentSession implements Node {
   ): AgentActivityConnection!
 
   """The URL of an external agent-hosted page associated with this session."""
-  externalLink: String
+  externalLink: String @deprecated(reason: "Use externalUrls instead.")
 
   """URLs of external resources associated with this session."""
   externalUrls: JSON!
@@ -439,7 +439,7 @@ input AgentSessionCreateInput {
   id: String
 
   """The issue that this session will be associated with."""
-  issueId: String!
+  issueId: String
 
   """The app user (agent) to create a session for."""
   appUserId: String!
@@ -17451,6 +17451,9 @@ input OrganizationUpdateInput {
   """Whether the organization has enabled resolved thread AI summaries."""
   aiThreadSummariesEnabled: Boolean
 
+  """Whether HIPAA compliance is enabled for organization."""
+  hipaaComplianceEnabled: Boolean
+
   """The security settings for the organization."""
   securitySettings: OrganizationSecuritySettingsInput
 
@@ -27957,6 +27960,9 @@ type ViewPreferencesValues {
 
   """The issue grouping."""
   issueGrouping: String
+
+  """The issue sub grouping."""
+  issueSubGrouping: String
 
   """Whether to show completed issues."""
   showCompletedIssues: String
