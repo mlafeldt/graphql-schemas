@@ -4902,6 +4902,11 @@ type EmailIntakeAddress implements Node {
   """
   issueCreatedAutoReply: String
 
+  """
+  The auto-reply ProseMirror JSON for issue created. If not set, the default reply will be used.
+  """
+  issueCreatedAutoReplyData: JSONObject
+
   """Whether the auto-reply for issue created is enabled."""
   issueCreatedAutoReplyEnabled: Boolean!
 
@@ -4913,6 +4918,11 @@ type EmailIntakeAddress implements Node {
   """
   issueCompletedAutoReply: String
 
+  """
+  The auto-reply ProseMirror JSON for issue completed. If not set, the default reply will be used.
+  """
+  issueCompletedAutoReplyData: JSONObject
+
   """Whether the auto-reply for issue canceled is enabled."""
   issueCanceledAutoReplyEnabled: Boolean!
 
@@ -4920,6 +4930,11 @@ type EmailIntakeAddress implements Node {
   The auto-reply message for issue canceled. If not set, the default reply will be used.
   """
   issueCanceledAutoReply: String
+
+  """
+  The auto-reply ProseMirror JSON for issue canceled. If not set, the default reply will be used.
+  """
+  issueCanceledAutoReplyData: JSONObject
 }
 
 input EmailIntakeAddressCreateInput {
@@ -18041,6 +18056,33 @@ type Project implements Node {
     orderBy: PaginationOrderBy
   ): InitiativeConnection!
 
+  """Associations of this project to parent initiatives."""
+  initiativeToProjects(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): InitiativeToProjectConnection!
+
   """Teams associated with this project."""
   teams(
     """Filter returned teams."""
@@ -20107,6 +20149,33 @@ type ProjectSearchResult implements Node {
     """
     orderBy: PaginationOrderBy
   ): InitiativeConnection!
+
+  """Associations of this project to parent initiatives."""
+  initiativeToProjects(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): InitiativeToProjectConnection!
 
   """Teams associated with this project."""
   teams(
