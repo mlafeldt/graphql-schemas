@@ -344,8 +344,8 @@ type AgentSession implements Node {
   """The user who dismissed the agent session."""
   dismissedBy: User
 
-  """The type of the agent session."""
-  type: AgentSessionType!
+  """[DEPRECATED] The type of the agent session."""
+  type: AgentSessionType @deprecated(reason: "This field is slated for removal.")
 
   """Activities associated with this agent session."""
   activities(
@@ -547,7 +547,7 @@ type AgentSessionToPullRequestEdge {
   cursor: String!
 }
 
-"""The type of an agent session."""
+"""[DEPRECATED] The type of an agent session."""
 enum AgentSessionType {
   commentThread
 }
@@ -5094,6 +5094,9 @@ input EmailUserAccountAuthChallengeInput {
   Whether to only return the login code. This is used by mobile apps to skip showing the login link.
   """
   loginCodeOnly: Boolean
+
+  """Response from the login challenge."""
+  challengeResponse: String
 }
 
 type EmailUserAccountAuthChallengeResponse {
@@ -16817,6 +16820,11 @@ type Organization implements Node {
   """
   allowedAiProviders: [String!]!
 
+  """
+  [INTERNAL] Configure per-modality AI host providers and model families.
+  """
+  aiProviderConfiguration: JSONObject
+
   """[DEPRECATED] Which day count to use for SLA calculations."""
   slaDayCount: SLADayCountType! @deprecated(reason: "No longer in use")
 
@@ -17532,6 +17540,11 @@ input OrganizationUpdateInput {
   [INTERNAL] Permitted AI providers in order of preference. Empty array means all providers are allowed.
   """
   allowedAiProviders: [String!]
+
+  """
+  [INTERNAL] Configure per-modality AI host providers and model families.
+  """
+  aiProviderConfiguration: JSONObject
 }
 
 """Customer owner sorting options."""
