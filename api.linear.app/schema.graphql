@@ -393,6 +393,11 @@ type AgentSession implements Node {
   plan: JSON
 
   """
+  Serialized JSON representing the contexts this session is related to, for direct chat sessions.
+  """
+  context: JSON!
+
+  """
   [Internal] A formatted prompt string containing relevant context for the agent
   session, including issue details, comments, and guidance.
   """
@@ -445,6 +450,13 @@ input AgentSessionCreateInput {
 
   """The app user (agent) to create a session for."""
   appUserId: String!
+
+  """
+  Serialized JSON representing the page contexts this session is related to.
+  Used for direct chat sessions to provide context about the current page (e.g.,
+  Issue, Project).
+  """
+  context: JSONObject
 }
 
 input AgentSessionCreateOnComment {
@@ -4902,11 +4914,6 @@ type EmailIntakeAddress implements Node {
   """
   issueCreatedAutoReply: String
 
-  """
-  The auto-reply ProseMirror JSON for issue created. If not set, the default reply will be used.
-  """
-  issueCreatedAutoReplyData: JSONObject
-
   """Whether the auto-reply for issue created is enabled."""
   issueCreatedAutoReplyEnabled: Boolean!
 
@@ -4918,11 +4925,6 @@ type EmailIntakeAddress implements Node {
   """
   issueCompletedAutoReply: String
 
-  """
-  The auto-reply ProseMirror JSON for issue completed. If not set, the default reply will be used.
-  """
-  issueCompletedAutoReplyData: JSONObject
-
   """Whether the auto-reply for issue canceled is enabled."""
   issueCanceledAutoReplyEnabled: Boolean!
 
@@ -4930,11 +4932,6 @@ type EmailIntakeAddress implements Node {
   The auto-reply message for issue canceled. If not set, the default reply will be used.
   """
   issueCanceledAutoReply: String
-
-  """
-  The auto-reply ProseMirror JSON for issue canceled. If not set, the default reply will be used.
-  """
-  issueCanceledAutoReplyData: JSONObject
 }
 
 input EmailIntakeAddressCreateInput {
