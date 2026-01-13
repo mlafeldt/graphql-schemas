@@ -23785,6 +23785,9 @@ type Release implements Node {
   """The name of the release."""
   name: String!
 
+  """The release's description."""
+  description: String
+
   """The version of the release."""
   version: String
 
@@ -23852,6 +23855,9 @@ input ReleaseCreateInput {
 
   """The name of the release."""
   name: String!
+
+  """The description of the release."""
+  description: String
 
   """The version of the release."""
   version: String
@@ -24214,6 +24220,9 @@ input ReleaseStageUpdateInput {
 input ReleaseUpdateInput {
   """The name of the release."""
   name: String
+
+  """The description of the release."""
+  description: String
 
   """The version of the release."""
   version: String
@@ -26396,6 +26405,11 @@ type TeamPayload {
   success: Boolean!
 }
 
+"""[Internal] How to handle sub-teams when retiring a parent team."""
+enum TeamRetirementSubTeamHandling {
+  unnest
+}
+
 """
 All possible roles within a team in terms of access to team settings and operations.
 """
@@ -26601,6 +26615,11 @@ input TeamUpdateInput {
 
   """[Internal] When the team was retired."""
   retiredAt: DateTime
+
+  """
+  [Internal] How to handle sub-teams when retiring. Required if the team has active sub-teams.
+  """
+  handleSubTeamsOnRetirement: TeamRetirementSubTeamHandling
 }
 
 """A template object used for creating entities faster."""
