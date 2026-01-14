@@ -344,9 +344,6 @@ type AgentSession implements Node {
   """The user who dismissed the agent session."""
   dismissedBy: User
 
-  """[DEPRECATED] The type of the agent session."""
-  type: AgentSessionType @deprecated(reason: "This field is slated for removal.")
-
   """Activities associated with this agent session."""
   activities(
     """Filter returned agent activities."""
@@ -396,6 +393,9 @@ type AgentSession implements Node {
   Serialized JSON representing the contexts this session is related to, for direct chat sessions.
   """
   context: JSON!
+
+  """[DEPRECATED] The type of the agent session."""
+  type: AgentSessionType @deprecated(reason: "This field is slated for removal.")
 
   """
   [Internal] A formatted prompt string containing relevant context for the agent
@@ -614,6 +614,19 @@ input AgentSessionUpdateInput {
   [Internal] The time the agent session was dismissed. Only updatable by internal clients.
   """
   dismissedAt: DateTime
+
+  """
+  [Internal] User-specific state for the agent session. Only updatable by internal clients.
+  """
+  userState: [AgentSessionUserStateInput!]
+}
+
+input AgentSessionUserStateInput {
+  """The ID of the user this state belongs to."""
+  userId: String!
+
+  """The time at which the user most recently viewed the session."""
+  lastReadAt: DateTime
 }
 
 """AI prompt rules for a team."""
@@ -4206,6 +4219,9 @@ type Document implements Node {
   """The issue that the document is associated with."""
   issue: Issue
 
+  """[Internal] The release that the document is associated with."""
+  release: Release
+
   """The document's unique URL slug."""
   slugId: String!
 
@@ -4394,6 +4410,9 @@ input DocumentCreateInput {
   Related issue for the document. Can be a UUID or issue identifier (e.g., 'LIN-123').
   """
   issueId: String
+
+  """[Internal] Related release for the document."""
+  releaseId: String
 
   """[Internal] The resource folder containing the document."""
   resourceFolderId: String
@@ -4639,6 +4658,9 @@ type DocumentSearchResult implements Node {
   """The issue that the document is associated with."""
   issue: Issue
 
+  """[Internal] The release that the document is associated with."""
+  release: Release
+
   """The document's unique URL slug."""
   slugId: String!
 
@@ -4735,6 +4757,9 @@ input DocumentUpdateInput {
   Related issue for the document. Can be a UUID or issue identifier (e.g., 'LIN-123').
   """
   issueId: String
+
+  """[Internal] Related release for the document."""
+  releaseId: String
 
   """[Internal] The resource folder containing the document."""
   resourceFolderId: String
@@ -5259,6 +5284,9 @@ input EntityExternalLinkCreateInput {
 
   """[Internal] The team associated with the link."""
   teamId: String
+
+  """[Internal] The release associated with the link."""
+  releaseId: String
 
   """[Internal] The resource folder containing the link."""
   resourceFolderId: String
@@ -12421,6 +12449,14 @@ type Mutation {
 
     """The identifier of the release to update."""
     id: String!
+  ): ReleasePayload!
+
+  """
+  [ALPHA] Marks the most recent started release for a pipeline as completed.
+  """
+  releaseComplete(
+    """The input containing the pipeline ID."""
+    input: ReleaseCompleteInput!
   ): ReleasePayload!
 
   """[ALPHA] Archives a release."""
@@ -23817,6 +23853,63 @@ type Release implements Node {
 
   """The time at which the release was canceled."""
   canceledAt: DateTime
+
+  """[Internal] Documents associated with the release."""
+  documents(
+    """Filter returned documents."""
+    filter: DocumentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): DocumentConnection!
+
+  """[Internal] Links associated with the release."""
+  links(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): EntityExternalLinkConnection!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -23839,6 +23932,13 @@ enum ReleaseChannel {
   beta
   preRelease
   public
+}
+
+input ReleaseCompleteInput {
+  """
+  The identifier of the pipeline to mark the latest started release as completed.
+  """
+  pipelineId: String!
 }
 
 type ReleaseConnection {
@@ -26408,6 +26508,7 @@ type TeamPayload {
 """[Internal] How to handle sub-teams when retiring a parent team."""
 enum TeamRetirementSubTeamHandling {
   unnest
+  retire
 }
 
 """
