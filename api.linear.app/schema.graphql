@@ -3745,6 +3745,63 @@ type Cycle implements Node {
 
   """Whether the cycle is the previous cycle for the team."""
   isPrevious: Boolean!
+
+  """[Internal] Documents associated with the cycle."""
+  documents(
+    """Filter returned documents."""
+    filter: DocumentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): DocumentConnection!
+
+  """[Internal] Links associated with the cycle."""
+  links(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): EntityExternalLinkConnection!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -4222,6 +4279,9 @@ type Document implements Node {
   """[Internal] The release that the document is associated with."""
   release: Release
 
+  """[Internal] The cycle that the document is associated with."""
+  cycle: Cycle
+
   """The document's unique URL slug."""
   slugId: String!
 
@@ -4413,6 +4473,9 @@ input DocumentCreateInput {
 
   """[Internal] Related release for the document."""
   releaseId: String
+
+  """[Internal] Related cycle for the document."""
+  cycleId: String
 
   """[Internal] The resource folder containing the document."""
   resourceFolderId: String
@@ -4661,6 +4724,9 @@ type DocumentSearchResult implements Node {
   """[Internal] The release that the document is associated with."""
   release: Release
 
+  """[Internal] The cycle that the document is associated with."""
+  cycle: Cycle
+
   """The document's unique URL slug."""
   slugId: String!
 
@@ -4760,6 +4826,9 @@ input DocumentUpdateInput {
 
   """[Internal] Related release for the document."""
   releaseId: String
+
+  """[Internal] Related cycle for the document."""
+  cycleId: String
 
   """[Internal] The resource folder containing the document."""
   resourceFolderId: String
@@ -5287,6 +5356,9 @@ input EntityExternalLinkCreateInput {
 
   """[Internal] The release associated with the link."""
   releaseId: String
+
+  """[Internal] The cycle associated with the link."""
+  cycleId: String
 
   """[Internal] The resource folder containing the link."""
   resourceFolderId: String
@@ -28272,6 +28344,7 @@ enum ViewType {
   projectCustomerNeeds
   reviews
   myReviews
+  createdReviews
   agents
   feedAll
   feedCreated
