@@ -3155,30 +3155,6 @@
             "deprecationReason": null
           },
           {
-            "name": "allowedAiProviders",
-            "description": "[INTERNAL] Permitted AI providers in order of preference. Empty array means all providers are allowed.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "aiProviderConfiguration",
             "description": "[INTERNAL] Configure per-modality AI host providers and model families.",
             "args": [],
@@ -3221,6 +3197,30 @@
             },
             "isDeprecated": true,
             "deprecationReason": "Use organization.projectUpdatesReminderFrequencyInWeeks instead"
+          },
+          {
+            "name": "allowedAiProviders",
+            "description": "[INTERNAL] Permitted AI providers.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use aiProviderConfiguration instead."
           },
           {
             "name": "users",
@@ -9734,6 +9734,26 @@
             "defaultValue": null
           },
           {
+            "name": "hasSharedUsers",
+            "description": "Comparator for filtering issues which have been shared with users outside of the team.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "RelationExistsComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "sharedWith",
+            "description": "Filters that users the issue has been shared with must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UserCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "team",
             "description": "Filters that the issues team must satisfy.",
             "type": {
@@ -11961,6 +11981,26 @@
             "defaultValue": null
           },
           {
+            "name": "hasSharedUsers",
+            "description": "Comparator for filtering issues which have been shared with users outside of the team.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "RelationExistsComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "sharedWith",
+            "description": "Filters that users the issue has been shared with must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UserCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "team",
             "description": "Filters that the issues team must satisfy.",
             "type": {
@@ -12932,6 +12972,26 @@
           {
             "name": "subscribers",
             "description": "Filters that issue subscribers must satisfy.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "UserCollectionFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "hasSharedUsers",
+            "description": "Comparator for filtering issues which have been shared with users outside of the team.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "RelationExistsComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "sharedWith",
+            "description": "Filters that users the issue has been shared with must satisfy.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "UserCollectionFilter",
@@ -14117,6 +14177,37 @@
                   "ofType": null
                 }
               }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "RelationExistsComparator",
+        "description": "Comparator for relation existence.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "eq",
+            "description": "Equals constraint.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "neq",
+            "description": "Not equals constraint.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
             },
             "defaultValue": null
           }
@@ -15716,37 +15807,6 @@
             "type": {
               "kind": "SCALAR",
               "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "RelationExistsComparator",
-        "description": "Comparator for relation existence.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "eq",
-            "description": "Equals constraint.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "neq",
-            "description": "Not equals constraint.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
               "ofType": null
             },
             "defaultValue": null
@@ -30572,6 +30632,18 @@
             },
             "isDeprecated": true,
             "deprecationReason": "This field is slated for removal."
+          },
+          {
+            "name": "url",
+            "description": "Agent session URL.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           },
           {
             "name": "promptContext",
@@ -92003,6 +92075,12 @@
             "deprecationReason": null
           },
           {
+            "name": "myIssuesSharedWithMe",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "userProfile",
             "description": null,
             "isDeprecated": false,
@@ -100213,24 +100291,6 @@
               "kind": "INPUT_OBJECT",
               "name": "OrganizationSecuritySettingsInput",
               "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "allowedAiProviders",
-            "description": "[INTERNAL] Permitted AI providers in order of preference. Empty array means all providers are allowed.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              }
             },
             "defaultValue": null
           },
@@ -114107,7 +114167,7 @@
           },
           {
             "name": "context",
-            "description": "Serialized JSON representing the page contexts this session is related to. Used for direct chat sessions to provide context about the current page (e.g., Issue, Project).",
+            "description": "[Internal] Serialized JSON representing the page contexts this session is related to. Used for direct chat sessions to provide context about the current page (e.g., Issue, Project).",
             "type": {
               "kind": "SCALAR",
               "name": "JSONObject",

@@ -397,6 +397,9 @@ type AgentSession implements Node {
   """[DEPRECATED] The type of the agent session."""
   type: AgentSessionType @deprecated(reason: "This field is slated for removal.")
 
+  """Agent session URL."""
+  url: String
+
   """
   [Internal] A formatted prompt string containing relevant context for the agent
   session, including issue details, comments, and guidance.
@@ -452,9 +455,9 @@ input AgentSessionCreateInput {
   appUserId: String!
 
   """
-  Serialized JSON representing the page contexts this session is related to.
-  Used for direct chat sessions to provide context about the current page (e.g.,
-  Issue, Project).
+  [Internal] Serialized JSON representing the page contexts this session is
+  related to. Used for direct chat sessions to provide context about the current
+  page (e.g., Issue, Project).
   """
   context: JSONObject
 }
@@ -9155,6 +9158,14 @@ input IssueCollectionFilter {
   """Filters that issue subscribers must satisfy."""
   subscribers: UserCollectionFilter
 
+  """
+  Comparator for filtering issues which have been shared with users outside of the team.
+  """
+  hasSharedUsers: RelationExistsComparator
+
+  """Filters that users the issue has been shared with must satisfy."""
+  sharedWith: UserCollectionFilter
+
   """Filters that the issues team must satisfy."""
   team: TeamFilter
 
@@ -9622,6 +9633,14 @@ input IssueFilter {
 
   """Filters that issue subscribers must satisfy."""
   subscribers: UserCollectionFilter
+
+  """
+  Comparator for filtering issues which have been shared with users outside of the team.
+  """
+  hasSharedUsers: RelationExistsComparator
+
+  """Filters that users the issue has been shared with must satisfy."""
+  sharedWith: UserCollectionFilter
 
   """Filters that the issues team must satisfy."""
   team: TeamFilter
@@ -15946,6 +15965,14 @@ input NullableIssueFilter {
   """Filters that issue subscribers must satisfy."""
   subscribers: UserCollectionFilter
 
+  """
+  Comparator for filtering issues which have been shared with users outside of the team.
+  """
+  hasSharedUsers: RelationExistsComparator
+
+  """Filters that users the issue has been shared with must satisfy."""
+  sharedWith: UserCollectionFilter
+
   """Filters that the issues team must satisfy."""
   team: TeamFilter
 
@@ -16921,11 +16948,6 @@ type Organization implements Node {
   aiDiscussionSummariesEnabled: Boolean!
 
   """
-  [INTERNAL] Permitted AI providers in order of preference. Empty array means all providers are allowed.
-  """
-  allowedAiProviders: [String!]!
-
-  """
   [INTERNAL] Configure per-modality AI host providers and model families.
   """
   aiProviderConfiguration: JSONObject
@@ -16935,6 +16957,9 @@ type Organization implements Node {
 
   """[DEPRECATED] The frequency at which to prompt for project updates."""
   projectUpdatesReminderFrequency: ProjectUpdateReminderFrequency! @deprecated(reason: "Use organization.projectUpdatesReminderFrequencyInWeeks instead")
+
+  """[INTERNAL] Permitted AI providers."""
+  allowedAiProviders: [String!]! @deprecated(reason: "Use aiProviderConfiguration instead.")
 
   """Users associated with the organization."""
   users(
@@ -17640,11 +17665,6 @@ input OrganizationUpdateInput {
 
   """The security settings for the organization."""
   securitySettings: OrganizationSecuritySettingsInput
-
-  """
-  [INTERNAL] Permitted AI providers in order of preference. Empty array means all providers are allowed.
-  """
-  allowedAiProviders: [String!]
 
   """
   [INTERNAL] Configure per-modality AI host providers and model families.
@@ -28304,6 +28324,7 @@ enum ViewType {
   myIssuesCreatedByMe
   myIssuesSubscribedTo
   myIssuesActivity
+  myIssuesSharedWithMe
   userProfile
   userProfileCreatedByUser
   board
