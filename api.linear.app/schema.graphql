@@ -738,14 +738,6 @@ type AsksChannelConnectPayload {
   addBot: Boolean!
 }
 
-type AsksWebFormsAuthResponse {
-  """User email."""
-  email: String!
-
-  """User display name."""
-  name: String!
-}
-
 """Issue assignee sorting options."""
 input AssigneeSort {
   """Whether nulls should be sorted first or last"""
@@ -12055,6 +12047,12 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """Rotates the signing secret for a Webhook."""
+  webhookRotateSecret(
+    """The identifier of the Webhook to rotate the secret for."""
+    id: String!
+  ): WebhookRotateSecretPayload!
+
   """Creates a new ViewPreferences object."""
   viewPreferencesCreate(
     """The ViewPreferences object to create."""
@@ -14458,12 +14456,6 @@ type Mutation {
     """The data used for token authentication."""
     input: TokenUserAccountAuthInput!
   ): AuthResolverResponse!
-
-  """Authenticate a user to the Asks web forms app."""
-  asksWebFormsAuth(
-    """The magic login code."""
-    token: String!
-  ): AsksWebFormsAuthResponse!
 
   """
   Authenticates a user account via email and authentication token for SAML.
@@ -24093,6 +24085,9 @@ input ReleaseDebugSinkInput {
 
   """Pull request debug information."""
   pullRequests: [JSONObject!]!
+
+  """List of paths applied during commit scanning."""
+  includePaths: [String!]
 }
 
 type ReleaseEdge {
@@ -28516,6 +28511,17 @@ type WebhookPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+type WebhookRotateSecretPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The new webhook signing secret."""
+  secret: String!
 }
 
 input WebhookUpdateInput {
