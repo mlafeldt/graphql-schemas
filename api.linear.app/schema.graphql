@@ -12525,10 +12525,10 @@ type Mutation {
     id: String!
   ): ReleaseStageArchivePayload!
 
-  """[ALPHA] Creates a new release."""
-  releaseCreate(
-    """The Release object to create."""
-    input: ReleaseCreateInput!
+  """[ALPHA] Syncs release data."""
+  releaseSync(
+    """The release data to sync."""
+    input: ReleaseSyncInput!
   ): ReleasePayload!
 
   """[ALPHA] Updates a release."""
@@ -22740,7 +22740,7 @@ type Query {
   ): IssueFilterSuggestionPayload!
 
   """
-  [Internal] Returns code repositories that are most likely to be relevant for implementing an issue.
+  Returns code repositories that are most likely to be relevant for implementing an issue.
   """
   issueRepositorySuggestions(
     """
@@ -24031,50 +24031,6 @@ type ReleaseConnection {
   pageInfo: PageInfo!
 }
 
-input ReleaseCreateInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
-  """The name of the release."""
-  name: String!
-
-  """The description of the release."""
-  description: String
-
-  """The version of the release."""
-  version: String
-
-  """The commit SHA associated with this release."""
-  commitSha: String
-
-  """The identifier of the pipeline this release belongs to."""
-  pipelineId: String!
-
-  """
-  The current stage of the release. Defaults to the first 'completed' stage.
-  """
-  stageId: String
-
-  """Issue identifiers (e.g. ENG-123) to associate with this release."""
-  issueIdentifiers: [String!]
-
-  """
-  Pull request references to look up. Issues linked to found PRs will be associated with this release.
-  """
-  pullRequestReferences: [PullRequestReferenceInput!]
-
-  """Debug information for release creation diagnostics."""
-  debugSink: ReleaseDebugSinkInput
-
-  """The estimated start date of the release."""
-  startDate: TimelessDate
-
-  """The estimated completion date of the release."""
-  targetDate: TimelessDate
-}
-
 """Debug sink for release creation diagnostics."""
 input ReleaseDebugSinkInput {
   """List of commit SHAs that were inspected."""
@@ -24411,6 +24367,51 @@ input ReleaseStageUpdateInput {
 
   """The position of the stage."""
   position: Float
+}
+
+"""The release data to sync."""
+input ReleaseSyncInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The name of the release."""
+  name: String!
+
+  """The description of the release."""
+  description: String
+
+  """The version of the release."""
+  version: String
+
+  """The commit SHA associated with this release."""
+  commitSha: String
+
+  """The identifier of the pipeline this release belongs to."""
+  pipelineId: String!
+
+  """
+  The current stage of the release. Defaults to the first 'completed' stage.
+  """
+  stageId: String
+
+  """Issue identifiers (e.g. ENG-123) to associate with this release."""
+  issueIdentifiers: [String!]
+
+  """
+  Pull request references to look up. Issues linked to found PRs will be associated with this release.
+  """
+  pullRequestReferences: [PullRequestReferenceInput!]
+
+  """Debug information for release creation diagnostics."""
+  debugSink: ReleaseDebugSinkInput
+
+  """The estimated start date of the release."""
+  startDate: TimelessDate
+
+  """The estimated completion date of the release."""
+  targetDate: TimelessDate
 }
 
 input ReleaseUpdateInput {
