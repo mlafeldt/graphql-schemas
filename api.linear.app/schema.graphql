@@ -6454,6 +6454,26 @@ input GitLabSettingsInput {
   expiresAt: String
 }
 
+type GitLabTestConnectionPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The integration that was created or updated."""
+  integration: Integration
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """Error message if the connection test failed."""
+  error: String
+
+  """Response body from GitLab for debugging."""
+  errorResponseBody: String
+
+  """Response headers from GitLab for debugging (JSON stringified)."""
+  errorResponseHeaders: String
+}
+
 """[Internal] The kind of link between an issue and a pull request."""
 enum GitLinkKind {
   closes
@@ -10020,6 +10040,11 @@ type IssueHistory implements Node {
 
   """The releases that the issue was removed from."""
   removedFromReleases: [Release!]
+
+  """
+  [INTERNAL] Metadata about the triage rule that made changes to the issue.
+  """
+  triageRuleMetadata: IssueHistoryTriageRuleMetadata
 }
 
 type IssueHistoryConnection {
@@ -10033,6 +10058,36 @@ type IssueHistoryEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""An error that occurred during triage rule execution."""
+type IssueHistoryTriageRuleError {
+  """The type of error that occurred."""
+  type: TriageRuleErrorType!
+
+  """The property that caused the error."""
+  property: String
+
+  """Whether the conflict was for the same child label."""
+  conflictForSameChildLabel: Boolean
+
+  """The team the issue was being moved from."""
+  fromTeam: Team
+
+  """The team the issue was being moved to."""
+  toTeam: Team
+
+  """The conflicting labels."""
+  conflictingLabels: [IssueLabel!]
+}
+
+"""Metadata about a triage rule that made changes to an issue."""
+type IssueHistoryTriageRuleMetadata {
+  """The error that occurred, if any."""
+  triageRuleError: IssueHistoryTriageRuleError
+
+  """The triage rule that triggered the issue update."""
+  updatedByTriageRule: WorkflowDefinition
 }
 
 """Comparator for issue identifiers."""
@@ -12244,6 +12299,23 @@ type Mutation {
     id: String!
   ): UserAdminPayload!
 
+  """Revokes a user's sessions. Can only be called by an admin or owner."""
+  userRevokeAllSessions(
+    """The identifier of the user to logout all sessions of."""
+    id: String!
+  ): UserAdminPayload!
+
+  """
+  Revokes a specific session for a user. Can only be called by an admin or owner.
+  """
+  userRevokeSession(
+    """The identifier of the session to revoke."""
+    sessionId: String!
+
+    """The identifier of the user whose session to revoke."""
+    id: String!
+  ): UserAdminPayload!
+
   """Un-suspends a user. Can only be called by an admin or owner."""
   userUnsuspend(
     """The identifier of the user to unsuspend."""
@@ -12608,6 +12680,17 @@ type Mutation {
   releaseComplete(
     """The input containing the pipeline ID and optional version."""
     input: ReleaseCompleteInput!
+  ): ReleasePayload!
+
+  """
+  [ALPHA] Updates a release by pipeline. If version is provided, updates that
+  specific release; otherwise updates the most recent started release.
+  """
+  releaseUpdateByPipeline(
+    """
+    The input containing the pipeline ID, optional version, and optional stage name.
+    """
+    input: ReleaseUpdateByPipelineInput!
   ): ReleasePayload!
 
   """[ALPHA] Archives a release."""
@@ -13509,6 +13592,14 @@ type Mutation {
     accessToken: String!
   ): GitLabIntegrationCreatePayload!
 
+  """
+  Tests connectivity to a self-hosted GitLab instance and clears auth errors if successful.
+  """
+  integrationGitlabTestConnection(
+    """The ID of the GitLab integration to test."""
+    integrationId: String!
+  ): GitLabTestConnectionPayload!
+
   """Creates an integration api key for Airbyte to connect with Linear."""
   airbyteIntegrationConnect(
     """Airbyte integration settings."""
@@ -13919,7 +14010,7 @@ type Mutation {
   ): DeletePayload!
 
   """
-  [Internal] Enables Linear Agent Slack workflow access for a Slack integration.
+  [Internal] Enables Linear Agent Slack workflow access for a Slack or Slack Asks integration.
   """
   integrationSlackWorkflowAccessUpdate(
     """Whether to enable workflow access."""
@@ -21868,6 +21959,12 @@ type Query {
   """The currently authenticated user."""
   viewer: User!
 
+  """Lists the sessions of a user. Can only be called by an admin or owner."""
+  userSessions(
+    """The identifier of the user to list sessions of."""
+    id: String!
+  ): [AuthenticationSessionResponse!]!
+
   """All triage responsibilities."""
   triageResponsibilities(
     """A cursor to be used with last for backward pagination."""
@@ -24599,6 +24696,23 @@ input ReleaseSyncInput {
   targetDate: TimelessDate
 }
 
+"""Input for updating a release by pipeline."""
+input ReleaseUpdateByPipelineInput {
+  """The identifier of the pipeline."""
+  pipelineId: String!
+
+  """
+  The version of the release to update. If not provided, the latest started release will be updated.
+  """
+  version: String
+
+  """
+  The stage name to set. First tries exact match, then falls back to
+  case-insensitive matching with dashes/underscores treated as spaces.
+  """
+  stage: String
+}
+
 input ReleaseUpdateInput {
   """The name of the release."""
   name: String
@@ -25201,6 +25315,11 @@ input SlackAsksSettingsInput {
   Whether Linear Agent should be enabled for this Slack Asks integration.
   """
   enableAgent: Boolean
+
+  """
+  Whether Linear Agent should be given Org-wide access within Slack workflows.
+  """
+  enableLinearAgentWorkflowAccess: Boolean
 }
 
 """Tuple for mapping Slack channel IDs to names."""
@@ -27453,6 +27572,13 @@ input TriageResponsibilityUpdateInput {
   timeScheduleId: String
 }
 
+"""The type of error that occurred during triage rule execution."""
+enum TriageRuleErrorType {
+  cycle
+  default
+  labelGroupConflict
+}
+
 """Issue update date sorting options."""
 input UpdatedAtSort {
   """Whether nulls should be sorted first or last"""
@@ -28741,6 +28867,93 @@ input WebhookUpdateInput {
   resourceTypes: [String!]
 }
 
+type WorkflowDefinition implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The name of the workflow."""
+  name: String!
+
+  """The name of the group that the workflow belongs to."""
+  groupName: String
+
+  """The description of the workflow."""
+  description: String
+
+  """The type of the workflow."""
+  type: WorkflowType!
+
+  """The type of the event that triggers off the workflow."""
+  trigger: WorkflowTrigger!
+
+  """The object type (e.g. Issue) that triggers this workflow."""
+  triggerType: WorkflowTriggerType!
+
+  """The conditions that need to be match for the workflow to be triggered."""
+  conditions: JSONObject
+  enabled: Boolean!
+
+  """
+  The team associated with the workflow. If not set, the workflow is associated with the entire organization.
+  """
+  team: Team
+
+  """The user who created the workflow."""
+  creator: User!
+
+  """An array of activities that will be executed as part of the workflow."""
+  activities: JSONObject!
+
+  """The sort order of the workflow definition within its siblings."""
+  sortOrder: String!
+
+  """The date when the workflow was last executed."""
+  lastExecutedAt: DateTime
+
+  """The user who last updated the workflow."""
+  lastUpdatedBy: User
+
+  """The contextual label view associated with the workflow."""
+  label: IssueLabel
+
+  """The contextual cycle view associated with the workflow."""
+  cycle: Cycle
+
+  """The contextual user view associated with the workflow."""
+  user: User
+
+  """The contextual project view associated with the workflow."""
+  project: Project
+
+  """The contextual initiative view associated with the workflow."""
+  initiative: Initiative
+
+  """The context custom view associated with the workflow."""
+  customView: CustomView
+
+  """The type of view to which this workflow's context is associated with."""
+  contextViewType: ContextViewType
+
+  """
+  The type of user view to which this workflow's context is associated with.
+  """
+  userContextViewType: UserContextViewType
+}
+
 """A state in a team workflow."""
 type WorkflowState implements Node {
   """The unique identifier of the entity."""
@@ -28942,6 +29155,26 @@ input WorkflowStateUpdateInput {
 
   """The position of the state."""
   position: Float
+}
+
+enum WorkflowTrigger {
+  entityCreated
+  entityUpdated
+  entityCreatedOrUpdated
+  entityRemoved
+  entityUnarchived
+}
+
+enum WorkflowTriggerType {
+  issue
+  project
+}
+
+enum WorkflowType {
+  sla
+  custom
+  viewSubscription
+  triage
 }
 
 input ZendeskSettingsInput {
