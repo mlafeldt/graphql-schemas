@@ -17796,6 +17796,11 @@ input OrganizationUpdateInput {
   """Whether the organization has enabled the feed feature."""
   feedEnabled: Boolean
 
+  """
+  Whether to hide other workspaces for new users signing up with email domains claimed by this organization.
+  """
+  hideNonPrimaryOrganizations: Boolean
+
   """Default schedule for how often feed summaries are generated."""
   defaultFeedSummarySchedule: FeedSummarySchedule
 
@@ -24208,6 +24213,9 @@ input ReleaseCollectionFilter {
   """Filters that the release's pipeline must satisfy."""
   pipeline: ReleasePipelineFilter
 
+  """Filters that the release's stage must satisfy."""
+  stage: ReleaseStageFilter
+
   """Compound filters, all of which need to be matched by the release."""
   and: [ReleaseCollectionFilter!]
 
@@ -24309,6 +24317,9 @@ input ReleaseFilter {
 
   """Filters that the release's pipeline must satisfy."""
   pipeline: ReleasePipelineFilter
+
+  """Filters that the release's stage must satisfy."""
+  stage: ReleaseStageFilter
 
   """Compound filters, all of which need to be matched by the release."""
   and: [ReleaseFilter!]
@@ -24618,6 +24629,30 @@ type ReleaseStageEdge {
   cursor: String!
 }
 
+"""[ALPHA] Release stage filtering options."""
+input ReleaseStageFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the stage type."""
+  type: ReleaseStageTypeComparator
+
+  """Comparator for the stage name."""
+  name: StringComparator
+
+  """Compound filters, all of which need to be matched by the stage."""
+  and: [ReleaseStageFilter!]
+
+  """Compound filters, one of which need to be matched by the stage."""
+  or: [ReleaseStageFilter!]
+}
+
 type ReleaseStagePayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -24635,6 +24670,26 @@ enum ReleaseStageType {
   started
   completed
   canceled
+}
+
+"""[ALPHA] Comparator for release stage type."""
+input ReleaseStageTypeComparator {
+  """Equals constraint."""
+  eq: ReleaseStageType
+
+  """Not-equals constraint."""
+  neq: ReleaseStageType
+
+  """In-array constraint."""
+  in: [ReleaseStageType!]
+
+  """Not-in-array constraint."""
+  nin: [ReleaseStageType!]
+
+  """
+  Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.
+  """
+  null: Boolean
 }
 
 input ReleaseStageUpdateInput {
