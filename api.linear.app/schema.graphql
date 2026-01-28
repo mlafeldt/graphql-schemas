@@ -1323,6 +1323,11 @@ type AuthResolverResponse {
   """ID of the organization last accessed by the user."""
   lastUsedOrganizationId: String
 
+  """
+  The authentication service used for the current session (e.g., google, email, saml).
+  """
+  service: String
+
   """Application token."""
   token: String @deprecated(reason: "Deprecated and not used anymore. Never populated.")
 }
@@ -12692,6 +12697,12 @@ type Mutation {
     """
     input: ReleaseUpdateByPipelineInput!
   ): ReleasePayload!
+
+  """[ALPHA] Deletes a release."""
+  releaseDelete(
+    """The identifier of the release to delete."""
+    id: String!
+  ): DeletePayload!
 
   """[ALPHA] Archives a release."""
   releaseArchive(
