@@ -377,9 +377,6 @@ type AgentSession implements Node {
   """The URL of an external agent-hosted page associated with this session."""
   externalLink: String @deprecated(reason: "Use externalUrls instead.")
 
-  """URLs of external resources associated with this session."""
-  externalUrls: JSON!
-
   """A summary of the activities in this session."""
   summary: String
 
@@ -432,6 +429,12 @@ type AgentSession implements Node {
     """
     orderBy: PaginationOrderBy
   ): AgentSessionToPullRequestConnection!
+
+  """External links associated with this session."""
+  externalLinks: [AgentSessionExternalLink!]!
+
+  """URLs of external resources associated with this session."""
+  externalUrls: JSON! @deprecated(reason: "Use externalLinks instead.")
 }
 
 type AgentSessionConnection {
@@ -491,6 +494,15 @@ type AgentSessionEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""An external link associated with an agent session."""
+type AgentSessionExternalLink {
+  """The URL of the external resource."""
+  url: String!
+
+  """Label for the link."""
+  label: String!
 }
 
 """Input for an external URL associated with an agent session."""
@@ -8561,6 +8573,9 @@ type Issue implements Node {
   """[Internal] The activity summary information for this issue."""
   activitySummary: JSONObject
 
+  """[Internal] AI-generated activity summary for this issue."""
+  summary: Summary
+
   """Id of the labels associated with this issue."""
   labelIds: [String!]!
 
@@ -10869,6 +10884,9 @@ type IssueSearchResult implements Node {
 
   """[Internal] The activity summary information for this issue."""
   activitySummary: JSONObject
+
+  """[Internal] AI-generated activity summary for this issue."""
+  summary: Summary
 
   """Id of the labels associated with this issue."""
   labelIds: [String!]!
@@ -25958,6 +25976,48 @@ type SuccessPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""An AI-generated summary."""
+type Summary implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The issue this summary belongs to."""
+  issue: Issue!
+
+  """The summary content as a Prosemirror document."""
+  content: JSONObject!
+
+  """The evaluation log id for this summary generation."""
+  evalLogId: String
+
+  """The generation status of the summary."""
+  generationStatus: SummaryGenerationStatus!
+
+  """The time at which the summary was generated."""
+  generatedAt: DateTime!
+}
+
+"""The generation status of a summary."""
+enum SummaryGenerationStatus {
+  pending
+  completed
+  failed
 }
 
 """A comment thread that is synced with an external source."""
