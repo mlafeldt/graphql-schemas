@@ -99,6 +99,9 @@ type AgentActivityActionContent {
 
   """The result of the action in Markdown format."""
   result: String
+
+  """[Internal] The result content as ProseMirror document."""
+  resultData: JSONObject
 }
 
 type AgentActivityConnection {
@@ -190,6 +193,9 @@ type AgentActivityElicitationContent {
 
   """The elicitation message in Markdown format."""
   body: String!
+
+  """[Internal] The elicitation content as ProseMirror document."""
+  bodyData: JSONObject!
 }
 
 """Content for an error activity."""
@@ -199,6 +205,9 @@ type AgentActivityErrorContent {
 
   """The error message in Markdown format."""
   body: String!
+
+  """[Internal] The error content as ProseMirror document."""
+  bodyData: JSONObject!
 }
 
 """Agent activity filtering options."""
@@ -250,6 +259,9 @@ type AgentActivityPromptContent {
 
   """A message requesting additional information or action from user."""
   body: String!
+
+  """[Internal] The prompt content as ProseMirror document."""
+  bodyData: JSONObject!
 }
 
 """Content for a response activity."""
@@ -259,6 +271,9 @@ type AgentActivityResponseContent {
 
   """The response content in Markdown format."""
   body: String!
+
+  """[Internal] The response content as ProseMirror document."""
+  bodyData: JSONObject!
 }
 
 """
@@ -278,6 +293,9 @@ type AgentActivityThoughtContent {
 
   """The thought content in Markdown format."""
   body: String!
+
+  """[Internal] The thought content as ProseMirror document."""
+  bodyData: JSONObject!
 }
 
 """The type of an agent activity."""
@@ -1492,6 +1510,11 @@ type Comment implements Node {
 
   """[Internal] A generated summary of the comment thread."""
   threadSummary: JSONObject
+
+  """
+  [Internal] Whether the comment is an artificial placeholder for an agent session thread created without a comment mention.
+  """
+  isArtificialAgentSessionRoot: Boolean!
 
   """Comment's URL."""
   url: String!
@@ -8089,6 +8112,7 @@ enum IntegrationService {
   email
   mcpServerPersonal
   mcpServer
+  microsoftTeams
 }
 
 input IntegrationSettingsInput {
@@ -8110,6 +8134,7 @@ input IntegrationSettingsInput {
   intercom: IntercomSettingsInput
   front: FrontSettingsInput
   gong: GongSettingsInput
+  microsoftTeams: MicrosoftTeamsSettingsInput
   jira: JiraSettingsInput
   notion: NotionSettingsInput
   opsgenie: OpsgenieInput
@@ -12126,6 +12151,11 @@ input ManualSort {
   order: PaginationSortOrder
 }
 
+input MicrosoftTeamsSettingsInput {
+  """The display name of the Azure AD tenant."""
+  tenantName: String
+}
+
 """Issue project milestone options."""
 input MilestoneSort {
   """Whether nulls should be sorted first or last"""
@@ -13931,6 +13961,15 @@ type Mutation {
     redirectUri: String!
 
     """The Gong OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """[ALPHA] Integrates the organization with Microsoft Teams."""
+  integrationMicrosoftTeams(
+    """The Microsoft OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Microsoft OAuth code."""
     code: String!
   ): IntegrationPayload!
 
@@ -17134,6 +17173,9 @@ type Organization implements Node {
   """
   aiProviderConfiguration: JSONObject
 
+  """[Internal] Whether the organization has enabled Linear Agent."""
+  linearAgentEnabled: Boolean!
+
   """[DEPRECATED] Which day count to use for SLA calculations."""
   slaDayCount: SLADayCountType! @deprecated(reason: "No longer in use")
 
@@ -17860,6 +17902,9 @@ input OrganizationUpdateInput {
   [INTERNAL] Configure per-modality AI host providers and model families.
   """
   aiProviderConfiguration: JSONObject
+
+  """[Internal] Whether the organization has enabled Linear Agent."""
+  linearAgentEnabled: Boolean
 }
 
 """Customer owner sorting options."""
@@ -22497,6 +22542,12 @@ type Query {
   """[ALPHA] One specific release pipeline."""
   releasePipeline(id: String!): ReleasePipeline!
 
+  """
+  [ALPHA] Returns the latest release for the pipeline associated with the access
+  key. The pipeline is inferred from the access key's resource configuration.
+  """
+  latestRelease: Release
+
   """The status of the rate limiter."""
   rateLimitStatus: RateLimitPayload!
 
@@ -24743,7 +24794,7 @@ input ReleaseSyncInput {
   id: String
 
   """The name of the release."""
-  name: String!
+  name: String
 
   """The description of the release."""
   description: String
@@ -24752,7 +24803,7 @@ input ReleaseSyncInput {
   version: String
 
   """The commit SHA associated with this release."""
-  commitSha: String
+  commitSha: String!
 
   """The identifier of the pipeline this release belongs to."""
   pipelineId: String!
