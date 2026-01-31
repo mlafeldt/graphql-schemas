@@ -9122,7 +9122,7 @@ type Issue implements Node {
   """
   asksExternalUserRequester: ExternalUser
 
-  """[ALPHA] The issue's workflow states over time."""
+  """The issue's workflow states over time."""
   stateHistory(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -11434,7 +11434,7 @@ type IssueSearchResult implements Node {
   """
   asksExternalUserRequester: ExternalUser
 
-  """[ALPHA] The issue's workflow states over time."""
+  """The issue's workflow states over time."""
   stateHistory(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -12763,6 +12763,34 @@ type Mutation {
     """The identifier of the release to unarchive."""
     id: String!
   ): ReleaseArchivePayload!
+
+  """
+  [ALPHA] Syncs release data using an access key. The pipeline is inferred from the access key.
+  """
+  releaseSyncByAccessKey(
+    """The release data to sync."""
+    input: ReleaseSyncInputBase!
+  ): ReleasePayload!
+
+  """
+  [ALPHA] Marks a release as completed using an access key. If version is
+  provided, completes that specific release; otherwise completes the most recent
+  started release. The pipeline is inferred from the access key.
+  """
+  releaseCompleteByAccessKey(
+    """The input containing the optional version."""
+    input: ReleaseCompleteInputBase!
+  ): ReleasePayload!
+
+  """
+  [ALPHA] Updates a release by pipeline using an access key. If version is
+  provided, updates that specific release; otherwise updates the most recent
+  started release. The pipeline is inferred from the access key.
+  """
+  releaseUpdateByPipelineByAccessKey(
+    """The input containing the optional version and optional stage name."""
+    input: ReleaseUpdateByPipelineInputBase!
+  ): ReleasePayload!
 
   """[ALPHA] Creates a new release pipeline."""
   releasePipelineCreate(
@@ -21628,6 +21656,9 @@ type PullRequest implements Node {
   """
   archivedAt: DateTime
 
+  """The pull request's unique URL slug."""
+  slugId: String!
+
   """The title of the pull request."""
   title: String!
 
@@ -22543,10 +22574,14 @@ type Query {
   releasePipeline(id: String!): ReleasePipeline!
 
   """
-  [ALPHA] Returns the latest release for the pipeline associated with the access
-  key. The pipeline is inferred from the access key's resource configuration.
+  [ALPHA] Returns a release pipeline by ID. Requires the access key to have access to the pipeline.
   """
-  latestRelease: Release
+  releasePipelineByAccessKey: ReleasePipeline!
+
+  """
+  [ALPHA] Returns the latest release for the pipeline associated with the access key.
+  """
+  latestReleaseByAccessKey: Release
 
   """The status of the rate limiter."""
   rateLimitStatus: RateLimitPayload!
@@ -24313,13 +24348,32 @@ input ReleaseCollectionFilter {
 }
 
 input ReleaseCompleteInput {
-  """The identifier of the pipeline to mark a release as completed."""
-  pipelineId: String!
-
   """
   The version of the release to complete. If not provided, the latest started release will be completed.
   """
   version: String
+
+  """
+  The commit SHA associated with this completion. If a completed release with
+  this SHA already exists, it will be returned instead of completing a new release.
+  """
+  commitSha: String
+
+  """The identifier of the pipeline to mark a release as completed."""
+  pipelineId: String!
+}
+
+input ReleaseCompleteInputBase {
+  """
+  The version of the release to complete. If not provided, the latest started release will be completed.
+  """
+  version: String
+
+  """
+  The commit SHA associated with this completion. If a completed release with
+  this SHA already exists, it will be returned instead of completing a new release.
+  """
+  commitSha: String
 }
 
 type ReleaseConnection {
@@ -24805,8 +24859,50 @@ input ReleaseSyncInput {
   """The commit SHA associated with this release."""
   commitSha: String!
 
+  """
+  The current stage of the release. Defaults to the first 'completed' stage.
+  """
+  stageId: String
+
+  """Issue identifiers (e.g. ENG-123) to associate with this release."""
+  issueIdentifiers: [String!]
+
+  """
+  Pull request references to look up. Issues linked to found PRs will be associated with this release.
+  """
+  pullRequestReferences: [PullRequestReferenceInput!]
+
+  """Debug information for release creation diagnostics."""
+  debugSink: ReleaseDebugSinkInput
+
+  """The estimated start date of the release."""
+  startDate: TimelessDate
+
+  """The estimated completion date of the release."""
+  targetDate: TimelessDate
+
   """The identifier of the pipeline this release belongs to."""
   pipelineId: String!
+}
+
+"""Base release sync data without pipeline specification."""
+input ReleaseSyncInputBase {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The name of the release."""
+  name: String
+
+  """The description of the release."""
+  description: String
+
+  """The version of the release."""
+  version: String
+
+  """The commit SHA associated with this release."""
+  commitSha: String!
 
   """
   The current stage of the release. Defaults to the first 'completed' stage.
@@ -24833,9 +24929,22 @@ input ReleaseSyncInput {
 
 """Input for updating a release by pipeline."""
 input ReleaseUpdateByPipelineInput {
+  """
+  The version of the release to update. If not provided, the latest started release will be updated.
+  """
+  version: String
+
+  """
+  The stage name to set. First tries exact match, then falls back to
+  case-insensitive matching with dashes/underscores treated as spaces.
+  """
+  stage: String
+
   """The identifier of the pipeline."""
   pipelineId: String!
+}
 
+input ReleaseUpdateByPipelineInputBase {
   """
   The version of the release to update. If not provided, the latest started release will be updated.
   """
@@ -28870,6 +28979,7 @@ enum ViewType {
   feedFollowing
   feedPopular
   workspaceMembers
+  releasePipelines
   roadmapAll
   roadmap
   roadmaps
