@@ -4487,6 +4487,9 @@ type DocumentContent implements Node {
   """The AI prompt rules that the content is associated with."""
   aiPromptRules: AiPromptRules
 
+  """The welcome message that the content is associated with."""
+  welcomeMessage: WelcomeMessage
+
   """
   The time at which the document content was restored from a previous version.
   """
@@ -29152,6 +29155,35 @@ input WebhookUpdateInput {
 
   """List of resources the webhook should subscribe to."""
   resourceTypes: [String!]
+}
+
+"""A welcome message for new users joining the workspace."""
+type WelcomeMessage implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The title of the welcome message notification."""
+  title: String
+
+  """Whether the welcome message is enabled."""
+  enabled: Boolean!
+
+  """The user who last updated the welcome message."""
+  updatedBy: User
 }
 
 type WorkflowDefinition implements Node {
