@@ -6406,40 +6406,6 @@ type GitHubCommitIntegrationPayload {
   webhookSecret: String!
 }
 
-type GitHubEnterpriseCloudExchangePayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The integration that was created or updated."""
-  integration: Integration
-
-  """Whether the operation was successful."""
-  success: Boolean!
-
-  """[Internal] The OAuth authorization URL to redirect the user to."""
-  oauthUrl: String!
-
-  """[Internal] The app installation URL to redirect the user to."""
-  installUrl: String!
-}
-
-type GitHubEnterpriseCloudSetupPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The integration that was created or updated."""
-  integration: Integration
-
-  """Whether the operation was successful."""
-  success: Boolean!
-
-  """[Internal] The URL to POST the manifest to create the GitHub App."""
-  manifestUrl: String!
-
-  """[Internal] The manifest JSON to POST to GitHub."""
-  manifest: String!
-}
-
 type GitHubEnterpriseServerInstallVerificationPayload {
   """Has the install been successful."""
   success: Boolean!
@@ -6480,22 +6446,6 @@ input GitHubImportSettingsInput {
 
   """The type of Github org"""
   orgType: GithubOrgType!
-}
-
-type GitHubIntegrationPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The integration that was created or updated."""
-  integration: Integration
-
-  """Whether the operation was successful."""
-  success: Boolean!
-
-  """
-  Whether creating a personal integration alongside the org integration was successful.
-  """
-  successPersonalIntegration: Boolean!
 }
 
 enum GithubOrgType {
@@ -12417,36 +12367,6 @@ type Mutation {
     id: String!
   ): UserAdminPayload!
 
-  """
-  [DEPRECATED] Makes user an admin. Can only be called by an admin or owner.
-  """
-  userPromoteAdmin(
-    """The identifier of the user to make an admin."""
-    id: String!
-  ): UserAdminPayload! @deprecated(reason: "Use userChangeRole instead. This mutation will be removed in a future release.")
-
-  """
-  [DEPRECATED] Makes user a regular user. Can only be called by an admin or owner.
-  """
-  userDemoteAdmin(
-    """The identifier of the user to make a regular user."""
-    id: String!
-  ): UserAdminPayload! @deprecated(reason: "Use userChangeRole instead. This mutation will be removed in a future release.")
-
-  """
-  [DEPRECATED] Makes user a regular user. Can only be called by an admin.
-  """
-  userPromoteMember(
-    """The identifier of the user to make a regular user."""
-    id: String!
-  ): UserAdminPayload! @deprecated(reason: "Use userChangeRole instead. This mutation will be removed in a future release.")
-
-  """[DEPRECATED] Makes user a guest. Can only be called by an admin."""
-  userDemoteMember(
-    """The identifier of the user to make a guest."""
-    id: String!
-  ): UserAdminPayload! @deprecated(reason: "Use userChangeRole instead. This mutation will be removed in a future release.")
-
   """Suspends a user. Can only be called by an admin or owner."""
   userSuspend(
     """The identifier of the user to suspend."""
@@ -13737,6 +13657,11 @@ type Mutation {
 
   """Connects the organization with the GitHub App."""
   integrationGithubConnect(
+    """
+    The GitHub Enterprise Cloud host (e.g., 'linear-development.ghe.com'). When provided, this creates a GEC integration.
+    """
+    githubHost: String
+
     """Whether the integration should have code access"""
     codeAccess: Boolean = false
 
@@ -13770,41 +13695,6 @@ type Mutation {
     """The base URL of the GitHub Enterprise Server installation."""
     githubUrl: String!
   ): GitHubEnterpriseServerPayload!
-
-  """
-  [Internal] Sets up a GitHub Enterprise Cloud integration by creating a pending integration and returning the manifest.
-  """
-  integrationGitHubEnterpriseCloudSetup(
-    """
-    [Internal] The base URL of the GitHub Enterprise Cloud instance (e.g., https://company.ghe.com).
-    """
-    enterpriseUrl: String!
-  ): GitHubEnterpriseCloudSetupPayload!
-
-  """
-  [Internal] Exchanges the manifest code for GitHub App credentials after the user creates the app.
-  """
-  integrationGitHubEnterpriseCloudExchangeManifest(
-    """[Internal] The code returned by GitHub after app creation."""
-    code: String!
-
-    """[Internal] The integration ID from the setup step."""
-    integrationId: String!
-  ): GitHubEnterpriseCloudExchangePayload!
-
-  """
-  [Internal] Completes the GitHub Enterprise Cloud integration by connecting with OAuth and installation.
-  """
-  integrationGitHubEnterpriseCloudConnect(
-    """[Internal] The OAuth authorization code."""
-    code: String!
-
-    """[Internal] The GitHub App installation ID."""
-    installationId: String!
-
-    """[Internal] The integration ID from the setup step."""
-    integrationId: String!
-  ): GitHubIntegrationPayload!
 
   """Connects the organization with a GitLab Access Token."""
   integrationGitlabConnect(
