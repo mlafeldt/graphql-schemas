@@ -10122,6 +10122,39 @@ type IssueHistory implements Node {
   """
   triageResponsibilityAutoAssigned: Boolean
 
+  """The team that triggered the triage responsibility action."""
+  triageResponsibilityTeam: Team
+
+  """The project milestone that the issue was moved from."""
+  fromProjectMilestone: ProjectMilestone
+
+  """The project milestone that the issue was moved to."""
+  toProjectMilestone: ProjectMilestone
+
+  """The time at which the issue's SLA was previously started."""
+  fromSlaStartedAt: DateTime
+
+  """The time at which the issue's SLA is now started."""
+  toSlaStartedAt: DateTime
+
+  """The SLA breach time that was previously set on the issue."""
+  fromSlaBreachesAt: DateTime
+
+  """The SLA breach time that is now set on the issue."""
+  toSlaBreachesAt: DateTime
+
+  """Whether the issue had previously breached its SLA."""
+  fromSlaBreached: Boolean
+
+  """Whether the issue has now breached its SLA."""
+  toSlaBreached: Boolean
+
+  """The type of SLA that was previously set on the issue."""
+  fromSlaType: String
+
+  """The type of SLA that is now set on the issue."""
+  toSlaType: String
+
   """The bot that performed the action."""
   botActor: ActorBot
 
@@ -12756,10 +12789,7 @@ type Mutation {
     input: ReleaseCompleteInput!
   ): ReleasePayload!
 
-  """
-  [ALPHA] Updates a release by pipeline. If version is provided, updates that
-  specific release; otherwise updates the most recent started release.
-  """
+  """[ALPHA] Updates a release by pipeline."""
   releaseUpdateByPipeline(
     """
     The input containing the pipeline ID, optional version, and optional stage name.
@@ -12803,11 +12833,7 @@ type Mutation {
     input: ReleaseCompleteInputBase!
   ): ReleasePayload!
 
-  """
-  [ALPHA] Updates a release by pipeline using an access key. If version is
-  provided, updates that specific release; otherwise updates the most recent
-  started release. The pipeline is inferred from the access key.
-  """
+  """[ALPHA] Updates a release by pipeline using an access key."""
   releaseUpdateByPipelineByAccessKey(
     """The input containing the optional version and optional stage name."""
     input: ReleaseUpdateByPipelineInputBase!
@@ -24977,7 +25003,7 @@ input ReleaseSyncInputBase {
 """Input for updating a release by pipeline."""
 input ReleaseUpdateByPipelineInput {
   """
-  The version of the release to update. If not provided, the latest started release will be updated.
+  The version of the release to update. If not provided, the latest started or latest planned release will be updated.
   """
   version: String
 
@@ -24993,7 +25019,7 @@ input ReleaseUpdateByPipelineInput {
 
 input ReleaseUpdateByPipelineInputBase {
   """
-  The version of the release to update. If not provided, the latest started release will be updated.
+  The version of the release to update. If not provided, the latest started or latest planned release will be updated.
   """
   version: String
 
@@ -26302,6 +26328,11 @@ type Team implements Node {
 
   """The team's color."""
   color: String
+
+  """
+  [Internal] The time at which the team was retired. Null if the team has not been retired.
+  """
+  retiredAt: DateTime
 
   """The organization that the team is associated with."""
   organization: Organization!
@@ -29228,6 +29259,111 @@ type WelcomeMessage implements Node {
 
   """The user who last updated the welcome message."""
   updatedBy: User
+}
+
+"""A welcome message related notification."""
+type WelcomeMessageNotification implements Notification & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """Notification type."""
+  type: String!
+
+  """The user that caused the notification."""
+  actor: User
+
+  """The external user that caused the notification."""
+  externalUserActor: ExternalUser
+
+  """The user that received the notification."""
+  user: User!
+
+  """
+  The time at when the user marked the notification as read. Null, if the the user hasn't read the notification
+  """
+  readAt: DateTime
+
+  """
+  The time at when an email reminder for this notification was sent to the user. Null, if no email
+      reminder has been sent.
+  """
+  emailedAt: DateTime
+
+  """
+  The time until a notification will be snoozed. After that it will appear in the inbox again.
+  """
+  snoozedUntilAt: DateTime
+
+  """The time at which a notification was unsnoozed.."""
+  unsnoozedAt: DateTime
+
+  """The category of the notification."""
+  category: NotificationCategory!
+
+  """[Internal] URL to the target of the notification."""
+  url: String!
+
+  """[Internal] Inbox URL for the notification."""
+  inboxUrl: String!
+
+  """[Internal] Notification title."""
+  title: String!
+
+  """[Internal] Notification subtitle."""
+  subtitle: String!
+
+  """[Internal] If notification actor was Linear."""
+  isLinearActor: Boolean!
+
+  """[Internal] Notification avatar URL."""
+  actorAvatarUrl: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorInitials: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorAvatarColor: String!
+
+  """[Internal] Issue's status type for issue notifications."""
+  issueStatusType: String
+
+  """[Internal] Project update health for new updates."""
+  projectUpdateHealth: String
+
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
+
+  """
+  [Internal] Notifications with the same grouping key will be grouped together in the UI.
+  """
+  groupingKey: String!
+
+  """
+  [Internal] Priority of the notification with the same grouping key. Higher
+  number means higher priority. If priority is the same, notifications should be
+  sorted by `createdAt`.
+  """
+  groupingPriority: Float!
+
+  """The bot that caused the notification."""
+  botActor: ActorBot
+
+  """Related welcome message."""
+  welcomeMessageId: String!
 }
 
 type WorkflowDefinition implements Node {
