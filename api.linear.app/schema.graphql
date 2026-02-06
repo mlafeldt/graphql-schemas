@@ -1940,6 +1940,9 @@ input ContactSalesCreateInput {
 
   """PostHog distinct ID for analytics correlation."""
   distinctId: String
+
+  """Session ID for analytics correlation."""
+  sessionId: String
 }
 
 """[Internal] Comparator for content."""
@@ -12066,6 +12069,9 @@ input JiraSettingsInput {
   The label of the Jira instance, for visual identification purposes only
   """
   label: String
+
+  """The status names per issue type, per project."""
+  statusNamesPerIssueType: JSONObject
 }
 
 input JiraUpdateInput {
@@ -12519,8 +12525,11 @@ type Mutation {
 
   """Creates a new project."""
   projectCreate(
-    """Whether to connect a Slack channel to the project."""
-    connectSlackChannel: Boolean
+    """
+    The full name for the Slack channel to create (including prefix). When
+    provided, a Slack channel will be created and connected to the project.
+    """
+    slackChannelName: String
 
     """The issue object to create."""
     input: ProjectCreateInput!
@@ -14790,6 +14799,9 @@ type Mutation {
 
   """Creates an organization from onboarding."""
   createOrganizationFromOnboarding(
+    """PostHog session ID for attribution tracking."""
+    sessionId: String
+
     """Onboarding survey."""
     survey: OnboardingCustomerSurvey
 
@@ -17376,6 +17388,12 @@ type Organization implements Node {
     orderBy: PaginationOrderBy
   ): IntegrationConnection!
 
+  """The Slack integration used for auto-creating project channels."""
+  slackProjectChannelIntegration: Integration
+
+  """The prefix used for auto-created Slack project channels."""
+  slackProjectChannelPrefix: String!
+
   """The organization's subscription to a paid plan."""
   subscription: PaidSubscription
 
@@ -18003,6 +18021,16 @@ input OrganizationUpdateInput {
   [INTERNAL] Configure per-modality AI host providers and model families.
   """
   aiProviderConfiguration: JSONObject
+
+  """
+  The ID of the Slack integration to use for auto-creating project channels.
+  """
+  slackProjectChannelIntegrationId: String
+
+  """
+  The prefix to use for auto-created Slack project channels (p-, proj-, or project-).
+  """
+  slackProjectChannelPrefix: String
 
   """[Internal] Whether the organization has enabled Linear Agent."""
   linearAgentEnabled: Boolean
@@ -18764,6 +18792,33 @@ type Project implements Node {
     orderBy: PaginationOrderBy
   ): EntityExternalLinkConnection!
 
+  """Attachments associated with the project."""
+  attachments(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectAttachmentConnection!
+
   """History entries associated with the project."""
   history(
     """A cursor to be used with last for backward pagination."""
@@ -19016,6 +19071,19 @@ type ProjectAttachment implements Node {
   An accessor helper to source.type, defines the source type of the attachment.
   """
   sourceType: String
+}
+
+type ProjectAttachmentConnection {
+  edges: [ProjectAttachmentEdge!]!
+  nodes: [ProjectAttachment!]!
+  pageInfo: PageInfo!
+}
+
+type ProjectAttachmentEdge {
+  node: ProjectAttachment!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
 }
 
 """Project filtering options."""
@@ -20857,6 +20925,33 @@ type ProjectSearchResult implements Node {
     """
     orderBy: PaginationOrderBy
   ): EntityExternalLinkConnection!
+
+  """Attachments associated with the project."""
+  attachments(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ProjectAttachmentConnection!
 
   """History entries associated with the project."""
   history(
@@ -26330,7 +26425,7 @@ type Team implements Node {
   color: String
 
   """
-  [Internal] The time at which the team was retired. Null if the team has not been retired.
+  The time at which the team was retired. Null if the team has not been retired.
   """
   retiredAt: DateTime
 
@@ -27484,7 +27579,7 @@ input TeamUpdateInput {
   """
   allMembersCanJoin: Boolean
 
-  """[Internal] When the team was retired."""
+  """When the team was retired."""
   retiredAt: DateTime
 
   """
