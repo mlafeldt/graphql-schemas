@@ -10826,6 +10826,15 @@ type IssuePriorityValue {
   label: String!
 }
 
+"""A reference to an issue found during release creation."""
+input IssueReferenceInput {
+  """The issue identifier (e.g. ENG-123)."""
+  identifier: String!
+
+  """The commit SHA where this issue reference was found."""
+  commitSha: String!
+}
+
 """A relation between two issues."""
 type IssueRelation implements Node {
   """The unique identifier of the entity."""
@@ -11910,6 +11919,9 @@ type IssueToRelease implements Node {
 
   """The release associated with the issue."""
   release: Release!
+
+  """The pull request that linked this issue to the release."""
+  pullRequest: PullRequest
 }
 
 type IssueToReleaseConnection {
@@ -12313,6 +12325,58 @@ input MilestoneSort {
 }
 
 type Mutation {
+  """
+  XHR request payload to upload an images, video and other attachments directly to Linear's cloud storage.
+  """
+  fileUpload(
+    """Optional metadata."""
+    metaData: JSON
+
+    """Should the file be made publicly accessible (default: false)."""
+    makePublic: Boolean
+
+    """File size of the uploaded file."""
+    size: Int!
+
+    """MIME type of the uploaded file."""
+    contentType: String!
+
+    """Filename of the uploaded file."""
+    filename: String!
+  ): UploadPayload!
+
+  """
+  XHR request payload to upload a file for import, directly to Linear's cloud storage.
+  """
+  importFileUpload(
+    """Optional metadata."""
+    metaData: JSON
+
+    """File size of the uploaded file."""
+    size: Int!
+
+    """MIME type of the uploaded file."""
+    contentType: String!
+
+    """Filename of the uploaded file."""
+    filename: String!
+  ): UploadPayload!
+
+  """Upload an image from an URL to Linear."""
+  imageUploadFromUrl(
+    """URL of the file to be uploaded to Linear."""
+    url: String!
+  ): ImageUploadFromUrlPayload!
+
+  """
+  [INTERNAL] Permanently delete an uploaded file by asset URL. This should be
+  used as a last resort and will break comments and documents that reference the asset.
+  """
+  fileUploadDangerouslyDelete(
+    """The asset URL of the uploaded file to delete."""
+    assetUrl: String!
+  ): FileUploadDeletePayload!
+
   """Creates a new state, adding it to the workflow of a team."""
   workflowStateCreate(
     """The state to create."""
@@ -14406,58 +14470,6 @@ type Mutation {
     """The identifier of the automation state to archive."""
     id: String!
   ): DeletePayload!
-
-  """
-  XHR request payload to upload an images, video and other attachments directly to Linear's cloud storage.
-  """
-  fileUpload(
-    """Optional metadata."""
-    metaData: JSON
-
-    """Should the file be made publicly accessible (default: false)."""
-    makePublic: Boolean
-
-    """File size of the uploaded file."""
-    size: Int!
-
-    """MIME type of the uploaded file."""
-    contentType: String!
-
-    """Filename of the uploaded file."""
-    filename: String!
-  ): UploadPayload!
-
-  """
-  XHR request payload to upload a file for import, directly to Linear's cloud storage.
-  """
-  importFileUpload(
-    """Optional metadata."""
-    metaData: JSON
-
-    """File size of the uploaded file."""
-    size: Int!
-
-    """MIME type of the uploaded file."""
-    contentType: String!
-
-    """Filename of the uploaded file."""
-    filename: String!
-  ): UploadPayload!
-
-  """Upload an image from an URL to Linear."""
-  imageUploadFromUrl(
-    """URL of the file to be uploaded to Linear."""
-    url: String!
-  ): ImageUploadFromUrlPayload!
-
-  """
-  [INTERNAL] Permanently delete an uploaded file by asset URL. This should be
-  used as a last resort and will break comments and documents that reference the asset.
-  """
-  fileUploadDangerouslyDelete(
-    """The asset URL of the uploaded file to delete."""
-    assetUrl: String!
-  ): FileUploadDeletePayload!
 
   """Creates a new favorite (project, cycle etc)."""
   favoriteCreate(
@@ -25107,13 +25119,21 @@ input ReleaseSyncInput {
   """
   stageId: String
 
-  """Issue identifiers (e.g. ENG-123) to associate with this release."""
+  """
+  [DEPRECATED] Issue identifiers (e.g. ENG-123) to associate with this release.
+  """
   issueIdentifiers: [String!]
+
+  """Issue references (e.g. ENG-123) to associate with this release."""
+  issueReferences: [IssueReferenceInput!]
 
   """
   Pull request references to look up. Issues linked to found PRs will be associated with this release.
   """
   pullRequestReferences: [PullRequestReferenceInput!]
+
+  """Information about the source repository."""
+  repository: RepositoryDataInput
 
   """Debug information for release creation diagnostics."""
   debugSink: ReleaseDebugSinkInput
@@ -25152,13 +25172,16 @@ input ReleaseSyncInputBase {
   """
   stageId: String
 
-  """Issue identifiers (e.g. ENG-123) to associate with this release."""
-  issueIdentifiers: [String!]
+  """Issue references (e.g. ENG-123) to associate with this release."""
+  issueReferences: [IssueReferenceInput!]
 
   """
   Pull request references to look up. Issues linked to found PRs will be associated with this release.
   """
   pullRequestReferences: [PullRequestReferenceInput!]
+
+  """Information about the source repository."""
+  repository: RepositoryDataInput
 
   """Debug information for release creation diagnostics."""
   debugSink: ReleaseDebugSinkInput
@@ -25224,6 +25247,23 @@ input ReleaseUpdateInput {
 
   """The estimated completion date of the release."""
   targetDate: TimelessDate
+}
+
+"""Information about the source repository."""
+input RepositoryDataInput {
+  """The owner of the repository (e.g., organization or user name)."""
+  owner: String!
+
+  """The name of the repository."""
+  name: String!
+
+  """The VCS provider hosting the repository (e.g., 'github', 'gitlab')."""
+  provider: String!
+
+  """
+  The base URL of the repository on the hosting provider (e.g., 'https://github.com/linear/linear-app').
+  """
+  url: String!
 }
 
 type RepositorySuggestion {
