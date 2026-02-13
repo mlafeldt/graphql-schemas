@@ -1856,6 +1856,11 @@ type Comment implements Node {
   """The bot that created the comment."""
   botActor: ActorBot
 
+  """
+  [Internal] The user on whose behalf the comment was created, e.g. when the Linear assistant creates a comment for a user.
+  """
+  onBehalfOf: User
+
   """The external thread that the comment is synced with."""
   externalThread: SyncedExternalThread
 
@@ -4718,6 +4723,9 @@ type DocumentContent implements Node {
 
   """The issue that the content is associated with."""
   issue: Issue
+
+  """[Internal] The pull request that the content is associated with."""
+  pullRequest: PullRequest
 
   """The project that the content is associated with."""
   project: Project
@@ -29467,6 +29475,7 @@ enum ViewType {
   completedCycle
   cycle
   release
+  continuousPipelineReleases
   project
   projectDocuments
   label
