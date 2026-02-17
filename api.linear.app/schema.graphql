@@ -15535,6 +15535,12 @@ type Mutation {
     id: String!
   ): AsksWebSettingsPayload!
 
+  """Deletes Asks web form settings."""
+  asksWebSettingsDelete(
+    """The identifier of the Asks web settings to delete."""
+    id: String!
+  ): DeletePayload!
+
   """Creates a new Asks web page."""
   asksWebPageCreate(
     """The Asks web page object to create."""
@@ -25348,27 +25354,14 @@ input ReleaseStageUpdateInput {
 
 """The release data to sync."""
 input ReleaseSyncInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
   """The name of the release."""
   name: String
-
-  """The description of the release."""
-  description: String
 
   """The version of the release."""
   version: String
 
   """The commit SHA associated with this release."""
   commitSha: String!
-
-  """
-  The current stage of the release. Defaults to the first 'completed' stage.
-  """
-  stageId: String
 
   """Issue references (e.g. ENG-123) to associate with this release."""
   issueReferences: [IssueReferenceInput!]
@@ -25383,12 +25376,6 @@ input ReleaseSyncInput {
 
   """Debug information for release creation diagnostics."""
   debugSink: ReleaseDebugSinkInput
-
-  """The estimated start date of the release."""
-  startDate: TimelessDate
-
-  """The estimated completion date of the release."""
-  targetDate: TimelessDate
 
   """The identifier of the pipeline this release belongs to."""
   pipelineId: String!
@@ -25396,27 +25383,14 @@ input ReleaseSyncInput {
 
 """Base release sync data without pipeline specification."""
 input ReleaseSyncInputBase {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
   """The name of the release."""
   name: String
-
-  """The description of the release."""
-  description: String
 
   """The version of the release."""
   version: String
 
   """The commit SHA associated with this release."""
   commitSha: String!
-
-  """
-  The current stage of the release. Defaults to the first 'completed' stage.
-  """
-  stageId: String
 
   """Issue references (e.g. ENG-123) to associate with this release."""
   issueReferences: [IssueReferenceInput!]
@@ -25431,12 +25405,6 @@ input ReleaseSyncInputBase {
 
   """Debug information for release creation diagnostics."""
   debugSink: ReleaseDebugSinkInput
-
-  """The estimated start date of the release."""
-  startDate: TimelessDate
-
-  """The estimated completion date of the release."""
-  targetDate: TimelessDate
 }
 
 """Input for updating a release by pipeline."""
