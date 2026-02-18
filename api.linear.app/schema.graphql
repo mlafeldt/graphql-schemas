@@ -9006,6 +9006,9 @@ type Issue implements Node {
   """Suggested branch name for the issue."""
   branchName: String!
 
+  """Shared access metadata for this issue."""
+  sharedAccess: IssueSharedAccess!
+
   """
   Returns the number of Attachment resources which are created by customer support ticketing systems (e.g. Zendesk).
   """
@@ -11366,6 +11369,9 @@ type IssueSearchResult implements Node {
   """Suggested branch name for the issue."""
   branchName: String!
 
+  """Shared access metadata for this issue."""
+  sharedAccess: IssueSharedAccess!
+
   """
   Returns the number of Attachment resources which are created by customer support ticketing systems (e.g. Zendesk).
   """
@@ -11811,6 +11817,20 @@ type IssueSearchResultEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+type IssueSharedAccess {
+  """Whether this issue has been shared with users outside the team."""
+  isShared: Boolean!
+
+  """Whether the viewer can access this issue only through issue sharing."""
+  viewerHasOnlySharedAccess: Boolean!
+
+  """The number of users this issue is shared with."""
+  sharedWithCount: Int!
+
+  """Users this issue is shared with."""
+  sharedWithUsers: [User!]!
 }
 
 """Issue sorting options."""
