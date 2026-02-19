@@ -1258,6 +1258,11 @@
             "kind": "OBJECT",
             "name": "OrganizationDomain",
             "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "AsksWebPageToTemplate",
+            "ofType": null
           }
         ]
       },
@@ -33253,18 +33258,6 @@
             "deprecationReason": null
           },
           {
-            "name": "signalMetadata",
-            "description": "Metadata about this agent activity's signal.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "JSON",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "ephemeral",
             "description": "Whether the activity is ephemeral, and should disappear after the next agent activity.",
             "args": [],
@@ -33283,6 +33276,18 @@
           {
             "name": "contextualMetadata",
             "description": "[Internal] Metadata about user-provided contextual information for this agent activity.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSON",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "signalMetadata",
+            "description": "Metadata about this agent activity's signal.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -41174,6 +41179,22 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "frozen",
+            "description": "Whether this stage is frozen. Only applicable to started type stages.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
                 "ofType": null
               }
             },
@@ -81428,20 +81449,8 @@
             "deprecationReason": null
           },
           {
-            "name": "description",
-            "description": "The description of the page.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "slugId",
-            "description": "The page's unique URL slug.",
+            "name": "slug",
+            "description": "The page's URL slug.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -81451,6 +81460,18 @@
                 "name": "String",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "descriptionData",
+            "description": "The description of the page as a Prosemirror document.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSONObject",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -95090,9 +95111,89 @@
             "deprecationReason": null
           },
           {
+            "name": "asksWebPageToTemplateCreate",
+            "description": "Creates a new AsksWebPageToTemplate join.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The properties of the AsksWebPageToTemplate to create.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AsksWebPageToTemplateCreateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AsksWebPageToTemplatePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "asksWebPageToTemplateDelete",
+            "description": "Deletes an AsksWebPageToTemplate join.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The identifier of the AsksWebPageToTemplate to delete.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "asksWebPageCreate",
             "description": "Creates a new Asks web page.",
             "args": [
+              {
+                "name": "templateIds",
+                "description": "Optional form template IDs to add to this page.",
+                "type": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                },
+                "defaultValue": null
+              },
               {
                 "name": "input",
                 "description": "The Asks web page object to create.",
@@ -101709,6 +101810,16 @@
               }
             },
             "defaultValue": null
+          },
+          {
+            "name": "frozen",
+            "description": "Whether this stage is frozen. Only applicable to started stages.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -101747,6 +101858,16 @@
             "type": {
               "kind": "SCALAR",
               "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "frozen",
+            "description": "Whether this stage is frozen. Only applicable to started stages.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
               "ofType": null
             },
             "defaultValue": null
@@ -110239,6 +110360,16 @@
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "enterpriseUrl",
+            "description": "The enterprise URL if this is a GitHub Enterprise Cloud integration.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "defaultValue": null
@@ -119139,6 +119270,223 @@
       },
       {
         "kind": "OBJECT",
+        "name": "AsksWebPageToTemplatePayload",
+        "description": "The result of an AsksWebPageToTemplate mutation.",
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "The identifier of the last sync operation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "asksWebPageToTemplate",
+            "description": "The AsksWebPageToTemplate that was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AsksWebPageToTemplate",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AsksWebPageToTemplate",
+        "description": "Join table between Asks web pages and templates.",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The unique identifier of the entity.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createdAt",
+            "description": "The time at which the entity was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't\n    been updated after creation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "archivedAt",
+            "description": "The time at which the entity was archived. Null if the entity has not been archived.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "asksWebPage",
+            "description": "The Asks web page that the template is associated with.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AsksWebPage",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "template",
+            "description": "The template that the Asks web page is associated with.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Template",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AsksWebPageToTemplateCreateInput",
+        "description": "The properties of the AsksWebPageToTemplate to create.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "asksWebPageId",
+            "description": "The identifier of the Asks web page.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "templateId",
+            "description": "The identifier of the template.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "AsksWebPagePayload",
         "description": null,
         "fields": [
@@ -119241,11 +119589,25 @@
             "defaultValue": null
           },
           {
-            "name": "description",
-            "description": "The description of the page.",
+            "name": "slug",
+            "description": "The page's URL slug.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "descriptionData",
+            "description": "The description of the page as a Prosemirror document.",
             "type": {
               "kind": "SCALAR",
-              "name": "String",
+              "name": "JSONObject",
               "ofType": null
             },
             "defaultValue": null
@@ -119332,11 +119694,21 @@
             "defaultValue": null
           },
           {
-            "name": "description",
-            "description": "The description of the page.",
+            "name": "slug",
+            "description": "The page's URL slug.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "descriptionData",
+            "description": "The description of the page as a Prosemirror document.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSONObject",
               "ofType": null
             },
             "defaultValue": null

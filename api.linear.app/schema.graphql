@@ -123,9 +123,6 @@ type AgentActivity implements Node {
   """
   signal: AgentActivitySignal
 
-  """Metadata about this agent activity's signal."""
-  signalMetadata: JSON
-
   """
   Whether the activity is ephemeral, and should disappear after the next agent activity.
   """
@@ -135,6 +132,9 @@ type AgentActivity implements Node {
   [Internal] Metadata about user-provided contextual information for this agent activity.
   """
   contextualMetadata: JSON
+
+  """Metadata about this agent activity's signal."""
+  signalMetadata: JSON
 }
 
 """Content for an action activity (tool call or action)."""
@@ -860,11 +860,11 @@ type AsksWebPage implements Node {
   """The title of the page."""
   title: String!
 
-  """The description of the page."""
-  description: String
+  """The page's URL slug."""
+  slug: String!
 
-  """The page's unique URL slug."""
-  slugId: String!
+  """The description of the page as a Prosemirror document."""
+  descriptionData: JSONObject
 
   """
   The auto-reply message for issue created. If not set, the default reply will be used.
@@ -903,8 +903,11 @@ input AsksWebPageCreateInput {
   """The title of the page."""
   title: String!
 
-  """The description of the page."""
-  description: String
+  """The page's URL slug."""
+  slug: String!
+
+  """The description of the page as a Prosemirror document."""
+  descriptionData: JSONObject
 
   """
   The auto-reply message for issue created. If not set, the default reply will be used.
@@ -942,12 +945,67 @@ type AsksWebPagePayload {
   success: Boolean!
 }
 
+"""Join table between Asks web pages and templates."""
+type AsksWebPageToTemplate implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The Asks web page that the template is associated with."""
+  asksWebPage: AsksWebPage!
+
+  """The template that the Asks web page is associated with."""
+  template: Template!
+}
+
+"""The properties of the AsksWebPageToTemplate to create."""
+input AsksWebPageToTemplateCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The identifier of the Asks web page."""
+  asksWebPageId: String!
+
+  """The identifier of the template."""
+  templateId: String!
+}
+
+"""The result of an AsksWebPageToTemplate mutation."""
+type AsksWebPageToTemplatePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The AsksWebPageToTemplate that was created."""
+  asksWebPageToTemplate: AsksWebPageToTemplate!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
 input AsksWebPageUpdateInput {
   """The title of the page."""
   title: String
 
-  """The description of the page."""
-  description: String
+  """The page's URL slug."""
+  slug: String
+
+  """The description of the page as a Prosemirror document."""
+  descriptionData: JSONObject
 
   """
   The auto-reply message for issue created. If not set, the default reply will be used.
@@ -6726,6 +6784,9 @@ input GitHubSettingsInput {
 
   """Whether the integration has code access"""
   codeAccess: Boolean
+
+  """The enterprise URL if this is a GitHub Enterprise Cloud integration."""
+  enterpriseUrl: String
 }
 
 type GitLabIntegrationCreatePayload {
@@ -15561,8 +15622,23 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """Creates a new AsksWebPageToTemplate join."""
+  asksWebPageToTemplateCreate(
+    """The properties of the AsksWebPageToTemplate to create."""
+    input: AsksWebPageToTemplateCreateInput!
+  ): AsksWebPageToTemplatePayload!
+
+  """Deletes an AsksWebPageToTemplate join."""
+  asksWebPageToTemplateDelete(
+    """The identifier of the AsksWebPageToTemplate to delete."""
+    id: String!
+  ): DeletePayload!
+
   """Creates a new Asks web page."""
   asksWebPageCreate(
+    """Optional form template IDs to add to this page."""
+    templateIds: [String!]
+
     """The Asks web page object to create."""
     input: AsksWebPageCreateInput!
   ): AsksWebPagePayload!
@@ -25220,6 +25296,9 @@ type ReleaseStage implements Node {
   """The position of the stage."""
   position: Float!
 
+  """Whether this stage is frozen. Only applicable to started type stages."""
+  frozen: Boolean!
+
   """The pipeline this stage belongs to."""
   pipeline: ReleasePipeline!
 
@@ -25289,6 +25368,9 @@ input ReleaseStageCreateInput {
 
   """The identifier of the pipeline this stage belongs to."""
   pipelineId: String!
+
+  """Whether this stage is frozen. Only applicable to started stages."""
+  frozen: Boolean
 }
 
 type ReleaseStageEdge {
@@ -25370,6 +25452,9 @@ input ReleaseStageUpdateInput {
 
   """The position of the stage."""
   position: Float
+
+  """Whether this stage is frozen. Only applicable to started stages."""
+  frozen: Boolean
 }
 
 """The release data to sync."""
