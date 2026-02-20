@@ -328,7 +328,7 @@ input AgentActivityPromptCreateInputContent {
   body: String
 
   """[Internal] The prompt content as a ProseMirror document."""
-  bodyData: JSONObject
+  bodyData: JSON
 }
 
 """Content for a response activity."""
@@ -827,284 +827,6 @@ type AsksChannelConnectPayload {
 
   """Whether the bot needs to be manually added to the channel."""
   addBot: Boolean!
-}
-
-"""A web page for an Asks web form."""
-type AsksWebPage implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The organization that the Asks web page belongs to."""
-  organization: Organization!
-
-  """The Asks web settings this page belongs to."""
-  asksWebSettings: AsksWebSettings!
-
-  """The user who created the Asks web page."""
-  creator: User
-
-  """The title of the page."""
-  title: String!
-
-  """The page's URL slug."""
-  slug: String!
-
-  """The description of the page as a Prosemirror document."""
-  descriptionData: JSONObject
-
-  """
-  The auto-reply message for issue created. If not set, the default reply will be used.
-  """
-  issueCreatedAutoReply: String
-
-  """Whether the auto-reply for issue created is enabled."""
-  issueCreatedAutoReplyEnabled: Boolean!
-
-  """
-  The auto-reply message for issue completed. If not set, the default reply will be used.
-  """
-  issueCompletedAutoReply: String
-
-  """Whether the auto-reply for issue completed is enabled."""
-  issueCompletedAutoReplyEnabled: Boolean!
-
-  """
-  The auto-reply message for issue canceled. If not set, the default reply will be used.
-  """
-  issueCanceledAutoReply: String
-
-  """Whether the auto-reply for issue canceled is enabled."""
-  issueCanceledAutoReplyEnabled: Boolean!
-}
-
-input AsksWebPageCreateInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
-  """The identifier of the Asks web settings this page belongs to."""
-  asksWebSettingsId: String!
-
-  """The title of the page."""
-  title: String!
-
-  """The page's URL slug."""
-  slug: String!
-
-  """The description of the page as a Prosemirror document."""
-  descriptionData: JSONObject
-
-  """
-  The auto-reply message for issue created. If not set, the default reply will be used.
-  """
-  issueCreatedAutoReply: String
-
-  """Whether the auto-reply for issue created is enabled."""
-  issueCreatedAutoReplyEnabled: Boolean
-
-  """
-  The auto-reply message for issue completed. If not set, the default reply will be used.
-  """
-  issueCompletedAutoReply: String
-
-  """Whether the auto-reply for issue completed is enabled."""
-  issueCompletedAutoReplyEnabled: Boolean
-
-  """
-  The auto-reply message for issue canceled. If not set, the default reply will be used.
-  """
-  issueCanceledAutoReply: String
-
-  """Whether the auto-reply for issue canceled is enabled."""
-  issueCanceledAutoReplyEnabled: Boolean
-}
-
-type AsksWebPagePayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The Asks web page that was created or updated."""
-  asksWebPage: AsksWebPage!
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-"""Join table between Asks web pages and templates."""
-type AsksWebPageToTemplate implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The Asks web page that the template is associated with."""
-  asksWebPage: AsksWebPage!
-
-  """The template that the Asks web page is associated with."""
-  template: Template!
-}
-
-"""The properties of the AsksWebPageToTemplate to create."""
-input AsksWebPageToTemplateCreateInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
-  """The identifier of the Asks web page."""
-  asksWebPageId: String!
-
-  """The identifier of the template."""
-  templateId: String!
-}
-
-"""The result of an AsksWebPageToTemplate mutation."""
-type AsksWebPageToTemplatePayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The AsksWebPageToTemplate that was created."""
-  asksWebPageToTemplate: AsksWebPageToTemplate!
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-input AsksWebPageUpdateInput {
-  """The title of the page."""
-  title: String
-
-  """The page's URL slug."""
-  slug: String
-
-  """The description of the page as a Prosemirror document."""
-  descriptionData: JSONObject
-
-  """
-  The auto-reply message for issue created. If not set, the default reply will be used.
-  """
-  issueCreatedAutoReply: String
-
-  """Whether the auto-reply for issue created is enabled."""
-  issueCreatedAutoReplyEnabled: Boolean
-
-  """
-  The auto-reply message for issue completed. If not set, the default reply will be used.
-  """
-  issueCompletedAutoReply: String
-
-  """Whether the auto-reply for issue completed is enabled."""
-  issueCompletedAutoReplyEnabled: Boolean
-
-  """
-  The auto-reply message for issue canceled. If not set, the default reply will be used.
-  """
-  issueCanceledAutoReply: String
-
-  """Whether the auto-reply for issue canceled is enabled."""
-  issueCanceledAutoReplyEnabled: Boolean
-}
-
-"""Settings for an Asks web form."""
-type AsksWebSettings implements Node {
-  """The unique identifier of the entity."""
-  id: ID!
-
-  """The time at which the entity was created."""
-  createdAt: DateTime!
-
-  """
-  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
-      been updated after creation.
-  """
-  updatedAt: DateTime!
-
-  """
-  The time at which the entity was archived. Null if the entity has not been archived.
-  """
-  archivedAt: DateTime
-
-  """The organization that the Asks web settings are associated with."""
-  organization: Organization!
-
-  """The user who created the Asks web settings."""
-  creator: User
-
-  """
-  The custom domain for the Asks web form. If null, the default Linear-hosted domain will be used.
-  """
-  domain: String
-
-  """The email intake address associated with these Asks web settings."""
-  emailIntakeAddress: EmailIntakeAddress
-
-  """The identity provider for SAML authentication on this Asks web form."""
-  identityProvider: IdentityProvider
-}
-
-input AsksWebSettingsCreateInput {
-  """
-  The identifier in UUID v4 format. If none is provided, the backend will generate one.
-  """
-  id: String
-
-  """
-  The custom domain for the Asks web form. If null, the default Linear-hosted domain will be used.
-  """
-  domain: String
-}
-
-input AsksWebSettingsEmailIntakeAddressInput {
-  """The sender name for outgoing emails."""
-  senderName: String
-
-  """The email address for forwarding."""
-  forwardingEmailAddress: String
-}
-
-type AsksWebSettingsPayload {
-  """The identifier of the last sync operation."""
-  lastSyncId: Float!
-
-  """The Asks web settings that were created or updated."""
-  asksWebSettings: AsksWebSettings!
-
-  """Whether the operation was successful."""
-  success: Boolean!
-}
-
-input AsksWebSettingsUpdateInput {
-  """
-  The custom domain for the Asks web form. If null, the default Linear-hosted domain will be used.
-  """
-  domain: String
 }
 
 """Issue assignee sorting options."""
@@ -12416,7 +12138,11 @@ input JiraSettingsInput {
   """
   label: String
 
-  """The status names per issue type, per project."""
+  """
+  Jira status names grouped by project, separated into issue statuses (non-Epic)
+  and project statuses (Epic). Structure: projectId -> { issueStatuses:
+  string[], projectStatuses: string[] }
+  """
   statusNamesPerIssueType: JSONObject
 }
 
@@ -15592,69 +15318,6 @@ type Mutation {
   """Deletes an issue attachment."""
   attachmentDelete(
     """The identifier of the attachment to delete."""
-    id: String!
-  ): DeletePayload!
-
-  """Creates a new Asks web form settings."""
-  asksWebSettingsCreate(
-    """Optional email intake address settings."""
-    emailIntakeAddress: AsksWebSettingsEmailIntakeAddressInput
-
-    """The Asks web settings object to create."""
-    input: AsksWebSettingsCreateInput!
-  ): AsksWebSettingsPayload!
-
-  """Updates Asks web form settings."""
-  asksWebSettingsUpdate(
-    """Optional email intake address settings."""
-    emailIntakeAddress: AsksWebSettingsEmailIntakeAddressInput
-
-    """The fields to update."""
-    input: AsksWebSettingsUpdateInput!
-
-    """The identifier of the Asks web settings to update."""
-    id: String!
-  ): AsksWebSettingsPayload!
-
-  """Deletes Asks web form settings."""
-  asksWebSettingsDelete(
-    """The identifier of the Asks web settings to delete."""
-    id: String!
-  ): DeletePayload!
-
-  """Creates a new AsksWebPageToTemplate join."""
-  asksWebPageToTemplateCreate(
-    """The properties of the AsksWebPageToTemplate to create."""
-    input: AsksWebPageToTemplateCreateInput!
-  ): AsksWebPageToTemplatePayload!
-
-  """Deletes an AsksWebPageToTemplate join."""
-  asksWebPageToTemplateDelete(
-    """The identifier of the AsksWebPageToTemplate to delete."""
-    id: String!
-  ): DeletePayload!
-
-  """Creates a new Asks web page."""
-  asksWebPageCreate(
-    """Optional form template IDs to add to this page."""
-    templateIds: [String!]
-
-    """The Asks web page object to create."""
-    input: AsksWebPageCreateInput!
-  ): AsksWebPagePayload!
-
-  """Updates an Asks web page."""
-  asksWebPageUpdate(
-    """The fields to update."""
-    input: AsksWebPageUpdateInput!
-
-    """The identifier of the Asks web page to update."""
-    id: String!
-  ): AsksWebPagePayload!
-
-  """Deletes an Asks web page."""
-  asksWebPageDelete(
-    """The identifier of the Asks web page to delete."""
     id: String!
   ): DeletePayload!
 
@@ -24515,18 +24178,6 @@ type Query {
     teamId: String
   ): AttachmentSourcesPayload!
 
-  """Asks web form settings by ID."""
-  asksWebSetting(
-    """The identifier of the Asks web settings."""
-    id: String!
-  ): AsksWebSettings!
-
-  """An Asks web page by ID."""
-  asksWebPage(
-    """The identifier of the Asks web page."""
-    id: String!
-  ): AsksWebPage!
-
   """Get basic information for an application."""
   applicationInfo(
     """The client ID of the application."""
@@ -29501,6 +29152,15 @@ type ViewPreferencesPayload {
   success: Boolean!
 }
 
+"""A label group column configuration for the project list view."""
+type ViewPreferencesProjectLabelGroupColumn {
+  """The identifier of the label group."""
+  id: String!
+
+  """Whether the label group column is active."""
+  active: Boolean!
+}
+
 """
 The type of view preferences (either user or organization level preferences).
 """
@@ -29518,17 +29178,554 @@ input ViewPreferencesUpdateInput {
 }
 
 type ViewPreferencesValues {
+  """The issue layout type."""
+  layout: String
+
   """The issue ordering."""
   viewOrdering: String
+
+  """The direction of the issue ordering."""
+  viewOrderingDirection: String
 
   """The issue grouping."""
   issueGrouping: String
 
-  """The issue sub grouping."""
+  """The issue sub-grouping."""
   issueSubGrouping: String
 
-  """Whether to show completed issues."""
+  """How sub-issues should be nested and displayed."""
+  issueNesting: String
+
+  """Whether completed issues are shown and for how long."""
   showCompletedIssues: String
+
+  """Whether to show parent issues for sub-issues."""
+  showParents: Boolean
+
+  """Whether to show sub-issues."""
+  showSubIssues: Boolean
+
+  """Whether to show sub-team issues."""
+  showSubTeamIssues: Boolean
+
+  """Whether to show supervised issues."""
+  showSupervisedIssues: Boolean
+
+  """Whether to show triage issues."""
+  showTriageIssues: Boolean
+
+  """Whether to show snoozed items."""
+  showSnoozedItems: Boolean
+
+  """Whether to show archived items."""
+  showArchivedItems: Boolean
+
+  """Whether to show read items."""
+  showReadItems: Boolean
+
+  """Whether to show unread items first."""
+  showUnreadItemsFirst: Boolean
+
+  """Whether issues in closed columns should be ordered by recency."""
+  closedIssuesOrderedByRecency: Boolean
+
+  """Whether to show empty groups."""
+  showEmptyGroups: Boolean
+
+  """Whether to show empty groups on the board layout."""
+  showEmptyGroupsBoard: Boolean
+
+  """Whether to show empty groups on the list layout."""
+  showEmptyGroupsList: Boolean
+
+  """Whether to show empty sub-groups."""
+  showEmptySubGroups: Boolean
+
+  """Whether to show empty sub-groups on the board layout."""
+  showEmptySubGroupsBoard: Boolean
+
+  """Whether to show empty sub-groups on the list layout."""
+  showEmptySubGroupsList: Boolean
+
+  """The label group ID used for issue grouping."""
+  issueGroupingLabelGroupId: String
+
+  """The label group ID used for issue sub-grouping."""
+  issueSubGroupingLabelGroupId: String
+
+  """Whether to show the issue identifier field."""
+  fieldId: Boolean
+
+  """Whether to show the issue status field."""
+  fieldStatus: Boolean
+
+  """Whether to show the issue priority field."""
+  fieldPriority: Boolean
+
+  """Whether to show the issue creation date field."""
+  fieldDateCreated: Boolean
+
+  """Whether to show the issue updated date field."""
+  fieldDateUpdated: Boolean
+
+  """Whether to show the issue archived date field."""
+  fieldDateArchived: Boolean
+
+  """Whether to show the issue last activity date field."""
+  fieldDateMyActivity: Boolean
+
+  """Whether to show the issue assignee field."""
+  fieldAssignee: Boolean
+
+  """Whether to show the issue estimate field."""
+  fieldEstimate: Boolean
+
+  """Whether to show the pull requests field."""
+  fieldPullRequests: Boolean
+
+  """Whether to show preview links."""
+  fieldPreviewLinks: Boolean
+
+  """Whether to show the Sentry issues field."""
+  fieldSentryIssues: Boolean
+
+  """Whether to show the due date field."""
+  fieldDueDate: Boolean
+
+  """Whether to show the link count field."""
+  fieldLinkCount: Boolean
+
+  """Whether to show the customer request count field."""
+  fieldCustomerCount: Boolean
+
+  """Whether to show the customer revenue field."""
+  fieldCustomerRevenue: Boolean
+
+  """Whether to show the SLA field."""
+  fieldSla: Boolean
+
+  """Whether to show the labels field."""
+  fieldLabels: Boolean
+
+  """Whether to show the project field."""
+  fieldProject: Boolean
+
+  """Whether to show the cycle field."""
+  fieldCycle: Boolean
+
+  """Whether to show the milestone field."""
+  fieldMilestone: Boolean
+
+  """Whether to show the release field."""
+  fieldRelease: Boolean
+
+  """Whether to show the time in current status field."""
+  fieldTimeInCurrentStatus: Boolean
+
+  """List of column model IDs which should be hidden on a board."""
+  hiddenColumns: [String!]
+
+  """List of row model IDs which should be hidden on a board."""
+  hiddenRows: [String!]
+
+  """The project layout type."""
+  projectLayout: String
+
+  """The project ordering."""
+  projectViewOrdering: String
+
+  """The project grouping."""
+  projectGrouping: String
+
+  """The project sub-grouping."""
+  projectSubGrouping: String
+
+  """The ordering of project groups."""
+  projectGroupOrdering: String
+
+  """The date resolution when grouping projects by date."""
+  projectGroupingDateResolution: String
+
+  """Whether completed projects are shown and for how long."""
+  showCompletedProjects: String
+
+  """The label group ID used for project grouping."""
+  projectGroupingLabelGroupId: String
+
+  """The label group ID used for project sub-grouping."""
+  projectSubGroupingLabelGroupId: String
+
+  """The project label group columns configuration."""
+  projectLabelGroupColumns: [ViewPreferencesProjectLabelGroupColumn!]
+
+  """Whether to show sub-team projects."""
+  showSubTeamProjects: Boolean
+
+  """Whether to show sub-initiative projects."""
+  showSubInitiativeProjects: Boolean
+
+  """How to show empty project groups."""
+  projectShowEmptyGroups: String
+
+  """How to show empty project groups on the list layout."""
+  projectShowEmptyGroupsList: String
+
+  """How to show empty project groups on the timeline layout."""
+  projectShowEmptyGroupsTimeline: String
+
+  """How to show empty project groups on the board layout."""
+  projectShowEmptyGroupsBoard: String
+
+  """How to show empty project sub-groups."""
+  projectShowEmptySubGroups: String
+
+  """How to show empty project sub-groups on the list layout."""
+  projectShowEmptySubGroupsList: String
+
+  """How to show empty project sub-groups on the timeline layout."""
+  projectShowEmptySubGroupsTimeline: String
+
+  """How to show empty project sub-groups on the board layout."""
+  projectShowEmptySubGroupsBoard: String
+
+  """Whether to show the project status field."""
+  projectFieldStatus: Boolean
+
+  """Whether to show the project priority field."""
+  projectFieldPriority: Boolean
+
+  """Whether to show the project lead field."""
+  projectFieldLead: Boolean
+
+  """Whether to show the project health field."""
+  projectFieldHealth: Boolean
+
+  """Whether to show the project members field."""
+  projectFieldMembers: Boolean
+
+  """Whether to show the project start date field."""
+  projectFieldStartDate: Boolean
+
+  """Whether to show the project target date field."""
+  projectFieldTargetDate: Boolean
+
+  """Whether to show the project teams field."""
+  projectFieldTeams: Boolean
+
+  """Whether to show the project roadmaps field."""
+  projectFieldRoadmaps: Boolean
+
+  """Whether to show the project initiatives field."""
+  projectFieldInitiatives: Boolean
+
+  """Whether to show the project milestone field."""
+  projectFieldMilestone: Boolean
+
+  """Whether to show the project description field."""
+  projectFieldDescription: Boolean
+
+  """Whether to show the project predictions field."""
+  projectFieldPredictions: Boolean
+
+  """Whether to show the project relations field."""
+  projectFieldRelations: Boolean
+
+  """Whether to show the project rollout stage field."""
+  projectFieldRolloutStage: Boolean
+
+  """Whether to show the project activity field."""
+  projectFieldActivity: Boolean
+
+  """Whether to show the project customer count field."""
+  projectFieldCustomerCount: Boolean
+
+  """Whether to show the project customer revenue field."""
+  projectFieldCustomerRevenue: Boolean
+
+  """Whether to show the project labels field."""
+  projectFieldLabels: Boolean
+
+  """Whether to show the project creation date field."""
+  projectFieldDateCreated: Boolean
+
+  """Whether to show the project updated date field."""
+  projectFieldDateUpdated: Boolean
+
+  """Whether to show the project completion date field."""
+  projectFieldDateCompleted: Boolean
+
+  """Whether to show the project status field on the timeline."""
+  projectFieldStatusTimeline: Boolean
+
+  """Whether to show the project lead field on the timeline."""
+  projectFieldLeadTimeline: Boolean
+
+  """Whether to show the project health field on the timeline."""
+  projectFieldHealthTimeline: Boolean
+
+  """Whether to show the project milestone field on the timeline."""
+  projectFieldMilestoneTimeline: Boolean
+
+  """Whether to show the project predictions field on the timeline."""
+  projectFieldPredictionsTimeline: Boolean
+
+  """Whether to show the project relations field on the timeline."""
+  projectFieldRelationsTimeline: Boolean
+
+  """Whether to show the project description field on the board."""
+  projectFieldDescriptionBoard: Boolean
+
+  """Whether to show the project members field on the board."""
+  projectFieldMembersBoard: Boolean
+
+  """Whether to show the project members field on the list."""
+  projectFieldMembersList: Boolean
+
+  """Whether to show the project members field on the timeline."""
+  projectFieldMembersTimeline: Boolean
+
+  """Whether to show the project roadmaps field on the board."""
+  projectFieldRoadmapsBoard: Boolean
+
+  """Whether to show the project roadmaps field on the list."""
+  projectFieldRoadmapsList: Boolean
+
+  """Whether to show the project roadmaps field on the timeline."""
+  projectFieldRoadmapsTimeline: Boolean
+
+  """Whether to show the project teams field on the board."""
+  projectFieldTeamsBoard: Boolean
+
+  """Whether to show the project teams field on the list."""
+  projectFieldTeamsList: Boolean
+
+  """Whether to show the project teams field on the timeline."""
+  projectFieldTeamsTimeline: Boolean
+
+  """The zoom level for the timeline view."""
+  projectZoomLevel: String @deprecated(reason: "Use timelineZoomScale instead.")
+
+  """The zoom scale for the timeline view."""
+  timelineZoomScale: Float
+
+  """Selected team IDs to show cycles for in timeline chronology bar."""
+  timelineChronologyShowCycleTeamIds: [String!]
+
+  """Whether to show week numbers in timeline chronology bar."""
+  timelineChronologyShowWeekNumbers: Boolean
+
+  """The initiative grouping."""
+  initiativeGrouping: String
+
+  """The initiative ordering."""
+  initiativesViewOrdering: String
+
+  """Whether to show the initiative projects field."""
+  initiativeFieldProjects: Boolean
+
+  """Whether to show the initiative teams field."""
+  initiativeFieldTeams: Boolean
+
+  """Whether to show the initiative description field."""
+  initiativeFieldDescription: Boolean
+
+  """Whether to show the initiative owner field."""
+  initiativeFieldOwner: Boolean
+
+  """Whether to show the initiative target date field."""
+  initiativeFieldTargetDate: Boolean
+
+  """Whether to show the initiative activity field."""
+  initiativeFieldActivity: Boolean
+
+  """Whether to show the initiative health field."""
+  initiativeFieldInitiativeHealth: Boolean
+
+  """Whether to show the initiative active projects health field."""
+  initiativeFieldHealth: Boolean
+
+  """Whether to show sub-initiatives nested."""
+  showNestedInitiatives: Boolean
+
+  """The customers view ordering."""
+  customersViewOrdering: String
+
+  """Whether to show the customer request count field."""
+  customerFieldRequestCount: Boolean
+
+  """Whether to show the customer domains field."""
+  customerFieldDomains: Boolean
+
+  """Whether to show the customer owner field."""
+  customerFieldOwner: Boolean
+
+  """Whether to show the customer revenue field."""
+  customerFieldRevenue: Boolean
+
+  """Whether to show the customer size field."""
+  customerFieldSize: Boolean
+
+  """Whether to show the customer source field."""
+  customerFieldSource: Boolean
+
+  """Whether to show the customer status field."""
+  customerFieldStatus: Boolean
+
+  """Whether to show the customer tier field."""
+  customerFieldTier: Boolean
+
+  """The customer page needs view grouping."""
+  customerPageNeedsViewGrouping: String
+
+  """The customer page needs view ordering."""
+  customerPageNeedsViewOrdering: String
+
+  """Whether to show important customer needs first."""
+  customerPageNeedsShowImportantFirst: Boolean
+
+  """Whether to show completed issues and projects in the customer page."""
+  customerPageNeedsShowCompletedIssuesAndProjects: String
+
+  """Whether to show the issue identifier field in the customer page."""
+  customerPageNeedsFieldIssueIdentifier: Boolean
+
+  """Whether to show the issue priority field in the customer page."""
+  customerPageNeedsFieldIssuePriority: Boolean
+
+  """Whether to show the issue status field in the customer page."""
+  customerPageNeedsFieldIssueStatus: Boolean
+
+  """Whether to show the issue due date field in the customer page."""
+  customerPageNeedsFieldIssueTargetDueDate: Boolean
+
+  """The embedded customer needs view ordering."""
+  embeddedCustomerNeedsViewOrdering: String
+
+  """Whether to show important embedded customer needs first."""
+  embeddedCustomerNeedsShowImportantFirst: Boolean
+
+  """The project customer needs view grouping."""
+  projectCustomerNeedsViewGrouping: String
+
+  """The project customer needs view ordering."""
+  projectCustomerNeedsViewOrdering: String
+
+  """Whether to show important project customer needs first."""
+  projectCustomerNeedsShowImportantFirst: Boolean
+
+  """Whether to show completed issues last in project customer needs."""
+  projectCustomerNeedsShowCompletedIssuesLast: Boolean
+
+  """The team view ordering."""
+  teamViewOrdering: String
+
+  """Whether to show the team identifier field."""
+  teamFieldIdentifier: Boolean
+
+  """Whether to show the team membership field."""
+  teamFieldMembership: Boolean
+
+  """Whether to show the team owner field."""
+  teamFieldOwner: Boolean
+
+  """Whether to show the team members field."""
+  teamFieldMembers: Boolean
+
+  """Whether to show the team projects field."""
+  teamFieldProjects: Boolean
+
+  """Whether to show the team cycle field."""
+  teamFieldCycle: Boolean
+
+  """Whether to show the team creation date field."""
+  teamFieldDateCreated: Boolean
+
+  """Whether to show the team updated date field."""
+  teamFieldDateUpdated: Boolean
+
+  """The custom views ordering."""
+  customViewsOrdering: String
+
+  """Whether to show the custom view owner field."""
+  customViewFieldOwner: Boolean
+
+  """Whether to show the custom view visibility field."""
+  customViewFieldVisibility: Boolean
+
+  """Whether to show the custom view creation date field."""
+  customViewFieldDateCreated: Boolean
+
+  """Whether to show the custom view updated date field."""
+  customViewFieldDateUpdated: Boolean
+
+  """The dashboards ordering."""
+  dashboardsOrdering: String
+
+  """Whether to show the dashboard owner field."""
+  dashboardFieldOwner: Boolean
+
+  """Whether to show the dashboard creation date field."""
+  dashboardFieldDateCreated: Boolean
+
+  """Whether to show the dashboard updated date field."""
+  dashboardFieldDateUpdated: Boolean
+
+  """The workspace members view ordering."""
+  workspaceMembersViewOrdering: String
+
+  """Whether to show the member status field."""
+  memberFieldStatus: Boolean
+
+  """Whether to show the member joined date field."""
+  memberFieldJoined: Boolean
+
+  """Whether to show the member teams field."""
+  memberFieldTeams: Boolean
+
+  """The release pipelines view ordering."""
+  releasePipelinesViewOrdering: String
+
+  """The search view ordering."""
+  searchViewOrdering: String
+
+  """The search result type filter."""
+  searchResultType: String
+
+  """The inbox view ordering."""
+  inboxViewOrdering: String
+
+  """The triage view ordering."""
+  triageViewOrdering: String
+
+  """The review grouping."""
+  reviewGrouping: String
+
+  """The review view ordering."""
+  reviewViewOrdering: String
+
+  """Whether completed reviews are shown and for how long."""
+  showCompletedReviews: String
+
+  """Whether to show draft reviews."""
+  showDraftReviews: Boolean
+
+  """Whether to show the review avatar field."""
+  reviewFieldAvatar: Boolean
+
+  """Whether to show the review preview links field."""
+  reviewFieldPreviewLinks: Boolean
+
+  """Whether to show the review repository field."""
+  reviewFieldRepository: Boolean
+
+  """Whether to show the review identifier field."""
+  reviewFieldIdentifier: Boolean
+
+  """Whether to show the review checks field."""
+  reviewFieldChecks: Boolean
+
+  """Whether completed agent sessions are shown and for how long."""
+  showCompletedAgentSessions: String
 }
 
 """The client view this custom view is targeting."""
