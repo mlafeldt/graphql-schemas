@@ -1443,6 +1443,48 @@ input CandidateRepository {
   hostname: String!
 }
 
+"""[Internal] Coding agent sandbox details for an agent session."""
+type CodingAgentSandboxPayload {
+  """The sandbox identifier."""
+  id: String!
+
+  """The agent session identifier."""
+  agentSessionId: String!
+
+  """The organization identifier."""
+  organizationId: String!
+
+  """The user who initiated the session."""
+  creatorId: String
+
+  """Current sandbox URL."""
+  sandboxUrl: String
+
+  """The sandbox logs URL."""
+  sandboxLogsUrl: String
+
+  """Claude Agent SDK conversation ID."""
+  workerConversationId: String
+
+  """GitHub repository in owner/repo format."""
+  repository: String!
+
+  """Git branch name for this sandbox."""
+  branchName: String
+
+  """Git ref to checkout."""
+  baseRef: String
+
+  """When the sandbox was created."""
+  createdAt: DateTime!
+
+  """When the sandbox first became active."""
+  startedAt: DateTime
+
+  """When the session reached a terminal state."""
+  endedAt: DateTime
+}
+
 """A comment associated with an issue."""
 type Comment implements Node {
   """The unique identifier of the entity."""
@@ -5575,6 +5617,22 @@ input EstimateSort {
 
   """The order for the individual sort"""
   order: PaginationSortOrder
+}
+
+input EventTrackingInput {
+  """The event name to track."""
+  event: String!
+
+  """Optional properties for the event."""
+  properties: JSONObject
+
+  """Client session ID for PostHog session correlation."""
+  sessionId: String
+}
+
+type EventTrackingPayload {
+  """Whether the operation was successful."""
+  success: Boolean!
 }
 
 """Information about an external entity."""
@@ -14495,6 +14553,12 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """Track an anonymous analytics event."""
+  trackAnonymousEvent(
+    """Event tracking details."""
+    input: EventTrackingInput!
+  ): EventTrackingPayload!
+
   """Creates a new entity link."""
   entityExternalLinkCreate(
     """The entity link object to create."""
@@ -22779,6 +22843,9 @@ type Query {
 
   """[ALPHA] All releases."""
   releases(
+    """Filter returned releases."""
+    filter: ReleaseFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -24217,6 +24284,14 @@ type Query {
     id: String!
   ): AgentSession!
 
+  """
+  [Internal] Retrieves the coding agent sandbox for a given agent session ID.
+  """
+  agentSessionSandbox(
+    """The identifier of the agent session."""
+    agentSessionId: String!
+  ): CodingAgentSandboxPayload
+
   """All agent activities."""
   agentActivities(
     """Filter returned agent activities."""
@@ -24586,6 +24661,12 @@ input ReleaseCollectionFilter {
   """Comparator for the updated at date."""
   updatedAt: DateComparator
 
+  """Comparator for the release name."""
+  name: StringComparator
+
+  """Comparator for the release version."""
+  version: StringComparator
+
   """Filters that the release's pipeline must satisfy."""
   pipeline: ReleasePipelineFilter
 
@@ -24710,6 +24791,12 @@ input ReleaseFilter {
 
   """Comparator for the updated at date."""
   updatedAt: DateComparator
+
+  """Comparator for the release name."""
+  name: StringComparator
+
+  """Comparator for the release version."""
+  version: StringComparator
 
   """Filters that the release's pipeline must satisfy."""
   pipeline: ReleasePipelineFilter
@@ -24877,6 +24964,9 @@ input ReleasePipelineFilter {
 
   """Comparator for the updated at date."""
   updatedAt: DateComparator
+
+  """Comparator for the pipeline name."""
+  name: StringComparator
 
   """Compound filters, all of which need to be matched by the pipeline."""
   and: [ReleasePipelineFilter!]
