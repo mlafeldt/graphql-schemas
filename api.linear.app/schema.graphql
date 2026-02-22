@@ -1645,6 +1645,33 @@ type Comment implements Node {
     orderBy: PaginationOrderBy
   ): AgentSessionConnection!
 
+  """[Internal] Agent sessions spawned from this comment."""
+  spawnedAgentSessions(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AgentSessionConnection!
+
   """Issues created from this comment."""
   createdIssues(
     """Filter returned issues."""
@@ -19146,6 +19173,9 @@ type Project implements Node {
 
   """The priority of the project as a label."""
   priorityLabel: String!
+
+  """The external services the project is synced with."""
+  syncedWith: [ExternalEntityInfo!]
 }
 
 """A generic payload return from entity archive mutations."""
@@ -21280,6 +21310,9 @@ type ProjectSearchResult implements Node {
 
   """The priority of the project as a label."""
   priorityLabel: String!
+
+  """The external services the project is synced with."""
+  syncedWith: [ExternalEntityInfo!]
 
   """Metadata related to search result."""
   metadata: JSONObject!
