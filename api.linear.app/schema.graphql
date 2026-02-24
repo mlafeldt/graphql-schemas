@@ -12166,6 +12166,31 @@ input JiraConfigurationInput {
   manualSetup: Boolean
 }
 
+input JiraFetchProjectStatusesInput {
+  """The id of the Jira integration."""
+  integrationId: String!
+
+  """The Jira project ID to fetch statuses for."""
+  projectId: String!
+}
+
+type JiraFetchProjectStatusesPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The integration that was created or updated."""
+  integration: Integration
+
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The fetched Jira issue statuses (non-Epic)."""
+  issueStatuses: [String!]!
+
+  """The fetched Jira project statuses (Epic)."""
+  projectStatuses: [String!]!
+}
+
 input JiraLinearMappingInput {
   """The Jira id for this project."""
   jiraProjectId: String!
@@ -14015,6 +14040,14 @@ type Mutation {
     input: JiraUpdateInput!
   ): IntegrationPayload!
 
+  """
+  [INTERNAL] Fetches Jira project statuses and stores them in integration settings.
+  """
+  integrationJiraFetchProjectStatuses(
+    """Input for fetching Jira project statuses."""
+    input: JiraFetchProjectStatusesInput!
+  ): JiraFetchProjectStatusesPayload!
+
   """Connect your Jira account to Linear."""
   integrationJiraPersonal(
     """The Jira OAuth code, when connecting using OAuth."""
@@ -15426,6 +15459,11 @@ type Mutation {
 
   """[Internal] Creates a new agent session on behalf of the current user"""
   agentSessionCreate(
+    """
+    [Internal] Optional pull request to associate with the created session.
+    """
+    pullRequestId: String
+
     """The agent session object to create."""
     input: AgentSessionCreateInput!
   ): AgentSessionPayload!
