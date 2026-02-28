@@ -22958,6 +22958,15 @@ type Query {
   """[ALPHA] One specific release."""
   release(id: String!): Release!
 
+  """[ALPHA] Search releases by term with ranked results."""
+  releaseSearch(
+    """Maximum results. Capped at 50."""
+    first: Int = 20
+
+    """Search term to match against release name, version, and pipeline name."""
+    term: String!
+  ): [Release!]!
+
   """[ALPHA] All release pipelines."""
   releasePipelines(
     """A cursor to be used with last for backward pagination."""
@@ -29396,6 +29405,9 @@ type ViewPreferencesValues {
 
   """Whether to show snoozed items."""
   showSnoozedItems: Boolean
+
+  """Whether to show only snoozed notifications."""
+  showOnlySnoozedItems: Boolean
 
   """Whether to show archived items."""
   showArchivedItems: Boolean
