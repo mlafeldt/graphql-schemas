@@ -1463,6 +1463,9 @@ type CodingAgentSandboxPayload {
   """The sandbox logs URL."""
   sandboxLogsUrl: String
 
+  """Datadog logs URL for the session or sandbox."""
+  datadogLogsUrl: String
+
   """Claude Agent SDK conversation ID."""
   workerConversationId: String
 
@@ -9804,6 +9807,9 @@ type IssueDraft implements Node {
   """Serialized array of JSONs representing customer needs."""
   needs: JSONObject
 
+  """The IDs of releases associated with the draft."""
+  releaseIds: [String!]!
+
   """Serialized array of JSONs representing the recurring issue's schedule."""
   schedule: JSONObject
 }
@@ -11703,6 +11709,21 @@ type IssueSharedAccess {
 
   """Users this issue is shared with."""
   sharedWithUsers: [User!]!
+
+  """
+  Issue update fields the viewer cannot modify due to shared-only access.
+  """
+  disallowedIssueFields: [IssueSharedAccessDisallowedField!]!
+}
+
+"""
+Issue update fields that are disallowed for users with only shared access.
+"""
+enum IssueSharedAccessDisallowedField {
+  projectId
+  teamId
+  cycleId
+  projectMilestoneId
 }
 
 """Issue sorting options."""
@@ -24866,6 +24887,9 @@ input ReleaseDebugSinkInput {
   """Map of issue identifiers to their source information."""
   issues: JSONObject!
 
+  """Map of reverted issue identifiers to their source information."""
+  revertedIssues: JSONObject
+
   """Pull request debug information."""
   pullRequests: [JSONObject!]!
 
@@ -25312,6 +25336,11 @@ input ReleaseSyncInput {
   issueReferences: [IssueReferenceInput!]
 
   """
+  Issue references that were reverted and should be removed from the release.
+  """
+  revertedIssueReferences: [IssueReferenceInput!]
+
+  """
   Pull request references to look up. Issues linked to found PRs will be associated with this release.
   """
   pullRequestReferences: [PullRequestReferenceInput!]
@@ -25339,6 +25368,11 @@ input ReleaseSyncInputBase {
 
   """Issue references (e.g. ENG-123) to associate with this release."""
   issueReferences: [IssueReferenceInput!]
+
+  """
+  Issue references that were reverted and should be removed from the release.
+  """
+  revertedIssueReferences: [IssueReferenceInput!]
 
   """
   Pull request references to look up. Issues linked to found PRs will be associated with this release.
@@ -27890,6 +27924,12 @@ type Template implements Node {
   """Template description."""
   description: String
 
+  """The icon of the template."""
+  icon: String
+
+  """The color of the template icon."""
+  color: String
+
   """Template data."""
   templateData: JSON!
 
@@ -27949,6 +27989,12 @@ input TemplateCreateInput {
   """The template description."""
   description: String
 
+  """The icon of the template."""
+  icon: String
+
+  """The color of the template icon."""
+  color: String
+
   """
   The template data as JSON encoded attributes of the type of entity, such as an issue.
   """
@@ -27982,6 +28028,12 @@ input TemplateUpdateInput {
 
   """The template description."""
   description: String
+
+  """The icon of the template."""
+  icon: String
+
+  """The color of the template icon."""
+  color: String
 
   """
   The identifier or key of the team associated with the template. If set to
@@ -30404,7 +30456,7 @@ type WorkflowState implements Node {
   position: Float!
 
   """
-  The type of the state. One of "triage", "backlog", "unstarted", "started", "completed", "canceled".
+  The type of the state. One of "triage", "backlog", "unstarted", "started", "completed", "canceled", "duplicate".
   """
   type: String!
 
@@ -30517,7 +30569,7 @@ input WorkflowStateFilter {
 
   """
   Comparator for the workflow state type. Possible values are "triage",
-  "backlog", "unstarted", "started", "completed", "canceled".
+  "backlog", "unstarted", "started", "completed", "canceled", "duplicate".
   """
   type: StringComparator
 
