@@ -1845,7 +1845,9 @@ input CommentCreateInput {
 
   """
   Flag to indicate this comment should be created on the issue's synced Slack
-  comment thread. If no synced Slack comment thread exists, the mutation will fail.
+  comment thread. If no synced Slack comment thread exists, the mutation will
+  fail. If there are multiple synced Slack threads on the issue, the oldest one
+  will be targeted.
   """
   createOnSyncedSlackThread: Boolean
 
@@ -7223,6 +7225,12 @@ input InitiativeCollectionFilter {
   """Comparator for the initiative target date."""
   targetDate: NullableDateComparator
 
+  """Comparator for the initiative started at date."""
+  startedAt: NullableDateComparator
+
+  """Comparator for the initiative completed at date."""
+  completedAt: NullableDateComparator
+
   """Comparator for the initiative health: onTrack, atRisk, offTrack"""
   health: StringComparator
 
@@ -7236,6 +7244,9 @@ input InitiativeCollectionFilter {
 
   """Filters that the initiative must be an ancestor of."""
   ancestors: InitiativeCollectionFilter
+
+  """Filters that the initiative updates must satisfy."""
+  initiativeUpdates: InitiativeUpdatesCollectionFilter
 
   """Compound filters, all of which need to be matched by the initiative."""
   and: [InitiativeCollectionFilter!]
@@ -7345,6 +7356,12 @@ input InitiativeFilter {
   """Comparator for the initiative target date."""
   targetDate: NullableDateComparator
 
+  """Comparator for the initiative started at date."""
+  startedAt: NullableDateComparator
+
+  """Comparator for the initiative completed at date."""
+  completedAt: NullableDateComparator
+
   """Comparator for the initiative health: onTrack, atRisk, offTrack"""
   health: StringComparator
 
@@ -7358,6 +7375,9 @@ input InitiativeFilter {
 
   """Filters that the initiative must be an ancestor of."""
   ancestors: InitiativeCollectionFilter
+
+  """Filters that the initiative updates must satisfy."""
+  initiativeUpdates: InitiativeUpdatesCollectionFilter
 
   """Compound filters, all of which need to be matched by the initiative."""
   and: [InitiativeFilter!]
@@ -8145,6 +8165,59 @@ type InitiativeUpdateReminderPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""
+Collection filtering options for filtering initiatives by initiative updates.
+"""
+input InitiativeUpdatesCollectionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """
+  Compound filters, all of which need to be matched by the initiative update.
+  """
+  and: [InitiativeUpdatesCollectionFilter!]
+
+  """Compound filters, one of which need to be matched by the update."""
+  or: [InitiativeUpdatesCollectionFilter!]
+
+  """Filters that needs to be matched by some initiative updates."""
+  some: InitiativeUpdatesFilter
+
+  """Filters that needs to be matched by all initiative updates."""
+  every: InitiativeUpdatesFilter
+
+  """Comparator for the collection length."""
+  length: NumberComparator
+}
+
+"""Options for filtering initiatives by initiative updates."""
+input InitiativeUpdatesFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """
+  Compound filters, all of which need to be matched by the initiative updates.
+  """
+  and: [InitiativeUpdatesFilter!]
+
+  """
+  Compound filters, one of which need to be matched by the initiative updates.
+  """
+  or: [InitiativeUpdatesFilter!]
 }
 
 input InitiativeUpdateUpdateInput {
@@ -15088,7 +15161,10 @@ type Mutation {
   ): LogoutResponse!
 
   """
-  Creates a new attachment, or updates existing if the same `url` and `issueId` is used.
+  Creates a new attachment, or updates existing if the same `url` and `issueId`
+  is used. To create an integration-aware attachment, use the
+  integration-specific mutations such as `attachmentLinkZendesk`,
+  `attachmentLinkSlack`, or `attachmentLinkURL` instead.
   """
   attachmentCreate(
     """The attachment object to create."""
@@ -15104,7 +15180,12 @@ type Mutation {
     id: String!
   ): AttachmentPayload!
 
-  """Link any url to an issue."""
+  """
+  Link any URL to an issue. If the workspace has a matching integration
+  configured and the URL is recognized (e.g., Zendesk, GitHub, Slack), a rich
+  attachment will be created that enables features like automated status
+  updates. Otherwise, a basic attachment is created.
+  """
   attachmentLinkURL(
     """
     Create attachment as a user with the provided name. This option is only
@@ -15134,7 +15215,10 @@ type Mutation {
     id: String
   ): AttachmentPayload!
 
-  """Link an existing GitLab MR to an issue."""
+  """
+  Link an existing GitLab MR to an issue. This creates a rich attachment using
+  the workspace's GitLab integration, enabling features like automated status syncing.
+  """
   attachmentLinkGitLabMR(
     """
     Create attachment as a user with the provided name. This option is only
@@ -15172,7 +15256,10 @@ type Mutation {
     number: Float!
   ): AttachmentPayload!
 
-  """Link a GitHub issue to a Linear issue."""
+  """
+  Link a GitHub issue to a Linear issue. This creates a rich attachment using
+  the workspace's GitHub integration, enabling features like automated status syncing.
+  """
   attachmentLinkGitHubIssue(
     """
     Create attachment as a user with the provided name. This option is only
@@ -15202,7 +15289,10 @@ type Mutation {
     url: String!
   ): AttachmentPayload!
 
-  """Link a GitHub pull request to an issue."""
+  """
+  Link a GitHub pull request to an issue. This creates a rich attachment using
+  the workspace's GitHub integration, enabling features like automated status syncing.
+  """
   attachmentLinkGitHubPR(
     """
     Create attachment as a user with the provided name. This option is only
@@ -15235,7 +15325,11 @@ type Mutation {
     linkKind: GitLinkKind
   ): AttachmentPayload!
 
-  """Link an existing Zendesk ticket to an issue."""
+  """
+  Link an existing Zendesk ticket to an issue. This creates a rich attachment
+  using the workspace's Zendesk integration, enabling features like automated
+  ticket reopening when the Linear issue is completed.
+  """
   attachmentLinkZendesk(
     """
     Create attachment as a user with the provided name. This option is only
@@ -15268,7 +15362,9 @@ type Mutation {
     url: String
   ): AttachmentPayload!
 
-  """Link an existing Discord message to an issue."""
+  """
+  Link an existing Discord message to an issue. This creates a rich attachment using the workspace's Discord integration.
+  """
   attachmentLinkDiscord(
     """
     Create attachment as a user with the provided name. This option is only
@@ -15312,7 +15408,9 @@ type Mutation {
     id: String!
   ): AttachmentPayload!
 
-  """Link an existing Slack message to an issue."""
+  """
+  Link an existing Slack message to an issue. This creates a rich attachment using the workspace's Slack integration.
+  """
   attachmentLinkSlack(
     """
     Create attachment as a user with the provided name. This option is only
@@ -15347,7 +15445,11 @@ type Mutation {
     syncToCommentThread: Boolean
   ): AttachmentPayload!
 
-  """Link an existing Front conversation to an issue."""
+  """
+  Link an existing Front conversation to an issue. This creates a rich
+  attachment using the workspace's Front integration, enabling features like
+  automated conversation updates.
+  """
   attachmentLinkFront(
     """
     Create attachment as a user with the provided name. This option is only
@@ -15377,7 +15479,11 @@ type Mutation {
     id: String
   ): FrontAttachmentPayload!
 
-  """Link an existing Intercom conversation to an issue."""
+  """
+  Link an existing Intercom conversation to an issue. This creates a rich
+  attachment using the workspace's Intercom integration, enabling features like
+  automated conversation updates.
+  """
   attachmentLinkIntercom(
     """
     Create attachment as a user with the provided name. This option is only
@@ -15410,7 +15516,10 @@ type Mutation {
     issueId: String!
   ): AttachmentPayload!
 
-  """Link an existing Jira issue to an issue."""
+  """
+  Link an existing Jira issue to an issue. This creates a rich attachment using
+  the workspace's Jira integration, enabling features like automated status syncing.
+  """
   attachmentLinkJiraIssue(
     """
     Create attachment as a user with the provided name. This option is only
@@ -15443,7 +15552,9 @@ type Mutation {
     url: String
   ): AttachmentPayload!
 
-  """Link an existing Salesforce case to an issue."""
+  """
+  Link an existing Salesforce case to an issue. This creates a rich attachment using the workspace's Salesforce integration.
+  """
   attachmentLinkSalesforce(
     """
     Create attachment as a user with the provided name. This option is only
@@ -24976,6 +25087,9 @@ type ReleasePipeline implements Node {
   """Glob patterns to include commits affecting matching file paths."""
   includePathPatterns: [String!]!
 
+  """[ALPHA] The number of non-archived releases in this pipeline."""
+  approximateReleaseCount: Int!
+
   """[ALPHA] Stages associated with this pipeline."""
   stages(
     """A cursor to be used with last for backward pagination."""
@@ -29776,8 +29890,20 @@ type ViewPreferencesValues {
   """Whether to show the initiative owner field."""
   initiativeFieldOwner: Boolean
 
+  """Whether to show the initiative start date field."""
+  initiativeFieldStartDate: Boolean
+
   """Whether to show the initiative target date field."""
   initiativeFieldTargetDate: Boolean
+
+  """Whether to show the initiative completed date field."""
+  initiativeFieldDateCompleted: Boolean
+
+  """Whether to show the initiative updated date field."""
+  initiativeFieldDateUpdated: Boolean
+
+  """Whether to show the initiative created date field."""
+  initiativeFieldDateCreated: Boolean
 
   """Whether to show the initiative activity field."""
   initiativeFieldActivity: Boolean
@@ -29928,6 +30054,15 @@ type ViewPreferencesValues {
 
   """The release pipelines view ordering."""
   releasePipelinesViewOrdering: String
+
+  """Whether to show the type field for release pipelines."""
+  releasePipelineFieldType: Boolean
+
+  """Whether to show the releases field for release pipelines."""
+  releasePipelineFieldReleases: Boolean
+
+  """Whether to show the latest release field for release pipelines."""
+  releasePipelineFieldLatestRelease: Boolean
 
   """The search view ordering."""
   searchViewOrdering: String
