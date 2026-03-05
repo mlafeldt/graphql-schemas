@@ -8347,6 +8347,7 @@ enum IntegrationService {
   salesforce
   slack
   slackAsks
+  asksWeb
   slackCustomViewNotifications
   slackOrgProjectUpdatesPost
   slackOrgInitiativeUpdatesPost
@@ -17103,6 +17104,9 @@ input NullableTeamFilter {
 
   """Filters that the teams parent must satisfy."""
   parent: NullableTeamFilter
+
+  """Filters that the team's ancestors must satisfy."""
+  ancestors: TeamCollectionFilter
 
   """Filter based on the existence of the relation."""
   null: Boolean
@@ -26380,6 +26384,7 @@ input SlackSettingsInput {
   enableLinearAgentWorkflowAccess: Boolean
 }
 
+"""Which day count to use for SLA calculations."""
 enum SLADayCountType {
   all
   onlyBusinessDays
@@ -27446,6 +27451,9 @@ input TeamCollectionFilter {
 
   """Filters that the teams parent must satisfy."""
   parent: NullableTeamFilter
+
+  """Filters that the team's ancestors must satisfy."""
+  ancestors: TeamCollectionFilter
 }
 
 type TeamConnection {
@@ -27617,6 +27625,9 @@ input TeamFilter {
 
   """Filters that the teams parent must satisfy."""
   parent: NullableTeamFilter
+
+  """Filters that the team's ancestors must satisfy."""
+  ancestors: TeamCollectionFilter
 
   """Compound filters, all of which need to be matched by the team."""
   and: [TeamFilter!]
