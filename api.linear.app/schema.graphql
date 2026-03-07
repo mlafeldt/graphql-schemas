@@ -723,6 +723,788 @@ input AgentSessionUserStateInput {
   lastReadAt: DateTime
 }
 
+"""[Internal] A conversation between a user and an LLM."""
+type AiConversation implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The user who the conversation belongs to."""
+  user: User
+
+  """
+  Serialized JSON representing the contexts this conversation is related to.
+  """
+  context: JSONObject!
+
+  """A summary of the conversation."""
+  summary: String
+
+  """[Internal] The workflow definition that created this conversation."""
+  workflowDefinition: WorkflowDefinition
+
+  """The status of the conversation."""
+  status: AiConversationStatus!
+
+  """
+  The time at when the user marked the conversation as read. Null, if the user hasn't read the conversation.
+  """
+  readAt: DateTime
+
+  """The parts of the conversation."""
+  parts: [AiConversationPart!]
+
+  """The iteration ID of the conversation in agentic workflow."""
+  iterationId: String
+
+  """[Internal] The log ID of the AI response."""
+  evalLogId: String
+}
+
+"""A base part in an AI conversation."""
+interface AiConversationBasePart {
+  """The ID of the part."""
+  id: String!
+
+  """The type of the part."""
+  type: AiConversationPartType!
+
+  """The metadata of the part."""
+  metadata: AiConversationPartMetadata!
+}
+
+interface AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+}
+
+interface AiConversationBaseWidget {
+  """The name of the widget."""
+  name: AiConversationWidgetName!
+
+  """The arguments of the widget."""
+  rawArgs: JSON
+
+  """
+  Display information for the widget, including ProseMirror and Markdown representations.
+  """
+  displayInfo: AiConversationWidgetDisplayInfo
+}
+
+type AiConversationCodeIntelligenceToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationCodeIntelligenceToolCallArgs
+}
+
+type AiConversationCodeIntelligenceToolCallArgs {
+  question: String!
+}
+
+type AiConversationCreateEntityToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationCreateEntityToolCallArgs
+}
+
+type AiConversationCreateEntityToolCallArgs {
+  type: String!
+  count: Float
+}
+
+type AiConversationDeleteEntityToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationDeleteEntityToolCallArgs
+}
+
+type AiConversationDeleteEntityToolCallArgs {
+  entity: AiConversationSearchEntitiesToolCallResultEntities!
+}
+
+type AiConversationEntityCardWidget implements AiConversationBaseWidget {
+  """The name of the widget."""
+  name: AiConversationWidgetName!
+
+  """The arguments of the widget."""
+  rawArgs: JSON
+
+  """
+  Display information for the widget, including ProseMirror and Markdown representations.
+  """
+  displayInfo: AiConversationWidgetDisplayInfo
+
+  """The arguments to the widget."""
+  args: AiConversationEntityCardWidgetArgs
+}
+
+type AiConversationEntityCardWidgetArgs {
+  """[Internal] The entity type"""
+  type: AiConversationEntityCardWidgetArgsType!
+
+  """The UUID of the entity to display"""
+  id: String!
+
+  """@deprecated Optional note to display about the entity"""
+  note: String @deprecated(reason: "Optional note to display about the entity")
+
+  """The action performed on the entity (leave empty if just found)"""
+  action: AiConversationEntityCardWidgetArgsAction
+}
+
+"""The action performed on the entity (leave empty if just found)"""
+enum AiConversationEntityCardWidgetArgsAction {
+  created
+  updated
+}
+
+"""[Internal] The entity type"""
+enum AiConversationEntityCardWidgetArgsType {
+  Issue
+  Project
+  Initiative
+  InitiativeUpdate
+  ProjectUpdate
+  Team
+  Template
+  Customer
+  CustomerNeed
+  Document
+  CustomView
+  PullRequest
+  Release
+  ReleasePipeline
+  AiPrompt
+}
+
+type AiConversationEntityListWidget implements AiConversationBaseWidget {
+  """The name of the widget."""
+  name: AiConversationWidgetName!
+
+  """The arguments of the widget."""
+  rawArgs: JSON
+
+  """
+  Display information for the widget, including ProseMirror and Markdown representations.
+  """
+  displayInfo: AiConversationWidgetDisplayInfo
+
+  """The arguments to the widget."""
+  args: AiConversationEntityListWidgetArgs
+}
+
+type AiConversationEntityListWidgetArgs {
+  """Total number of entities in the list"""
+  count: Float
+  entities: [AiConversationEntityListWidgetArgsEntities!]!
+
+  """The action performed on the entities (leave empty if just found)"""
+  action: AiConversationEntityListWidgetArgsAction
+}
+
+"""The action performed on the entities (leave empty if just found)"""
+enum AiConversationEntityListWidgetArgsAction {
+  created
+  updated
+}
+
+type AiConversationEntityListWidgetArgsEntities {
+  """[Internal] The entity type"""
+  type: AiConversationEntityListWidgetArgsEntitiesType!
+
+  """Entity UUID"""
+  id: String!
+
+  """@deprecated Optional note to display about the entity"""
+  note: String @deprecated(reason: "Optional note to display about the entity")
+}
+
+"""[Internal] The entity type"""
+enum AiConversationEntityListWidgetArgsEntitiesType {
+  Issue
+  Project
+  Initiative
+  InitiativeUpdate
+  ProjectUpdate
+  Team
+  Template
+  Customer
+  CustomerNeed
+  Document
+  CustomView
+  PullRequest
+  Release
+  ReleasePipeline
+  AiPrompt
+}
+
+type AiConversationGetMicrosoftTeamsConversationHistoryToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+}
+
+type AiConversationGetPullRequestDiffToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationGetPullRequestDiffToolCallArgs
+}
+
+type AiConversationGetPullRequestDiffToolCallArgs {
+  entity: AiConversationSearchEntitiesToolCallResultEntities!
+}
+
+type AiConversationGetPullRequestFileToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationGetPullRequestFileToolCallArgs
+}
+
+type AiConversationGetPullRequestFileToolCallArgs {
+  entity: AiConversationSearchEntitiesToolCallResultEntities!
+  path: String!
+}
+
+type AiConversationGetSlackConversationHistoryToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+}
+
+type AiConversationInvokeMcpToolToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationInvokeMcpToolToolCallArgs
+}
+
+type AiConversationInvokeMcpToolToolCallArgs {
+  server: AiConversationInvokeMcpToolToolCallArgsServer!
+  tool: AiConversationInvokeMcpToolToolCallArgsTool!
+}
+
+type AiConversationInvokeMcpToolToolCallArgsServer {
+  integrationId: String!
+  name: String!
+  title: String
+}
+
+type AiConversationInvokeMcpToolToolCallArgsTool {
+  name: String!
+  title: String
+}
+
+"""A part in an AI conversation."""
+union AiConversationPart = AiConversationPromptPart | AiConversationTextPart | AiConversationReasoningPart | AiConversationToolCallPart | AiConversationWidgetPart
+
+"""Metadata about a part in an AI conversation."""
+type AiConversationPartMetadata {
+  """The turn ID of the part."""
+  turnId: String!
+
+  """The eval log ID of the part."""
+  evalLogId: String
+
+  """AI feedback state for this part."""
+  feedback: JSONObject
+}
+
+"""The type of a part in an AI conversation."""
+enum AiConversationPartType {
+  prompt
+  toolCall
+  reasoning
+  text
+  widget
+  widgetPlaceholder
+}
+
+"""A prompt part in an AI conversation."""
+type AiConversationPromptPart implements AiConversationBasePart {
+  """The ID of the part."""
+  id: String!
+
+  """The type of the part."""
+  type: AiConversationPartType!
+
+  """The metadata of the part."""
+  metadata: AiConversationPartMetadata!
+
+  """The data of the prompt part."""
+  bodyData: JSONObject!
+
+  """The Markdown body of the prompt part."""
+  body: String!
+
+  """The user who created the prompt part."""
+  user: User
+}
+
+type AiConversationQueryActivityToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationQueryActivityToolCallArgs
+}
+
+type AiConversationQueryActivityToolCallArgs {
+  entities: [AiConversationSearchEntitiesToolCallResultEntities!]
+}
+
+type AiConversationQueryUpdatesToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationQueryUpdatesToolCallArgs
+}
+
+type AiConversationQueryUpdatesToolCallArgs {
+  updateType: AiConversationQueryUpdatesToolCallArgsUpdateType!
+  entity: AiConversationSearchEntitiesToolCallResultEntities
+}
+
+enum AiConversationQueryUpdatesToolCallArgsUpdateType {
+  ProjectUpdate
+  InitiativeUpdate
+}
+
+type AiConversationQueryViewToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationQueryViewToolCallArgs
+}
+
+type AiConversationQueryViewToolCallArgs {
+  view: AiConversationQueryViewToolCallArgsView!
+  mode: AiConversationQueryViewToolCallArgsMode!
+  filter: String
+}
+
+enum AiConversationQueryViewToolCallArgsMode {
+  list
+  insight
+}
+
+type AiConversationQueryViewToolCallArgsView {
+  type: String!
+  group: AiConversationSearchEntitiesToolCallResultEntities
+  predefinedView: String
+}
+
+"""A reasoning part in an AI conversation."""
+type AiConversationReasoningPart implements AiConversationBasePart {
+  """The ID of the part."""
+  id: String!
+
+  """The type of the part."""
+  type: AiConversationPartType!
+
+  """The metadata of the part."""
+  metadata: AiConversationPartMetadata!
+
+  """The title of the reasoning part."""
+  title: String
+
+  """The data of the reasoning part."""
+  bodyData: JSONObject!
+
+  """The Markdown body of the reasoning part."""
+  body: String!
+}
+
+type AiConversationResearchToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationResearchToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationResearchToolCallResult
+}
+
+type AiConversationResearchToolCallArgs {
+  context: String!
+  query: String!
+  subjects: [AiConversationSearchEntitiesToolCallResultEntities!]
+}
+
+type AiConversationResearchToolCallResult {
+  progressId: String
+}
+
+type AiConversationRetrieveEntitiesToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationRetrieveEntitiesToolCallArgs
+}
+
+type AiConversationRetrieveEntitiesToolCallArgs {
+  entities: [AiConversationSearchEntitiesToolCallResultEntities!]!
+}
+
+type AiConversationSearchDocumentationToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+}
+
+type AiConversationSearchEntitiesToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationSearchEntitiesToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationSearchEntitiesToolCallResult
+}
+
+type AiConversationSearchEntitiesToolCallArgs {
+  type: String
+  queries: [String!]!
+}
+
+type AiConversationSearchEntitiesToolCallResult {
+  entities: [AiConversationSearchEntitiesToolCallResultEntities!]!
+}
+
+type AiConversationSearchEntitiesToolCallResultEntities {
+  type: String!
+  id: String!
+}
+
+"""The status of an AI conversation."""
+enum AiConversationStatus {
+  active
+  complete
+  awaitingInput
+  error
+  pending
+}
+
+type AiConversationSuggestValuesToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationSuggestValuesToolCallArgs
+}
+
+type AiConversationSuggestValuesToolCallArgs {
+  field: String!
+  query: String
+}
+
+"""A text part in an AI conversation."""
+type AiConversationTextPart implements AiConversationBasePart {
+  """The ID of the part."""
+  id: String!
+
+  """The type of the part."""
+  type: AiConversationPartType!
+
+  """The metadata of the part."""
+  metadata: AiConversationPartMetadata!
+
+  """The data of the text part."""
+  bodyData: JSONObject!
+
+  """The Markdown body of the text part."""
+  body: String!
+}
+
+"""The name of a tool that was called in an AI conversation."""
+enum AiConversationTool {
+  SearchEntities
+  RetrieveEntities
+  QueryView
+  QueryActivity
+  QueryUpdates
+  SuggestValues
+  CreateEntity
+  UpdateEntity
+  DeleteEntity
+  Research
+  CodeIntelligence
+  GetPullRequestDiff
+  GetPullRequestFile
+  TranscribeVideo
+  TranscribeMedia
+  SearchDocumentation
+  WebSearch
+  GetSlackConversationHistory
+  GetMicrosoftTeamsConversationHistory
+  InvokeMcpTool
+}
+
+"""The tool call."""
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationInvokeMcpToolToolCall
+
+"""A tool call part in an AI conversation."""
+type AiConversationToolCallPart implements AiConversationBasePart {
+  """The ID of the part."""
+  id: String!
+
+  """The type of the part."""
+  type: AiConversationPartType!
+
+  """The metadata of the part."""
+  metadata: AiConversationPartMetadata!
+
+  """The tool call part."""
+  toolCall: AiConversationToolCall!
+}
+
+type AiConversationToolDisplayInfo {
+  icon: String!
+  activeLabel: String!
+  inactiveLabel: String!
+  detail: String
+  result: String
+}
+
+type AiConversationTranscribeMediaToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+}
+
+type AiConversationTranscribeVideoToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+}
+
+type AiConversationUpdateEntityToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationUpdateEntityToolCallArgs
+}
+
+type AiConversationUpdateEntityToolCallArgs {
+  entity: AiConversationSearchEntitiesToolCallResultEntities!
+}
+
+type AiConversationWebSearchToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationWebSearchToolCallArgs
+}
+
+type AiConversationWebSearchToolCallArgs {
+  query: String
+  url: String
+}
+
+"""The widget."""
+union AiConversationWidget = AiConversationEntityCardWidget | AiConversationEntityListWidget
+
+type AiConversationWidgetDisplayInfo {
+  """The ProseMirror data representation of the widget content."""
+  bodyData: JSONObject!
+
+  """The Markdown representation of the widget content."""
+  body: String!
+}
+
+"""The name of a widget in an AI conversation."""
+enum AiConversationWidgetName {
+  EntityCard
+  EntityList
+}
+
+"""A widget part in an AI conversation."""
+type AiConversationWidgetPart implements AiConversationBasePart {
+  """The ID of the part."""
+  id: String!
+
+  """The type of the part."""
+  type: AiConversationPartType!
+
+  """The metadata of the part."""
+  metadata: AiConversationPartMetadata!
+
+  """The widget."""
+  widget: AiConversationWidget!
+}
+
 """AI prompt rules for a team."""
 type AiPromptRules implements Node {
   """The unique identifier of the entity."""
@@ -1340,6 +2122,9 @@ type AuthOrganization {
 
   """The region the organization is hosted in."""
   region: String!
+
+  """An approximate count of users, updated once per day."""
+  approximateUserCount: Float!
 
   """
   Whether to hide other organizations for new users signing up with email domains claimed by this organization.
@@ -5225,6 +6010,11 @@ type EmailIntakeAddress implements Node {
   The auto-reply message for issue canceled. If not set, the default reply will be used.
   """
   issueCanceledAutoReply: String
+
+  """
+  Whether to reopen completed or canceled issues when a substantive email reply is received.
+  """
+  reopenOnReply: Boolean!
 }
 
 input EmailIntakeAddressCreateInput {
@@ -5280,6 +6070,11 @@ input EmailIntakeAddressCreateInput {
 
   """Whether customer requests are enabled."""
   customerRequestsEnabled: Boolean
+
+  """
+  Whether to reopen completed or canceled issues when a substantive email reply is received.
+  """
+  reopenOnReply: Boolean
 }
 
 type EmailIntakeAddressPayload {
@@ -5350,6 +6145,11 @@ input EmailIntakeAddressUpdateInput {
 
   """Whether customer requests are enabled."""
   customerRequestsEnabled: Boolean
+
+  """
+  Whether to reopen completed or canceled issues when a substantive email reply is received.
+  """
+  reopenOnReply: Boolean
 }
 
 input EmailUnsubscribeInput {
@@ -10384,7 +11184,10 @@ type IssueHistory implements Node {
   """
   [INTERNAL] Metadata about the triage rule that made changes to the issue.
   """
-  triageRuleMetadata: IssueHistoryTriageRuleMetadata
+  triageRuleMetadata: IssueHistoryTriageRuleMetadata @deprecated(reason: "Use `workflowMetadata` instead.")
+
+  """[INTERNAL] Metadata about the workflow that made changes to the issue."""
+  workflowMetadata: IssueHistoryWorkflowMetadata
 }
 
 type IssueHistoryConnection {
@@ -10427,7 +11230,16 @@ type IssueHistoryTriageRuleMetadata {
   triageRuleError: IssueHistoryTriageRuleError
 
   """The triage rule that triggered the issue update."""
-  updatedByTriageRule: WorkflowDefinition
+  updatedByTriageRule: WorkflowDefinition @deprecated(reason: "Use `IssueHistoryWorkflowMetadata.workflowDefinition` instead.")
+}
+
+"""Metadata about a workflow that made changes to an issue."""
+type IssueHistoryWorkflowMetadata {
+  """The workflow definition that triggered the issue update."""
+  workflowDefinition: WorkflowDefinition
+
+  """The AI conversation associated with the workflow."""
+  aiConversation: AiConversation
 }
 
 """Comparator for issue identifiers."""
@@ -13148,11 +13960,11 @@ type Mutation {
     input: ReleaseUpdateByPipelineInput!
   ): ReleasePayload!
 
-  """[ALPHA] Deletes a release."""
+  """[ALPHA] Deletes (trashes) a release."""
   releaseDelete(
     """The identifier of the release to delete."""
     id: String!
-  ): DeletePayload!
+  ): ReleaseArchivePayload!
 
   """[ALPHA] Archives a release."""
   releaseArchive(
@@ -17102,6 +17914,9 @@ input NullableTeamFilter {
   """Filters that the teams parent must satisfy."""
   parent: NullableTeamFilter
 
+  """Filters that the team's ancestors must satisfy."""
+  ancestors: TeamCollectionFilter
+
   """Filter based on the existence of the relation."""
   null: Boolean
 
@@ -17571,6 +18386,11 @@ type Organization implements Node {
   Previously used URL keys for the organization (last 3 are kept and redirected).
   """
   previousUrlKeys: [String!]!
+
+  """
+  [Internal] Whether agent invocation is restricted to full workspace members.
+  """
+  restrictAgentInvocationToMembers: Boolean
 
   """Whether HIPAA compliance is enabled for organization."""
   hipaaComplianceEnabled: Boolean!
@@ -24790,6 +25610,9 @@ type Release implements Node {
   """The time at which the release was canceled."""
   canceledAt: DateTime
 
+  """A flag that indicates whether the release is in the trash bin."""
+  trashed: Boolean
+
   """[Internal] The progress history of the release."""
   progressHistory: JSONObject!
 
@@ -27445,6 +28268,9 @@ input TeamCollectionFilter {
 
   """Filters that the teams parent must satisfy."""
   parent: NullableTeamFilter
+
+  """Filters that the team's ancestors must satisfy."""
+  ancestors: TeamCollectionFilter
 }
 
 type TeamConnection {
@@ -27616,6 +28442,9 @@ input TeamFilter {
 
   """Filters that the teams parent must satisfy."""
   parent: NullableTeamFilter
+
+  """Filters that the team's ancestors must satisfy."""
+  ancestors: TeamCollectionFilter
 
   """Compound filters, all of which need to be matched by the team."""
   and: [TeamFilter!]
@@ -29489,6 +30318,9 @@ input ViewPreferencesCreateInput {
   """The project label these view preferences are associated with."""
   projectLabelId: String
 
+  """The release pipeline these view preferences are associated with."""
+  releasePipelineId: String
+
   """The custom view these view preferences are associated with."""
   customViewId: String
 
@@ -29572,7 +30404,7 @@ type ViewPreferencesValues {
   """Whether to show snoozed items."""
   showSnoozedItems: Boolean
 
-  """Whether to show only snoozed notifications."""
+  """Whether to show only snoozed items."""
   showOnlySnoozedItems: Boolean
 
   """Whether to show archived items."""
@@ -30064,6 +30896,17 @@ type ViewPreferencesValues {
   """Whether to show the latest release field for release pipelines."""
   releasePipelineFieldLatestRelease: Boolean
 
+  """The scheduled pipeline releases view ordering."""
+  scheduledPipelineReleasesViewOrdering: String
+
+  """Whether to show the stage field for scheduled pipeline releases."""
+  scheduledPipelineReleaseFieldStage: Boolean
+
+  """
+  Whether to show the release date field for scheduled pipeline releases.
+  """
+  scheduledPipelineReleaseFieldReleaseDate: Boolean
+
   """The search view ordering."""
   searchViewOrdering: String
 
@@ -30122,6 +30965,7 @@ enum ViewType {
   cycle
   release
   continuousPipelineReleases
+  scheduledPipelineReleases
   project
   projectDocuments
   label
