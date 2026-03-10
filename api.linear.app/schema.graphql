@@ -5421,6 +5421,9 @@ type DocumentContentHistoryType {
 
   """The ID of the author of the change."""
   actorIds: [String!]
+
+  """Metadata associated with the history item."""
+  metadata: JSON
 }
 
 input DocumentCreateInput {
@@ -23555,7 +23558,11 @@ type Query {
   project(id: String!): Project!
 
   """Suggests filters for a project view based on a text prompt."""
-  projectFilterSuggestion(prompt: String!): ProjectFilterSuggestionPayload!
+  projectFilterSuggestion(
+    """[Internal] The ID of the team if filtering a team view."""
+    teamId: String
+    prompt: String!
+  ): ProjectFilterSuggestionPayload!
 
   """
   All teams whose issues can be accessed by the user. This might be different
@@ -24398,7 +24405,10 @@ type Query {
 
   """Suggests filters for an issue view based on a text prompt."""
   issueFilterSuggestion(
-    """The ID of the project if filtering a project view"""
+    """[Internal] The ID of the team if filtering a team view."""
+    teamId: String
+
+    """The ID of the project if filtering a project view."""
     projectId: String
     prompt: String!
   ): IssueFilterSuggestionPayload!
@@ -26375,6 +26385,9 @@ input ReleaseUpdateInput {
 
   """The estimated completion date of the release."""
   targetDate: TimelessDate
+
+  """Whether the release has been trashed."""
+  trashed: Boolean
 }
 
 """Information about the source repository."""
