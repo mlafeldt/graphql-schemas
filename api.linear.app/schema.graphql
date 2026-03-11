@@ -1250,6 +1250,25 @@ type AiConversationResearchToolCallResult {
   progressId: String
 }
 
+type AiConversationRestoreEntityToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationRestoreEntityToolCallArgs
+}
+
+type AiConversationRestoreEntityToolCallArgs {
+  entity: AiConversationSearchEntitiesToolCallResultEntities!
+}
+
 type AiConversationRetrieveEntitiesToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -1371,6 +1390,7 @@ enum AiConversationTool {
   CreateEntity
   UpdateEntity
   DeleteEntity
+  RestoreEntity
   Research
   CodeIntelligence
   GetPullRequestDiff
@@ -1385,7 +1405,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -2250,6 +2270,9 @@ type CodingAgentSandboxPayload {
 
   """Datadog logs URL for the session or sandbox."""
   datadogLogsUrl: String
+
+  """Temporal URL to view all workflows for this sandbox."""
+  temporalWorkflowUrl: String
 
   """Claude Agent SDK conversation ID."""
   workerConversationId: String
@@ -23071,6 +23094,9 @@ type PullRequestCommit {
 
   """The number of changed files if available."""
   changedFiles: Float
+
+  """Whether this commit has multiple parents."""
+  isMergeCommit: Boolean
 
   """Linear user IDs for commit authors (includes co-authors)."""
   authorUserIds: [String!]!
