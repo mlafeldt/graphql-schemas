@@ -2296,7 +2296,7 @@ type CodingAgentSandboxPayload {
   endedAt: DateTime
 }
 
-"""A comment associated with an issue."""
+"""A comment associated with an entity."""
 type Comment implements Node {
   """The unique identifier of the entity."""
   id: ID!
@@ -2344,6 +2344,20 @@ type Comment implements Node {
 
   """The post that the comment is associated with."""
   post: Post
+
+  """[Internal] The project that the comment is associated with."""
+  project: Project
+
+  """[Internal] The ID of the project that the comment is associated with."""
+  projectId: String
+
+  """[Internal] The initiative that the comment is associated with."""
+  initiative: Initiative
+
+  """
+  [Internal] The ID of the initiative that the comment is associated with.
+  """
+  initiativeId: String
 
   """The parent comment under which the current comment is nested."""
   parent: Comment
@@ -2567,6 +2581,12 @@ input CommentCollectionFilter {
   """Filters that the comment's document content must satisfy."""
   documentContent: NullableDocumentContentFilter
 
+  """[Internal] Filters that the comment's project must satisfy."""
+  project: NullableProjectFilter
+
+  """[Internal] Filters that the comment's initiative must satisfy."""
+  initiative: NullableInitiativeFilter
+
   """Filters that the comment's reactions must satisfy."""
   reactions: ReactionCollectionFilter
 
@@ -2623,6 +2643,12 @@ input CommentCreateInput {
 
   """The document content to associate the comment with."""
   documentContentId: String
+
+  """[Internal] The project to associate the comment with."""
+  projectId: String
+
+  """[Internal] The initiative to associate the comment with."""
+  initiativeId: String
 
   """The parent comment under which to nest a current comment."""
   parentId: String
@@ -2705,6 +2731,12 @@ input CommentFilter {
 
   """Filters that the comment's document content must satisfy."""
   documentContent: NullableDocumentContentFilter
+
+  """[Internal] Filters that the comment's project must satisfy."""
+  project: NullableProjectFilter
+
+  """[Internal] Filters that the comment's initiative must satisfy."""
+  initiative: NullableInitiativeFilter
 
   """Filters that the comment's reactions must satisfy."""
   reactions: ReactionCollectionFilter
@@ -13726,6 +13758,23 @@ type Mutation {
     id: String!
   ): ProjectPayload!
 
+  """[Internal] Creates a Slack channel for an existing project."""
+  projectCreateSlackChannel(
+    """
+    The identifier of the Slack integration to use. When not provided, uses the organization's configured integration.
+    """
+    integrationId: String
+
+    """
+    The full name for the Slack channel to create (including prefix). When
+    provided, a Slack channel will be created and connected to the project.
+    """
+    slackChannelName: String!
+
+    """The identifier of the project."""
+    id: String!
+  ): ProjectPayload!
+
   """
   [INTERNAL] Updates all projects currently assigned to to a project status to a new project status.
   """
@@ -17128,6 +17177,12 @@ input NullableCommentFilter {
   """Filters that the comment's document content must satisfy."""
   documentContent: NullableDocumentContentFilter
 
+  """[Internal] Filters that the comment's project must satisfy."""
+  project: NullableProjectFilter
+
+  """[Internal] Filters that the comment's initiative must satisfy."""
+  initiative: NullableInitiativeFilter
+
   """Filters that the comment's reactions must satisfy."""
   reactions: ReactionCollectionFilter
 
@@ -17368,6 +17423,71 @@ input NullableDurationComparator {
   Greater-than-or-equal constraint. Matches any values that are greater than or equal to the given value.
   """
   gte: Duration
+}
+
+"""Initiative filtering options."""
+input NullableInitiativeFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the initiative name."""
+  name: StringComparator
+
+  """Comparator for the initiative slug ID."""
+  slugId: StringComparator
+
+  """Filters that the initiative creator must satisfy."""
+  creator: NullableUserFilter
+
+  """Comparator for the initiative status: Planned, Active, Completed"""
+  status: StringComparator
+
+  """Filters that the initiative teams must satisfy."""
+  teams: TeamCollectionFilter
+
+  """Filters that the initiative owner must satisfy."""
+  owner: NullableUserFilter
+
+  """Comparator for the initiative target date."""
+  targetDate: NullableDateComparator
+
+  """Comparator for the initiative started at date."""
+  startedAt: NullableDateComparator
+
+  """Comparator for the initiative completed at date."""
+  completedAt: NullableDateComparator
+
+  """Comparator for the initiative health: onTrack, atRisk, offTrack"""
+  health: StringComparator
+
+  """
+  Comparator for the initiative health (with age): onTrack, atRisk, offTrack, outdated, noUpdate
+  """
+  healthWithAge: StringComparator
+
+  """Comparator for the initiative activity type."""
+  activityType: StringComparator
+
+  """Filters that the initiative must be an ancestor of."""
+  ancestors: InitiativeCollectionFilter
+
+  """Filters that the initiative updates must satisfy."""
+  initiativeUpdates: InitiativeUpdatesCollectionFilter
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
+
+  """Compound filters, all of which need to be matched by the initiative."""
+  and: [NullableInitiativeFilter!]
+
+  """Compound filters, one of which need to be matched by the initiative."""
+  or: [NullableInitiativeFilter!]
 }
 
 """Issue filtering options."""
@@ -25947,6 +26067,9 @@ type ReleasePipeline implements Node {
   """[ALPHA] The number of non-archived releases in this pipeline."""
   approximateReleaseCount: Int!
 
+  """[Internal] Release pipeline URL."""
+  url: String!
+
   """[ALPHA] Stages associated with this pipeline."""
   stages(
     """A cursor to be used with last for backward pagination."""
@@ -27286,18 +27409,6 @@ input SlaStatusSort {
 
 """Comparator for issue source type."""
 input SourceMetadataComparator {
-  """Equals constraint."""
-  eq: String
-
-  """Not-equals constraint."""
-  neq: String
-
-  """In-array constraint."""
-  in: [String!]
-
-  """Not-in-array constraint."""
-  nin: [String!]
-
   """
   Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.
   """
