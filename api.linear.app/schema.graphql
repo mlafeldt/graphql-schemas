@@ -1485,7 +1485,8 @@ type AiConversationUpdateEntityToolCall implements AiConversationBaseToolCall {
 }
 
 type AiConversationUpdateEntityToolCallArgs {
-  entity: AiConversationSearchEntitiesToolCallResultEntities!
+  entity: AiConversationSearchEntitiesToolCallResultEntities
+  entities: [AiConversationSearchEntitiesToolCallResultEntities!]
 }
 
 type AiConversationWebSearchToolCall implements AiConversationBaseToolCall {
@@ -26128,6 +26129,33 @@ type ReleasePipeline implements Node {
   """[Internal] Release pipeline URL."""
   url: String!
 
+  """[ALPHA] Teams associated with this pipeline."""
+  teams(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): TeamConnection!
+
   """[ALPHA] Stages associated with this pipeline."""
   stages(
     """A cursor to be used with last for backward pagination."""
@@ -26220,6 +26248,9 @@ input ReleasePipelineCreateInput {
 
   """Glob patterns to include commits affecting matching file paths."""
   includePathPatterns: [String!]
+
+  """The identifiers of the teams this pipeline is associated with."""
+  teamIds: [String!]
 }
 
 type ReleasePipelineEdge {
@@ -26279,6 +26310,9 @@ input ReleasePipelineUpdateInput {
 
   """Glob patterns to include commits affecting matching file paths."""
   includePathPatterns: [String!]
+
+  """The identifiers of the teams this pipeline is associated with."""
+  teamIds: [String!]
 }
 
 """[Internal] A release stage."""
