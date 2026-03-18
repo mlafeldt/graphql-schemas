@@ -756,6 +756,9 @@ type AiConversation implements Node {
   """[Internal] The workflow definition that created this conversation."""
   workflowDefinition: WorkflowDefinition
 
+  """The initial source of the conversation."""
+  initialSource: AiConversationInitialSource!
+
   """The status of the conversation."""
   status: AiConversationStatus!
 
@@ -1046,6 +1049,16 @@ type AiConversationGetSlackConversationHistoryToolCall implements AiConversation
 
   """The result of the tool call."""
   rawResult: JSON
+}
+
+"""The initial source of an AI conversation."""
+enum AiConversationInitialSource {
+  slack
+  microsoftTeams
+  directChat
+  comment
+  pullRequestComment
+  workflow
 }
 
 type AiConversationInvokeMcpToolToolCall implements AiConversationBaseToolCall {
@@ -23247,11 +23260,22 @@ type PullRequestCheck {
   """Whether the check is required."""
   isRequired: Boolean
 
+  """How the check should be opened in the client."""
+  presentation: PullRequestCheckPresentation
+
   """The date/time at which when the check was started."""
   startedAt: DateTime
 
   """The date/time at which when the check was completed."""
   completedAt: DateTime
+}
+
+"""[ALPHA] How a pull request check should be opened in the client."""
+enum PullRequestCheckPresentation {
+  jobLogs
+  runLogs
+  markdown
+  externalOnly
 }
 
 """[ALPHA] A pull request commit."""
@@ -30138,6 +30162,7 @@ enum UserFlagType {
   slackBotWelcomeMessageShown
   teamsBotWelcomeMessageShown
   slackAgentPromoFromCreateNewIssueShown
+  agentExamplesDismissed
   all
 }
 
