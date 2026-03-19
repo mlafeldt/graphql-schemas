@@ -18649,6 +18649,9 @@ type Organization implements Node {
   """[Internal] Whether the organization has enabled Linear Agent."""
   linearAgentEnabled: Boolean!
 
+  """[Internal] Settings for Linear Agent features."""
+  linearAgentSettings: JSONObject!
+
   """[DEPRECATED] Which day count to use for SLA calculations."""
   slaDayCount: SLADayCountType! @deprecated(reason: "No longer in use")
 
@@ -19193,6 +19196,13 @@ input OrganizationIpRestrictionInput {
   enabled: Boolean!
 }
 
+input OrganizationLinearAgentSettingsInput {
+  """
+  [Internal] Whether the organization has enabled web search for Linear Agent.
+  """
+  webSearchEnabled: Boolean
+}
+
 type OrganizationMeta {
   """The region the organization is hosted in."""
   region: String!
@@ -19410,6 +19420,9 @@ input OrganizationUpdateInput {
 
   """[Internal] Whether the organization has enabled Linear Agent."""
   linearAgentEnabled: Boolean
+
+  """[Internal] Settings for Linear Agent features."""
+  linearAgentSettings: OrganizationLinearAgentSettingsInput
 }
 
 """Customer owner sorting options."""
@@ -31153,11 +31166,17 @@ type ViewPreferencesValues {
   """Whether to show the member teams field."""
   memberFieldTeams: Boolean
 
+  """The release pipeline grouping."""
+  releasePipelineGrouping: String
+
   """The release pipelines view ordering."""
   releasePipelinesViewOrdering: String
 
   """Whether to show the type field for release pipelines."""
   releasePipelineFieldType: Boolean
+
+  """Whether to show the teams field for release pipelines."""
+  releasePipelineFieldTeams: Boolean
 
   """Whether to show the releases field for release pipelines."""
   releasePipelineFieldReleases: Boolean
