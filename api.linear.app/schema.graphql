@@ -12718,6 +12718,15 @@ enum IssueSharedAccessDisallowedField {
   projectMilestoneId
 }
 
+"""
+Policy controlling whether and by whom issues in a team can be shared with non-team-members.
+"""
+enum IssueSharingPolicy {
+  disabled
+  adminsOnly
+  allMembers
+}
+
 """Issue sorting options."""
 input IssueSortInput {
   """Sort by priority"""
@@ -18630,6 +18639,9 @@ type Organization implements Node {
   """
   aiAddonEnabled: Boolean!
 
+  """[INTERNAL] Whether the organization has enabled agent automation."""
+  agentAutomationEnabled: Boolean!
+
   """[INTERNAL] Whether the organization has enabled generated updates."""
   generatedUpdatesEnabled: Boolean!
 
@@ -19379,6 +19391,9 @@ input OrganizationUpdateInput {
 
   """[INTERNAL] Whether the organization has enabled the AI add-on."""
   aiAddonEnabled: Boolean
+
+  """[INTERNAL] Whether the organization has enabled agent automation."""
+  agentAutomationEnabled: Boolean
 
   """[INTERNAL] Whether the organization has enabled generated updates."""
   generatedUpdatesEnabled: Boolean
@@ -23234,6 +23249,12 @@ type PullRequest implements Node {
   """The target branch of the pull request."""
   targetBranch: String!
 
+  """The head SHA of the pull request."""
+  headSha: String
+
+  """The base SHA of the pull request."""
+  baseSha: String
+
   """The URL of the pull request in the version control system."""
   url: String!
 
@@ -25903,6 +25924,42 @@ type Release implements Node {
     """
     orderBy: PaginationOrderBy
   ): DocumentConnection!
+
+  """[ALPHA] Issues associated with the release."""
+  issues(
+    """Filter returned issues."""
+    filter: IssueFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueConnection!
+
+  """[ALPHA] Number of issues associated with the release."""
+  issueCount(
+    """Include archived issues in the count."""
+    includeArchived: Boolean = false
+  ): Int!
 
   """[Internal] Links associated with the release."""
   links(
@@ -28684,6 +28741,11 @@ input TeamCreateInput {
   [Internal] The scope of product intelligence suggestion data for the team.
   """
   productIntelligenceScope: ProductIntelligenceScope
+
+  """
+  The policy controlling whether and by whom issues in the team can be shared with non-team-members.
+  """
+  issueSharingPolicy: IssueSharingPolicy
 }
 
 type TeamEdge {
@@ -29099,6 +29161,11 @@ input TeamUpdateInput {
   [Internal] The scope of product intelligence suggestion data for the team.
   """
   productIntelligenceScope: ProductIntelligenceScope
+
+  """
+  The policy controlling whether and by whom issues in the team can be shared with non-team-members.
+  """
+  issueSharingPolicy: IssueSharingPolicy
 
   """The security settings for the team."""
   securitySettings: TeamSecuritySettingsInput
@@ -31187,13 +31254,22 @@ type ViewPreferencesValues {
   """The scheduled pipeline releases view ordering."""
   scheduledPipelineReleasesViewOrdering: String
 
-  """Whether to show the stage field for scheduled pipeline releases."""
-  scheduledPipelineReleaseFieldStage: Boolean
+  """The scheduled pipeline releases view grouping."""
+  scheduledPipelineReleasesViewGrouping: String
+
+  """Whether to show the version field for scheduled pipeline releases."""
+  scheduledPipelineReleaseFieldVersion: Boolean
 
   """
   Whether to show the release date field for scheduled pipeline releases.
   """
   scheduledPipelineReleaseFieldReleaseDate: Boolean
+
+  """Whether to show the completion field for scheduled pipeline releases."""
+  scheduledPipelineReleaseFieldCompletion: Boolean
+
+  """Whether to show the description field for scheduled pipeline releases."""
+  scheduledPipelineReleaseFieldDescription: Boolean
 
   """The search view ordering."""
   searchViewOrdering: String
