@@ -5605,6 +5605,12 @@ input DocumentFilter {
   """Filters that the document's initiative must satisfy."""
   initiative: InitiativeFilter
 
+  """Filters that the document's cycle must satisfy."""
+  cycle: CycleFilter
+
+  """Filters that the document's release must satisfy."""
+  release: ReleaseFilter
+
   """Compound filters, all of which need to be matched by the document."""
   and: [DocumentFilter!]
 
@@ -13226,6 +13232,11 @@ input JiraLinearMappingInput {
 
   """Whether this mapping is the default one for issue creation."""
   default: Boolean
+
+  """
+  Whether this mapping uses legacy unidirectional sync behavior where no changes sync from Linear to Jira.
+  """
+  legacyUnidirectional: Boolean
 }
 
 input JiraPersonalSettingsInput {
@@ -19208,11 +19219,26 @@ input OrganizationIpRestrictionInput {
   enabled: Boolean!
 }
 
+input OrganizationLinearAgentMcpServerAllowlistEntryInput {
+  """[Internal] The MCP server URL that Linear Agent is allowed to use."""
+  url: String!
+}
+
 input OrganizationLinearAgentSettingsInput {
   """
   [Internal] Whether the organization has enabled web search for Linear Agent.
   """
   webSearchEnabled: Boolean
+
+  """
+  [Internal] Whether the organization has enabled MCP servers for Linear Agent.
+  """
+  mcpServersEnabled: Boolean
+
+  """
+  [Internal] The MCP server allowlist for Linear Agent. When unset, all MCP servers are allowed.
+  """
+  mcpServersAllowlist: [OrganizationLinearAgentMcpServerAllowlistEntryInput!]
 }
 
 type OrganizationMeta {
@@ -24117,6 +24143,9 @@ type Query {
 
   """[ALPHA] All release stages."""
   releaseStages(
+    """Filter returned release stages."""
+    filter: ReleaseStageFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -24189,6 +24218,9 @@ type Query {
 
   """[ALPHA] All release pipelines."""
   releasePipelines(
+    """Filter returned release pipelines."""
+    filter: ReleasePipelineFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -31998,9 +32030,10 @@ enum WorkflowTriggerType {
 
 enum WorkflowType {
   sla
-  custom
+  automation
   viewSubscription
   triage
+  triageAutomation
 }
 
 input ZendeskSettingsInput {
