@@ -13029,6 +13029,9 @@ input IssueSortInput {
 
   """[ALPHA] Sort by number of links associated with the issue"""
   linkCount: LinkCountSort
+
+  """[ALPHA] Sort by most recent release date"""
+  release: ReleaseSort
 }
 
 """
@@ -25438,6 +25441,11 @@ type Query {
   """A collection of document content history entries."""
   documentContentHistory(id: String!): DocumentContentHistoryPayload!
 
+  """
+  [Internal] Fetches document content history entries by their IDs, including content data.
+  """
+  documentContentHistoryEntries(entryIds: [String!]!): DocumentContentHistoryPayload!
+
   """All cycles."""
   cycles(
     """Filter returned users."""
@@ -26688,6 +26696,15 @@ input ReleasePipelineUpdateInput {
 
   """The identifiers of the teams this pipeline is associated with."""
   teamIds: [String!]
+}
+
+"""[Internal] Issue release sorting options."""
+input ReleaseSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
 }
 
 """Release sorting options."""
@@ -28190,6 +28207,12 @@ type Subscription {
 
   """Triggered when a a document is unarchived"""
   documentUnarchived: Document!
+
+  """Triggered when a document content is created"""
+  documentContentCreated: DocumentContent!
+
+  """Triggered when a document content is updated"""
+  documentContentUpdated: DocumentContent!
 
   """Triggered when a document content draft is created"""
   documentContentDraftCreated: DocumentContentDraft!
