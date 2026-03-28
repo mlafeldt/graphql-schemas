@@ -7804,6 +7804,11 @@ input GongRecordingImportConfigInput {
 input GongSettingsInput {
   """Configuration for recording import."""
   importConfig: GongRecordingImportConfigInput
+
+  """
+  Whether to tag matching internal Gong call participants as user mentions in created issues.
+  """
+  tagParticipantsInIssues: Boolean
 }
 
 input GoogleSheetsExportSettings {
@@ -9896,7 +9901,7 @@ type Issue implements Node {
   title: String!
 
   """
-  The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
   """
   priority: Float!
 
@@ -10579,7 +10584,7 @@ input IssueCollectionFilter {
   description: NullableStringComparator
 
   """
-  Comparator for the issues priority. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  Comparator for the issues priority. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
   """
   priority: NullableNumberComparator
 
@@ -10814,7 +10819,7 @@ input IssueCreateInput {
   parentId: String
 
   """
-  The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
   """
   priority: Int
 
@@ -11064,7 +11069,7 @@ input IssueFilter {
   description: NullableStringComparator
 
   """
-  Comparator for the issues priority. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  Comparator for the issues priority. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
   """
   priority: NullableNumberComparator
 
@@ -12277,7 +12282,7 @@ type IssueSearchResult implements Node {
   title: String!
 
   """
-  The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
   """
   priority: Float!
 
@@ -13088,6 +13093,9 @@ input IssueSubscriptionFilter {
 
   """Filter by workflow state ID."""
   stateId: IDComparator
+
+  """Filter by parent issue ID."""
+  parentId: IDComparator
 }
 
 type IssueSuggestion implements Node {
@@ -13344,7 +13352,7 @@ input IssueUpdateInput {
   parentId: String
 
   """
-  The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
   """
   priority: Int
 
@@ -15602,7 +15610,7 @@ type Mutation {
     code: String!
   ): IntegrationPayload!
 
-  """[ALPHA] Integrates the organization with Microsoft Teams."""
+  """Integrates the organization with Microsoft Teams."""
   integrationMicrosoftTeams(
     """The Microsoft OAuth redirect URI."""
     redirectUri: String!
@@ -15611,7 +15619,7 @@ type Mutation {
     code: String!
   ): IntegrationPayload!
 
-  """[ALPHA] Connects the user's personal Microsoft account to Linear."""
+  """Connects the user's personal Microsoft account to Linear."""
   integrationMicrosoftPersonalConnect(
     """The Microsoft OAuth redirect URI."""
     redirectUri: String!
@@ -17831,7 +17839,7 @@ input NullableIssueFilter {
   description: NullableStringComparator
 
   """
-  Comparator for the issues priority. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  Comparator for the issues priority. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
   """
   priority: NullableNumberComparator
 
@@ -20167,7 +20175,7 @@ type Project implements Node {
   lastAppliedTemplate: Template
 
   """
-  The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
   """
   priority: Int!
 
@@ -21004,7 +21012,7 @@ input ProjectCreateInput {
   prioritySortOrder: Float
 
   """
-  The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
   """
   priority: Int
 
@@ -22304,7 +22312,7 @@ type ProjectSearchResult implements Node {
   lastAppliedTemplate: Template
 
   """
-  The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
   """
   priority: Int!
 
@@ -23389,7 +23397,7 @@ input ProjectUpdateInput {
   trashed: Boolean
 
   """
-  The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low.
+  The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
   """
   priority: Int
 
@@ -32543,6 +32551,7 @@ enum WorkflowTrigger {
 enum WorkflowTriggerType {
   issue
   project
+  release
 }
 
 enum WorkflowType {
