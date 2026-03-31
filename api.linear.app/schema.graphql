@@ -14317,6 +14317,39 @@ type Mutation {
     id: String!
   ): ReleaseStageArchivePayload!
 
+  """[ALPHA] Creates a new release pipeline."""
+  releasePipelineCreate(
+    """The ReleasePipeline object to create."""
+    input: ReleasePipelineCreateInput!
+  ): ReleasePipelinePayload!
+
+  """[ALPHA] Updates a release pipeline."""
+  releasePipelineUpdate(
+    """A partial ReleasePipeline object to update the ReleasePipeline with."""
+    input: ReleasePipelineUpdateInput!
+
+    """The identifier of the release pipeline to update."""
+    id: String!
+  ): ReleasePipelinePayload!
+
+  """[ALPHA] Archives a release pipeline."""
+  releasePipelineArchive(
+    """The identifier of the release pipeline to archive."""
+    id: String!
+  ): ReleasePipelineArchivePayload!
+
+  """[ALPHA] Unarchives a release pipeline."""
+  releasePipelineUnarchive(
+    """The identifier of the release pipeline to unarchive."""
+    id: String!
+  ): ReleasePipelineArchivePayload!
+
+  """[ALPHA] Deletes a release pipeline."""
+  releasePipelineDelete(
+    """The identifier of the release pipeline to delete."""
+    id: String!
+  ): DeletePayload!
+
   """[ALPHA] Syncs release data."""
   releaseSync(
     """The release data to sync."""
@@ -14396,39 +14429,6 @@ type Mutation {
     """The input containing the optional version and optional stage name."""
     input: ReleaseUpdateByPipelineInputBase!
   ): ReleasePayload!
-
-  """[ALPHA] Creates a new release pipeline."""
-  releasePipelineCreate(
-    """The ReleasePipeline object to create."""
-    input: ReleasePipelineCreateInput!
-  ): ReleasePipelinePayload!
-
-  """[ALPHA] Updates a release pipeline."""
-  releasePipelineUpdate(
-    """A partial ReleasePipeline object to update the ReleasePipeline with."""
-    input: ReleasePipelineUpdateInput!
-
-    """The identifier of the release pipeline to update."""
-    id: String!
-  ): ReleasePipelinePayload!
-
-  """[ALPHA] Archives a release pipeline."""
-  releasePipelineArchive(
-    """The identifier of the release pipeline to archive."""
-    id: String!
-  ): ReleasePipelineArchivePayload!
-
-  """[ALPHA] Unarchives a release pipeline."""
-  releasePipelineUnarchive(
-    """The identifier of the release pipeline to unarchive."""
-    id: String!
-  ): ReleasePipelineArchivePayload!
-
-  """[ALPHA] Deletes a release pipeline."""
-  releasePipelineDelete(
-    """The identifier of the release pipeline to delete."""
-    id: String!
-  ): DeletePayload!
 
   """Creates a new reaction."""
   reactionCreate(
@@ -24440,48 +24440,6 @@ type Query {
   """[ALPHA] One specific release stage."""
   releaseStage(id: String!): ReleaseStage!
 
-  """[ALPHA] All releases."""
-  releases(
-    """Filter returned releases."""
-    filter: ReleaseFilter
-
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): ReleaseConnection!
-
-  """[ALPHA] One specific release."""
-  release(id: String!): Release!
-
-  """[ALPHA] Search releases by term with ranked results."""
-  releaseSearch(
-    """Maximum results. Capped at 50."""
-    first: Int = 20
-
-    """Search term to match against release name, version, and pipeline name."""
-    term: String!
-  ): [Release!]!
-
   """[ALPHA] All release pipelines."""
   releasePipelines(
     """Filter returned release pipelines."""
@@ -24524,6 +24482,51 @@ type Query {
   [ALPHA] Returns the latest release for the pipeline associated with the access key.
   """
   latestReleaseByAccessKey: Release
+
+  """[ALPHA] All releases."""
+  releases(
+    """Filter returned releases."""
+    filter: ReleaseFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+
+    """[ALPHA] Sort returned releases."""
+    sort: [ReleaseSortInput!]
+  ): ReleaseConnection!
+
+  """[ALPHA] One specific release."""
+  release(id: String!): Release!
+
+  """[ALPHA] Search releases by term with ranked results."""
+  releaseSearch(
+    """Maximum results. Capped at 50."""
+    first: Int = 20
+
+    """Search term to match against release name, version, and pipeline name."""
+    term: String!
+  ): [Release!]!
 
   """The status of the rate limiter."""
   rateLimitStatus: RateLimitPayload!
@@ -30335,9 +30338,6 @@ type User implements Node {
   """Whether the user is mentionable."""
   isMentionable: Boolean!
 
-  """Whether the user is assignable."""
-  isAssignable: Boolean!
-
   """Whether the user account is active or disabled (suspended)."""
   active: Boolean!
 
@@ -30588,6 +30588,9 @@ type User implements Node {
 
   """Whether the user is an organization owner."""
   owner: Boolean!
+
+  """Whether the user is assignable."""
+  isAssignable: Boolean!
 
   """Whether this agent user supports agent sessions."""
   supportsAgentSessions: Boolean!
