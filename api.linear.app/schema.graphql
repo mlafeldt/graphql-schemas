@@ -10926,6 +10926,9 @@ input IssueCreateInput {
   default template of this team based on user's membership will be applied.
   """
   useDefaultTemplate: Boolean
+
+  """[ALPHA] The identifiers of the releases to associate with this issue."""
+  releaseIds: [String!]
 }
 
 """[Internal] A draft issue."""
@@ -13370,6 +13373,12 @@ input IssueUpdateInput {
 
   """The identifiers of the issue labels to be removed from this issue."""
   removedLabelIds: [String!]
+
+  """The identifiers of the releases to be added to this issue."""
+  addedReleaseIds: [String!]
+
+  """The identifiers of the releases to be removed from this issue."""
+  removedReleaseIds: [String!]
 
   """The identifier of the team associated with the issue."""
   teamId: String
@@ -19038,6 +19047,16 @@ type Organization implements Node {
   """The prefix used for auto-created Slack project channels."""
   slackProjectChannelPrefix: String!
 
+  """
+  [Internal] Whether the Slack project channels feature is enabled for the organization.
+  """
+  slackProjectChannelsEnabled: Boolean!
+
+  """
+  [Internal] Whether to automatically create a Slack channel when a new project is created.
+  """
+  slackAutoCreateProjectChannel: Boolean!
+
   """The organization's subscription to a paid plan."""
   subscription: PaidSubscription
 
@@ -19721,6 +19740,16 @@ input OrganizationUpdateInput {
   The prefix to use for auto-created Slack project channels (p-, proj-, or project-).
   """
   slackProjectChannelPrefix: String
+
+  """
+  [Internal] Whether the Slack project channels feature is enabled for the organization.
+  """
+  slackProjectChannelsEnabled: Boolean
+
+  """
+  [Internal] Whether to automatically create a Slack channel when a new project is created.
+  """
+  slackAutoCreateProjectChannel: Boolean
 
   """[Internal] Whether the organization has enabled Linear Agent."""
   linearAgentEnabled: Boolean
@@ -24468,6 +24497,9 @@ type Query {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
+
+    """[ALPHA] Sort returned release pipelines."""
+    sort: [ReleasePipelineSortInput!]
   ): ReleasePipelineConnection!
 
   """[ALPHA] One specific release pipeline."""
@@ -26171,6 +26203,9 @@ type Release implements Node {
   """The current stage of the release."""
   stage: ReleaseStage!
 
+  """The user who created the release."""
+  creator: User
+
   """The release's unique URL slug."""
   slugId: String!
 
@@ -26197,6 +26232,33 @@ type Release implements Node {
 
   """[Internal] The current progress of the release."""
   currentProgress: JSONObject!
+
+  """[Internal] History entries associated with the release."""
+  history(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ReleaseHistoryConnection!
 
   """Release URL."""
   url: String!
@@ -26481,6 +26543,45 @@ input ReleaseFilter {
   or: [ReleaseFilter!]
 }
 
+"""[Internal] A release history containing relevant change events."""
+type ReleaseHistory implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The events that happened while recording that history."""
+  entries: JSONObject!
+
+  """The release that the history is associated with."""
+  release: Release!
+}
+
+type ReleaseHistoryConnection {
+  edges: [ReleaseHistoryEdge!]!
+  nodes: [ReleaseHistory!]!
+  pageInfo: PageInfo!
+}
+
+type ReleaseHistoryEdge {
+  node: ReleaseHistory!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
 type ReleasePayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -26684,6 +26785,15 @@ input ReleasePipelineFilter {
   or: [ReleasePipelineFilter!]
 }
 
+"""Release pipeline name sorting options."""
+input ReleasePipelineNameSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 type ReleasePipelinePayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -26693,6 +26803,12 @@ type ReleasePipelinePayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""Release pipeline sorting options."""
+input ReleasePipelineSortInput {
+  """Sort by release pipeline name."""
+  name: ReleasePipelineNameSort
 }
 
 """A type of release pipeline."""
@@ -28783,6 +28899,17 @@ type Team implements Node {
   """[Internal] Whether new users should join this team by default."""
   joinByDefault: Boolean
 
+  """
+  [Internal] Whether the team should inherit its Slack auto-create project
+  channel setting from its parent. Only applies to sub-teams.
+  """
+  inheritSlackAutoCreateProjectChannel: Boolean!
+
+  """
+  [Internal] Whether to automatically create a Slack channel when a new project is created in this team.
+  """
+  slackAutoCreateProjectChannel: Boolean
+
   """Calendar feed URL (iCal) for cycles."""
   cycleCalenderUrl: String!
 
@@ -29306,6 +29433,17 @@ input TeamCreateInput {
   The policy controlling whether and by whom issues in the team can be shared with non-team-members.
   """
   issueSharingPolicy: IssueSharingPolicy
+
+  """
+  [Internal] Whether the team should inherit its Slack auto-create project
+  channel setting from its parent. Only applies to sub-teams.
+  """
+  inheritSlackAutoCreateProjectChannel: Boolean
+
+  """
+  [Internal] Whether to automatically create a Slack channel when a new project is created in this team.
+  """
+  slackAutoCreateProjectChannel: Boolean
 }
 
 type TeamEdge {
@@ -29726,6 +29864,17 @@ input TeamUpdateInput {
   The policy controlling whether and by whom issues in the team can be shared with non-team-members.
   """
   issueSharingPolicy: IssueSharingPolicy
+
+  """
+  [Internal] Whether the team should inherit its Slack auto-create project
+  channel setting from its parent. Only applies to sub-teams.
+  """
+  inheritSlackAutoCreateProjectChannel: Boolean
+
+  """
+  [Internal] Whether to automatically create a Slack channel when a new project is created in this team.
+  """
+  slackAutoCreateProjectChannel: Boolean
 
   """The security settings for the team."""
   securitySettings: TeamSecuritySettingsInput
