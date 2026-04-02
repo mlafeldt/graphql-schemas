@@ -18391,6 +18391,9 @@ input NullableTeamFilter {
   """Comparator for the team privacy."""
   private: BooleanComparator
 
+  """Comparator for the time at which the team was retired."""
+  retiredAt: NullableDateComparator
+
   """Filters that the teams issues must satisfy."""
   issues: IssueCollectionFilter
 
@@ -19163,6 +19166,9 @@ type Organization implements Node {
 
   """Whether the organization is using Customers."""
   customersEnabled: Boolean!
+
+  """[Internal] Whether release management is enabled for the organization."""
+  releasesEnabled: Boolean!
 
   """[DEPRECATED] Whether member users are allowed to send invites."""
   allowMembersToInvite: Boolean @deprecated(reason: "Use `securitySettings.invitationsRole` instead.")
@@ -26621,6 +26627,11 @@ type ReleasePipeline implements Node {
   """The type of the pipeline."""
   type: ReleasePipelineType!
 
+  """
+  [ALPHA] Whether this pipeline targets a production environment. Default to true.
+  """
+  isProduction: Boolean!
+
   """Glob patterns to include commits affecting matching file paths."""
   includePathPatterns: [String!]!
 
@@ -26750,6 +26761,11 @@ input ReleasePipelineCreateInput {
   """The type of the pipeline."""
   type: ReleasePipelineType
 
+  """
+  Whether this pipeline targets a production environment. Default to true.
+  """
+  isProduction: Boolean
+
   """Glob patterns to include commits affecting matching file paths."""
   includePathPatterns: [String!]
 
@@ -26826,6 +26842,11 @@ input ReleasePipelineUpdateInput {
 
   """The type of the pipeline."""
   type: ReleasePipelineType
+
+  """
+  Whether this pipeline targets a production environment. Default to true.
+  """
+  isProduction: Boolean
 
   """Glob patterns to include commits affecting matching file paths."""
   includePathPatterns: [String!]
@@ -29476,6 +29497,9 @@ input TeamFilter {
   """Comparator for the team privacy."""
   private: BooleanComparator
 
+  """Comparator for the time at which the team was retired."""
+  retiredAt: NullableDateComparator
+
   """Filters that the teams issues must satisfy."""
   issues: IssueCollectionFilter
 
@@ -30449,6 +30473,9 @@ type User implements Node {
   """A short description of the user, either its title or bio."""
   description: String
 
+  """The user's job title."""
+  title: String
+
   """The emoji to represent the user current status."""
   statusEmoji: String
 
@@ -31295,6 +31322,9 @@ input UserUpdateInput {
 
   """The user description or a short bio."""
   description: String
+
+  """The user's job title."""
+  title: String
 
   """The emoji part of the user status."""
   statusEmoji: String
