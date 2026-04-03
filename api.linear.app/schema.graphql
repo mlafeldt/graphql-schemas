@@ -10199,6 +10199,36 @@ type Issue implements Node {
     orderBy: PaginationOrderBy
   ): CommentConnection!
 
+  """[Internal] AI prompt progresses associated with this issue."""
+  aiPromptProgresses(
+    """Filter returned AI prompt progresses."""
+    filter: AiPromptProgressFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AiPromptProgressConnection!
+
   """History entries associated with the issue."""
   history(
     """A cursor to be used with last for backward pagination."""
@@ -12583,6 +12613,36 @@ type IssueSearchResult implements Node {
     orderBy: PaginationOrderBy
   ): CommentConnection!
 
+  """[Internal] AI prompt progresses associated with this issue."""
+  aiPromptProgresses(
+    """Filter returned AI prompt progresses."""
+    filter: AiPromptProgressFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AiPromptProgressConnection!
+
   """History entries associated with the issue."""
   history(
     """A cursor to be used with last for backward pagination."""
@@ -13527,6 +13587,19 @@ input JiraSettingsInput {
 
   """Whether this integration is for Jira Server or not."""
   isJiraServer: Boolean = false
+
+  """
+  Whether this integration uses custom OAuth authentication (enterprise SSO).
+  """
+  isCustomOAuth: Boolean
+
+  """
+  The OAuth client ID for the personal connection OAuth app, when using custom OAuth.
+  """
+  personalOAuthClientId: String
+
+  """The custom OAuth server token endpoint URL (enterprise SSO)."""
+  customOAuthServerUrl: String
 
   """
   Whether the user needs to provide setup information about the webhook to
@@ -24557,13 +24630,21 @@ type Query {
   """[ALPHA] One specific release."""
   release(id: String!): Release!
 
-  """[ALPHA] Search releases by term with ranked results."""
+  """
+  [ALPHA] Search releases with optional text matching and filter-based scoping.
+  """
   releaseSearch(
+    """Filter to apply to the release results."""
+    filter: ReleaseFilter
+
     """Maximum results. Capped at 50."""
     first: Int = 20
 
-    """Search term to match against release name, version, and pipeline name."""
-    term: String!
+    """
+    Search term to match against release name, version, and pipeline name. When
+    omitted, returns releases ordered by stage priority.
+    """
+    term: String
   ): [Release!]!
 
   """The status of the rate limiter."""
@@ -26408,6 +26489,9 @@ input ReleaseCollectionFilter {
   """Filters that the release's stage must satisfy."""
   stage: ReleaseStageFilter
 
+  """Comparator for the release completion date."""
+  completedAt: NullableDateComparator
+
   """Compound filters, all of which need to be matched by the release."""
   and: [ReleaseCollectionFilter!]
 
@@ -26541,6 +26625,9 @@ input ReleaseFilter {
 
   """Filters that the release's stage must satisfy."""
   stage: ReleaseStageFilter
+
+  """Comparator for the release completion date."""
+  completedAt: NullableDateComparator
 
   """Compound filters, all of which need to be matched by the release."""
   and: [ReleaseFilter!]
@@ -26793,6 +26880,9 @@ input ReleasePipelineFilter {
 
   """Comparator for the pipeline name."""
   name: StringComparator
+
+  """Comparator for the pipeline production flag."""
+  isProduction: BooleanComparator
 
   """Compound filters, all of which need to be matched by the pipeline."""
   and: [ReleasePipelineFilter!]
@@ -28897,7 +28987,7 @@ type Team implements Node {
   autoCloseStateId: String
 
   """
-  Period after which automatically closed and completed issues are automatically archived in months.
+  Period after which automatically closed, completed, and duplicate issues are automatically archived in months.
   """
   autoArchivePeriod: Float!
 
@@ -29428,7 +29518,8 @@ input TeamCreateInput {
   autoCloseStateId: String
 
   """
-  Period after which closed and completed issues are automatically archived, in months. 0 means disabled.
+  Period after which closed (completed, canceled, or duplicate) issues are
+  automatically archived, in months. 0 means disabled.
   """
   autoArchivePeriod: Float
 
@@ -29846,7 +29937,7 @@ input TeamUpdateInput {
   autoCloseChildIssues: Boolean
 
   """
-  Period after which closed and completed issues are automatically archived, in months.
+  Period after which closed (completed, canceled, or duplicate) issues are automatically archived, in months.
   """
   autoArchivePeriod: Float
 
@@ -32742,6 +32833,7 @@ enum WorkflowType {
   viewSubscription
   triage
   triageAutomation
+  release
 }
 
 input ZendeskSettingsInput {
