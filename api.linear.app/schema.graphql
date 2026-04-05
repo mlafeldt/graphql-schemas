@@ -1092,6 +1092,34 @@ type AiConversationInvokeMcpToolToolCallArgsTool {
   title: String
 }
 
+type AiConversationNavigateToPageToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationNavigateToPageToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationNavigateToPageToolCallResult
+}
+
+type AiConversationNavigateToPageToolCallArgs {
+  entityType: String
+  identifier: String
+}
+
+type AiConversationNavigateToPageToolCallResult {
+  url: String!
+  newTab: Boolean
+}
+
 """A part in an AI conversation."""
 union AiConversationPart = AiConversationPromptPart | AiConversationTextPart | AiConversationReasoningPart | AiConversationToolCallPart | AiConversationWidgetPart
 
@@ -1429,11 +1457,12 @@ enum AiConversationTool {
   WebSearch
   GetSlackConversationHistory
   GetMicrosoftTeamsConversationHistory
+  NavigateToPage
   InvokeMcpTool
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -29546,10 +29575,8 @@ input TeamCreateInput {
   """
   productIntelligenceScope: ProductIntelligenceScope
 
-  """
-  The policy controlling whether and by whom issues in the team can be shared with non-team-members.
-  """
-  issueSharingPolicy: IssueSharingPolicy
+  """Whether issue sharing is enabled for this team."""
+  issueSharingEnabled: Boolean
 
   """
   [Internal] Whether the team should inherit its Slack auto-create project
@@ -29794,6 +29821,9 @@ enum TeamRoleType {
 }
 
 input TeamSecuritySettingsInput {
+  """The minimum team role required to share issues with non-team-members."""
+  issueSharing: TeamRoleType
+
   """The minimum team role required to manage labels in the team."""
   labelManagement: TeamRoleType
 
@@ -29980,10 +30010,8 @@ input TeamUpdateInput {
   """
   productIntelligenceScope: ProductIntelligenceScope
 
-  """
-  The policy controlling whether and by whom issues in the team can be shared with non-team-members.
-  """
-  issueSharingPolicy: IssueSharingPolicy
+  """Whether issue sharing is enabled for this team."""
+  issueSharingEnabled: Boolean
 
   """
   [Internal] Whether the team should inherit its Slack auto-create project
