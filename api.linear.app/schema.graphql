@@ -414,6 +414,9 @@ type AgentSession implements Node {
   """The issue this agent session is associated with."""
   issue: Issue
 
+  """The agent session's unique URL slug."""
+  slugId: String
+
   """The current status of the agent session."""
   status: AgentSessionStatus!
 
@@ -753,6 +756,9 @@ type AiConversation implements Node {
   """A summary of the conversation."""
   summary: String
 
+  """The conversation's unique URL slug."""
+  slugId: String
+
   """[Internal] The workflow definition that created this conversation."""
   workflowDefinition: WorkflowDefinition
 
@@ -915,6 +921,7 @@ enum AiConversationEntityCardWidgetArgsType {
   Initiative
   InitiativeUpdate
   ProjectUpdate
+  WorkflowDefinition
   Team
   Template
   Customer
@@ -976,6 +983,7 @@ enum AiConversationEntityListWidgetArgsEntitiesType {
   Initiative
   InitiativeUpdate
   ProjectUpdate
+  WorkflowDefinition
   Team
   Template
   Customer
@@ -2239,6 +2247,11 @@ type AuthenticationSessionResponse {
 
   """Name of the session, derived from the client and operating system"""
   name: String!
+
+  """
+  Detailed name of the session including version information, derived from the user agent.
+  """
+  detailedName: String!
 
   """Identifies the session used to make the request."""
   isCurrentSession: Boolean!
@@ -28196,6 +28209,11 @@ input SlackSettingsInput {
   Whether Linear Agent should be given Org-wide access within Slack workflows.
   """
   enableLinearAgentWorkflowAccess: Boolean
+
+  """
+  Whether Code Intelligence should be enabled for this Slack integration.
+  """
+  enableCodeIntelligence: Boolean
 }
 
 """Which day count to use for SLA calculations."""
@@ -31789,6 +31807,15 @@ type ViewPreferencesValues {
 
   """List of row model IDs which should be hidden on a board."""
   hiddenRows: [String!]
+
+  """List of group model IDs which should be hidden on a list."""
+  hiddenGroupsList: [String!]
+
+  """Custom ordering of groups on the board layout."""
+  columnOrderBoard: [String!]
+
+  """Custom ordering of groups on the list layout."""
+  columnOrderList: [String!]
 
   """The project layout type."""
   projectLayout: String
