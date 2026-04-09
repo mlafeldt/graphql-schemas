@@ -2479,16 +2479,10 @@ input CandidateRepository {
   hostname: String!
 }
 
-"""[Internal] Coding agent sandbox details for an agent session."""
-type CodingAgentSandboxPayload {
+"""[Internal] A single sandbox container entry."""
+type CodingAgentSandboxEntry {
   """The sandbox identifier."""
   id: String!
-
-  """The agent session identifier."""
-  agentSessionId: String!
-
-  """The organization identifier."""
-  organizationId: String!
 
   """The user who initiated the session."""
   creatorId: String
@@ -2498,12 +2492,6 @@ type CodingAgentSandboxPayload {
 
   """The sandbox logs URL."""
   sandboxLogsUrl: String
-
-  """Datadog logs URL for the session or sandbox."""
-  datadogLogsUrl: String
-
-  """Temporal URL to view all workflows for this sandbox."""
-  temporalWorkflowUrl: String
 
   """Claude Agent SDK conversation ID."""
   workerConversationId: String
@@ -2523,8 +2511,23 @@ type CodingAgentSandboxPayload {
   """When the sandbox first became active."""
   startedAt: DateTime
 
-  """When the session reached a terminal state."""
+  """When the sandbox reached a terminal state."""
   endedAt: DateTime
+}
+
+"""[Internal] Coding agent sandbox details for an agent session."""
+type CodingAgentSandboxPayload {
+  """The agent session identifier."""
+  agentSessionId: String!
+
+  """All sandbox containers for this session, oldest first."""
+  sandboxes: [CodingAgentSandboxEntry!]!
+
+  """Datadog logs URL covering all sandboxes in the session."""
+  datadogLogsUrl: String
+
+  """Temporal URL to view workflows for this session."""
+  temporalWorkflowsUrl: String
 }
 
 """A comment associated with an entity."""
@@ -10705,6 +10708,9 @@ input IssueCollectionFilter {
   """Comparator for the issues canceled at date."""
   canceledAt: NullableDateComparator
 
+  """Comparator for the issue's SLA breach date."""
+  slaBreachesAt: NullableDateComparator
+
   """Comparator for the issues archived at date."""
   archivedAt: NullableDateComparator
 
@@ -11192,6 +11198,9 @@ input IssueFilter {
 
   """Comparator for the issues canceled at date."""
   canceledAt: NullableDateComparator
+
+  """Comparator for the issue's SLA breach date."""
+  slaBreachesAt: NullableDateComparator
 
   """Comparator for the issues archived at date."""
   archivedAt: NullableDateComparator
@@ -13574,6 +13583,9 @@ input IssueUpdateInput {
   """The date at which the issue is due."""
   dueDate: TimelessDate
 
+  """Whether this issue should inherit shared access from its parent issue."""
+  inheritsSharedAccess: Boolean
+
   """Whether the issue has been trashed."""
   trashed: Boolean
 
@@ -13896,6 +13908,11 @@ input ManualSort {
 input MicrosoftTeamsSettingsInput {
   """The display name of the Azure AD tenant."""
   tenantName: String
+
+  """
+  Whether Code Intelligence should be enabled for this Microsoft Teams integration.
+  """
+  enableCodeIntelligence: Boolean
 }
 
 """Issue project milestone options."""
@@ -18041,6 +18058,9 @@ input NullableIssueFilter {
 
   """Comparator for the issues canceled at date."""
   canceledAt: NullableDateComparator
+
+  """Comparator for the issue's SLA breach date."""
+  slaBreachesAt: NullableDateComparator
 
   """Comparator for the issues archived at date."""
   archivedAt: NullableDateComparator
@@ -26128,7 +26148,7 @@ type Query {
   ): AgentSession!
 
   """
-  [Internal] Retrieves the coding agent sandbox for a given agent session ID.
+  [Internal] Retrieves coding agent sandbox details for a given agent session ID.
   """
   agentSessionSandbox(
     """The identifier of the agent session."""
