@@ -1013,6 +1013,7 @@ enum AiConversationEntityCardWidgetArgsType {
   CustomerNeed
   Document
   CustomView
+  Dashboard
   PullRequest
   Release
   ReleasePipeline
@@ -1075,6 +1076,7 @@ enum AiConversationEntityListWidgetArgsEntitiesType {
   CustomerNeed
   Document
   CustomView
+  Dashboard
   PullRequest
   Release
   ReleasePipeline
@@ -10767,6 +10769,7 @@ enum IntegrationService {
   mcpServer
   microsoftTeams
   microsoftPersonal
+  microsoftTeamsProjectPost
 }
 
 input IntegrationSettingsInput {
@@ -10789,6 +10792,7 @@ input IntegrationSettingsInput {
   front: FrontSettingsInput
   gong: GongSettingsInput
   microsoftTeams: MicrosoftTeamsSettingsInput
+  microsoftTeamsProjectPost: MicrosoftTeamsPostSettingsInput
   jira: JiraSettingsInput
   notion: NotionSettingsInput
   opsgenie: OpsgenieInput
@@ -10863,6 +10867,11 @@ type IntegrationsSettings implements Node {
   """Whether to send a Slack message when a project update is created."""
   slackProjectUpdateCreated: Boolean
 
+  """
+  Whether to send a Microsoft Teams message when a project update is created.
+  """
+  microsoftTeamsProjectUpdateCreated: Boolean
+
   """Whether to send a new project update to team Slack channels."""
   slackProjectUpdateCreatedToTeam: Boolean
 
@@ -10917,6 +10926,11 @@ input IntegrationsSettingsCreateInput {
 
   """Whether to send a Slack message when a project update is created."""
   slackProjectUpdateCreated: Boolean
+
+  """
+  Whether to send a Microsoft Teams message when a project update is created.
+  """
+  microsoftTeamsProjectUpdateCreated: Boolean
 
   """
   Whether to send a Slack message when a project update is created to team channels.
@@ -11000,6 +11014,11 @@ input IntegrationsSettingsUpdateInput {
 
   """Whether to send a Slack message when a project update is created."""
   slackProjectUpdateCreated: Boolean
+
+  """
+  Whether to send a Microsoft Teams message when a project update is created.
+  """
+  microsoftTeamsProjectUpdateCreated: Boolean
 
   """
   Whether to send a Slack message when a project update is created to team channels.
@@ -15267,6 +15286,9 @@ input IssueUpdateInput {
   """The identifiers of the issue labels to be removed from this issue."""
   removedLabelIds: [String!]
 
+  """The identifiers of the releases associated with this issue."""
+  releaseIds: [String!]
+
   """The identifiers of the releases to be added to this issue."""
   addedReleaseIds: [String!]
 
@@ -15646,6 +15668,56 @@ input ManualSort {
   order: PaginationSortOrder
 }
 
+"""
+An additional HTTP header sent with requests to the connected MCP server. Header values are stored securely.
+"""
+input McpServerCustomHeaderInput {
+  """The HTTP header name."""
+  name: String!
+
+  """The HTTP header value."""
+  value: String!
+}
+
+type MicrosoftTeamsChannel {
+  """The Microsoft Teams channel id (e.g. `19:abc@thread.tacv2`)."""
+  id: String!
+
+  """The display name of the channel."""
+  displayName: String!
+
+  """The membership type of the channel: standard, private, or shared."""
+  membershipType: String!
+}
+
+type MicrosoftTeamsChannelsPayload {
+  """The teams the user belongs to with their channels."""
+  teams: [MicrosoftTeamsTeam!]!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+input MicrosoftTeamsPostSettingsInput {
+  """AAD group id of the Team."""
+  teamId: String!
+
+  """Display name of the Team."""
+  teamName: String!
+
+  """Microsoft Teams channel id."""
+  channelId: String!
+
+  """Display name of the channel."""
+  channelName: String!
+
+  """Membership type of the channel: standard, private, or shared."""
+  membershipType: String!
+
+  """Azure AD tenant id the team belongs to."""
+  tenantId: String!
+}
+
 input MicrosoftTeamsSettingsInput {
   """The display name of the Azure AD tenant."""
   tenantName: String
@@ -15654,6 +15726,17 @@ input MicrosoftTeamsSettingsInput {
   Whether Code Intelligence should be enabled for this Microsoft Teams integration.
   """
   enableCodeIntelligence: Boolean
+}
+
+type MicrosoftTeamsTeam {
+  """The AAD group id of the team."""
+  id: String!
+
+  """The display name of the team."""
+  displayName: String!
+
+  """The channels in the team the user can access."""
+  channels: [MicrosoftTeamsChannel!]!
 }
 
 """Issue project milestone options."""
@@ -17472,6 +17555,11 @@ type Mutation {
 
   """Connect your GitHub account to Linear."""
   integrationGitHubPersonal(
+    """
+    The enterprise URL for GitHub Enterprise Cloud connections. Omit for github.com.
+    """
+    enterpriseUrl: String
+
     """Whether to connect with code access."""
     codeAccess: Boolean
 
@@ -17738,6 +17826,32 @@ type Mutation {
     code: String!
   ): IntegrationPayload!
 
+  """
+  [Internal] Connect a project to a Microsoft Teams channel. Find-or-update
+  semantics: creates a microsoftTeamsProjectPost integration row if none exists
+  for the project, or overwrites the existing one's team/channel selection.
+  Requires the connecting user to have linked their personal Microsoft account.
+  """
+  integrationMicrosoftTeamsProjectPost(
+    """Membership type of the channel: standard, private, or shared."""
+    membershipType: String!
+
+    """Display name of the chosen channel."""
+    channelName: String!
+
+    """Microsoft Teams channel id."""
+    channelId: String!
+
+    """Display name of the chosen team."""
+    teamName: String!
+
+    """AAD group id of the chosen team."""
+    teamId: String!
+
+    """Integration's associated project."""
+    projectId: String!
+  ): IntegrationPayload!
+
   """Integrates the workspace with Google Sheets."""
   integrationGoogleSheets(
     """The Google OAuth code."""
@@ -17812,12 +17926,22 @@ type Mutation {
 
   """[INTERNAL] Connects the user's personal account with an MCP server."""
   integrationMcpServerPersonalConnect(
+    """
+    Optional additional HTTP headers to include with requests to this MCP server.
+    """
+    customHeaders: [McpServerCustomHeaderInput!]
+
     """The URL of the MCP server to connect with."""
     serverUrl: String!
   ): IntegrationPayload!
 
   """[INTERNAL] Connects the workspace with an MCP server."""
   integrationMcpServerConnect(
+    """
+    Optional additional HTTP headers to include with requests to this MCP server.
+    """
+    customHeaders: [McpServerCustomHeaderInput!]
+
     """The ID of the workflow definition to connect the MCP server to."""
     workflowDefinitionId: String
 
@@ -28260,6 +28384,13 @@ type Query {
   ): IntegrationHasScopesPayload!
 
   """
+  [Internal] Lists Microsoft Teams teams and channels accessible to the
+  connecting user. Uses the user's microsoftPersonal integration for auth. Used
+  by the project channel picker dialog to populate the team/channel dropdowns.
+  """
+  microsoftTeamsChannels: MicrosoftTeamsChannelsPayload!
+
+  """
   Returns all initiative status updates in the workspace, with optional filtering.
   """
   initiativeUpdates(
@@ -33796,6 +33927,9 @@ input TokenUserAccountAuthInput {
 
   """An optional invite link for a workspace."""
   inviteLink: String
+
+  """Auth code for the client initiating the login sequence."""
+  clientAuthCode: String
 }
 
 """
