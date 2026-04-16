@@ -9,6 +9,50 @@ Indicates exactly one field must be supplied and this field must not be `null`.
 """
 directive @oneOf on INPUT_OBJECT
 
+"""
+[Internal] An access key for CI/CD integrations. Unlike personal API keys,
+access keys are not tied to a specific user's permissions but are scoped to an
+organization with specific capabilities and resource access (e.g., specific
+release pipelines). They support revocation with a grace period, allowing
+existing deployments to complete before the key becomes fully invalid.
+"""
+type AccessKey implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The organization this access key belongs to."""
+  organization: Organization!
+
+  """The user who created the access key."""
+  creator: User
+
+  """
+  The timestamp when the access key was last used to authenticate an API request. Null if the key has never been used.
+  """
+  lastUsedAt: DateTime
+
+  """
+  The timestamp when the access key was revoked. May be set to a future date to
+  implement a grace period during which the key remains valid. Null if the key
+  has not been revoked.
+  """
+  revokedAt: DateTime
+}
+
 """Activity collection filtering options."""
 input ActivityCollectionFilter {
   """Comparator for the identifier."""
@@ -866,6 +910,36 @@ type AiConversation implements Node {
 
   """[Internal] The log ID of the AI response."""
   evalLogId: String
+
+  """Messages associated with the conversation."""
+  messages(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AiMessageConnection!
+
+  """The conversation rendered as a Markdown string."""
+  body: String!
 }
 
 """A base part in an AI conversation."""
@@ -1680,6 +1754,77 @@ type AiConversationWidgetPart implements AiConversationBasePart {
 }
 
 """
+[Internal] A message in a conversation between a user and the Linear AI
+assistant. Messages are not synced to the client and are instead fetched via
+GraphQL. Each message has a role (user or assistant), structured content parts,
+and optional context references.
+"""
+type AiMessage implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The conversation the message belongs to."""
+  conversation: AiConversation!
+
+  """
+  The structured content parts of the message, such as text, code, or tool results.
+  """
+  parts: JSONObject!
+
+  """
+  The role of the message sender, indicating whether it was sent by the user or the AI assistant.
+  """
+  role: AiMessageRole!
+
+  """
+  Contextual references attached to this message, such as related issues,
+  projects, or documents that were provided as context for the AI.
+  """
+  context: JSONObject!
+
+  """
+  The AI model used to generate this message. Null for user-sent messages.
+  """
+  llmModel: String
+
+  """[Internal] The log ID of the AI response."""
+  evalLogId: String
+}
+
+type AiMessageConnection {
+  edges: [AiMessageEdge!]!
+  nodes: [AiMessage!]!
+  pageInfo: PageInfo!
+}
+
+type AiMessageEdge {
+  node: AiMessage!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""The role of an AI message."""
+enum AiMessageRole {
+  assistant
+  user
+}
+
+"""
 [Internal] Tracks the progress and state of an AI prompt workflow execution.
 Each progress record is associated with an issue or comment and contains the
 workflow type, current status, metadata about the execution, and optionally the
@@ -1715,6 +1860,23 @@ type AiPromptProgress implements Node {
 
   """[Internal] The log ID for the prompt workflow, if available."""
   logId: String
+
+  """[Internal] The AI conversation associated with the prompt workflow."""
+  aiConversation: AiConversation
+
+  """[Internal] The root comment ID associated with this prompt workflow."""
+  rootCommentId: String
+
+  """[Internal] The AI conversation ID linked to this prompt workflow."""
+  aiConversationId: String
+
+  """
+  [Internal] A human-readable label for the current step of the prompt workflow, or null when inactive.
+  """
+  statusLabel: String
+
+  """[Internal] The agent user associated with this prompt workflow."""
+  user: User
 }
 
 type AiPromptProgressConnection {
@@ -1842,7 +2004,6 @@ enum AiPromptType {
   projectUpdates
   initiativeUpdates
   agentGuidance
-  triageAgent
   codeIntelligence
   aiConversation
   slackIssueIntake
@@ -6164,6 +6325,9 @@ type Dashboard implements Node {
   and the widgets within each row, including their type, size, and data settings.
   """
   widgets: JSONObject!
+
+  """The team associated with the dashboard."""
+  team: Team
 }
 
 """Comparator for dates."""
@@ -6437,10 +6601,10 @@ type DocumentConnection {
 
 """
 The rich-text content body of a document, issue, project, initiative, project
-milestone, pull request, AI prompt rules, or welcome message. Content is stored
-as a base64-encoded Yjs state and can be converted to Markdown or ProseMirror
-JSON. Each DocumentContent belongs to exactly one parent entity and supports
-real-time collaborative editing.
+milestone, pull request, release note, AI prompt rules, or welcome message.
+Content is stored as a base64-encoded Yjs state and can be converted to Markdown
+or ProseMirror JSON. Each DocumentContent belongs to exactly one parent entity
+and supports real-time collaborative editing.
 """
 type DocumentContent implements Node {
   """The unique identifier of the entity."""
@@ -6517,6 +6681,66 @@ type DocumentContent implements Node {
   the content history. Null if the content has never been restored.
   """
   restoredAt: DateTime
+
+  """Comments associated with the document content."""
+  comments(
+    """Filter returned comments."""
+    filter: CommentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CommentConnection!
+
+  """[ALPHA] The histories of the document content."""
+  history(
+    """Filter returned document content histories."""
+    filter: DocumentContentHistoryFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): DocumentContentHistoryConnection!
 }
 
 """
@@ -6563,6 +6787,88 @@ type DocumentContentDraft implements Node {
 
   """The identifier of the user who owns this draft."""
   userId: String!
+}
+
+"""
+A version history entry for document content. Each entry captures a snapshot of
+the document's ProseMirror content at a specific point in time, along with the
+IDs of the users who contributed to that version. History entries are created
+automatically as collaborative editing sessions progress, and can also be
+created when AI agent checkpoints are compacted.
+"""
+type DocumentContentHistory implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """
+  The document content entity that this history entry is a version snapshot of.
+  """
+  documentContent: DocumentContent!
+
+  """
+  [Internal] The document content as a ProseMirror document at the time this history entry was captured.
+  """
+  contentData: JSONObject
+
+  """
+  IDs of users whose edits are included in this history entry. Multiple users
+  may be present due to concurrent collaborative editing.
+  """
+  actorIds: [String!]!
+
+  """
+  The timestamp of the document content state when this snapshot was captured.
+  This may differ from createdAt because the snapshot reflects the content's
+  state at its last known updatedAt timestamp. On document creation, these
+  timestamps can be identical.
+  """
+  contentDataSnapshotAt: DateTime!
+
+  """
+  [Internal] Metadata associated with the history entry, including precomputed
+  content diffs, AI-generated change summaries, and source metadata indicating
+  how the entry was created.
+  """
+  metadata: JSONObject
+}
+
+type DocumentContentHistoryConnection {
+  edges: [DocumentContentHistoryEdge!]!
+  nodes: [DocumentContentHistory!]!
+  pageInfo: PageInfo!
+}
+
+type DocumentContentHistoryEdge {
+  node: DocumentContentHistory!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""Document content history filtering options."""
+input DocumentContentHistoryFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
 }
 
 type DocumentContentHistoryPayload {
@@ -12509,6 +12815,33 @@ type IssueDraft implements Node {
 
   """Serialized array of JSONs representing the recurring issue's schedule."""
   schedule: JSONObject
+
+  """The issue labels associated with this draft."""
+  labels(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IssueLabelConnection!
 }
 
 type IssueDraftConnection {
@@ -14986,6 +15319,12 @@ type IssueSuggestion implements Node {
   label. Can be used to query the label directly.
   """
   suggestedLabelId: String
+
+  """The reasons for the suggestion."""
+  reasons: [String!]!
+
+  """Whether the suggestion should be visible."""
+  isVisible: Boolean!
 }
 
 """IssueSuggestion collection filtering options."""
@@ -15800,6 +16139,644 @@ type Mutation {
     """The asset URL of the uploaded file to delete."""
     assetUrl: String!
   ): FileUploadDeletePayload!
+
+  """[INTERNAL] Updates the integration."""
+  integrationUpdate(
+    """A partial integration object to update the integration with."""
+    input: IntegrationUpdateInput!
+
+    """The identifier of the integration to update."""
+    id: String!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Updates the integration settings."""
+  integrationSettingsUpdate(
+    """An integration settings object."""
+    input: IntegrationSettingsInput!
+
+    """The identifier of the integration to update."""
+    id: String!
+  ): IntegrationPayload! @deprecated(reason: "Use integrationUpdate instead.")
+
+  """Generates a webhook for the GitHub commit integration."""
+  integrationGithubCommitCreate: GitHubCommitIntegrationPayload!
+
+  """Connects the workspace with the GitHub App."""
+  integrationGithubConnect(
+    """
+    The GitHub Enterprise Cloud host (e.g., 'linear-development.ghe.com'). When provided, this creates a GEC integration.
+    """
+    githubHost: String
+
+    """Whether the integration should have code access"""
+    codeAccess: Boolean = false
+
+    """The GitHub grant code that's exchanged for OAuth tokens."""
+    code: String!
+
+    """The GitHub data to connect with."""
+    installationId: String!
+  ): IntegrationPayload!
+
+  """Connects the workspace with the GitHub Import App."""
+  integrationGithubImportConnect(
+    """The GitHub grant code that's exchanged for OAuth tokens."""
+    code: String!
+
+    """The GitHub data to connect with."""
+    installationId: String!
+  ): IntegrationPayload!
+
+  """Refreshes the data for a GitHub import integration."""
+  integrationGithubImportRefresh(
+    """The id of the integration to update."""
+    id: String!
+  ): IntegrationPayload!
+
+  """Connects the workspace with a GitHub Enterprise Server."""
+  integrationGitHubEnterpriseServerConnect(
+    """The name of GitHub organization."""
+    organizationName: String!
+
+    """The base URL of the GitHub Enterprise Server installation."""
+    githubUrl: String!
+  ): GitHubEnterpriseServerPayload!
+
+  """Connects the workspace with a GitLab Access Token."""
+  integrationGitlabConnect(
+    """The URL of the GitLab installation."""
+    gitlabUrl: String!
+
+    """The GitLab Access Token to connect with."""
+    accessToken: String!
+  ): GitLabIntegrationCreatePayload!
+
+  """
+  Tests connectivity to a self-hosted GitLab instance and clears auth errors if successful.
+  """
+  integrationGitlabTestConnection(
+    """The ID of the GitLab integration to test."""
+    integrationId: String!
+  ): GitLabTestConnectionPayload!
+
+  """Creates an integration api key for Airbyte to connect with Linear."""
+  airbyteIntegrationConnect(
+    """Airbyte integration settings."""
+    input: AirbyteConfigurationInput!
+  ): IntegrationPayload!
+
+  """
+  [Internal] Connects the Google Calendar to the user to this Linear account via OAuth2.
+  """
+  integrationGoogleCalendarPersonalConnect(
+    """[Internal] The Google OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Integrates the workspace with LaunchDarkly."""
+  integrationLaunchDarklyConnect(
+    """The LaunchDarkly OAuth code."""
+    code: String!
+
+    """The LaunchDarkly project key."""
+    projectKey: String!
+
+    """The LaunchDarkly environment."""
+    environment: String!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Integrates your personal account with LaunchDarkly."""
+  integrationLaunchDarklyPersonalConnect(
+    """The LaunchDarkly OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Connects the workspace with a Jira Personal Access Token."""
+  jiraIntegrationConnect(
+    """Jira integration settings."""
+    input: JiraConfigurationInput!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Updates a Jira Integration."""
+  integrationJiraUpdate(
+    """Jira integration update input."""
+    input: JiraUpdateInput!
+  ): IntegrationPayload!
+
+  """
+  [INTERNAL] Fetches Jira project statuses and stores them in integration settings.
+  """
+  integrationJiraFetchProjectStatuses(
+    """Input for fetching Jira project statuses."""
+    input: JiraFetchProjectStatusesInput!
+  ): JiraFetchProjectStatusesPayload!
+
+  """Connect your Jira account to Linear."""
+  integrationJiraPersonal(
+    """The Jira OAuth code, when connecting using OAuth."""
+    code: String
+
+    """The Jira personal access token, when connecting using a PAT."""
+    accessToken: String
+  ): IntegrationPayload!
+
+  """Connect your GitHub account to Linear."""
+  integrationGitHubPersonal(
+    """
+    The enterprise URL for GitHub Enterprise Cloud connections. Omit for github.com.
+    """
+    enterpriseUrl: String
+
+    """Whether to connect with code access."""
+    codeAccess: Boolean
+
+    """The GitHub OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """Integrates the workspace with Intercom."""
+  integrationIntercom(
+    """
+    The Intercom domain URL to use for the integration. Defaults to app.intercom.com if not provided.
+    """
+    domainUrl: String
+
+    """The Intercom OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Intercom OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """Disconnects the workspace from Intercom."""
+  integrationIntercomDelete: IntegrationPayload!
+
+  """
+  [INTERNAL] Refreshes the customer data attributes from the specified integration service.
+  """
+  integrationCustomerDataAttributesRefresh(
+    """The integration service to refresh customer data attributes from."""
+    input: IntegrationCustomerDataAttributesRefreshInput!
+  ): IntegrationPayload!
+
+  """[DEPRECATED] Updates settings on the Intercom integration."""
+  integrationIntercomSettingsUpdate(
+    """
+    A partial Intercom integration settings object to update the integration settings with.
+    """
+    input: IntercomSettingsInput!
+  ): IntegrationPayload! @deprecated(reason: "This mutation is deprecated, please use `integrationSettingsUpdate` instead")
+
+  """Integrates the workspace with Discord."""
+  integrationDiscord(
+    """The Discord OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Discord OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Integrates the workspace with Opsgenie."""
+  integrationOpsgenieConnect(
+    """The Opsgenie API key."""
+    apiKey: String!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Refresh Opsgenie schedule mappings."""
+  integrationOpsgenieRefreshScheduleMappings: IntegrationPayload!
+
+  """[INTERNAL] Integrates the workspace with PagerDuty."""
+  integrationPagerDutyConnect(
+    """The PagerDuty OAuth code."""
+    code: String!
+
+    """The PagerDuty OAuth redirect URI."""
+    redirectUri: String!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Refresh PagerDuty schedule mappings."""
+  integrationPagerDutyRefreshScheduleMappings: IntegrationPayload!
+
+  """[Internal] Updates existing Slack and Asks integration scopes."""
+  updateIntegrationSlackScopes(
+    """The ID of the existing Slack integration"""
+    integrationId: String!
+
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """Integrates the workspace with Slack."""
+  integrationSlack(
+    """
+    [DEPRECATED] Whether or not v2 of Slack OAuth should be used. No longer used.
+    """
+    shouldUseV2Auth: Boolean
+
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """Integrates the workspace with the Slack Asks app."""
+  integrationSlackAsks(
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """
+  Updates the Slack team's name in Linear for an existing Slack or Asks integration.
+  """
+  integrationSlackOrAsksUpdateSlackTeamName(
+    """The integration ID."""
+    integrationId: String!
+  ): IntegrationSlackWorkspaceNamePayload!
+
+  """Integrates your personal notifications with Slack."""
+  integrationSlackPersonal(
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """Connect a Slack channel to Asks."""
+  integrationAsksConnectChannel(
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): AsksChannelConnectPayload!
+
+  """Slack integration for team notifications."""
+  integrationSlackPost(
+    """
+    [DEPRECATED] Whether or not v2 of Slack OAuth should be used. No longer used.
+    """
+    shouldUseV2Auth: Boolean
+
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """Integration's associated team."""
+    teamId: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): SlackChannelConnectPayload!
+
+  """Slack integration for project notifications."""
+  integrationSlackProjectPost(
+    """
+    The service to enable once connected, either 'notifications' or 'updates'.
+    """
+    service: String!
+
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """Integration's associated project."""
+    projectId: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): SlackChannelConnectPayload!
+
+  """[Internal] Slack integration for initiative notifications."""
+  integrationSlackInitiativePost(
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """Integration's associated initiative."""
+    initiativeId: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): SlackChannelConnectPayload!
+
+  """Slack integration for custom view notifications."""
+  integrationSlackCustomViewNotifications(
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """Integration's associated custom view."""
+    customViewId: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): SlackChannelConnectPayload!
+
+  """Integrates a Slack Asks channel with a Customer."""
+  integrationSlackCustomerChannelLink(
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """The customer to link the Slack channel with"""
+    customerId: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): SuccessPayload!
+
+  """Slack integration for workspace-level project update notifications."""
+  integrationSlackOrgProjectUpdatesPost(
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): SlackChannelConnectPayload!
+
+  """
+  [Internal] Slack integration for workspace-level initiative update notifications.
+  """
+  integrationSlackOrgInitiativeUpdatesPost(
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): SlackChannelConnectPayload!
+
+  """Imports custom emojis from your Slack workspace."""
+  integrationSlackImportEmojis(
+    """The Slack OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Slack OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """Integrates the workspace with Figma."""
+  integrationFigma(
+    """The Figma OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Figma OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """Integrates the workspace with Gong."""
+  integrationGong(
+    """The Gong OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Gong OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """Integrates the workspace with Microsoft Teams."""
+  integrationMicrosoftTeams(
+    """The Microsoft OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Microsoft OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """Connects the user's personal Microsoft account to Linear."""
+  integrationMicrosoftPersonalConnect(
+    """The Microsoft OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Microsoft OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """
+  [Internal] Connect a project to a Microsoft Teams channel. Find-or-update
+  semantics: creates a microsoftTeamsProjectPost integration row if none exists
+  for the project, or overwrites the existing one's team/channel selection.
+  Requires the connecting user to have linked their personal Microsoft account.
+  """
+  integrationMicrosoftTeamsProjectPost(
+    """Membership type of the channel: standard, private, or shared."""
+    membershipType: String!
+
+    """Display name of the chosen channel."""
+    channelName: String!
+
+    """Microsoft Teams channel id."""
+    channelId: String!
+
+    """Display name of the chosen team."""
+    teamName: String!
+
+    """AAD group id of the chosen team."""
+    teamId: String!
+
+    """Integration's associated project."""
+    projectId: String!
+  ): IntegrationPayload!
+
+  """Integrates the workspace with Google Sheets."""
+  integrationGoogleSheets(
+    """The Google OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """Manually update Google Sheets data."""
+  refreshGoogleSheetsData(
+    """The type of export."""
+    type: String
+
+    """The identifier of the Google Sheets integration to update."""
+    id: String!
+  ): IntegrationPayload!
+
+  """Integrates the workspace with Sentry."""
+  integrationSentryConnect(
+    """The slug of the Sentry organization being connected."""
+    organizationSlug: String!
+
+    """The Sentry grant code that's exchanged for OAuth tokens."""
+    code: String!
+
+    """The Sentry installationId to connect with."""
+    installationId: String!
+  ): IntegrationPayload!
+
+  """Integrates the workspace with Front."""
+  integrationFront(
+    """The Front OAuth redirect URI."""
+    redirectUri: String!
+
+    """The Front OAuth code."""
+    code: String!
+  ): IntegrationPayload!
+
+  """Integrates the workspace with Zendesk."""
+  integrationZendesk(
+    """The Zendesk installation subdomain."""
+    subdomain: String!
+
+    """The Zendesk OAuth code."""
+    code: String!
+
+    """The Zendesk OAuth scopes."""
+    scope: String!
+
+    """The Zendesk OAuth redirect URI."""
+    redirectUri: String!
+  ): IntegrationPayload!
+
+  """Enables Loom integration for the workspace."""
+  integrationLoom: IntegrationPayload! @deprecated(reason: "Not available.")
+
+  """Integrates the workspace with Salesforce."""
+  integrationSalesforce(
+    """The Salesforce OAuth code."""
+    code: String!
+
+    """The Salesforce installation subdomain."""
+    subdomain: String!
+
+    """The Salesforce OAuth redirect URI."""
+    redirectUri: String!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Refreshes the Salesforce integration metadata."""
+  integrationSalesforceMetadataRefresh(
+    """The ID of the integration to refresh metadata for."""
+    id: String!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Connects the user's personal account with an MCP server."""
+  integrationMcpServerPersonalConnect(
+    """
+    Optional additional HTTP headers to include with requests to this MCP server.
+    """
+    customHeaders: [McpServerCustomHeaderInput!]
+
+    """The URL of the MCP server to connect with."""
+    serverUrl: String!
+  ): IntegrationPayload!
+
+  """[INTERNAL] Connects the workspace with an MCP server."""
+  integrationMcpServerConnect(
+    """
+    Optional additional HTTP headers to include with requests to this MCP server.
+    """
+    customHeaders: [McpServerCustomHeaderInput!]
+
+    """The ID of the workflow definition to connect the MCP server to."""
+    workflowDefinitionId: String
+
+    """The ID of the team to connect the MCP server to."""
+    teamId: String
+
+    """The URL of the MCP server to connect with."""
+    serverUrl: String!
+  ): IntegrationPayload!
+
+  """Deletes an integration."""
+  integrationDelete(
+    """
+    Whether to skip deleting the installation on the external service side.
+    """
+    skipInstallationDeletion: Boolean
+
+    """The identifier of the integration to delete."""
+    id: String!
+  ): DeletePayload!
+
+  """Archives an integration."""
+  integrationArchive(
+    """The identifier of the integration to archive."""
+    id: String!
+  ): DeletePayload!
+
+  """
+  [Internal] Enables Linear Agent Slack workflow access for a Slack or Slack Asks integration.
+  """
+  integrationSlackWorkflowAccessUpdate(
+    """Whether to enable workflow access."""
+    enabled: Boolean!
+
+    """The ID of the integration to toggle workflow access for."""
+    integrationId: String!
+  ): IntegrationPayload!
+
+  """
+  Associates a project with an initiative. A project can only appear once in an initiative hierarchy.
+  """
+  initiativeToProjectCreate(
+    """The properties of the initiativeToProject to create."""
+    input: InitiativeToProjectCreateInput!
+  ): InitiativeToProjectPayload!
+
+  """Updates an initiative-to-project association, such as its sort order."""
+  initiativeToProjectUpdate(
+    """The properties of the initiativeToProject to update."""
+    input: InitiativeToProjectUpdateInput!
+
+    """The identifier of the initiativeToProject to update."""
+    id: String!
+  ): InitiativeToProjectPayload!
+
+  """Removes a project from an initiative."""
+  initiativeToProjectDelete(
+    """The identifier of the initiativeToProject to delete."""
+    id: String!
+  ): DeletePayload!
+
+  """Creates a new comment."""
+  commentCreate(
+    """The comment object to create."""
+    input: CommentCreateInput!
+  ): CommentPayload!
+
+  """Updates a comment."""
+  commentUpdate(
+    """
+    [INTERNAL] Flag to prevent setting editedAt when updating bodyData (used for background uploads).
+    """
+    skipEditedAt: Boolean
+
+    """A partial comment object to update the comment with."""
+    input: CommentUpdateInput!
+
+    """The identifier of the comment to update."""
+    id: String!
+  ): CommentPayload!
+
+  """Deletes a comment."""
+  commentDelete(
+    """The identifier of the comment to delete."""
+    id: String!
+  ): DeletePayload!
+
+  """
+  Resolves a comment thread. Marks the root comment as resolved by the current user.
+  """
+  commentResolve(
+    """
+    The identifier of the child comment that resolves the thread. If not
+    provided, the thread is resolved without a specific resolving comment.
+    """
+    resolvingCommentId: String
+
+    """The identifier of the comment to resolve."""
+    id: String!
+  ): CommentPayload!
+
+  """
+  Unresolves a previously resolved comment thread. Clears the resolved state on the root comment.
+  """
+  commentUnresolve(
+    """The identifier of the comment to unresolve."""
+    id: String!
+  ): CommentPayload!
 
   """Creates a new state, adding it to the workflow of a team."""
   workflowStateCreate(
@@ -17413,573 +18390,6 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
-  """[INTERNAL] Updates the integration."""
-  integrationUpdate(
-    """A partial integration object to update the integration with."""
-    input: IntegrationUpdateInput!
-
-    """The identifier of the integration to update."""
-    id: String!
-  ): IntegrationPayload!
-
-  """[INTERNAL] Updates the integration settings."""
-  integrationSettingsUpdate(
-    """An integration settings object."""
-    input: IntegrationSettingsInput!
-
-    """The identifier of the integration to update."""
-    id: String!
-  ): IntegrationPayload! @deprecated(reason: "Use integrationUpdate instead.")
-
-  """Generates a webhook for the GitHub commit integration."""
-  integrationGithubCommitCreate: GitHubCommitIntegrationPayload!
-
-  """Connects the workspace with the GitHub App."""
-  integrationGithubConnect(
-    """
-    The GitHub Enterprise Cloud host (e.g., 'linear-development.ghe.com'). When provided, this creates a GEC integration.
-    """
-    githubHost: String
-
-    """Whether the integration should have code access"""
-    codeAccess: Boolean = false
-
-    """The GitHub grant code that's exchanged for OAuth tokens."""
-    code: String!
-
-    """The GitHub data to connect with."""
-    installationId: String!
-  ): IntegrationPayload!
-
-  """Connects the workspace with the GitHub Import App."""
-  integrationGithubImportConnect(
-    """The GitHub grant code that's exchanged for OAuth tokens."""
-    code: String!
-
-    """The GitHub data to connect with."""
-    installationId: String!
-  ): IntegrationPayload!
-
-  """Refreshes the data for a GitHub import integration."""
-  integrationGithubImportRefresh(
-    """The id of the integration to update."""
-    id: String!
-  ): IntegrationPayload!
-
-  """Connects the workspace with a GitHub Enterprise Server."""
-  integrationGitHubEnterpriseServerConnect(
-    """The name of GitHub organization."""
-    organizationName: String!
-
-    """The base URL of the GitHub Enterprise Server installation."""
-    githubUrl: String!
-  ): GitHubEnterpriseServerPayload!
-
-  """Connects the workspace with a GitLab Access Token."""
-  integrationGitlabConnect(
-    """The URL of the GitLab installation."""
-    gitlabUrl: String!
-
-    """The GitLab Access Token to connect with."""
-    accessToken: String!
-  ): GitLabIntegrationCreatePayload!
-
-  """
-  Tests connectivity to a self-hosted GitLab instance and clears auth errors if successful.
-  """
-  integrationGitlabTestConnection(
-    """The ID of the GitLab integration to test."""
-    integrationId: String!
-  ): GitLabTestConnectionPayload!
-
-  """Creates an integration api key for Airbyte to connect with Linear."""
-  airbyteIntegrationConnect(
-    """Airbyte integration settings."""
-    input: AirbyteConfigurationInput!
-  ): IntegrationPayload!
-
-  """
-  [Internal] Connects the Google Calendar to the user to this Linear account via OAuth2.
-  """
-  integrationGoogleCalendarPersonalConnect(
-    """[Internal] The Google OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """[INTERNAL] Integrates the workspace with LaunchDarkly."""
-  integrationLaunchDarklyConnect(
-    """The LaunchDarkly OAuth code."""
-    code: String!
-
-    """The LaunchDarkly project key."""
-    projectKey: String!
-
-    """The LaunchDarkly environment."""
-    environment: String!
-  ): IntegrationPayload!
-
-  """[INTERNAL] Integrates your personal account with LaunchDarkly."""
-  integrationLaunchDarklyPersonalConnect(
-    """The LaunchDarkly OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """[INTERNAL] Connects the workspace with a Jira Personal Access Token."""
-  jiraIntegrationConnect(
-    """Jira integration settings."""
-    input: JiraConfigurationInput!
-  ): IntegrationPayload!
-
-  """[INTERNAL] Updates a Jira Integration."""
-  integrationJiraUpdate(
-    """Jira integration update input."""
-    input: JiraUpdateInput!
-  ): IntegrationPayload!
-
-  """
-  [INTERNAL] Fetches Jira project statuses and stores them in integration settings.
-  """
-  integrationJiraFetchProjectStatuses(
-    """Input for fetching Jira project statuses."""
-    input: JiraFetchProjectStatusesInput!
-  ): JiraFetchProjectStatusesPayload!
-
-  """Connect your Jira account to Linear."""
-  integrationJiraPersonal(
-    """The Jira OAuth code, when connecting using OAuth."""
-    code: String
-
-    """The Jira personal access token, when connecting using a PAT."""
-    accessToken: String
-  ): IntegrationPayload!
-
-  """Connect your GitHub account to Linear."""
-  integrationGitHubPersonal(
-    """
-    The enterprise URL for GitHub Enterprise Cloud connections. Omit for github.com.
-    """
-    enterpriseUrl: String
-
-    """Whether to connect with code access."""
-    codeAccess: Boolean
-
-    """The GitHub OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """Integrates the workspace with Intercom."""
-  integrationIntercom(
-    """
-    The Intercom domain URL to use for the integration. Defaults to app.intercom.com if not provided.
-    """
-    domainUrl: String
-
-    """The Intercom OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Intercom OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """Disconnects the workspace from Intercom."""
-  integrationIntercomDelete: IntegrationPayload!
-
-  """
-  [INTERNAL] Refreshes the customer data attributes from the specified integration service.
-  """
-  integrationCustomerDataAttributesRefresh(
-    """The integration service to refresh customer data attributes from."""
-    input: IntegrationCustomerDataAttributesRefreshInput!
-  ): IntegrationPayload!
-
-  """[DEPRECATED] Updates settings on the Intercom integration."""
-  integrationIntercomSettingsUpdate(
-    """
-    A partial Intercom integration settings object to update the integration settings with.
-    """
-    input: IntercomSettingsInput!
-  ): IntegrationPayload! @deprecated(reason: "This mutation is deprecated, please use `integrationSettingsUpdate` instead")
-
-  """Integrates the workspace with Discord."""
-  integrationDiscord(
-    """The Discord OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Discord OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """[INTERNAL] Integrates the workspace with Opsgenie."""
-  integrationOpsgenieConnect(
-    """The Opsgenie API key."""
-    apiKey: String!
-  ): IntegrationPayload!
-
-  """[INTERNAL] Refresh Opsgenie schedule mappings."""
-  integrationOpsgenieRefreshScheduleMappings: IntegrationPayload!
-
-  """[INTERNAL] Integrates the workspace with PagerDuty."""
-  integrationPagerDutyConnect(
-    """The PagerDuty OAuth code."""
-    code: String!
-
-    """The PagerDuty OAuth redirect URI."""
-    redirectUri: String!
-  ): IntegrationPayload!
-
-  """[INTERNAL] Refresh PagerDuty schedule mappings."""
-  integrationPagerDutyRefreshScheduleMappings: IntegrationPayload!
-
-  """[Internal] Updates existing Slack and Asks integration scopes."""
-  updateIntegrationSlackScopes(
-    """The ID of the existing Slack integration"""
-    integrationId: String!
-
-    """The Slack OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Slack OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """Integrates the workspace with Slack."""
-  integrationSlack(
-    """
-    [DEPRECATED] Whether or not v2 of Slack OAuth should be used. No longer used.
-    """
-    shouldUseV2Auth: Boolean
-
-    """The Slack OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Slack OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """Integrates the workspace with the Slack Asks app."""
-  integrationSlackAsks(
-    """The Slack OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Slack OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """
-  Updates the Slack team's name in Linear for an existing Slack or Asks integration.
-  """
-  integrationSlackOrAsksUpdateSlackTeamName(
-    """The integration ID."""
-    integrationId: String!
-  ): IntegrationSlackWorkspaceNamePayload!
-
-  """Integrates your personal notifications with Slack."""
-  integrationSlackPersonal(
-    """The Slack OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Slack OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """Connect a Slack channel to Asks."""
-  integrationAsksConnectChannel(
-    """The Slack OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Slack OAuth code."""
-    code: String!
-  ): AsksChannelConnectPayload!
-
-  """Slack integration for team notifications."""
-  integrationSlackPost(
-    """
-    [DEPRECATED] Whether or not v2 of Slack OAuth should be used. No longer used.
-    """
-    shouldUseV2Auth: Boolean
-
-    """The Slack OAuth redirect URI."""
-    redirectUri: String!
-
-    """Integration's associated team."""
-    teamId: String!
-
-    """The Slack OAuth code."""
-    code: String!
-  ): SlackChannelConnectPayload!
-
-  """Slack integration for project notifications."""
-  integrationSlackProjectPost(
-    """
-    The service to enable once connected, either 'notifications' or 'updates'.
-    """
-    service: String!
-
-    """The Slack OAuth redirect URI."""
-    redirectUri: String!
-
-    """Integration's associated project."""
-    projectId: String!
-
-    """The Slack OAuth code."""
-    code: String!
-  ): SlackChannelConnectPayload!
-
-  """[Internal] Slack integration for initiative notifications."""
-  integrationSlackInitiativePost(
-    """The Slack OAuth redirect URI."""
-    redirectUri: String!
-
-    """Integration's associated initiative."""
-    initiativeId: String!
-
-    """The Slack OAuth code."""
-    code: String!
-  ): SlackChannelConnectPayload!
-
-  """Slack integration for custom view notifications."""
-  integrationSlackCustomViewNotifications(
-    """The Slack OAuth redirect URI."""
-    redirectUri: String!
-
-    """Integration's associated custom view."""
-    customViewId: String!
-
-    """The Slack OAuth code."""
-    code: String!
-  ): SlackChannelConnectPayload!
-
-  """Integrates a Slack Asks channel with a Customer."""
-  integrationSlackCustomerChannelLink(
-    """The Slack OAuth redirect URI."""
-    redirectUri: String!
-
-    """The customer to link the Slack channel with"""
-    customerId: String!
-
-    """The Slack OAuth code."""
-    code: String!
-  ): SuccessPayload!
-
-  """Slack integration for workspace-level project update notifications."""
-  integrationSlackOrgProjectUpdatesPost(
-    """The Slack OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Slack OAuth code."""
-    code: String!
-  ): SlackChannelConnectPayload!
-
-  """
-  [Internal] Slack integration for workspace-level initiative update notifications.
-  """
-  integrationSlackOrgInitiativeUpdatesPost(
-    """The Slack OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Slack OAuth code."""
-    code: String!
-  ): SlackChannelConnectPayload!
-
-  """Imports custom emojis from your Slack workspace."""
-  integrationSlackImportEmojis(
-    """The Slack OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Slack OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """Integrates the workspace with Figma."""
-  integrationFigma(
-    """The Figma OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Figma OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """Integrates the workspace with Gong."""
-  integrationGong(
-    """The Gong OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Gong OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """Integrates the workspace with Microsoft Teams."""
-  integrationMicrosoftTeams(
-    """The Microsoft OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Microsoft OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """Connects the user's personal Microsoft account to Linear."""
-  integrationMicrosoftPersonalConnect(
-    """The Microsoft OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Microsoft OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """
-  [Internal] Connect a project to a Microsoft Teams channel. Find-or-update
-  semantics: creates a microsoftTeamsProjectPost integration row if none exists
-  for the project, or overwrites the existing one's team/channel selection.
-  Requires the connecting user to have linked their personal Microsoft account.
-  """
-  integrationMicrosoftTeamsProjectPost(
-    """Membership type of the channel: standard, private, or shared."""
-    membershipType: String!
-
-    """Display name of the chosen channel."""
-    channelName: String!
-
-    """Microsoft Teams channel id."""
-    channelId: String!
-
-    """Display name of the chosen team."""
-    teamName: String!
-
-    """AAD group id of the chosen team."""
-    teamId: String!
-
-    """Integration's associated project."""
-    projectId: String!
-  ): IntegrationPayload!
-
-  """Integrates the workspace with Google Sheets."""
-  integrationGoogleSheets(
-    """The Google OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """Manually update Google Sheets data."""
-  refreshGoogleSheetsData(
-    """The type of export."""
-    type: String
-
-    """The identifier of the Google Sheets integration to update."""
-    id: String!
-  ): IntegrationPayload!
-
-  """Integrates the workspace with Sentry."""
-  integrationSentryConnect(
-    """The slug of the Sentry organization being connected."""
-    organizationSlug: String!
-
-    """The Sentry grant code that's exchanged for OAuth tokens."""
-    code: String!
-
-    """The Sentry installationId to connect with."""
-    installationId: String!
-  ): IntegrationPayload!
-
-  """Integrates the workspace with Front."""
-  integrationFront(
-    """The Front OAuth redirect URI."""
-    redirectUri: String!
-
-    """The Front OAuth code."""
-    code: String!
-  ): IntegrationPayload!
-
-  """Integrates the workspace with Zendesk."""
-  integrationZendesk(
-    """The Zendesk installation subdomain."""
-    subdomain: String!
-
-    """The Zendesk OAuth code."""
-    code: String!
-
-    """The Zendesk OAuth scopes."""
-    scope: String!
-
-    """The Zendesk OAuth redirect URI."""
-    redirectUri: String!
-  ): IntegrationPayload!
-
-  """Enables Loom integration for the workspace."""
-  integrationLoom: IntegrationPayload! @deprecated(reason: "Not available.")
-
-  """Integrates the workspace with Salesforce."""
-  integrationSalesforce(
-    """The Salesforce OAuth code."""
-    code: String!
-
-    """The Salesforce installation subdomain."""
-    subdomain: String!
-
-    """The Salesforce OAuth redirect URI."""
-    redirectUri: String!
-  ): IntegrationPayload!
-
-  """[INTERNAL] Refreshes the Salesforce integration metadata."""
-  integrationSalesforceMetadataRefresh(
-    """The ID of the integration to refresh metadata for."""
-    id: String!
-  ): IntegrationPayload!
-
-  """[INTERNAL] Connects the user's personal account with an MCP server."""
-  integrationMcpServerPersonalConnect(
-    """
-    Optional additional HTTP headers to include with requests to this MCP server.
-    """
-    customHeaders: [McpServerCustomHeaderInput!]
-
-    """The URL of the MCP server to connect with."""
-    serverUrl: String!
-  ): IntegrationPayload!
-
-  """[INTERNAL] Connects the workspace with an MCP server."""
-  integrationMcpServerConnect(
-    """
-    Optional additional HTTP headers to include with requests to this MCP server.
-    """
-    customHeaders: [McpServerCustomHeaderInput!]
-
-    """The ID of the workflow definition to connect the MCP server to."""
-    workflowDefinitionId: String
-
-    """The ID of the team to connect the MCP server to."""
-    teamId: String
-
-    """The URL of the MCP server to connect with."""
-    serverUrl: String!
-  ): IntegrationPayload!
-
-  """Deletes an integration."""
-  integrationDelete(
-    """
-    Whether to skip deleting the installation on the external service side.
-    """
-    skipInstallationDeletion: Boolean
-
-    """The identifier of the integration to delete."""
-    id: String!
-  ): DeletePayload!
-
-  """Archives an integration."""
-  integrationArchive(
-    """The identifier of the integration to archive."""
-    id: String!
-  ): DeletePayload!
-
-  """
-  [Internal] Enables Linear Agent Slack workflow access for a Slack or Slack Asks integration.
-  """
-  integrationSlackWorkflowAccessUpdate(
-    """Whether to enable workflow access."""
-    enabled: Boolean!
-
-    """The ID of the integration to toggle workflow access for."""
-    integrationId: String!
-  ): IntegrationPayload!
-
   """Requests a currently unavailable integration."""
   integrationRequest(
     """Integration request details."""
@@ -18023,29 +18433,6 @@ type Mutation {
     """The identifier of the initiative update to unarchive."""
     id: String!
   ): InitiativeUpdateArchivePayload!
-
-  """
-  Associates a project with an initiative. A project can only appear once in an initiative hierarchy.
-  """
-  initiativeToProjectCreate(
-    """The properties of the initiativeToProject to create."""
-    input: InitiativeToProjectCreateInput!
-  ): InitiativeToProjectPayload!
-
-  """Updates an initiative-to-project association, such as its sort order."""
-  initiativeToProjectUpdate(
-    """The properties of the initiativeToProject to update."""
-    input: InitiativeToProjectUpdateInput!
-
-    """The identifier of the initiativeToProject to update."""
-    id: String!
-  ): InitiativeToProjectPayload!
-
-  """Removes a project from an initiative."""
-  initiativeToProjectDelete(
-    """The identifier of the initiativeToProject to delete."""
-    id: String!
-  ): DeletePayload!
 
   """Creates a new initiative."""
   initiativeCreate(
@@ -18533,54 +18920,6 @@ type Mutation {
     """The contact entry to create."""
     input: ContactSalesCreateInput!
   ): ContactPayload!
-
-  """Creates a new comment."""
-  commentCreate(
-    """The comment object to create."""
-    input: CommentCreateInput!
-  ): CommentPayload!
-
-  """Updates a comment."""
-  commentUpdate(
-    """
-    [INTERNAL] Flag to prevent setting editedAt when updating bodyData (used for background uploads).
-    """
-    skipEditedAt: Boolean
-
-    """A partial comment object to update the comment with."""
-    input: CommentUpdateInput!
-
-    """The identifier of the comment to update."""
-    id: String!
-  ): CommentPayload!
-
-  """Deletes a comment."""
-  commentDelete(
-    """The identifier of the comment to delete."""
-    id: String!
-  ): DeletePayload!
-
-  """
-  Resolves a comment thread. Marks the root comment as resolved by the current user.
-  """
-  commentResolve(
-    """
-    The identifier of the child comment that resolves the thread. If not
-    provided, the thread is resolved without a specific resolving comment.
-    """
-    resolvingCommentId: String
-
-    """The identifier of the comment to resolve."""
-    id: String!
-  ): CommentPayload!
-
-  """
-  Unresolves a previously resolved comment thread. Clears the resolved state on the root comment.
-  """
-  commentUnresolve(
-    """The identifier of the comment to unresolve."""
-    id: String!
-  ): CommentPayload!
 
   """
   Finds or creates a new user account by email and sends an email with token.
@@ -20802,6 +21141,9 @@ input NullableTeamFilter {
   """Filters that the team's ancestors must satisfy."""
   ancestors: TeamCollectionFilter
 
+  """[ALPHA] Filters that the team's release pipelines must satisfy."""
+  releasePipelines: ReleasePipelineCollectionFilter
+
   """Filter based on the existence of the relation."""
   null: Boolean
 
@@ -22561,6 +22903,45 @@ type Post implements Node {
   The feed summary schedule cadence that was active when this post was created. Null for non-summary posts.
   """
   feedSummaryScheduleAtCreate: FeedSummarySchedule
+
+  """Reactions associated with the post."""
+  reactions: [Reaction!]!
+
+  """Comments associated with the post."""
+  comments(
+    """Filter returned comments."""
+    filter: CommentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CommentConnection!
+
+  """A URL to the generated audio for the Post."""
+  audioSummaryUrl: String
+
+  """Number of comments associated with the post."""
+  commentCount: Int!
 }
 
 """A notification related to a post, such as new comments or reactions."""
@@ -23506,6 +23887,12 @@ type ProjectAttachment implements Node {
   null if not set.
   """
   sourceType: String
+
+  """The project this attachment belongs to."""
+  project: Project!
+
+  """The body data of the attachment, if any."""
+  bodyData: String
 }
 
 type ProjectAttachmentConnection {
@@ -26555,6 +26942,53 @@ type PullRequest implements Node {
   account has been deleted.
   """
   creator: User
+
+  """Agent sessions associated with this pull request."""
+  agentSessions(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AgentSessionToPullRequestConnection!
+
+  """Pull request URL to the Linear app"""
+  appUrl: String!
+
+  """The full identifier of the pull request (including repository name)."""
+  fullIdentifier: String!
+
+  """The pull request's description in markdown format."""
+  description: String
+
+  """The pull request's description as a Prosemirror document."""
+  descriptionData: JSON
+
+  """Integration type that created this pull request, if applicable."""
+  integrationSourceType: IntegrationService
+
+  """
+  Diff statistics for the pull request including file count, additions, deletions, and changes.
+  """
+  diffStats: PullRequestDiffStats
 }
 
 """
@@ -26641,6 +27075,21 @@ type PullRequestCommit {
 
   """External user IDs for commit authors (includes co-authors)."""
   authorExternalUserIds: [String!]!
+}
+
+"""Diff statistics for a pull request."""
+type PullRequestDiffStats {
+  """The number of files changed in the pull request."""
+  fileCount: Float!
+
+  """The number of lines added in the pull request."""
+  additions: Float!
+
+  """The number of lines changed in the pull request."""
+  changes: Float!
+
+  """The number of lines deleted in the pull request."""
+  deletions: Float!
 }
 
 """The method used to merge a pull request."""
@@ -26920,6 +27369,157 @@ enum PushSubscriptionType {
 }
 
 type Query {
+  """All integrations for the workspace."""
+  integrations(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): IntegrationConnection!
+
+  """Retrieves a single integration by its identifier."""
+  integration(
+    """The identifier of the integration to retrieve."""
+    id: String!
+  ): Integration!
+
+  """
+  Verify that we received the correct response from the GitHub Enterprise Server.
+  """
+  verifyGitHubEnterpriseServerInstallation(
+    """The integration ID."""
+    integrationId: String!
+  ): GitHubEnterpriseServerInstallVerificationPayload!
+
+  """Checks if the integration has all required scopes."""
+  integrationHasScopes(
+    """Required scopes."""
+    scopes: [String!]!
+
+    """The integration ID."""
+    integrationId: String!
+  ): IntegrationHasScopesPayload!
+
+  """
+  [Internal] Lists Microsoft Teams teams and channels accessible to the
+  connecting user. Uses the user's microsoftPersonal integration for auth. Used
+  by the project channel picker dialog to populate the team/channel dropdowns.
+  """
+  microsoftTeamsChannels: MicrosoftTeamsChannelsPayload!
+
+  """Returns all initiative-to-project associations in the workspace."""
+  initiativeToProjects(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): InitiativeToProjectConnection!
+
+  """Returns a single initiative-to-project association by its identifier."""
+  initiativeToProject(id: String!): InitiativeToProject!
+
+  """A collection of document content history entries."""
+  documentContentHistory(
+    """The identifier of the document content to retrieve history for."""
+    id: String!
+  ): DocumentContentHistoryPayload!
+
+  """
+  [Internal] Fetches document content history entries by their IDs, including content data.
+  """
+  documentContentHistoryEntries(
+    """
+    The identifiers of the history entries to retrieve. Maximum 10 per request.
+    """
+    entryIds: [String!]!
+  ): DocumentContentHistoryPayload!
+
+  """All comments the user has access to in the workspace."""
+  comments(
+    """Filter returned comments."""
+    filter: CommentFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): CommentConnection!
+
+  """A specific comment."""
+  comment(
+    """The identifier of the comment to retrieve."""
+    id: String
+
+    """The hash of the comment to retrieve."""
+    hash: String
+  ): Comment!
+
+  """
+  Retrieves public information about an OAuth application by its client ID. Used
+  during the authorization flow to display application details to the user.
+  """
+  applicationInfo(
+    """The client ID of the application."""
+    clientId: String!
+  ): Application!
+
   """
   All issue workflow states (issue statuses). Returns a paginated list of
   workflow states visible to the authenticated user, across all teams they have access to.
@@ -28333,63 +28933,6 @@ type Query {
     id: String!
   ): IntegrationTemplate!
 
-  """All integrations for the workspace."""
-  integrations(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): IntegrationConnection!
-
-  """Retrieves a single integration by its identifier."""
-  integration(
-    """The identifier of the integration to retrieve."""
-    id: String!
-  ): Integration!
-
-  """
-  Verify that we received the correct response from the GitHub Enterprise Server.
-  """
-  verifyGitHubEnterpriseServerInstallation(
-    """The integration ID."""
-    integrationId: String!
-  ): GitHubEnterpriseServerInstallVerificationPayload!
-
-  """Checks if the integration has all required scopes."""
-  integrationHasScopes(
-    """Required scopes."""
-    scopes: [String!]!
-
-    """The integration ID."""
-    integrationId: String!
-  ): IntegrationHasScopesPayload!
-
-  """
-  [Internal] Lists Microsoft Teams teams and channels accessible to the
-  connecting user. Uses the user's microsoftPersonal integration for auth. Used
-  by the project channel picker dialog to populate the team/channel dropdowns.
-  """
-  microsoftTeamsChannels: MicrosoftTeamsChannelsPayload!
-
   """
   Returns all initiative status updates in the workspace, with optional filtering.
   """
@@ -28427,36 +28970,6 @@ type Query {
     """The identifier of the initiative update to retrieve."""
     id: String!
   ): InitiativeUpdate!
-
-  """Returns all initiative-to-project associations in the workspace."""
-  initiativeToProjects(
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): InitiativeToProjectConnection!
-
-  """Returns a single initiative-to-project association by its identifier."""
-  initiativeToProject(id: String!): InitiativeToProject!
 
   """
   Returns all initiatives in the workspace, with optional filtering and sorting.
@@ -28690,22 +29203,6 @@ type Query {
     """The identifier or slug of the document to retrieve."""
     id: String!
   ): Document!
-
-  """A collection of document content history entries."""
-  documentContentHistory(
-    """The identifier of the document content to retrieve history for."""
-    id: String!
-  ): DocumentContentHistoryPayload!
-
-  """
-  [Internal] Fetches document content history entries by their IDs, including content data.
-  """
-  documentContentHistoryEntries(
-    """
-    The identifiers of the history entries to retrieve. Maximum 10 per request.
-    """
-    entryIds: [String!]!
-  ): DocumentContentHistoryPayload!
 
   """All cycles accessible to the user."""
   cycles(
@@ -28967,45 +29464,6 @@ type Query {
     id: String!
   ): CustomViewHasSubscribersPayload!
 
-  """All comments the user has access to in the workspace."""
-  comments(
-    """Filter returned comments."""
-    filter: CommentFilter
-
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-  ): CommentConnection!
-
-  """A specific comment."""
-  comment(
-    """The identifier of the comment to retrieve."""
-    id: String
-
-    """The hash of the comment to retrieve."""
-    hash: String
-  ): Comment!
-
   """Fetch users belonging to this user account."""
   availableUsers: AuthResolverResponse!
 
@@ -29149,15 +29607,6 @@ type Query {
     """
     teamId: String
   ): AttachmentSourcesPayload!
-
-  """
-  Retrieves public information about an OAuth application by its client ID. Used
-  during the authorization flow to display application details to the user.
-  """
-  applicationInfo(
-    """The client ID of the application."""
-    clientId: String!
-  ): Application!
 
   """All agent sessions."""
   agentSessions(
@@ -30026,6 +30475,9 @@ type ReleasePipeline implements Node {
   """
   approximateReleaseCount: Int!
 
+  """[ALPHA] The active access key for this pipeline."""
+  accessKey: AccessKey
+
   """
   [Internal] The URL to the release pipeline's releases list in the Linear app.
   """
@@ -30128,6 +30580,46 @@ type ReleasePipelineArchivePayload implements ArchivePayload {
   entity: ReleasePipeline
 }
 
+"""[ALPHA] Release pipeline collection filtering options."""
+input ReleasePipelineCollectionFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the pipeline name."""
+  name: StringComparator
+
+  """Comparator for the pipeline production flag."""
+  isProduction: BooleanComparator
+
+  """Filters that the release pipeline's teams must satisfy."""
+  teams: TeamCollectionFilter
+
+  """
+  Compound filters, all of which need to be matched by the release pipeline.
+  """
+  and: [ReleasePipelineCollectionFilter!]
+
+  """
+  Compound filters, one of which need to be matched by the release pipeline.
+  """
+  or: [ReleasePipelineCollectionFilter!]
+
+  """Filters that needs to be matched by some release pipelines."""
+  some: ReleasePipelineFilter
+
+  """Filters that needs to be matched by all release pipelines."""
+  every: ReleasePipelineFilter
+
+  """Comparator for the collection length."""
+  length: NumberComparator
+}
+
 type ReleasePipelineConnection {
   edges: [ReleasePipelineEdge!]!
   nodes: [ReleasePipeline!]!
@@ -30187,6 +30679,9 @@ input ReleasePipelineFilter {
 
   """Comparator for the pipeline production flag."""
   isProduction: BooleanComparator
+
+  """Filters that the release pipeline's teams must satisfy."""
+  teams: TeamCollectionFilter
 
   """Compound filters, all of which need to be matched by the pipeline."""
   and: [ReleasePipelineFilter!]
@@ -32708,6 +33203,36 @@ type Team implements Node {
     sort: [ProjectSortInput!]
   ): ProjectConnection!
 
+  """[ALPHA] Release pipelines associated with the team."""
+  releasePipelines(
+    """Filter returned release pipelines."""
+    filter: ReleasePipelineFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): ReleasePipelineConnection!
+
   """The states that define the workflow associated with the team."""
   states(
     """Filter returned workflow states."""
@@ -33099,6 +33624,9 @@ input TeamFilter {
 
   """Filters that the team's ancestors must satisfy."""
   ancestors: TeamCollectionFilter
+
+  """[ALPHA] Filters that the team's release pipelines must satisfy."""
+  releasePipelines: ReleasePipelineCollectionFilter
 
   """Compound filters, all of which need to be matched by the team."""
   and: [TeamFilter!]
@@ -34236,6 +34764,12 @@ type User implements Node {
 
   """Whether the user account is active or disabled (suspended)."""
   active: Boolean!
+
+  """Enabled feature flags for the user."""
+  featureFlags: [String!]!
+
+  """Whether this is the Linear app user. Only one per organization."""
+  isLinearAppUser: Boolean
 
   """Issue drafts that the user has created but not yet submitted."""
   issueDrafts(
