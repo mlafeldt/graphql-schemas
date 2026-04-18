@@ -842,6 +842,11 @@ type AiConversation implements Node {
   initialSource: AiConversationInitialSource!
 
   """
+  The client platform from which this conversation was initiated, such as web, desktop, or mobile.
+  """
+  clientPlatform: AiConversationClientPlatform
+
+  """
   The current processing status of the conversation, indicating whether the AI
   is actively generating a response or has completed its turn.
   """
@@ -903,6 +908,13 @@ interface AiConversationBaseWidget {
   Display information for the widget, including ProseMirror and Markdown representations.
   """
   displayInfo: AiConversationWidgetDisplayInfo
+}
+
+"""The client platform from which an AI conversation was initiated."""
+enum AiConversationClientPlatform {
+  web
+  desktop
+  mobile
 }
 
 type AiConversationCodeIntelligenceToolCall implements AiConversationBaseToolCall {
@@ -3958,6 +3970,13 @@ input CustomerNeedCreateInput {
   applications creating needs in `actor=app` mode.
   """
   displayIconUrl: String
+
+  """
+  The time at which the customer need was created (e.g. if importing from
+  another system). Must be a time in the past. If none is provided, the backend
+  will generate the time as now.
+  """
+  createdAt: DateTime
 }
 
 type CustomerNeedEdge {
@@ -27348,6 +27367,12 @@ type Query {
     id: String!
   ): TeamMembership!
 
+  """Active SLA configurations that can apply to the requested team."""
+  slaConfigurations(
+    """The identifier or key of the team to evaluate SLA rules against."""
+    teamId: String!
+  ): [SlaConfiguration!]!
+
   """
   Search for issues, projects, initiatives, and documents using natural
   language. Uses vector-based semantic search with optional full-text search and
@@ -31720,6 +31745,29 @@ input SlackSettingsInput {
   Whether Code Intelligence should be enabled for this Slack integration.
   """
   enableCodeIntelligence: Boolean
+}
+
+"""An active SLA rule that can apply to a team."""
+type SlaConfiguration {
+  """The identifier of the SLA rule."""
+  id: String!
+
+  """The name of the SLA rule."""
+  name: String!
+
+  """The workflow conditions that determine when this SLA rule applies."""
+  conditions: JSONObject!
+
+  """
+  The SLA value configured by the rule, expressed in milliseconds or business days depending on the day-count type.
+  """
+  sla: Float
+
+  """The SLA type used when the rule sets an SLA."""
+  slaType: SLADayCountType
+
+  """Whether the rule removes an SLA instead of setting one."""
+  removesSla: Boolean!
 }
 
 """Which day count to use for SLA calculations."""
@@ -36140,6 +36188,7 @@ enum ViewType {
   completedCycle
   cycle
   release
+  releaseOverviewIssues
   continuousPipelineReleases
   scheduledPipelineReleases
   project
