@@ -1095,6 +1095,27 @@ enum AiConversationEntityListWidgetArgsEntitiesType {
   AiPrompt
 }
 
+"""An event part in an AI conversation."""
+type AiConversationEventPart implements AiConversationBasePart {
+  """The ID of the part."""
+  id: String!
+
+  """The type of the part."""
+  type: AiConversationPartType!
+
+  """The metadata of the part."""
+  metadata: AiConversationPartMetadata!
+
+  """The data of the event part."""
+  bodyData: JSONObject!
+
+  """The Markdown body of the event part."""
+  body: String!
+
+  """The ID of the subscription to resolve when this event is delivered."""
+  subscriptionId: String
+}
+
 type AiConversationGetMicrosoftTeamsConversationHistoryToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -1105,6 +1126,27 @@ type AiConversationGetMicrosoftTeamsConversationHistoryToolCall implements AiCon
 
   """The result of the tool call."""
   rawResult: JSON
+}
+
+type AiConversationGetPullRequestCheckLogsToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationGetPullRequestCheckLogsToolCallArgs
+}
+
+type AiConversationGetPullRequestCheckLogsToolCallArgs {
+  entity: AiConversationSearchEntitiesToolCallResultEntities!
+  checkName: String!
+  workflowName: String
 }
 
 type AiConversationGetPullRequestDiffToolCall implements AiConversationBaseToolCall {
@@ -1239,17 +1281,20 @@ type AiConversationNavigateToPageToolCall implements AiConversationBaseToolCall 
 }
 
 type AiConversationNavigateToPageToolCallArgs {
-  entityType: String
-  identifier: String
+  entities: [AiConversationNavigateToPageToolCallArgsEntities!]!
+}
+
+type AiConversationNavigateToPageToolCallArgsEntities {
+  entityType: String!
+  uuid: String!
 }
 
 type AiConversationNavigateToPageToolCallResult {
-  url: String!
-  newTab: Boolean
+  urls: [String!]!
 }
 
 """A part in an AI conversation."""
-union AiConversationPart = AiConversationPromptPart | AiConversationTextPart | AiConversationReasoningPart | AiConversationToolCallPart | AiConversationWidgetPart
+union AiConversationPart = AiConversationPromptPart | AiConversationTextPart | AiConversationReasoningPart | AiConversationEventPart | AiConversationToolCallPart | AiConversationWidgetPart
 
 """Metadata about a part in an AI conversation."""
 type AiConversationPartMetadata {
@@ -1284,6 +1329,7 @@ enum AiConversationPartType {
   toolCall
   reasoning
   text
+  event
   widget
   widgetPlaceholder
 }
@@ -1523,6 +1569,34 @@ enum AiConversationStatus {
   awaitingInput
   error
   pending
+  waiting
+}
+
+type AiConversationSubscribeToEventToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationSubscribeToEventToolCallArgs
+}
+
+type AiConversationSubscribeToEventToolCallArgs {
+  subscriptionId: String
+  type: AiConversationSubscribeToEventToolCallArgsType!
+  message: String
+  endsAt: String
+}
+
+enum AiConversationSubscribeToEventToolCallArgsType {
+  once
+  recurring
 }
 
 type AiConversationSuggestValuesToolCall implements AiConversationBaseToolCall {
@@ -1579,7 +1653,10 @@ enum AiConversationTool {
   CodeIntelligence
   GetPullRequestDiff
   GetPullRequestFile
+  GetPullRequestCheckLogs
   HandoffToCodingSession
+  SubscribeToEvent
+  UnsubscribeFromEvent
   TranscribeVideo
   TranscribeMedia
   SearchDocumentation
@@ -1591,7 +1668,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -1638,6 +1715,26 @@ type AiConversationTranscribeVideoToolCall implements AiConversationBaseToolCall
 
   """The result of the tool call."""
   rawResult: JSON
+}
+
+type AiConversationUnsubscribeFromEventToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationUnsubscribeFromEventToolCallArgs
+}
+
+type AiConversationUnsubscribeFromEventToolCallArgs {
+  subscriptionId: String!
+  message: String
 }
 
 type AiConversationUpdateEntityToolCall implements AiConversationBaseToolCall {
