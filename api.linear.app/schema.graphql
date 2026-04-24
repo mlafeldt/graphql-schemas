@@ -1518,6 +1518,27 @@ type AiConversationRetrieveEntitiesToolCallArgs {
   entities: [AiConversationSearchEntitiesToolCallResultEntities!]!
 }
 
+type AiConversationRetryPullRequestCheckToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationRetryPullRequestCheckToolCallArgs
+}
+
+type AiConversationRetryPullRequestCheckToolCallArgs {
+  entity: AiConversationSearchEntitiesToolCallResultEntities!
+  checkName: String!
+  workflowName: String
+}
+
 type AiConversationSearchDocumentationToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -1589,9 +1610,15 @@ type AiConversationSubscribeToEventToolCall implements AiConversationBaseToolCal
 
 type AiConversationSubscribeToEventToolCallArgs {
   subscriptionId: String
+  kind: AiConversationSubscribeToEventToolCallArgsKind
   type: AiConversationSubscribeToEventToolCallArgsType!
   message: String
   endsAt: String
+}
+
+enum AiConversationSubscribeToEventToolCallArgsKind {
+  timer
+  trigger
 }
 
 enum AiConversationSubscribeToEventToolCallArgsType {
@@ -1654,6 +1681,7 @@ enum AiConversationTool {
   GetPullRequestDiff
   GetPullRequestFile
   GetPullRequestCheckLogs
+  RetryPullRequestCheck
   HandoffToCodingSession
   SubscribeToEvent
   UnsubscribeFromEvent
@@ -1668,7 +1696,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -8620,7 +8648,7 @@ input FrontSettingsInput {
   automateTicketReopeningOnCompletion: Boolean
 
   """
-  Whether a ticket should be automatically reopened when its linked Linear issue is cancelled.
+  Whether a ticket should be automatically reopened when its linked Linear issue is canceled.
   """
   automateTicketReopeningOnCancellation: Boolean
 
@@ -8641,7 +8669,7 @@ input FrontSettingsInput {
   automateTicketReopeningOnProjectCompletion: Boolean
 
   """
-  Whether a ticket should be automatically reopened when its linked Linear project is cancelled.
+  Whether a ticket should be automatically reopened when its linked Linear project is canceled.
   """
   automateTicketReopeningOnProjectCancellation: Boolean
 
@@ -10992,7 +11020,7 @@ type IntegrationsSettings implements Node {
   slackIssueNewComment: Boolean
 
   """
-  Whether to send a Slack message when any of the project or team's issues change to completed or cancelled.
+  Whether to send a Slack message when any of the project or team's issues change to completed or canceled.
   """
   slackIssueStatusChangedDone: Boolean
 
@@ -11057,7 +11085,7 @@ input IntegrationsSettingsCreateInput {
   slackIssueNewComment: Boolean
 
   """
-  Whether to send a Slack message when any of the project or team's issues change to completed or cancelled.
+  Whether to send a Slack message when any of the project or team's issues change to completed or canceled.
   """
   slackIssueStatusChangedDone: Boolean
 
@@ -11145,7 +11173,7 @@ input IntegrationsSettingsUpdateInput {
   slackIssueNewComment: Boolean
 
   """
-  Whether to send a Slack message when any of the project or team's issues change to completed or cancelled.
+  Whether to send a Slack message when any of the project or team's issues change to completed or canceled.
   """
   slackIssueStatusChangedDone: Boolean
 
@@ -11290,7 +11318,7 @@ input IntercomSettingsInput {
   automateTicketReopeningOnCompletion: Boolean
 
   """
-  Whether a ticket should be automatically reopened when its linked Linear issue is cancelled.
+  Whether a ticket should be automatically reopened when its linked Linear issue is canceled.
   """
   automateTicketReopeningOnCancellation: Boolean
 
@@ -11311,7 +11339,7 @@ input IntercomSettingsInput {
   automateTicketReopeningOnProjectCompletion: Boolean
 
   """
-  Whether a ticket should be automatically reopened when its linked Linear project is cancelled.
+  Whether a ticket should be automatically reopened when its linked Linear project is canceled.
   """
   automateTicketReopeningOnProjectCancellation: Boolean
 
@@ -31353,7 +31381,7 @@ input SalesforceSettingsInput {
   automateTicketReopeningOnCompletion: Boolean
 
   """
-  Whether a ticket should be automatically reopened when its linked Linear issue is cancelled.
+  Whether a ticket should be automatically reopened when its linked Linear issue is canceled.
   """
   automateTicketReopeningOnCancellation: Boolean
 
@@ -31374,7 +31402,7 @@ input SalesforceSettingsInput {
   automateTicketReopeningOnProjectCompletion: Boolean
 
   """
-  Whether a ticket should be automatically reopened when its linked Linear project is cancelled.
+  Whether a ticket should be automatically reopened when its linked Linear project is canceled.
   """
   automateTicketReopeningOnProjectCancellation: Boolean
 
@@ -37120,7 +37148,7 @@ input ZendeskSettingsInput {
   automateTicketReopeningOnCompletion: Boolean
 
   """
-  Whether a ticket should be automatically reopened when its linked Linear issue is cancelled.
+  Whether a ticket should be automatically reopened when its linked Linear issue is canceled.
   """
   automateTicketReopeningOnCancellation: Boolean
 
@@ -37141,7 +37169,7 @@ input ZendeskSettingsInput {
   automateTicketReopeningOnProjectCompletion: Boolean
 
   """
-  Whether a ticket should be automatically reopened when its linked Linear project is cancelled.
+  Whether a ticket should be automatically reopened when its linked Linear project is canceled.
   """
   automateTicketReopeningOnProjectCancellation: Boolean
 
