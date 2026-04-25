@@ -33808,6 +33808,9 @@ type RepositoryRulesetBypassActor implements Node {
   """This actor represents the ability for an enterprise owner to bypass"""
   enterpriseOwner: Boolean!
 
+  """This actor represents the ability for an enterprise role to bypass"""
+  enterpriseRole: Boolean!
+
   """The Node ID of the RepositoryRulesetBypassActor object"""
   id: ID!
 
@@ -33881,6 +33884,11 @@ input RepositoryRulesetBypassActorInput {
 
   """For enterprise owner bypasses, true"""
   enterpriseOwner: Boolean
+
+  """
+  For enterprise role bypasses, true. NOTE: This bypass actor is in beta.
+  """
+  enterpriseRole: Boolean
 
   """For deploy key bypasses, true. Can only use ALWAYS as the bypass mode"""
   deployKey: Boolean
@@ -38563,7 +38571,7 @@ input TagNamePatternParametersInput {
 }
 
 """A team of users in an organization."""
-type Team implements MemberStatusable & Node & Subscribable {
+type Team implements MemberStatusable & Node & Subscribable & TeamReviewRequestable {
   """A list of teams that are ancestors of this team."""
   ancestors(
     """Returns the elements in the list that come after the specified cursor."""
@@ -39469,6 +39477,18 @@ enum TeamReviewAssignmentAlgorithm {
 
   """Balance review load across the entire team"""
   LOAD_BALANCE
+}
+
+"""Represents a team that can be requested to review a pull request."""
+interface TeamReviewRequestable {
+  """The Node ID of the TeamReviewRequestable object"""
+  id: ID!
+
+  """The name of the team."""
+  name: String!
+
+  """A unique, human-readable identifier for the team."""
+  slug: String!
 }
 
 """The role of a user on a team."""
