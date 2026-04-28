@@ -30236,8 +30236,22 @@ input ReleaseNoteCreateInput {
   """Identifier of the release pipeline."""
   pipelineId: String!
 
-  """The releases included in this note."""
-  releaseIds: [String!]!
+  """
+  Explicit release IDs to include. Mutually exclusive with
+  rangeFromReleaseId/rangeToReleaseId — exactly one of the two shapes must be provided.
+  """
+  releaseIds: [String!]
+
+  """
+  Oldest release (by createdAt) to include. When paired with rangeToReleaseId,
+  expands to every release in the pipeline within the createdAt window.
+  """
+  rangeFromReleaseId: String
+
+  """
+  Newest release (by createdAt) to include. Paired with rangeFromReleaseId.
+  """
+  rangeToReleaseId: String
 }
 
 type ReleaseNoteEdge {
@@ -30261,8 +30275,20 @@ type ReleaseNotePayload {
 
 """[ALPHA] Input for updating a release note."""
 input ReleaseNoteUpdateInput {
-  """The releases included in this note."""
+  """
+  Explicit release IDs to set. Mutually exclusive with rangeFromReleaseId/rangeToReleaseId.
+  """
   releaseIds: [String!]
+
+  """
+  Oldest release (by createdAt) of the new range. Paired with rangeToReleaseId.
+  """
+  rangeFromReleaseId: String
+
+  """
+  Newest release (by createdAt) of the new range. Paired with rangeFromReleaseId.
+  """
+  rangeToReleaseId: String
 }
 
 """
@@ -30337,6 +30363,13 @@ type ReleasePipeline implements Node {
   and may not reflect the exact count at all times.
   """
   approximateReleaseCount: Int!
+
+  """
+  [Internal] The document template used to define the release notes format for
+  this pipeline. AI-generated release notes follow the structure and tone of
+  this template. Null if no template has been configured.
+  """
+  releaseNoteTemplate: Template
 
   """
   [Internal] The URL to the release pipeline's releases list in the Linear app.
@@ -34021,6 +34054,14 @@ type Template implements Node {
   team: Team
 
   """
+  [Internal] The release pipeline this template is bound to. Required when the
+  template type is 'releaseNote' and forbidden otherwise. The pipeline owns at
+  most one release note template, which defines the format AI follows when
+  generating release notes.
+  """
+  pipeline: ReleasePipeline
+
+  """
   The user who created the template. Null if the creator's account has been deleted.
   """
   creator: User
@@ -34063,6 +34104,13 @@ input TemplateCreateInput {
   the template will be shared across all teams.
   """
   teamId: String
+
+  """
+  The identifier of the release pipeline this template is bound to. Required
+  when the template type is 'releaseNote' and rejected otherwise. Each pipeline
+  can have at most one release note template.
+  """
+  pipelineId: String
 
   """The template name."""
   name: String!
@@ -35847,7 +35895,10 @@ type ViewPreferencesValues {
   projectSubGrouping: String
 
   """The ordering of project groups."""
-  projectGroupOrdering: String
+  projectGroupOrdering: String @deprecated(reason: "Use groupOrderingMode instead.")
+
+  """The ordering mode for groups. Supersedes projectGroupOrdering."""
+  groupOrderingMode: String
 
   """The date resolution when grouping projects by date."""
   projectGroupingDateResolution: String
