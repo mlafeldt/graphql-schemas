@@ -1014,6 +1014,7 @@ enum AiConversationEntityCardWidgetArgsAction {
 """[Internal] The entity type"""
 enum AiConversationEntityCardWidgetArgsType {
   Issue
+  IssueDraft
   Project
   Initiative
   InitiativeUpdate
@@ -1077,6 +1078,7 @@ type AiConversationEntityListWidgetArgsEntities {
 """[Internal] The entity type"""
 enum AiConversationEntityListWidgetArgsEntitiesType {
   Issue
+  IssueDraft
   Project
   Initiative
   InitiativeUpdate
@@ -2303,6 +2305,13 @@ input AttachmentCreateInput {
   available to OAuth applications creating attachments in `actor=application` mode.
   """
   createAsUser: String
+
+  """
+  Provide an external user avatar URL. Can only be used in conjunction with the
+  `createAsUser` options. This option is only available to OAuth applications
+  creating attachments in `actor=app` mode.
+  """
+  displayIconUrl: String
 }
 
 type AttachmentEdge {
@@ -9439,6 +9448,11 @@ type Initiative implements Node {
   """
   completedAt: DateTime
 
+  """
+  [Internal] The IDs of the initiative labels associated with this initiative.
+  """
+  labelIds: [String!]!
+
   """Initiative URL."""
   url: String!
 
@@ -9666,6 +9680,36 @@ type Initiative implements Node {
     """
     orderBy: PaginationOrderBy
   ): DocumentConnection!
+
+  """[Internal] Labels associated with this initiative."""
+  labels(
+    """Filter returned initiative labels."""
+    filter: InitiativeLabelFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): InitiativeLabelConnection!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -9802,6 +9846,11 @@ input InitiativeCreateInput {
 
   """The initiative's content in markdown format."""
   content: String
+
+  """
+  [Internal] The identifiers of the initiative labels associated with this initiative.
+  """
+  labelIds: [String!]
 }
 
 type InitiativeEdge {
@@ -9932,6 +9981,117 @@ type InitiativeHistoryEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""
+A label that can be applied to initiatives for categorization. Initiative labels
+are workspace-level and can be organized into groups with a parent-child
+hierarchy. Only child labels (not group labels) can be directly applied to initiatives.
+"""
+type InitiativeLabel implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The label's name."""
+  name: String!
+
+  """The label's description."""
+  description: String
+
+  """
+  The label's color as a HEX string (e.g., '#EB5757'). Used for visual identification of the label in the UI.
+  """
+  color: String!
+
+  """
+  Whether the label is a group. When true, this label acts as a container for
+  child labels and cannot be directly applied to issues or projects. When false,
+  the label can be directly applied.
+  """
+  isGroup: Boolean!
+
+  """
+  The date when the label was last applied to an issue or project. Null if the label has never been applied.
+  """
+  lastAppliedAt: DateTime
+
+  """[Internal] When the label was retired."""
+  retiredAt: DateTime
+
+  """The workspace that the initiative label belongs to."""
+  organization: Organization!
+
+  """The user who created the label."""
+  creator: User
+
+  """
+  The user who retired the label. Retired labels cannot be applied to new
+  initiatives but remain on existing ones. Null if the label is active.
+  """
+  retiredBy: User
+
+  """
+  The parent label group. If set, this label is a child within a group. Only one
+  child label from each group can be applied to an initiative at a time.
+  """
+  parent: InitiativeLabel
+}
+
+type InitiativeLabelConnection {
+  edges: [InitiativeLabelEdge!]!
+  nodes: [InitiativeLabel!]!
+  pageInfo: PageInfo!
+}
+
+type InitiativeLabelEdge {
+  node: InitiativeLabel!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""Initiative label filtering options."""
+input InitiativeLabelFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the name."""
+  name: StringComparator
+
+  """Comparator for whether the label is a group label."""
+  isGroup: BooleanComparator
+
+  """Filters that the initiative labels creator must satisfy."""
+  creator: NullableUserFilter
+
+  """Filters that the initiative label's parent label must satisfy."""
+  parent: InitiativeLabelFilter
+
+  """Compound filters, all of which need to be matched by the label."""
+  and: [InitiativeLabelFilter!]
+
+  """Compound filters, one of which need to be matched by the label."""
+  or: [InitiativeLabelFilter!]
 }
 
 """Initiative manual sorting options."""
@@ -10705,6 +10865,11 @@ input InitiativeUpdateInput {
 
   """The hour of the day (0-23) at which to prompt for initiative updates."""
   updateRemindersHour: Int
+
+  """
+  [Internal] The identifiers of the initiative labels associated with this initiative.
+  """
+  labelIds: [String!]
 }
 
 """The result of an initiative update mutation."""
@@ -18271,6 +18436,24 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
+  """[Internal]Adds a label to an initiative."""
+  initiativeAddLabel(
+    """The identifier of the label to add."""
+    labelId: String!
+
+    """The identifier of the initiative to add the label to."""
+    id: String!
+  ): InitiativePayload!
+
+  """[Internal]Removes a label from an initiative."""
+  initiativeRemoveLabel(
+    """The identifier of the label to remove."""
+    labelId: String!
+
+    """The identifier of the initiative to remove the label from."""
+    id: String!
+  ): InitiativePayload!
+
   """
   Creates a new parent-child relation between two initiatives. The relation
   cannot create cycles or exceed maximum nesting depth.
@@ -23957,9 +24140,7 @@ input ProjectCreateInput {
   """
   priority: Int
 
-  """
-  [Internal] The identifiers of the project labels associated with this project.
-  """
+  """The identifiers of the project labels associated with this project."""
   labelIds: [String!]
 }
 
@@ -27893,7 +28074,7 @@ type Query {
     orderBy: PaginationOrderBy
   ): ReleaseNoteConnection!
 
-  """[ALPHA] Fetch a release note by its identifier."""
+  """[ALPHA] Fetch a release note by its UUID or slug identifier."""
   releaseNote(id: String!): ReleaseNote!
 
   """
@@ -30212,6 +30393,11 @@ type ReleaseNote implements Node {
   The time at which the entity was archived. Null if the entity has not been archived.
   """
   archivedAt: DateTime
+
+  """
+  The release note's unique URL slug, used to construct human-readable URLs for the note.
+  """
+  slugId: String!
 
   """[ALPHA] Releases included in the note."""
   releases: [Release!]!
@@ -36010,6 +36196,9 @@ type ViewPreferencesValues {
 
   """Whether to show the project completion date field."""
   projectFieldDateCompleted: Boolean
+
+  """Whether to show the project issue count field."""
+  projectFieldIssues: Boolean
 
   """Whether to show the project status field on the timeline."""
   projectFieldStatusTimeline: Boolean
