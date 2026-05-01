@@ -9094,6 +9094,13 @@ input GitLabSettingsInput {
 
   """The ISO timestamp the GitLab access token expires."""
   expiresAt: String
+
+  """
+  Path or numeric ID of a project to use for the setup health check. Set this
+  when the GitLab tenant blocks non-project API endpoints; the setup check then
+  validates against this single project instead of the personal access token endpoint.
+  """
+  validationProjectPath: String
 }
 
 type GitLabTestConnectionPayload {
@@ -17577,11 +17584,29 @@ type Mutation {
 
   """Connects the workspace with a GitLab Access Token."""
   integrationGitlabConnect(
+    """The GitLab Access Token to connect with."""
+    accessToken: String!
+
     """The URL of the GitLab installation."""
     gitlabUrl: String!
 
-    """The GitLab Access Token to connect with."""
-    accessToken: String!
+    """
+    Optional path or numeric ID of a project to use for the setup health check.
+    Set this when the GitLab tenant blocks non-project API endpoints.
+    """
+    validationProjectPath: String
+
+    """
+    Whether the access token is limited to a read-only scope. Used as a fallback
+    when `validationProjectPath` is set and `personal_access_tokens/self` is unreachable.
+    """
+    readonly: Boolean
+
+    """
+    ISO timestamp when the access token expires. Used as a fallback when
+    `validationProjectPath` is set and `personal_access_tokens/self` is unreachable.
+    """
+    expiresAt: String
   ): GitLabIntegrationCreatePayload!
 
   """
@@ -34231,6 +34256,9 @@ input TeamUpdateInput {
   workspace admins or owners and only unsetting is allowed!
   """
   scimManaged: Boolean
+
+  """The SCIM group name for the team."""
+  scimGroupName: String
 
   """The parent team ID."""
   parentId: String
