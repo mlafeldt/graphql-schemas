@@ -9101,6 +9101,13 @@ input GitLabSettingsInput {
   validates against this single project instead of the personal access token endpoint.
   """
   validationProjectPath: String
+
+  """
+  When true, MR webhook PR sync uses the project-scoped REST aggregator instead
+  of GraphQL. Set automatically for teleport-routed installations whose proxies
+  require all upstream paths to live under `/api/v4/projects/...`.
+  """
+  useRestPrSync: Boolean
 }
 
 type GitLabTestConnectionPayload {
@@ -22769,11 +22776,6 @@ input OrganizationUpdateInput {
   authSettings: OrganizationAuthSettingsInput
 
   """
-  [INTERNAL] Configure per-modality AI host providers and model families.
-  """
-  aiProviderConfiguration: JSONObject
-
-  """
   The ID of the Slack integration to use for auto-creating project channels.
   """
   slackProjectChannelIntegrationId: String
@@ -35999,6 +36001,15 @@ input ViewPreferencesCreateInput {
   userId: String
 }
 
+"""A label group column configuration for the initiative list view."""
+type ViewPreferencesInitiativeLabelGroupColumn {
+  """The identifier of the label group."""
+  id: String!
+
+  """Whether the label group column is active."""
+  active: Boolean!
+}
+
 """The result of a view preferences mutation."""
 type ViewPreferencesPayload {
   """The identifier of the last sync operation."""
@@ -36400,6 +36411,12 @@ type ViewPreferencesValues {
 
   """The initiative grouping."""
   initiativeGrouping: String
+
+  """[Internal] The label group ID used for initiative grouping."""
+  initiativeGroupingLabelGroupId: String
+
+  """[Internal] The initiative label group columns configuration."""
+  initiativeLabelGroupColumns: [ViewPreferencesInitiativeLabelGroupColumn!]
 
   """The initiative ordering."""
   initiativesViewOrdering: String
