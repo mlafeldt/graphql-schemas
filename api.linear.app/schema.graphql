@@ -6511,8 +6511,7 @@ type Document implements Node {
   issue: Issue
 
   """
-  [Internal] The release that the document is associated with. Null if the
-  document belongs to a different parent entity type.
+  The release that the document is associated with. Null if the document belongs to a different parent entity type.
   """
   release: Release
 
@@ -6775,6 +6774,15 @@ type DocumentContentHistoryType {
   metadata: JSON
 }
 
+"""Document creation date sorting options."""
+input DocumentCreatedAtSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 """Input for creating a new document."""
 input DocumentCreateInput {
   """
@@ -6808,7 +6816,7 @@ input DocumentCreateInput {
   """
   issueId: String
 
-  """[Internal] Related release for the document."""
+  """Related release for the document."""
   releaseId: String
 
   """[Internal] Related cycle for the document."""
@@ -6825,6 +6833,15 @@ input DocumentCreateInput {
 
   """[INTERNAL] The identifiers of the users subscribing to this document."""
   subscriberIds: [String!]
+}
+
+"""Document creator sorting options."""
+input DocumentCreatorSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
 }
 
 type DocumentEdge {
@@ -6862,6 +6879,9 @@ input DocumentFilter {
 
   """Filters that the document's initiative must satisfy."""
   initiative: InitiativeFilter
+
+  """Filters that the document's team must satisfy."""
+  team: NullableTeamFilter
 
   """Filters that the document's cycle must satisfy."""
   cycle: CycleFilter
@@ -7021,6 +7041,15 @@ type DocumentPayload {
   success: Boolean!
 }
 
+"""Document project sorting options."""
+input DocumentProjectSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 type DocumentSearchPayload {
   edges: [DocumentSearchResultEdge!]!
   nodes: [DocumentSearchResult!]!
@@ -7104,8 +7133,7 @@ type DocumentSearchResult implements Node {
   issue: Issue
 
   """
-  [Internal] The release that the document is associated with. Null if the
-  document belongs to a different parent entity type.
+  The release that the document is associated with. Null if the document belongs to a different parent entity type.
   """
   release: Release
 
@@ -7193,6 +7221,42 @@ type DocumentSearchResultEdge {
   cursor: String!
 }
 
+"""Document sorting options."""
+input DocumentSortInput {
+  """Sort by document title."""
+  title: DocumentTitleSort
+
+  """Sort by the document's creator (author)."""
+  creator: DocumentCreatorSort
+
+  """Sort by the document's parent project name."""
+  project: DocumentProjectSort
+
+  """Sort by document creation date."""
+  createdAt: DocumentCreatedAtSort
+
+  """Sort by document last-updated date."""
+  updatedAt: DocumentUpdatedAtSort
+}
+
+"""Document title sorting options."""
+input DocumentTitleSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
+"""Document update date sorting options."""
+input DocumentUpdatedAtSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 """Input for updating an existing document."""
 input DocumentUpdateInput {
   """The title of the document."""
@@ -7221,7 +7285,7 @@ input DocumentUpdateInput {
   """
   issueId: String
 
-  """[Internal] Related release for the document."""
+  """Related release for the document."""
   releaseId: String
 
   """[Internal] Related cycle for the document."""
@@ -7840,7 +7904,7 @@ input EntityExternalLinkCreateInput {
   """[Internal] The team associated with the link."""
   teamId: String
 
-  """[Internal] The release associated with the link."""
+  """The release associated with the link."""
   releaseId: String
 
   """[Internal] The cycle associated with the link."""
@@ -8326,10 +8390,10 @@ type Favorite implements Node {
   """The favorited pull request."""
   pullRequest: PullRequest
 
-  """[ALPHA] The favorited release."""
+  """The favorited release."""
   release: Release
 
-  """[ALPHA] The favorited release pipeline."""
+  """The favorited release pipeline."""
   releasePipeline: ReleasePipeline
 
   """The favorited team."""
@@ -8435,10 +8499,10 @@ input FavoriteCreateInput {
   """The identifier of the pull request to favorite."""
   pullRequestId: String
 
-  """[ALPHA] The identifier of the release to favorite."""
+  """The identifier of the release to favorite."""
   releaseId: String
 
-  """[ALPHA] The identifier of the release pipeline to favorite."""
+  """The identifier of the release pipeline to favorite."""
   releasePipelineId: String
 
   """The identifier of the team to favorite."""
@@ -9083,6 +9147,12 @@ type GitLabIntegrationCreatePayload {
 
   """Response headers from GitLab for debugging (JSON stringified)."""
   errorResponseHeaders: String
+
+  """
+  Method and post-encoding upstream URI of the failed request, for debugging
+  proxy allowlist rules (e.g. `GET /api/v4/projects/aire%2Fagents`).
+  """
+  errorRequest: String
 }
 
 input GitLabSettingsInput {
@@ -9128,6 +9198,12 @@ type GitLabTestConnectionPayload {
 
   """Response headers from GitLab for debugging (JSON stringified)."""
   errorResponseHeaders: String
+
+  """
+  Method and post-encoding upstream URI of the failed request, for debugging
+  proxy allowlist rules (e.g. `GET /api/v4/projects/aire%2Fagents`).
+  """
+  errorRequest: String
 }
 
 """[Internal] The kind of link between an issue and a pull request."""
@@ -12244,7 +12320,7 @@ type Issue implements Node {
     orderBy: PaginationOrderBy
   ): CustomerNeedConnection!
 
-  """[ALPHA] Releases associated with the issue."""
+  """Releases associated with the issue."""
   releases(
     """Filter returned releases."""
     filter: ReleaseFilter
@@ -12584,7 +12660,7 @@ input IssueCollectionFilter {
   """Filters that the issue's customer needs must satisfy."""
   needs: CustomerNeedCollectionFilter
 
-  """[ALPHA] Filters that the issue's releases must satisfy."""
+  """Filters that the issue's releases must satisfy."""
   releases: ReleaseCollectionFilter
 
   """Count of customers"""
@@ -12770,7 +12846,7 @@ input IssueCreateInput {
   """
   useDefaultTemplate: Boolean
 
-  """[ALPHA] The identifiers of the releases to associate with this issue."""
+  """The identifiers of the releases to associate with this issue."""
   releaseIds: [String!]
 
   """
@@ -13131,7 +13207,7 @@ input IssueFilter {
   """Filters that the issue's customer needs must satisfy."""
   needs: CustomerNeedCollectionFilter
 
-  """[ALPHA] Filters that the issue's releases must satisfy."""
+  """Filters that the issue's releases must satisfy."""
   releases: ReleaseCollectionFilter
 
   """Count of customers"""
@@ -13328,10 +13404,10 @@ type IssueHistory implements Node {
   """ID's of labels that were removed."""
   removedLabelIds: [String!]
 
-  """[ALPHA] ID's of releases that the issue was added to."""
+  """ID's of releases that the issue was added to."""
   addedToReleaseIds: [String!]
 
-  """[ALPHA] ID's of releases that the issue was removed from."""
+  """ID's of releases that the issue was removed from."""
   removedFromReleaseIds: [String!]
 
   """Changed issue relationships."""
@@ -14993,7 +15069,7 @@ type IssueSearchResult implements Node {
     orderBy: PaginationOrderBy
   ): CustomerNeedConnection!
 
-  """[ALPHA] Releases associated with the issue."""
+  """Releases associated with the issue."""
   releases(
     """Filter returned releases."""
     filter: ReleaseFilter
@@ -15241,7 +15317,7 @@ input IssueSortInput {
   """[ALPHA] Sort by number of links associated with the issue"""
   linkCount: LinkCountSort
 
-  """[ALPHA] Sort by most recent release date"""
+  """Sort by most recent release date"""
   release: ReleaseSort
 }
 
@@ -15577,11 +15653,11 @@ type IssueTitleSuggestionFromCustomerRequestPayload {
 }
 
 """
-[Internal] A join entity linking an issue to a release for release tracking.
-Each record represents an association between a single issue and a single
-release, along with metadata about the source of the link (e.g., which pull
-requests connected the issue to the release). Creating or deleting these
-associations automatically records the change in issue history.
+A join entity linking an issue to a release for release tracking. Each record
+represents an association between a single issue and a single release, along
+with metadata about the source of the link (e.g., which pull requests connected
+the issue to the release). Creating or deleting these associations automatically
+records the change in issue history.
 """
 type IssueToRelease implements Node {
   """The unique identifier of the entity."""
@@ -15615,8 +15691,8 @@ type IssueToReleaseConnection {
 }
 
 """
-[ALPHA] Input for creating a new association between an issue and a release.
-Both an issue identifier and a release identifier must be provided.
+Input for creating a new association between an issue and a release. Both an
+issue identifier and a release identifier must be provided.
 """
 input IssueToReleaseCreateInput {
   """
@@ -15641,7 +15717,7 @@ type IssueToReleaseEdge {
 }
 
 """
-[ALPHA] The result of an issue-to-release mutation, containing the created or updated association and a success indicator.
+The result of an issue-to-release mutation, containing the created or updated association and a success indicator.
 """
 type IssueToReleasePayload {
   """The identifier of the last sync operation."""
@@ -18048,6 +18124,11 @@ type Mutation {
 
     """The Salesforce OAuth redirect URI."""
     redirectUri: String!
+
+    """
+    The PKCE code verifier matching the code_challenge sent on authorization.
+    """
+    codeVerifier: String!
   ): IntegrationPayload!
 
   """[INTERNAL] Refreshes the Salesforce integration metadata."""
@@ -18519,7 +18600,7 @@ type Mutation {
   ): IssuePayload!
 
   """
-  [ALPHA] Creates a new association between an issue and a release, linking the issue to the release for tracking purposes.
+  Creates a new association between an issue and a release, linking the issue to the release for tracking purposes.
   """
   issueToReleaseCreate(
     """The properties of the issueToRelease to create."""
@@ -18527,8 +18608,8 @@ type Mutation {
   ): IssueToReleasePayload!
 
   """
-  [ALPHA] Deletes an issue-to-release association by looking up the issue and
-  release identifiers, removing the issue from the release.
+  Deletes an issue-to-release association by looking up the issue and release
+  identifiers, removing the issue from the release.
   """
   issueToReleaseDeleteByIssueAndRelease(
     """The identifier of the release."""
@@ -18541,7 +18622,7 @@ type Mutation {
   ): DeletePayload!
 
   """
-  [ALPHA] Deletes an issue-to-release association by its identifier, removing the issue from the release.
+  Deletes an issue-to-release association by its identifier, removing the issue from the release.
   """
   issueToReleaseDelete(
     """The identifier of the issue-to-release association to delete."""
@@ -18956,13 +19037,13 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
-  """[ALPHA] Creates a release note."""
+  """Creates a release note."""
   releaseNoteCreate(
     """The release note fields."""
     input: ReleaseNoteCreateInput!
   ): ReleaseNotePayload!
 
-  """[ALPHA] Updates a release note."""
+  """Updates a release note."""
   releaseNoteUpdate(
     """The fields to update."""
     input: ReleaseNoteUpdateInput!
@@ -18971,14 +19052,14 @@ type Mutation {
     id: String!
   ): ReleaseNotePayload!
 
-  """[ALPHA] Deletes a release note."""
+  """Deletes a release note."""
   releaseNoteDelete(
     """The identifier of the release note to delete."""
     id: String!
   ): DeletePayload!
 
   """
-  [ALPHA] Creates a new release pipeline with default stages. Subject to plan entitlement and quota limits.
+  Creates a new release pipeline with default stages. Subject to plan entitlement and quota limits.
   """
   releasePipelineCreate(
     """The ReleasePipeline object to create."""
@@ -18986,9 +19067,9 @@ type Mutation {
   ): ReleasePipelinePayload!
 
   """
-  [ALPHA] Updates an existing release pipeline. Supports updating name, slug,
-  type, production flag, path patterns, and team associations. Private teams
-  that the current user cannot access are preserved in the team list.
+  Updates an existing release pipeline. Supports updating name, slug, type,
+  production flag, path patterns, and team associations. Private teams that the
+  current user cannot access are preserved in the team list.
   """
   releasePipelineUpdate(
     """A partial ReleasePipeline object to update the ReleasePipeline with."""
@@ -18998,20 +19079,20 @@ type Mutation {
     id: String!
   ): ReleasePipelinePayload!
 
-  """[ALPHA] Archives a release pipeline."""
+  """Archives a release pipeline."""
   releasePipelineArchive(
     """The identifier of the release pipeline to archive."""
     id: String!
   ): ReleasePipelineArchivePayload!
 
-  """[ALPHA] Unarchives a release pipeline."""
+  """Unarchives a release pipeline."""
   releasePipelineUnarchive(
     """The identifier of the release pipeline to unarchive."""
     id: String!
   ): ReleasePipelineArchivePayload!
 
   """
-  [ALPHA] Permanently deletes a release pipeline and all associated stages and releases.
+  Permanently deletes a release pipeline and all associated stages and releases.
   """
   releasePipelineDelete(
     """The identifier of the release pipeline to delete."""
@@ -19019,7 +19100,7 @@ type Mutation {
   ): DeletePayload!
 
   """
-  [ALPHA] Syncs release data by resolving issue and pull request references and
+  Syncs release data by resolving issue and pull request references and
   associating them with a release. For continuous pipelines, creates a new
   completed release. For scheduled pipelines, finds or creates a started release
   and accumulates issues into it.
@@ -19030,9 +19111,9 @@ type Mutation {
   ): ReleasePayload!
 
   """
-  [ALPHA] Creates a new release in a pipeline. If no stage is specified,
-  defaults to the first completed stage for continuous pipelines or the first
-  started stage for scheduled pipelines.
+  Creates a new release in a pipeline. If no stage is specified, defaults to the
+  first completed stage for continuous pipelines or the first started stage for
+  scheduled pipelines.
   """
   releaseCreate(
     """The release to create."""
@@ -19040,8 +19121,7 @@ type Mutation {
   ): ReleasePayload!
 
   """
-  [ALPHA] Updates an existing release by ID. Supports updating name,
-  description, version, commit SHA, pipeline, stage, and dates.
+  Updates an existing release by ID. Supports updating name, description, version, commit SHA, pipeline, stage, and dates.
   """
   releaseUpdate(
     """A partial Release object to update the Release with."""
@@ -19052,8 +19132,8 @@ type Mutation {
   ): ReleasePayload!
 
   """
-  [ALPHA] Marks a release as completed. If version is provided, completes that
-  specific release; otherwise completes the most recent started release.
+  Marks a release as completed. If version is provided, completes that specific
+  release; otherwise completes the most recent started release.
   """
   releaseComplete(
     """The input containing the pipeline ID and optional version."""
@@ -19061,8 +19141,8 @@ type Mutation {
   ): ReleasePayload!
 
   """
-  [ALPHA] Updates a release by pipeline identifier. Finds the release by version
-  or latest started/planned release, and optionally transitions it to a new stage by name.
+  Updates a release by pipeline identifier. Finds the release by version or
+  latest started/planned release, and optionally transitions it to a new stage by name.
   """
   releaseUpdateByPipeline(
     """
@@ -19072,31 +19152,31 @@ type Mutation {
   ): ReleasePayload!
 
   """
-  [ALPHA] Moves a release to the trash bin. Trashed releases are archived and
-  will be permanently deleted after a retention period. If the release is
-  already archived, it is marked as trashed with a fresh archive timestamp.
+  Moves a release to the trash bin. Trashed releases are archived and will be
+  permanently deleted after a retention period. If the release is already
+  archived, it is marked as trashed with a fresh archive timestamp.
   """
   releaseDelete(
     """The identifier of the release to delete."""
     id: String!
   ): ReleaseArchivePayload!
 
-  """[ALPHA] Archives a release."""
+  """Archives a release."""
   releaseArchive(
     """The identifier of the release to archive."""
     id: String!
   ): ReleaseArchivePayload!
 
-  """[ALPHA] Unarchives a release."""
+  """Unarchives a release."""
   releaseUnarchive(
     """The identifier of the release to unarchive."""
     id: String!
   ): ReleaseArchivePayload!
 
   """
-  [ALPHA] Syncs release data using an access key for CI/CD integration. The
-  pipeline is automatically inferred from the access key's configured resources,
-  so no pipeline ID is needed in the input.
+  Syncs release data using an access key for CI/CD integration. The pipeline is
+  automatically inferred from the access key's configured resources, so no
+  pipeline ID is needed in the input.
   """
   releaseSyncByAccessKey(
     """The release data to sync."""
@@ -19104,26 +19184,26 @@ type Mutation {
   ): ReleasePayload!
 
   """
-  [ALPHA] Marks a release as completed using an access key. If version is
-  provided, completes that specific release; otherwise completes the most recent
-  started release. The pipeline is inferred from the access key.
+  Marks a release as completed using an access key. If version is provided,
+  completes that specific release; otherwise completes the most recent started
+  release. The pipeline is inferred from the access key.
   """
   releaseCompleteByAccessKey(
     """The input containing the optional version."""
     input: ReleaseCompleteInputBase!
   ): ReleasePayload!
 
-  """[ALPHA] Updates a release by pipeline using an access key."""
+  """Updates a release by pipeline using an access key."""
   releaseUpdateByPipelineByAccessKey(
     """The input containing the optional version and optional stage name."""
     input: ReleaseUpdateByPipelineInputBase!
   ): ReleasePayload!
 
   """
-  [ALPHA] Creates a new release stage in a pipeline. Non-started stages must use
-  default names and colors, and only one stage of each non-started type is
-  allowed per pipeline. Started stages can optionally be frozen, but at least
-  one non-frozen started stage must remain.
+  Creates a new release stage in a pipeline. Non-started stages must use default
+  names and colors, and only one stage of each non-started type is allowed per
+  pipeline. Started stages can optionally be frozen, but at least one non-frozen
+  started stage must remain.
   """
   releaseStageCreate(
     """The ReleaseStage object to create."""
@@ -19131,8 +19211,8 @@ type Mutation {
   ): ReleaseStagePayload!
 
   """
-  [ALPHA] Updates an existing release stage. Only started-type stages can be
-  edited. Supports updating name, color, position, and frozen status.
+  Updates an existing release stage. Only started-type stages can be edited.
+  Supports updating name, color, position, and frozen status.
   """
   releaseStageUpdate(
     """A partial ReleaseStage object to update the ReleaseStage with."""
@@ -19143,16 +19223,16 @@ type Mutation {
   ): ReleaseStagePayload!
 
   """
-  [ALPHA] Archives a release stage. Only started-type stages can be archived,
-  and only if they have no active releases and at least one other stage of the
-  same type remains. Cannot archive the last non-frozen started stage.
+  Archives a release stage. Only started-type stages can be archived, and only
+  if they have no active releases and at least one other stage of the same type
+  remains. Cannot archive the last non-frozen started stage.
   """
   releaseStageArchive(
     """The identifier of the release stage to archive."""
     id: String!
   ): ReleaseStageArchivePayload!
 
-  """[ALPHA] Unarchives a release stage."""
+  """Unarchives a release stage."""
   releaseStageUnarchive(
     """The identifier of the release stage to unarchive."""
     id: String!
@@ -20891,7 +20971,7 @@ input NullableIssueFilter {
   """Filters that the issue's customer needs must satisfy."""
   needs: CustomerNeedCollectionFilter
 
-  """[ALPHA] Filters that the issue's releases must satisfy."""
+  """Filters that the issue's releases must satisfy."""
   releases: ReleaseCollectionFilter
 
   """Count of customers"""
@@ -21283,7 +21363,7 @@ input NullableTeamFilter {
   """Filters that the team's ancestors must satisfy."""
   ancestors: TeamCollectionFilter
 
-  """[ALPHA] Filters that the team's release pipelines must satisfy."""
+  """Filters that the team's release pipelines must satisfy."""
   releasePipelines: ReleasePipelineCollectionFilter
 
   """Filter based on the existence of the relation."""
@@ -22156,7 +22236,7 @@ type Organization implements Node {
   """
   customersEnabled: Boolean!
 
-  """[Internal] Whether release management is enabled for the workspace."""
+  """Whether release management is enabled for the workspace."""
   releasesEnabled: Boolean!
 
   """[DEPRECATED] Whether member users are allowed to send invites."""
@@ -28032,6 +28112,9 @@ type Query {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
+
+    """[INTERNAL] Sort returned documents."""
+    sort: [DocumentSortInput!]
   ): DocumentConnection!
 
   """A specific document by ID or slug."""
@@ -28663,7 +28746,7 @@ type Query {
   ): RepositorySuggestionsPayload!
 
   """
-  [ALPHA] All issue-to-release associations. Returns a paginated list of all
+  All issue-to-release associations. Returns a paginated list of all
   issue-to-release links visible to the authenticated user.
   """
   issueToReleases(
@@ -28693,7 +28776,7 @@ type Query {
   ): IssueToReleaseConnection!
 
   """
-  [ALPHA] One specific issue-to-release association, looked up by its unique identifier.
+  One specific issue-to-release association, looked up by its unique identifier.
   """
   issueToRelease(
     """The identifier of the issue-to-release association to retrieve."""
@@ -29034,7 +29117,7 @@ type Query {
   """
   rateLimitStatus: RateLimitPayload!
 
-  """[ALPHA] Release notes in the workspace."""
+  """Release notes in the workspace."""
   releaseNotes(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -29061,11 +29144,11 @@ type Query {
     orderBy: PaginationOrderBy
   ): ReleaseNoteConnection!
 
-  """[ALPHA] Fetch a release note by its UUID or slug identifier."""
+  """Fetch a release note by its UUID or slug identifier."""
   releaseNote(id: String!): ReleaseNote!
 
   """
-  [ALPHA] All release pipelines in the workspace, with optional filtering and sorting.
+  All release pipelines in the workspace, with optional filtering and sorting.
   """
   releasePipelines(
     """Filter returned release pipelines."""
@@ -29095,28 +29178,24 @@ type Query {
     """
     orderBy: PaginationOrderBy
 
-    """[ALPHA] Sort returned release pipelines."""
+    """Sort returned release pipelines."""
     sort: [ReleasePipelineSortInput!]
   ): ReleasePipelineConnection!
 
-  """
-  [ALPHA] Fetch a single release pipeline by its UUID or slug identifier.
-  """
+  """Fetch a single release pipeline by its UUID or slug identifier."""
   releasePipeline(id: String!): ReleasePipeline!
 
   """
-  [ALPHA] Returns a release pipeline by ID. Requires the access key to have access to the pipeline.
+  Returns a release pipeline by ID. Requires the access key to have access to the pipeline.
   """
   releasePipelineByAccessKey: ReleasePipeline!
 
   """
-  [ALPHA] Returns the latest release for the pipeline associated with the access key.
+  Returns the latest release for the pipeline associated with the access key.
   """
   latestReleaseByAccessKey: Release
 
-  """
-  [ALPHA] All releases in the workspace, with optional filtering and sorting.
-  """
+  """All releases in the workspace, with optional filtering and sorting."""
   releases(
     """Filter returned releases."""
     filter: ReleaseFilter
@@ -29145,15 +29224,15 @@ type Query {
     """
     orderBy: PaginationOrderBy
 
-    """[ALPHA] Sort returned releases."""
+    """Sort returned releases."""
     sort: [ReleaseSortInput!]
   ): ReleaseConnection!
 
-  """[ALPHA] Fetch a single release by its UUID or slug identifier."""
+  """Fetch a single release by its UUID or slug identifier."""
   release(id: String!): Release!
 
   """
-  [ALPHA] Search releases with optional text matching against name, version, and
+  Search releases with optional text matching against name, version, and
   pipeline name. When no search term is provided, returns releases ordered by
   stage priority (started > planned > completed > canceled).
   """
@@ -29171,7 +29250,7 @@ type Query {
     term: String
   ): [Release!]!
 
-  """[ALPHA] All release stages in the workspace, with optional filtering."""
+  """All release stages in the workspace, with optional filtering."""
   releaseStages(
     """Filter returned release stages."""
     filter: ReleaseStageFilter
@@ -29201,7 +29280,7 @@ type Query {
     orderBy: PaginationOrderBy
   ): ReleaseStageConnection!
 
-  """[ALPHA] Fetch a single release stage by its UUID."""
+  """Fetch a single release stage by its UUID."""
   releaseStage(id: String!): ReleaseStage!
 
   """
@@ -29993,11 +30072,11 @@ input RelationExistsComparator {
 }
 
 """
-[Internal] A release that bundles issues together for a software deployment or
-version. Releases belong to a release pipeline and progress through stages
-(e.g., planned, started, completed, canceled). Issues are associated with
-releases via the IssueToRelease join entity, and the release tracks lifecycle
-timestamps such as when it was started, completed, or canceled.
+A release that bundles issues together for a software deployment or version.
+Releases belong to a release pipeline and progress through stages (e.g.,
+planned, started, completed, canceled). Issues are associated with releases via
+the IssueToRelease join entity, and the release tracks lifecycle timestamps such
+as when it was started, completed, or canceled.
 """
 type Release implements Node {
   """The unique identifier of the entity."""
@@ -30103,17 +30182,17 @@ type Release implements Node {
   trashed: Boolean
 
   """
-  [Internal] The historical progress snapshots for the release, tracking how issue completion has evolved over time.
+  The historical progress snapshots for the release, tracking how issue completion has evolved over time.
   """
   progressHistory: JSONObject!
 
   """
-  [Internal] The current progress summary for the release, including counts of
-  issues by workflow state type (e.g., completed, in progress, unstarted).
+  The current progress summary for the release, including counts of issues by
+  workflow state type (e.g., completed, in progress, unstarted).
   """
   currentProgress: JSONObject!
 
-  """[Internal] History entries associated with the release."""
+  """History entries associated with the release."""
   history(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -30143,7 +30222,7 @@ type Release implements Node {
   """The URL to the release page in the Linear app."""
   url: String!
 
-  """[Internal] Documents associated with the release."""
+  """Documents associated with the release."""
   documents(
     """Filter returned documents."""
     filter: DocumentFilter
@@ -30173,7 +30252,7 @@ type Release implements Node {
     orderBy: PaginationOrderBy
   ): DocumentConnection!
 
-  """[ALPHA] Issues associated with the release."""
+  """Issues associated with the release."""
   issues(
     """Filter returned issues."""
     filter: IssueFilter
@@ -30203,13 +30282,13 @@ type Release implements Node {
     orderBy: PaginationOrderBy
   ): IssueConnection!
 
-  """[ALPHA] Number of issues associated with the release."""
+  """Number of issues associated with the release."""
   issueCount(
     """Include archived issues in the count."""
     includeArchived: Boolean = false
   ): Int!
 
-  """[Internal] Links associated with the release."""
+  """Links associated with the release."""
   links(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -30236,7 +30315,7 @@ type Release implements Node {
     orderBy: PaginationOrderBy
   ): EntityExternalLinkConnection!
 
-  """[ALPHA] Release notes for the release."""
+  """Release notes for the release."""
   releaseNotes: [ReleaseNote!]!
 }
 
@@ -30262,7 +30341,7 @@ enum ReleaseChannel {
   public
 }
 
-"""[ALPHA] Release collection filtering options."""
+"""Release collection filtering options."""
 input ReleaseCollectionFilter {
   """Comparator for the identifier."""
   id: IDComparator
@@ -30377,6 +30456,26 @@ input ReleaseCreateInput {
 
   """The estimated completion date of the release."""
   targetDate: TimelessDate
+
+  """
+  The time at which the release was created (e.g. if importing from another
+  system). Must be a time in the past. If none is provided, the backend will
+  generate the time as now.
+  """
+  createdAt: DateTime
+
+  """
+  The time at which the release was started (e.g. if importing from another
+  system). Must be a time in the past and after createdAt.
+  """
+  startedAt: DateTime
+
+  """
+  The time at which the release was completed (e.g. if importing from another
+  system). Must be a time in the past and after createdAt. Cannot be provided
+  with an incompatible stage.
+  """
+  completedAt: DateTime
 }
 
 """
@@ -30408,7 +30507,7 @@ type ReleaseEdge {
   cursor: String!
 }
 
-"""[ALPHA] Release filtering options."""
+"""Release filtering options."""
 input ReleaseFilter {
   """Comparator for the identifier."""
   id: IDComparator
@@ -30442,11 +30541,10 @@ input ReleaseFilter {
 }
 
 """
-[Internal] A release history record containing a batch of chronologically
-ordered change events for a release. Each record holds up to 30 entries, and new
-records are created once the current record is full and a time window has
-elapsed. Tracks changes to name, description, version, stage, dates, pipeline,
-and archive status.
+A release history record containing a batch of chronologically ordered change
+events for a release. Each record holds up to 30 entries, and new records are
+created once the current record is full and a time window has elapsed. Tracks
+changes to name, description, version, stage, dates, pipeline, and archive status.
 """
 type ReleaseHistory implements Node {
   """The unique identifier of the entity."""
@@ -30487,8 +30585,7 @@ type ReleaseHistoryEdge {
 }
 
 """
-[Internal] A release note. The note body is stored in related document content,
-and the releases it covers are tracked in releaseIds.
+A release note. The note body is stored in related document content, and the releases it covers are tracked in releaseIds.
 """
 type ReleaseNote implements Node {
   """The unique identifier of the entity."""
@@ -30513,16 +30610,16 @@ type ReleaseNote implements Node {
   """
   slugId: String!
 
-  """[ALPHA] User-supplied title for the release note."""
+  """User-supplied title for the release note."""
   title: String
 
   """The most recent release covered by this note."""
   lastRelease: Release
 
-  """[ALPHA] Releases included in the note."""
+  """Releases included in the note."""
   releases: [Release!]!
 
-  """[Internal] Document content backing the release note body."""
+  """Document content backing the release note body."""
   documentContent: DocumentContent
 }
 
@@ -30532,7 +30629,7 @@ type ReleaseNoteConnection {
   pageInfo: PageInfo!
 }
 
-"""[ALPHA] Input for creating a release note."""
+"""Input for creating a release note."""
 input ReleaseNoteCreateInput {
   """
   The identifier in UUID v4 format. If none is provided, the backend will generate one.
@@ -30573,7 +30670,7 @@ type ReleaseNoteEdge {
   cursor: String!
 }
 
-"""[ALPHA] The result of a release note mutation."""
+"""The result of a release note mutation."""
 type ReleaseNotePayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -30585,7 +30682,7 @@ type ReleaseNotePayload {
   success: Boolean!
 }
 
-"""[ALPHA] Input for updating a release note."""
+"""Input for updating a release note."""
 input ReleaseNoteUpdateInput {
   """
   Explicit release IDs to set. Mutually exclusive with rangeFromReleaseId/rangeToReleaseId.
@@ -30624,10 +30721,10 @@ type ReleasePayload {
 }
 
 """
-[Internal] A release pipeline that defines a release workflow with ordered
-stages. Pipelines can be continuous (each sync creates a completed release) or
-scheduled (issues accumulate in a started release that is explicitly completed).
-Pipelines are associated with teams and can filter commits by file path patterns.
+A release pipeline that defines a release workflow with ordered stages.
+Pipelines can be continuous (each sync creates a completed release) or scheduled
+(issues accumulate in a started release that is explicitly completed). Pipelines
+are associated with teams and can filter commits by file path patterns.
 """
 type ReleasePipeline implements Node {
   """The unique identifier of the entity."""
@@ -30663,8 +30760,8 @@ type ReleasePipeline implements Node {
   type: ReleasePipelineType!
 
   """
-  [ALPHA] Whether this pipeline targets a production environment. Defaults to
-  true. Used to distinguish production pipelines from staging or development pipelines.
+  Whether this pipeline targets a production environment. Defaults to true. Used
+  to distinguish production pipelines from staging or development pipelines.
   """
   isProduction: Boolean!
 
@@ -30676,16 +30773,16 @@ type ReleasePipeline implements Node {
   includePathPatterns: [String!]!
 
   """
-  [ALPHA] The approximate number of non-archived releases in this pipeline. This
-  is a denormalized count that is updated when releases are created or archived,
-  and may not reflect the exact count at all times.
+  The approximate number of non-archived releases in this pipeline. This is a
+  denormalized count that is updated when releases are created or archived, and
+  may not reflect the exact count at all times.
   """
   approximateReleaseCount: Int!
 
   """
-  [Internal] The document template used to define the release notes format for
-  this pipeline. AI-generated release notes follow the structure and tone of
-  this template. Null if no template has been configured.
+  The document template used to define the release notes format for this
+  pipeline. AI-generated release notes follow the structure and tone of this
+  template. Null if no template has been configured.
   """
   releaseNoteTemplate: Template
 
@@ -30694,12 +30791,10 @@ type ReleasePipeline implements Node {
   """
   latestReleaseNote: ReleaseNote
 
-  """
-  [Internal] The URL to the release pipeline's releases list in the Linear app.
-  """
+  """The URL to the release pipeline's releases list in the Linear app."""
   url: String!
 
-  """[ALPHA] Teams associated with this pipeline."""
+  """Teams associated with this pipeline."""
   teams(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -30726,7 +30821,7 @@ type ReleasePipeline implements Node {
     orderBy: PaginationOrderBy
   ): TeamConnection!
 
-  """[ALPHA] Stages associated with this pipeline."""
+  """Stages associated with this pipeline."""
   stages(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -30753,7 +30848,7 @@ type ReleasePipeline implements Node {
     orderBy: PaginationOrderBy
   ): ReleaseStageConnection!
 
-  """[ALPHA] Releases associated with this pipeline."""
+  """Releases associated with this pipeline."""
   releases(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -30779,7 +30874,7 @@ type ReleasePipeline implements Node {
     """
     orderBy: PaginationOrderBy
 
-    """[ALPHA] Sort returned releases."""
+    """Sort returned releases."""
     sort: [ReleaseSortInput!]
   ): ReleaseConnection!
 }
@@ -30796,7 +30891,7 @@ type ReleasePipelineArchivePayload implements ArchivePayload {
   entity: ReleasePipeline
 }
 
-"""[ALPHA] Release pipeline collection filtering options."""
+"""Release pipeline collection filtering options."""
 input ReleasePipelineCollectionFilter {
   """Comparator for the identifier."""
   id: IDComparator
@@ -30879,7 +30974,7 @@ type ReleasePipelineEdge {
   cursor: String!
 }
 
-"""[ALPHA] Release pipeline filtering options."""
+"""Release pipeline filtering options."""
 input ReleasePipelineFilter {
   """Comparator for the identifier."""
   id: IDComparator
@@ -30966,7 +31061,7 @@ input ReleasePipelineUpdateInput {
   teamIds: [String!]
 }
 
-"""[Internal] Issue release sorting options."""
+"""Issue release sorting options."""
 input ReleaseSort {
   """Whether nulls should be sorted first or last"""
   nulls: PaginationNulls = last
@@ -30982,10 +31077,10 @@ input ReleaseSortInput {
 }
 
 """
-[Internal] A stage within a release pipeline that represents a phase in the
-release lifecycle (e.g., Planned, In Progress, Completed, Canceled). Releases
-progress through stages as they move toward production. Started-type stages can
-be frozen to prevent new issues from being automatically synced into releases at that stage.
+A stage within a release pipeline that represents a phase in the release
+lifecycle (e.g., Planned, In Progress, Completed, Canceled). Releases progress
+through stages as they move toward production. Started-type stages can be frozen
+to prevent new issues from being automatically synced into releases at that stage.
 """
 type ReleaseStage implements Node {
   """The unique identifier of the entity."""
@@ -31038,7 +31133,7 @@ type ReleaseStage implements Node {
   """
   pipeline: ReleasePipeline!
 
-  """[ALPHA] Releases associated with this stage."""
+  """Releases associated with this stage."""
   releases(
     """A cursor to be used with last for backward pagination."""
     before: String
@@ -31117,7 +31212,7 @@ type ReleaseStageEdge {
   cursor: String!
 }
 
-"""[ALPHA] Release stage filtering options."""
+"""Release stage filtering options."""
 input ReleaseStageFilter {
   """Comparator for the identifier."""
   id: IDComparator
@@ -31174,7 +31269,7 @@ enum ReleaseStageType {
   canceled
 }
 
-"""[ALPHA] Comparator for release stage type."""
+"""Comparator for release stage type."""
 input ReleaseStageTypeComparator {
   """Equals constraint."""
   eq: ReleaseStageType
@@ -31341,6 +31436,12 @@ input ReleaseUpdateInput {
 
   """The estimated completion date of the release."""
   targetDate: TimelessDate
+
+  """The time at which the release was started."""
+  startedAt: DateTime
+
+  """The time at which the release was completed."""
+  completedAt: DateTime
 
   """Whether the release has been trashed."""
   trashed: Boolean
@@ -33442,7 +33543,7 @@ type Team implements Node {
     sort: [ProjectSortInput!]
   ): ProjectConnection!
 
-  """[ALPHA] Release pipelines associated with the team."""
+  """Release pipelines associated with the team."""
   releasePipelines(
     """Filter returned release pipelines."""
     filter: ReleasePipelineFilter
@@ -33864,7 +33965,7 @@ input TeamFilter {
   """Filters that the team's ancestors must satisfy."""
   ancestors: TeamCollectionFilter
 
-  """[ALPHA] Filters that the team's release pipelines must satisfy."""
+  """Filters that the team's release pipelines must satisfy."""
   releasePipelines: ReleasePipelineCollectionFilter
 
   """Compound filters, all of which need to be matched by the team."""
@@ -34380,10 +34481,9 @@ type Template implements Node {
   team: Team
 
   """
-  [Internal] The release pipeline this template is bound to. Required when the
-  template type is 'releaseNote' and forbidden otherwise. The pipeline owns at
-  most one release note template, which defines the format AI follows when
-  generating release notes.
+  The release pipeline this template is bound to. Required when the template
+  type is 'releaseNote' and forbidden otherwise. The pipeline owns at most one
+  release note template, which defines the format AI follows when generating release notes.
   """
   pipeline: ReleasePipeline
 
@@ -37517,6 +37617,7 @@ enum WorkflowTriggerType {
   issue
   project
   release
+  schedule
 }
 
 enum WorkflowType {
