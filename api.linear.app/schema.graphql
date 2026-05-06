@@ -155,6 +155,20 @@ type AgentActivity implements Node {
   """
   contextualMetadata: JSON
 
+  """
+  [Internal] Whether this activity is queued for later processing. Queued
+  activities are not sent to the agent until the session reaches a terminal state.
+  """
+  queued: Boolean!
+
+  """
+  [Internal] The time at which the prompt actually entered the conversation.
+  Only set when the prompt did not enter the conversation immediately (i.e., it
+  was queued and later dequeued). Null for prompts that were sent directly and
+  for non-prompt activities.
+  """
+  sentAt: DateTime
+
   """Metadata about this agent activity's signal."""
   signalMetadata: JSON
 }
@@ -251,6 +265,11 @@ input AgentActivityCreatePromptInput {
 
   """The comment that contains the content of this activity."""
   sourceCommentId: String
+
+  """
+  [Internal] If true, the activity is queued and will be sent to the agent when it finishes its current task.
+  """
+  queued: Boolean
 }
 
 type AgentActivityEdge {
@@ -834,6 +853,11 @@ type AiConversation implements Node {
 
   """[Internal] The workflow definition that created this conversation."""
   workflowDefinition: WorkflowDefinition
+
+  """
+  [Internal] The cron workflow definition that created this conversation.
+  """
+  workflowCronJobDefinition: WorkflowCronJobDefinition
 
   """
   The source from which this conversation was initiated, such as direct chat, an
@@ -4611,6 +4635,67 @@ input CustomerRevenueSort {
 
   """The order for the individual sort"""
   order: PaginationSortOrder
+}
+
+"""[Internal] Configuration for the customer attributes data source."""
+input CustomersAttributesDataSourceConfigurationInput {
+  """
+  [Internal] How customer attribute values are sourced: 'manual' or 'integration'.
+  """
+  sourceType: String!
+
+  """
+  [Internal] Whether to allow manual edits to customer attributes when no source is configured.
+  """
+  allowManualEdits: Boolean
+
+  """[Internal] Integration details (when sourceType is 'integration')."""
+  integration: CustomersAttributesDataSourceIntegrationInput
+
+  """
+  [Internal] Mapping from customer attribute keys (owner, revenue, size, status, tier, externalId) to external field IDs.
+  """
+  attributesMapping: JSONObject
+
+  """
+  [Internal] Errors encountered while syncing customer attributes (set by sync workers).
+  """
+  attributesErrors: JSONObject
+}
+
+"""[Internal] Integration providing customer attribute data."""
+input CustomersAttributesDataSourceIntegrationInput {
+  """[Internal] The integration service that manages customer attributes."""
+  service: IntegrationService!
+}
+
+"""
+[Internal] Input for updating workspace Customers feature configuration.
+"""
+input CustomersConfigurationInput {
+  """
+  [Internal] The team to use to create default issues for new request items.
+  """
+  defaultTeamId: String
+
+  """
+  [Internal] Domains or email addresses excluded entirely from the Customers feature.
+  """
+  excludeList: [String!]
+
+  """
+  [Internal] Domains or email addresses ignored when matching to a customer.
+  """
+  ignoreList: [String!]
+
+  """[Internal] How customer revenue should be displayed."""
+  revenueDisplay: String
+
+  """[Internal] The currency code used for customer revenue."""
+  revenueCurrencyCode: String
+
+  """[Internal] Configuration for the customer attributes data source."""
+  attributesDataSourceConfiguration: CustomersAttributesDataSourceConfigurationInput
 }
 
 """Issue customer sorting options."""
@@ -16302,6 +16387,22 @@ type Mutation {
     input: AgentActivityCreatePromptInput!
   ): AgentActivityPayload!
 
+  """
+  [Internal] Immediately sends a queued prompt activity to the agent, bypassing the queue.
+  """
+  agentActivitySendQueued(
+    """The ID of the queued agent activity to send."""
+    id: String!
+  ): AgentActivityPayload!
+
+  """
+  [Internal] Deletes a queued prompt activity, removing it from the queue.
+  """
+  agentActivityDeleteQueued(
+    """The ID of the queued agent activity to delete."""
+    id: String!
+  ): AgentActivityPayload!
+
   """Creates a new agent session on a root comment."""
   agentSessionCreateOnComment(
     """The agent session object to create."""
@@ -22713,6 +22814,19 @@ type OrganizationStartTrialPayload {
   success: Boolean!
 }
 
+"""[Internal] Input for updating workspace theme settings."""
+input OrganizationThemeSettingsInput {
+  """
+  [ALPHA] Light theme palette: CSS custom property name (`--name`) to color or length value.
+  """
+  lightTheme: JSONObject
+
+  """
+  [ALPHA] Dark theme palette: CSS custom property name (`--name`) to color or length value.
+  """
+  darkTheme: JSONObject
+}
+
 """Input for updating the workspace."""
 input OrganizationUpdateInput {
   """The name of the workspace."""
@@ -22801,13 +22915,13 @@ input OrganizationUpdateInput {
   allowedFileUploadContentTypes: [String!]
 
   """[ALPHA] Theme settings for the workspace."""
-  themeSettings: JSONObject
+  themeSettings: OrganizationThemeSettingsInput
 
   """[INTERNAL] Whether the workspace is using customers."""
   customersEnabled: Boolean
 
   """[INTERNAL] Configuration settings for the Customers feature."""
-  customersConfiguration: JSONObject
+  customersConfiguration: CustomersConfigurationInput
 
   """[INTERNAL] Whether code intelligence is enabled for the workspace."""
   codeIntelligenceEnabled: Boolean
@@ -33235,7 +33349,7 @@ type Team implements Node {
 
   """
   Security settings for the team, including role-based restrictions for issue
-  sharing, label management, member management, and template management.
+  sharing, label management, member management, template management, and agent skills.
   """
   securitySettings: JSONObject!
 
@@ -34205,6 +34319,9 @@ input TeamSecuritySettingsInput {
 
   """The minimum team role required to manage templates in the team."""
   templateManagement: TeamRoleType
+
+  """The minimum team role required to manage agent skills in the team."""
+  agentSkillsManagement: TeamRoleType
 }
 
 """Issue team sorting options."""
@@ -37250,6 +37367,61 @@ type WelcomeMessageNotification implements Notification & Entity & Node {
 
   """Related welcome message."""
   welcomeMessageId: String!
+}
+
+"""
+A time-triggered automation workflow definition that executes on a recurring
+schedule. Cron job definitions are scoped to a team and contain a set of
+activities (actions) that run automatically according to the configured cron
+schedule, such as periodically assigning issues or sending notifications.
+"""
+type WorkflowCronJobDefinition implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The name of the workflow cron job."""
+  name: String!
+
+  """The description of the workflow cron job."""
+  description: String
+
+  """
+  Whether the workflow cron job is enabled and will execute on its schedule.
+  """
+  enabled: Boolean!
+
+  """The team associated with the workflow cron job."""
+  team: Team!
+
+  """The user who created the workflow cron job."""
+  creator: User!
+
+  """Recurring schedule which is used to execute the workflow cron job."""
+  schedule: JSONObject!
+
+  """
+  An array of activities that will be executed as part of the workflow cron job.
+  """
+  activities: JSONObject!
+
+  """
+  The sort order of the workflow cron job definition within its siblings.
+  """
+  sortOrder: String!
 }
 
 """
