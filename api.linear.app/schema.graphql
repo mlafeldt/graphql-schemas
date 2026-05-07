@@ -883,7 +883,8 @@ type AiConversation implements Node {
 
   """
   The ordered sequence of conversation parts (prompts, text responses, reasoning
-  steps, tool calls, and widgets) that make up this conversation's visible history.
+  steps, tool calls, errors, and widgets) that make up this conversation's
+  visible history.
   """
   parts: [AiConversationPart!]
 
@@ -1121,6 +1122,21 @@ enum AiConversationEntityListWidgetArgsEntitiesType {
   AiPrompt
 }
 
+"""An error part in an AI conversation."""
+type AiConversationErrorPart implements AiConversationBasePart {
+  """The ID of the part."""
+  id: String!
+
+  """The type of the part."""
+  type: AiConversationPartType!
+
+  """The metadata of the part."""
+  metadata: AiConversationPartMetadata!
+
+  """The user-facing error message for the failed AI response."""
+  message: String!
+}
+
 """An event part in an AI conversation."""
 type AiConversationEventPart implements AiConversationBasePart {
   """The ID of the part."""
@@ -1320,7 +1336,7 @@ type AiConversationNavigateToPageToolCallResult {
 }
 
 """A part in an AI conversation."""
-union AiConversationPart = AiConversationPromptPart | AiConversationTextPart | AiConversationReasoningPart | AiConversationEventPart | AiConversationToolCallPart | AiConversationWidgetPart
+union AiConversationPart = AiConversationPromptPart | AiConversationTextPart | AiConversationReasoningPart | AiConversationEventPart | AiConversationErrorPart | AiConversationToolCallPart | AiConversationWidgetPart
 
 """Metadata about a part in an AI conversation."""
 type AiConversationPartMetadata {
@@ -1356,6 +1372,7 @@ enum AiConversationPartType {
   reasoning
   text
   event
+  error
   widget
   widgetPlaceholder
 }
@@ -7956,6 +7973,9 @@ type EntityExternalLink implements Node {
 
   """The initiative that the link is associated with."""
   initiative: Initiative
+
+  """The project that the link is associated with."""
+  project: Project
 }
 
 type EntityExternalLinkConnection {
@@ -14084,11 +14104,6 @@ input IssueLabelCreateInput {
   """The identifier of the parent label."""
   parentId: String
 
-  """
-  The team associated with the label. If not given, the label will be associated with the entire workspace.
-  """
-  teamId: String
-
   """Whether the label is a group."""
   isGroup: Boolean
 
@@ -14096,6 +14111,11 @@ input IssueLabelCreateInput {
   The time at which the label was retired. Set to null to restore a retired label.
   """
   retiredAt: DateTime
+
+  """
+  The team associated with the label. If not given, the label will be associated with the entire workspace.
+  """
+  teamId: String
 }
 
 type IssueLabelEdge {
@@ -23995,6 +24015,14 @@ type Project implements Node {
   """Settings for all integrations associated with that project."""
   integrationsSettings: IntegrationsSettings
 
+  """The ID of the Slack channel connected to the project, if any."""
+  slackChannelId: String
+
+  """
+  The ID of the Microsoft Teams channel connected to the project, if any.
+  """
+  microsoftTeamsChannelId: String
+
   """The project's content in markdown format."""
   content: String
 
@@ -26318,6 +26346,14 @@ type ProjectSearchResult implements Node {
   """Settings for all integrations associated with that project."""
   integrationsSettings: IntegrationsSettings
 
+  """The ID of the Slack channel connected to the project, if any."""
+  slackChannelId: String
+
+  """
+  The ID of the Microsoft Teams channel connected to the project, if any.
+  """
+  microsoftTeamsChannelId: String
+
   """The project's content in markdown format."""
   content: String
 
@@ -27215,10 +27251,18 @@ type PullRequest implements Node {
   status: PullRequestStatus!
 
   """
+  The current merge status of the pull request, synced from the hosting provider.
+  """
+  mergeStatus: String!
+
+  """
   Merge settings and allowed merge methods for this pull request's repository.
   Null if the settings have not been synced from the provider.
   """
   mergeSettings: PullRequestMergeSettings
+
+  """The time at which the pull request was opened."""
+  openedAt: DateTime!
 
   """
   The merge commit created when the pull request was merged. Null if the pull
@@ -30510,6 +30554,9 @@ input ReleaseCompleteInput {
   """
   commitSha: String
 
+  """Optional release name to apply when completing the release."""
+  name: String
+
   """The identifier of the pipeline to mark a release as completed."""
   pipelineId: String!
 }
@@ -30529,6 +30576,9 @@ input ReleaseCompleteInputBase {
   this SHA already exists, it will be returned instead of completing a new release.
   """
   commitSha: String
+
+  """Optional release name to apply when completing the release."""
+  name: String
 }
 
 type ReleaseConnection {
@@ -31504,6 +31554,9 @@ input ReleaseUpdateByPipelineInput {
   """
   stage: String
 
+  """Optional release name to apply when updating the release."""
+  name: String
+
   """The identifier of the pipeline."""
   pipelineId: String!
 }
@@ -31523,6 +31576,9 @@ input ReleaseUpdateByPipelineInputBase {
   case-insensitive matching with dashes/underscores treated as spaces.
   """
   stage: String
+
+  """Optional release name to apply when updating the release."""
+  name: String
 }
 
 """Input for updating an existing release."""
@@ -31572,7 +31628,9 @@ input RepositoryDataInput {
   """The name of the repository."""
   name: String!
 
-  """The VCS provider hosting the repository (e.g., 'github', 'gitlab')."""
+  """
+  The VCS provider hosting the repository (e.g., 'github', 'gitlab', 'bitbucket').
+  """
   provider: String!
 
   """
@@ -32937,6 +32995,9 @@ type Subscription {
   """Triggered when a project update is updated"""
   projectUpdateUpdated: ProjectUpdate!
 
+  """Triggered when a project update is archived"""
+  projectUpdateArchived: ProjectUpdate!
+
   """Triggered when a project update is deleted"""
   projectUpdateDeleted: ProjectUpdate!
 
@@ -33231,6 +33292,16 @@ type Team implements Node {
 
   """[Internal] The team's sub-teams."""
   children: [Team!]!
+
+  """
+  [Internal] Sections shown on the team home that group pinned resources.
+  """
+  resourceSections: [TeamResourceSection!]!
+
+  """
+  [Internal] Documents and external links pinned to the team home, optionally grouped under sections.
+  """
+  pinnedResources: [TeamPinnedResource!]!
 
   """Whether the team uses cycles for sprint-style issue management."""
   cyclesEnabled: Boolean!
@@ -34286,6 +34357,94 @@ type TeamPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""
+References a document or external link pinned to a team home for quick access.
+Pinning does not move the underlying resource; the same resource may be pinned
+on multiple teams.
+"""
+type TeamPinnedResource implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The team home where this pin appears."""
+  team: Team!
+
+  """
+  The section this pin is grouped under on the team home. Null if the pin is not inside a section.
+  """
+  section: TeamResourceSection
+
+  """The pinned document, when the pin targets a document."""
+  document: Document
+
+  """The pinned external link, when the pin targets a link."""
+  entityExternalLink: EntityExternalLink
+
+  """
+  Sort order of this pin among pins with the same team and section (including pins without a section).
+  """
+  sortOrder: Float!
+
+  """The user who created the pin. Null if the user was deleted."""
+  creator: User
+
+  """The user who last updated the pin. Null if the user was deleted."""
+  updatedBy: User
+}
+
+"""
+A titled section on a team home that groups pinned resources (documents and
+external links). Sections are specific to the team home and do not change where
+resources live in their source team or project.
+"""
+type TeamResourceSection implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The team whose home page owns this section."""
+  team: Team!
+
+  """The section title shown on the team home."""
+  title: String!
+
+  """Sort order of this section among other sections on the same team home."""
+  sortOrder: Float!
+
+  """The user who created the section. Null if the creator was deleted."""
+  creator: User
+
+  """The user who last updated the section. Null if the user was deleted."""
+  updatedBy: User
 }
 
 """[Internal] How to handle sub-teams when retiring a parent team."""
