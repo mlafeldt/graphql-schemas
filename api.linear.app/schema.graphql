@@ -15716,6 +15716,18 @@ type IssueSuggestionMetadata {
   [Internal] Identifier of the automation rule that was applied from this suggestion. Null if no rule was applied.
   """
   appliedAutomationRuleId: String
+
+  """
+  [Internal] Identifier of the automation rule that attempted to apply this
+  suggestion. Null if no rule attempted to apply it or if the rule applied successfully.
+  """
+  failedAutomationRuleId: String
+
+  """
+  [Internal] Reason why an automation rule could not apply this suggestion. Null
+  if no rule attempted to apply it or if the rule applied successfully.
+  """
+  failedAutomationRuleReason: String
 }
 
 """
@@ -33544,6 +33556,9 @@ type Team implements Node {
   """
   ancestors: [Team!]!
 
+  """[Internal] Whether this team is protected."""
+  protected: Boolean!
+
   """
   Issues belonging to the team. Supports filtering and optional inclusion of sub-team issues.
   """
@@ -37564,7 +37579,7 @@ type WorkflowCronJobDefinition implements Node {
   enabled: Boolean!
 
   """The team associated with the workflow cron job."""
-  team: Team!
+  team: Team
 
   """The user who created the workflow cron job."""
   creator: User!
