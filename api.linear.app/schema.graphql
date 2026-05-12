@@ -2152,6 +2152,11 @@ type AsksChannelConnectPayload {
   """Whether the operation was successful."""
   success: Boolean!
 
+  """
+  GitHub-specific details for the operation. Populated by GitHub-related mutations only.
+  """
+  gitHub: GitHubIntegrationConnectDetails
+
   """The new Asks Slack channel mapping for the connected channel."""
   mapping: SlackChannelNameMapping!
 
@@ -2724,6 +2729,9 @@ type AuthOrganization {
   """The region the organization is hosted in."""
   region: String!
 
+  """The cell the organization is hosted in."""
+  cell: String
+
   """An approximate count of users, updated once per day."""
   approximateUserCount: Float!
 
@@ -2982,27 +2990,24 @@ type Comment implements Node {
   post: Post
 
   """
-  [Internal] The project that the comment is associated with. Used for
-  project-level discussion threads. Null if the comment belongs to a different
-  parent entity type.
+  The project that the comment is associated with. Used for project-level
+  discussion threads. Null if the comment belongs to a different parent entity type.
   """
   project: Project
 
   """
-  [Internal] The ID of the project that the comment is associated with. Null if
-  the comment belongs to a different parent entity type.
+  The ID of the project that the comment is associated with. Null if the comment belongs to a different parent entity type.
   """
   projectId: String
 
   """
-  [Internal] The initiative that the comment is associated with. Null if the
-  comment belongs to a different parent entity type.
+  The initiative that the comment is associated with. Null if the comment belongs to a different parent entity type.
   """
   initiative: Initiative
 
   """
-  [Internal] The ID of the initiative that the comment is associated with. Null
-  if the comment belongs to a different parent entity type.
+  The ID of the initiative that the comment is associated with. Null if the
+  comment belongs to a different parent entity type.
   """
   initiativeId: String
 
@@ -3350,10 +3355,10 @@ input CommentCreateInput {
   """The document content to associate the comment with."""
   documentContentId: String
 
-  """[Internal] The project to associate the comment with."""
+  """The project to associate the comment with."""
   projectId: String
 
-  """[Internal] The initiative to associate the comment with."""
+  """The initiative to associate the comment with."""
   initiativeId: String
 
   """The parent comment under which to nest a current comment."""
@@ -9105,6 +9110,11 @@ type GitHubCommitIntegrationPayload {
   """Whether the operation was successful."""
   success: Boolean!
 
+  """
+  GitHub-specific details for the operation. Populated by GitHub-related mutations only.
+  """
+  gitHub: GitHubIntegrationConnectDetails
+
   """The webhook secret to provide to GitHub."""
   webhookSecret: String!
 }
@@ -9123,6 +9133,11 @@ type GitHubEnterpriseServerPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+
+  """
+  GitHub-specific details for the operation. Populated by GitHub-related mutations only.
+  """
+  gitHub: GitHubIntegrationConnectDetails
 
   """The setup address."""
   setupUrl: String!
@@ -9149,6 +9164,22 @@ input GitHubImportSettingsInput {
 
   """The type of Github org"""
   orgType: GithubOrgType!
+}
+
+"""
+GitHub-specific details that some integration mutations may return alongside the
+standard payload. Populated only by GitHub-related mutations.
+"""
+type GitHubIntegrationConnectDetails {
+  """
+  Full names ('owner/repo') of repositories whose existing GitHub Issues sync
+  mappings would become inaccessible if the new GitHub App installation replaces
+  the existing one. When non-empty the connect was halted; the client should
+  surface the impact and re-call the mutation with `confirmReplace: true` to
+  commit, or do nothing to leave the integration unchanged. Capped at a small
+  constant; longer lists are truncated.
+  """
+  lostRepositoryNames: [String!]
 }
 
 enum GithubOrgType {
@@ -9241,6 +9272,11 @@ type GitLabIntegrationCreatePayload {
   """Whether the operation was successful."""
   success: Boolean!
 
+  """
+  GitHub-specific details for the operation. Populated by GitHub-related mutations only.
+  """
+  gitHub: GitHubIntegrationConnectDetails
+
   """The webhook secret to provide to GitLab."""
   webhookSecret: String!
 
@@ -9294,6 +9330,11 @@ type GitLabTestConnectionPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+
+  """
+  GitHub-specific details for the operation. Populated by GitHub-related mutations only.
+  """
+  gitHub: GitHubIntegrationConnectDetails
 
   """Error message if the connection test failed."""
   error: String
@@ -11301,6 +11342,11 @@ type IntegrationPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+
+  """
+  GitHub-specific details for the operation. Populated by GitHub-related mutations only.
+  """
+  gitHub: GitHubIntegrationConnectDetails
 }
 
 """Input for requesting a currently unavailable integration."""
@@ -15998,6 +16044,11 @@ type JiraFetchProjectStatusesPayload {
   """Whether the operation was successful."""
   success: Boolean!
 
+  """
+  GitHub-specific details for the operation. Populated by GitHub-related mutations only.
+  """
+  gitHub: GitHubIntegrationConnectDetails
+
   """The fetched Jira issue statuses (non-Epic)."""
   issueStatuses: [String!]!
 
@@ -17751,6 +17802,11 @@ type Mutation {
 
   """Connects the workspace with the GitHub App."""
   integrationGithubConnect(
+    """
+    Set to true to force-replace the existing GitHub App installation (e.g. to ignore repository access conflicts).
+    """
+    confirmReplace: Boolean = false
+
     """
     The GitHub Enterprise Cloud host (e.g., 'linear-development.ghe.com'). When provided, this creates a GEC integration.
     """
@@ -29365,6 +29421,20 @@ type Query {
   """
   latestReleaseByAccessKey: Release
 
+  """
+  Returns recent in-progress and completed releases for the pipeline associated
+  with the access key, ordered with in-progress first then most recently
+  completed. Used by `linear-release` to walk candidates and pick the one whose
+  `commitSha` is an ancestor of the current build commit, which disambiguates
+  concurrent release trains on the same pipeline.
+  """
+  recentReleasesByAccessKey(
+    """
+    Maximum number of releases to return. Defaults to 20 and is capped at 100.
+    """
+    limit: Int
+  ): [Release!]!
+
   """All releases in the workspace, with optional filtering and sorting."""
   releases(
     """Filter returned releases."""
@@ -32308,6 +32378,11 @@ type SlackChannelConnectPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+
+  """
+  GitHub-specific details for the operation. Populated by GitHub-related mutations only.
+  """
+  gitHub: GitHubIntegrationConnectDetails
 
   """Whether the bot needs to be manually added to the channel."""
   addBot: Boolean!
@@ -37658,6 +37733,13 @@ type WorkflowDefinition implements Node {
   Whether the workflow is enabled and will execute when its trigger conditions are met.
   """
   enabled: Boolean!
+
+  """
+  Whether the workflow should only execute once per entity. When true, the
+  workflow is excluded from matching automations for an entity if it has already
+  been executed for that entity.
+  """
+  runOnce: Boolean!
 
   """
   The team associated with the workflow. If not set, the workflow is associated with the entire workspace.
