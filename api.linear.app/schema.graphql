@@ -4001,6 +4001,13 @@ type CustomerNeed implements Node {
   no attached source.
   """
   url: String
+
+  """
+  The effective Markdown content shown for this customer need. Returns the
+  manually stored body when present, otherwise falls back to content extracted
+  from the source attachment. Null if no content is available.
+  """
+  content: String
 }
 
 """A generic payload return from entity archive mutations."""
@@ -19436,6 +19443,11 @@ type Mutation {
     IDs of private teams to include in the export. If null, only data from public teams is exported.
     """
     includePrivateTeamIds: [String!]
+
+    """
+    IDs of protected teams to include in the export. If null, protected team data is omitted.
+    """
+    includeProtectedTeamIds: [String!]
   ): CreateCsvExportReportPayload!
 
   """Creates a new roadmap."""
