@@ -34022,6 +34022,28 @@ enum RepositoryRuleType {
   TAG_NAME_PATTERN
 
   """
+  Require all changes made to a targeted branch to pass the specified workflows before they can be merged.
+  """
+  WORKFLOWS
+
+  """Workflow files cannot be modified."""
+  WORKFLOW_UPDATES
+
+  """
+  Choose which tools must provide code scanning results before the reference is
+  updated. When configured, code scanning must be enabled and have results for
+  both the commit and the reference being updated.
+  """
+  CODE_SCANNING
+
+  """
+  Request Copilot code review for new pull requests automatically if the author
+  has access to Copilot code review and their premium requests quota has not
+  reached the limit.
+  """
+  COPILOT_CODE_REVIEW
+
+  """
   Prevent commits that include changes in specified file and folder paths from
   being pushed to the commit graph. This includes absolute paths that contain file names.
   """
@@ -34042,30 +34064,8 @@ enum RepositoryRuleType {
   """
   MAX_FILE_SIZE
 
-  """
-  Require all changes made to a targeted branch to pass the specified workflows before they can be merged.
-  """
-  WORKFLOWS
-
   """Secret scanning"""
   SECRET_SCANNING
-
-  """Workflow files cannot be modified."""
-  WORKFLOW_UPDATES
-
-  """
-  Choose which tools must provide code scanning results before the reference is
-  updated. When configured, code scanning must be enabled and have results for
-  both the commit and the reference being updated.
-  """
-  CODE_SCANNING
-
-  """
-  Request Copilot code review for new pull requests automatically if the author
-  has access to Copilot code review and their premium requests quota has not
-  reached the limit.
-  """
-  COPILOT_CODE_REVIEW
 }
 
 """The possible filters for suggested actors in a repository"""
@@ -35109,6 +35109,15 @@ input RuleParametersInput {
   """Parameters used for the `tag_name_pattern` rule type"""
   tagNamePattern: TagNamePatternParametersInput
 
+  """Parameters used for the `workflows` rule type"""
+  workflows: WorkflowsParametersInput
+
+  """Parameters used for the `code_scanning` rule type"""
+  codeScanning: CodeScanningParametersInput
+
+  """Parameters used for the `copilot_code_review` rule type"""
+  copilotCodeReview: CopilotCodeReviewParametersInput
+
   """Parameters used for the `file_path_restriction` rule type"""
   filePathRestriction: FilePathRestrictionParametersInput
 
@@ -35120,15 +35129,6 @@ input RuleParametersInput {
 
   """Parameters used for the `max_file_size` rule type"""
   maxFileSize: MaxFileSizeParametersInput
-
-  """Parameters used for the `workflows` rule type"""
-  workflows: WorkflowsParametersInput
-
-  """Parameters used for the `code_scanning` rule type"""
-  codeScanning: CodeScanningParametersInput
-
-  """Parameters used for the `copilot_code_review` rule type"""
-  copilotCodeReview: CopilotCodeReviewParametersInput
 }
 
 """Types which can have `RepositoryRule` objects."""
