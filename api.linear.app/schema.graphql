@@ -8424,6 +8424,9 @@ type Favorite implements Node {
   """The targeted tab of the initiative."""
   initiativeTab: InitiativeTab
 
+  """The targeted tab of the release pipeline."""
+  pipelineTab: PipelineTab
+
   """
   The user who owns this favorite. Favorites are personal and only visible to their owner.
   """
@@ -8512,6 +8515,9 @@ type Favorite implements Node {
 
   """The favorited release pipeline."""
   releasePipeline: ReleasePipeline
+
+  """The favorited release note."""
+  releaseNote: ReleaseNote
 
   """The favorited team."""
   team: Team
@@ -8621,6 +8627,12 @@ input FavoriteCreateInput {
 
   """The identifier of the release pipeline to favorite."""
   releasePipelineId: String
+
+  """The tab of the release pipeline to favorite."""
+  pipelineTab: PipelineTab
+
+  """The identifier of the release note to favorite."""
+  releaseNoteId: String
 
   """The identifier of the team to favorite."""
   teamId: String
@@ -20097,6 +20109,7 @@ enum NotificationCategory {
   triage
   customers
   feed
+  billing
   system
 }
 
@@ -20150,6 +20163,9 @@ type NotificationCategoryPreferences {
 
   """The preferences for feed summary notifications."""
   feed: NotificationChannelPreferences!
+
+  """The preferences for billing notifications."""
+  billing: NotificationChannelPreferences!
 }
 
 input NotificationCategoryPreferencesInput {
@@ -20194,6 +20210,9 @@ input NotificationCategoryPreferencesInput {
 
   """The preferences for notifications about feed summaries."""
   feed: PartialNotificationChannelPreferencesInput
+
+  """The preferences for billing notifications."""
+  billing: PartialNotificationChannelPreferencesInput
 }
 
 """The delivery channels a user can receive notifications in."""
@@ -23262,6 +23281,12 @@ type PasskeyLoginStartResponse {
 
   """The passkey authentication options to pass to the WebAuthn API."""
   options: JSONObject!
+}
+
+"""Different tabs available inside a release pipeline."""
+enum PipelineTab {
+  releaseNotes
+  releases
 }
 
 """
@@ -31036,6 +31061,12 @@ type ReleasePipeline implements Node {
   isProduction: Boolean!
 
   """
+  Whether to automatically generate a release note when a release is completed.
+  Only applies to scheduled pipelines; ignored for continuous pipelines.
+  """
+  autoGenerateReleaseNotesOnCompletion: Boolean!
+
+  """
   Glob patterns to filter commits by file path. When non-empty, only commits
   that modify files matching at least one pattern will be included in release
   syncs. An empty array means all commits are included regardless of file paths.
@@ -31230,6 +31261,13 @@ input ReleasePipelineCreateInput {
   """
   isProduction: Boolean
 
+  """
+  Whether to automatically generate a release note when a release is completed.
+  Only applies to scheduled pipelines; ignored for continuous pipelines.
+  Defaults to false.
+  """
+  autoGenerateReleaseNotesOnCompletion: Boolean
+
   """Glob patterns to include commits affecting matching file paths."""
   includePathPatterns: [String!]
 
@@ -31323,6 +31361,12 @@ input ReleasePipelineUpdateInput {
   Whether this pipeline targets a production environment. Default to true.
   """
   isProduction: Boolean
+
+  """
+  Whether to automatically generate a release note when a release is completed.
+  Only applies to scheduled pipelines; ignored for continuous pipelines.
+  """
+  autoGenerateReleaseNotesOnCompletion: Boolean
 
   """Glob patterns to include commits affecting matching file paths."""
   includePathPatterns: [String!]
@@ -35413,6 +35457,157 @@ type UploadPayload {
 }
 
 """
+A usage alert triggered when a workspace crosses a billing or consumption threshold.
+"""
+type UsageAlert implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The kind of usage alert that was triggered."""
+  type: String!
+
+  """Type-specific metadata captured when the alert was triggered."""
+  metadata: JSONObject!
+}
+
+"""
+A notification related to a usage alert, sent to workspace billing admins.
+"""
+type UsageAlertNotification implements Notification & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """
+  Notification type. Determines the kind of event that triggered this
+  notification and which associated entity fields will be populated.
+  """
+  type: String!
+
+  """
+  The user that caused the notification. Null if the notification was triggered
+  by a non-user actor such as an integration, external user, or system event.
+  """
+  actor: User
+
+  """
+  The external user that caused the notification. Populated when the
+  notification was triggered by an external user (e.g., a commenter from a
+  connected integration like Slack or GitHub) rather than a Linear workspace member.
+  """
+  externalUserActor: ExternalUser
+
+  """The recipient user of this notification."""
+  user: User!
+
+  """
+  The time at which the user marked the notification as read. Null if the notification is unread.
+  """
+  readAt: DateTime
+
+  """
+  The time at which an email reminder for this notification was sent to the user. Null if no email reminder has been sent.
+  """
+  emailedAt: DateTime
+
+  """
+  The time until which a notification is snoozed. After this time, the
+  notification reappears in the user's inbox. Null if the notification is not
+  currently snoozed.
+  """
+  snoozedUntilAt: DateTime
+
+  """
+  The time at which a notification was unsnoozed. Null if the notification has not been unsnoozed.
+  """
+  unsnoozedAt: DateTime
+
+  """The category of the notification."""
+  category: NotificationCategory!
+
+  """[Internal] URL to the target of the notification."""
+  url: String!
+
+  """[Internal] Inbox URL for the notification."""
+  inboxUrl: String!
+
+  """[Internal] Notification title."""
+  title: String!
+
+  """[Internal] Notification subtitle."""
+  subtitle: String!
+
+  """[Internal] If notification actor was Linear."""
+  isLinearActor: Boolean!
+
+  """[Internal] Notification avatar URL."""
+  actorAvatarUrl: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorInitials: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorAvatarColor: String!
+
+  """[Internal] Issue's status type for issue notifications."""
+  issueStatusType: String
+
+  """[Internal] Project update health for new updates."""
+  projectUpdateHealth: String
+
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
+
+  """
+  [Internal] Notifications with the same grouping key will be grouped together in the UI.
+  """
+  groupingKey: String!
+
+  """
+  [Internal] Priority of the notification with the same grouping key. Higher
+  number means higher priority. If priority is the same, notifications should be
+  sorted by `createdAt`.
+  """
+  groupingPriority: Float!
+
+  """The bot that caused the notification."""
+  botActor: ActorBot
+
+  """Related usage alert."""
+  usageAlertId: String!
+
+  """The usage alert related to the notification."""
+  usageAlert: UsageAlert!
+}
+
+"""
 A user that belongs to a workspace. Users can have different roles (admin,
 member, guest, or app) that determine their level of access. Users can be
 members of multiple teams, and can be active or deactivated. Guest users have
@@ -37160,6 +37355,9 @@ type ViewPreferencesValues {
 
   """The inbox view ordering."""
   inboxViewOrdering: String
+
+  """The inbox view grouping."""
+  inboxViewGrouping: String
 
   """The triage view ordering."""
   triageViewOrdering: String
