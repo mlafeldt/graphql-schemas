@@ -30911,6 +30911,13 @@ type ReleaseNote implements Node {
   """The number of releases covered by this note."""
   releaseCount: Int!
 
+  """
+  Generation status when these release notes are being auto-generated: `pending`
+  while the LLM call is running, `completed` once it lands. `null` means the
+  release notes were written by a user and never went through auto-generation.
+  """
+  generationStatus: ReleaseNoteGenerationStatus
+
   """Releases included in the note."""
   releases: [Release!]!
 
@@ -30963,6 +30970,12 @@ type ReleaseNoteEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""The generation status of a release note's body content."""
+enum ReleaseNoteGenerationStatus {
+  pending
+  completed
 }
 
 """The result of a release note mutation."""
@@ -31744,9 +31757,6 @@ input ReleaseUpdateInput {
 
   """The commit SHA associated with this release."""
   commitSha: String
-
-  """The identifier of the pipeline this release belongs to."""
-  pipelineId: String
 
   """The current stage of the release."""
   stageId: String
@@ -33395,8 +33405,9 @@ input TargetDateSort {
 """
 A team is the primary organizational unit in Linear. Issues belong to teams, and
 each team has its own workflow states, cycles, labels, and settings. Teams can
-be public (visible to all workspace members) or private (visible only to team
-members). Teams can also have sub-teams that inherit settings from their parent.
+be public (visible to all workspace members), private (visible only to team
+members), or protected (visible only within an enclosing private-team boundary).
+Teams can also have sub-teams that inherit settings from their parent.
 """
 type Team implements Node {
   """The unique identifier of the entity."""
@@ -33566,7 +33577,7 @@ type Team implements Node {
   """
   Whether the team is private. Private teams are only visible to their members and require an explicit invitation to join.
   """
-  private: Boolean!
+  private: Boolean! @deprecated(reason: "Use `Team.visibility` instead.")
 
   """
   Whether all members in the workspace can join the team. Only used for public teams.
@@ -33690,6 +33701,13 @@ type Team implements Node {
 
   """Calendar feed URL (iCal) for cycles."""
   cycleCalenderUrl: String!
+
+  """
+  The visibility of the team. Returns public for teams visible to all workspace
+  members, private for teams visible only to members, and protected for
+  non-private teams inside a private-team boundary.
+  """
+  visibility: TeamVisibility!
 
   """The name of the team including its parent team name if it has one."""
   displayName: String!
@@ -34844,6 +34862,15 @@ input TeamUpdateInput {
   [Internal] How to handle sub-teams when retiring. Required if the team has active sub-teams.
   """
   handleSubTeamsOnRetirement: TeamRetirementSubTeamHandling
+}
+
+"""
+The visibility of a team. A team can be public, private, or protected within an enclosing private-team boundary.
+"""
+enum TeamVisibility {
+  public
+  protected
+  private
 }
 
 """
@@ -36184,6 +36211,8 @@ enum UserFlagType {
   agentHomeHeadlineSeen
   agentCodeIntelligencePromoDismissed
   agentCodeIntelligenceSplashAnimationSeen
+  slackProjectChannelsPromoDismissed
+  slackProjectChannelsPromoShown
   all
 }
 
