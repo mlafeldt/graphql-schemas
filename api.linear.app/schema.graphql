@@ -2803,6 +2803,9 @@ type AuthUser {
   """
   role: UserRoleType!
 
+  """The ID of the OAuth client that created the user."""
+  oauthClientId: String
+
   """Whether the user is active."""
   active: Boolean!
 
@@ -11787,6 +11790,11 @@ type IntegrationTemplatePayload {
 input IntegrationUpdateInput {
   """The settings to update."""
   settings: IntegrationSettingsInput
+
+  """
+  The ID of the workflow definition draft that this integration should be assigned to.
+  """
+  workflowDefinitionDraftId: String
 }
 
 input IntercomSettingsInput {
@@ -18363,6 +18371,9 @@ type Mutation {
     """
     customHeaders: [McpServerCustomHeaderInput!]
 
+    """The ID of the workflow definition draft to connect the MCP server to."""
+    workflowDefinitionDraftId: String
+
     """The ID of the workflow definition to connect the MCP server to."""
     workflowDefinitionId: String
 
@@ -22195,6 +22206,9 @@ type Organization implements Node {
 
   """[INTERNAL] Whether the workspace has enabled generated updates."""
   generatedUpdatesEnabled: Boolean!
+
+  """[INTERNAL] Whether the workspace has opted in to AI telemetry."""
+  aiTelemetryEnabled: Boolean!
 
   """Whether the workspace has enabled resolved thread AI summaries."""
   aiThreadSummariesEnabled: Boolean!
@@ -37981,6 +37995,9 @@ type WorkflowDefinition implements Node {
   the workflow triggers on all matching events.
   """
   conditions: JSONObject
+
+  """Recurring schedule which is used to execute the workflow."""
+  schedule: JSONObject
 
   """
   Whether the workflow is enabled and will execute when its trigger conditions are met.
