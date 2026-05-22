@@ -7984,7 +7984,7 @@ type EntityExternalLink implements Node {
   sortOrder: Float!
 
   """The user who created the link."""
-  creator: User!
+  creator: User
 
   """The initiative that the link is associated with."""
   initiative: Initiative
@@ -12829,6 +12829,23 @@ input IssueCollectionFilter {
   """[Internal] Comparator for filtering issues which have suggested teams."""
   hasSuggestedTeams: RelationExistsComparator
 
+  """
+  [Internal] Comparator for filtering issues bucketed as having active agent
+  sessions, no closed agent pull requests, and no merged agent pull requests.
+  """
+  hasActiveAgentSessions: RelationExistsComparator
+
+  """
+  [Internal] Comparator for filtering issues bucketed as having all agent
+  sessions dismissed or closed, and no merged agent pull requests.
+  """
+  hasDismissedAgentSessions: RelationExistsComparator
+
+  """
+  [Internal] Comparator for filtering issues which have agent-session-linked pull requests that were merged.
+  """
+  hasMergedAgentPullRequests: RelationExistsComparator
+
   """Comparator for the issues sla status."""
   slaStatus: SlaStatusComparator
 
@@ -13375,6 +13392,23 @@ input IssueFilter {
 
   """[Internal] Comparator for filtering issues which have suggested teams."""
   hasSuggestedTeams: RelationExistsComparator
+
+  """
+  [Internal] Comparator for filtering issues bucketed as having active agent
+  sessions, no closed agent pull requests, and no merged agent pull requests.
+  """
+  hasActiveAgentSessions: RelationExistsComparator
+
+  """
+  [Internal] Comparator for filtering issues bucketed as having all agent
+  sessions dismissed or closed, and no merged agent pull requests.
+  """
+  hasDismissedAgentSessions: RelationExistsComparator
+
+  """
+  [Internal] Comparator for filtering issues which have agent-session-linked pull requests that were merged.
+  """
+  hasMergedAgentPullRequests: RelationExistsComparator
 
   """Comparator for the issues sla status."""
   slaStatus: SlaStatusComparator
@@ -18938,6 +18972,53 @@ type Mutation {
     id: String!
   ): DeletePayload! @deprecated(reason: "Update `notificationSubscription.active` to `false` instead.")
 
+  """
+  [ALPHA] Creates an OAuth application owned by the calling OAuth application.
+  """
+  oauthApplicationCreate(
+    """The OAuth application object to create."""
+    input: OAuthApplicationCreateInput!
+  ): OAuthApplicationCreatePayload!
+
+  """
+  [ALPHA] Updates an OAuth application created by the calling OAuth application.
+  """
+  oauthApplicationUpdate(
+    """A partial OAuth application object to update."""
+    input: OAuthApplicationUpdateInput!
+
+    """The identifier of the OAuth application to update."""
+    id: String!
+  ): OAuthApplicationPayload!
+
+  """
+  [ALPHA] Archives an OAuth application created by the calling OAuth application.
+  """
+  oauthApplicationArchive(
+    """The identifier of the OAuth application to archive."""
+    id: String!
+  ): OAuthApplicationArchivePayload!
+
+  """
+  [ALPHA] Rotates the client secret for an OAuth application created by the calling OAuth application.
+  """
+  oauthApplicationRotateSecret(
+    """
+    The identifier of the OAuth application for which to rotate the secret.
+    """
+    id: String!
+  ): OAuthApplicationRotateSecretPayload!
+
+  """
+  [ALPHA] Rotates the webhook signing secret for an OAuth application created by the calling OAuth application.
+  """
+  oauthApplicationRotateWebhookSecret(
+    """
+    The identifier of the OAuth application for which to rotate the webhook secret.
+    """
+    id: String!
+  ): OAuthApplicationRotateWebhookSecretPayload!
+
   """[INTERNAL] Verifies a domain claim."""
   organizationDomainClaim(
     """The ID of the organization domain to claim."""
@@ -21199,6 +21280,23 @@ input NullableIssueFilter {
   """[Internal] Comparator for filtering issues which have suggested teams."""
   hasSuggestedTeams: RelationExistsComparator
 
+  """
+  [Internal] Comparator for filtering issues bucketed as having active agent
+  sessions, no closed agent pull requests, and no merged agent pull requests.
+  """
+  hasActiveAgentSessions: RelationExistsComparator
+
+  """
+  [Internal] Comparator for filtering issues bucketed as having all agent
+  sessions dismissed or closed, and no merged agent pull requests.
+  """
+  hasDismissedAgentSessions: RelationExistsComparator
+
+  """
+  [Internal] Comparator for filtering issues which have agent-session-linked pull requests that were merged.
+  """
+  hasMergedAgentPullRequests: RelationExistsComparator
+
   """Comparator for the issues sla status."""
   slaStatus: SlaStatusComparator
 
@@ -21773,6 +21871,183 @@ input NumberComparator {
   Greater-than-or-equal constraint. Matches any values that are greater than or equal to the given value.
   """
   gte: Float
+}
+
+"""
+Public API representation of an OAuth application managed by the calling OAuth
+application. Secrets are only returned by create and rotation mutations.
+"""
+type OAuthApplication {
+  """The unique identifier of the OAuth application."""
+  id: String!
+
+  """The public client ID used during OAuth authorization flows."""
+  clientId: String!
+
+  """The human-readable name of the OAuth application."""
+  name: String!
+
+  """User-facing description of the OAuth application. Null if not set."""
+  description: String
+
+  """Name of the developer or company that built the OAuth application."""
+  developer: String!
+
+  """URL of the developer's website, homepage, or documentation."""
+  developerUrl: String!
+
+  """URL of the OAuth application's icon. Null if not set."""
+  imageUrl: String
+
+  """Allowed redirect URIs for OAuth authorization flows."""
+  redirectUris: [String!]!
+
+  """
+  Distribution setting for the OAuth application. Private applications are only installable by the owning workspace.
+  """
+  distribution: OAuthApplicationDistribution!
+
+  """Resource types the OAuth application's webhooks subscribe to."""
+  webhookResourceTypes: [String!]!
+
+  """Webhook URL used for delivering webhook payloads. Null if not set."""
+  webhookUrl: String
+
+  """Whether webhook delivery is enabled for this OAuth application."""
+  webhookEnabled: Boolean!
+
+  """The time at which the OAuth application was created."""
+  createdAt: DateTime!
+
+  """The time at which the OAuth application was last updated."""
+  updatedAt: DateTime!
+}
+
+"""The result of archiving an OAuth application."""
+type OAuthApplicationArchivePayload {
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+"""Input for creating an OAuth application through the public API."""
+input OAuthApplicationCreateInput {
+  """The OAuth application's name."""
+  name: String!
+
+  """User-facing description of the OAuth application."""
+  description: String
+
+  """Name of the developer or company that built the OAuth application."""
+  developer: String!
+
+  """URL of the developer's website, homepage, or documentation."""
+  developerUrl: String!
+
+  """Allowed redirect URIs for OAuth authorization flows."""
+  redirectUris: [String!]!
+
+  """
+  Optional client-supplied idempotency key. Reusing the same key with the same
+  managing OAuth application returns the existing OAuth application instead of
+  creating a duplicate.
+  """
+  idempotencyKey: String
+
+  """URL of the OAuth application's icon."""
+  imageUrl: String
+
+  """Webhook URL used for delivering webhook payloads."""
+  webhookUrl: String
+
+  """Resource types the OAuth application's webhooks subscribe to."""
+  webhookResourceTypes: [String!]
+}
+
+"""The result of creating an OAuth application."""
+type OAuthApplicationCreatePayload {
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The OAuth application that was created or updated."""
+  application: OAuthApplication!
+
+  """
+  The client secret. Store this value securely because it cannot be retrieved
+  later. Null when returning an existing OAuth application for an idempotency key.
+  """
+  clientSecret: String
+
+  """
+  The webhook signing secret. Null if the OAuth application does not have a
+  webhook configured or an existing OAuth application is returned for an
+  idempotency key.
+  """
+  webhookSecret: String
+}
+
+"""Distribution setting for an OAuth application."""
+enum OAuthApplicationDistribution {
+  private
+  public
+}
+
+"""The result of an OAuth application mutation."""
+type OAuthApplicationPayload {
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The OAuth application that was created or updated."""
+  application: OAuthApplication!
+}
+
+"""The result of rotating an OAuth application's client secret."""
+type OAuthApplicationRotateSecretPayload {
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """
+  The new client secret. Store this value securely because it cannot be retrieved later.
+  """
+  clientSecret: String!
+}
+
+"""The result of rotating an OAuth application's webhook signing secret."""
+type OAuthApplicationRotateWebhookSecretPayload {
+  """Whether the operation was successful."""
+  success: Boolean!
+
+  """The new webhook signing secret."""
+  webhookSecret: String!
+}
+
+"""Input for updating an OAuth application through the public API."""
+input OAuthApplicationUpdateInput {
+  """The OAuth application's name."""
+  name: String
+
+  """User-facing description of the OAuth application."""
+  description: String
+
+  """Name of the developer or company that built the OAuth application."""
+  developer: String
+
+  """URL of the developer's website, homepage, or documentation."""
+  developerUrl: String
+
+  """Allowed redirect URIs for OAuth authorization flows."""
+  redirectUris: [String!]
+
+  """URL of the OAuth application's icon."""
+  imageUrl: String
+
+  """Webhook URL used for delivering webhook payloads."""
+  webhookUrl: String
+
+  """Whether webhook delivery is enabled for this OAuth application."""
+  webhookEnabled: Boolean
+
+  """Resource types the OAuth application's webhooks subscribe to."""
+  webhookResourceTypes: [String!]
 }
 
 """
@@ -29142,6 +29417,19 @@ type Query {
     id: String!
   ): NotificationSubscription!
 
+  """
+  [ALPHA] OAuth applications created by the calling OAuth application through the public API.
+  """
+  oauthApplications: [OAuthApplication!]!
+
+  """
+  [ALPHA] A specific OAuth application created by the calling OAuth application through the public API.
+  """
+  oauthApplication(
+    """The identifier of the OAuth application to retrieve."""
+    id: String!
+  ): OAuthApplication!
+
   """[INTERNAL] Checks whether the domain can be claimed."""
   organizationDomainClaimRequest(
     """The ID of the organization domain to claim."""
@@ -30696,6 +30984,9 @@ input ReleaseCompleteInput {
   """Optional release name to apply when completing the release."""
   name: String
 
+  """External links to attach to the completed release."""
+  links: [ReleaseLinkInput!]
+
   """The identifier of the pipeline to mark a release as completed."""
   pipelineId: String!
 }
@@ -30718,6 +31009,9 @@ input ReleaseCompleteInputBase {
 
   """Optional release name to apply when completing the release."""
   name: String
+
+  """External links to attach to the completed release."""
+  links: [ReleaseLinkInput!]
 }
 
 type ReleaseConnection {
@@ -30885,6 +31179,17 @@ type ReleaseHistoryEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""An external link to attach to the release."""
+input ReleaseLinkInput {
+  """The URL of the link."""
+  url: String!
+
+  """
+  Optional label for the link. If omitted, the API derives one from the URL.
+  """
+  label: String
 }
 
 """
@@ -31677,6 +31982,9 @@ input ReleaseSyncInput {
   """Debug information for release creation diagnostics."""
   debugSink: ReleaseDebugSinkInput
 
+  """External links to attach to the release."""
+  links: [ReleaseLinkInput!]
+
   """The identifier of the pipeline this release belongs to."""
   pipelineId: String!
 }
@@ -31714,6 +32022,9 @@ input ReleaseSyncInputBase {
 
   """Debug information for release creation diagnostics."""
   debugSink: ReleaseDebugSinkInput
+
+  """External links to attach to the release."""
+  links: [ReleaseLinkInput!]
 }
 
 """
@@ -31733,6 +32044,9 @@ input ReleaseUpdateByPipelineInput {
 
   """Optional release name to apply when updating the release."""
   name: String
+
+  """External links to attach to the updated release."""
+  links: [ReleaseLinkInput!]
 
   """The identifier of the pipeline."""
   pipelineId: String!
@@ -31756,6 +32070,9 @@ input ReleaseUpdateByPipelineInputBase {
 
   """Optional release name to apply when updating the release."""
   name: String
+
+  """External links to attach to the updated release."""
+  links: [ReleaseLinkInput!]
 }
 
 """Input for updating an existing release."""
@@ -33845,6 +34162,9 @@ type Team implements Node {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
+
+    """[INTERNAL] Sort returned users."""
+    sort: [UserSortInput!]
   ): UserConnection!
 
   """[ALPHA] The membership of the given user in the team."""
