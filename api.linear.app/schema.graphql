@@ -935,6 +935,25 @@ interface AiConversationBaseWidget {
   displayInfo: AiConversationWidgetDisplayInfo
 }
 
+type AiConversationBashToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationBashToolCallArgs
+}
+
+type AiConversationBashToolCallArgs {
+  command: String!
+}
+
 """The client platform from which an AI conversation was initiated."""
 enum AiConversationClientPlatform {
   web
@@ -979,6 +998,25 @@ type AiConversationCreateEntityToolCall implements AiConversationBaseToolCall {
 type AiConversationCreateEntityToolCallArgs {
   type: String!
   count: Float
+}
+
+type AiConversationCreateSandboxToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationCreateSandboxToolCallArgs
+}
+
+type AiConversationCreateSandboxToolCallArgs {
+  repository: String!
 }
 
 type AiConversationDeleteEntityToolCall implements AiConversationBaseToolCall {
@@ -1474,6 +1512,25 @@ type AiConversationQueryViewToolCallArgsView {
   predefinedView: String
 }
 
+type AiConversationReadSandboxFileToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationReadSandboxFileToolCallArgs
+}
+
+type AiConversationReadSandboxFileToolCallArgs {
+  path: String!
+}
+
 """A reasoning part in an AI conversation."""
 type AiConversationReasoningPart implements AiConversationBasePart {
   """The ID of the part."""
@@ -1669,6 +1726,18 @@ enum AiConversationSubscribeToEventToolCallArgsType {
   recurring
 }
 
+type AiConversationSuggestRepositoryToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+}
+
 type AiConversationSuggestValuesToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -1721,6 +1790,10 @@ enum AiConversationTool {
   RestoreEntity
   Research
   CodeIntelligence
+  SuggestRepository
+  CreateSandbox
+  Bash
+  ReadSandboxFile
   GetPullRequestDiff
   GetPullRequestFile
   GetPullRequestCheckLogs
@@ -1739,7 +1812,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -16363,6 +16436,12 @@ input LaunchDarklySettingsInput {
   environment: String!
 }
 
+"""How workspace MCP server access is restricted for Linear Agent."""
+enum LinearAgentMcpServersMode {
+  all
+  allowlist
+}
+
 """[ALPHA] Issue link count sorting options."""
 input LinkCountSort {
   """Whether nulls should be sorted first or last"""
@@ -21686,6 +21765,9 @@ input NullableTeamFilter {
   """Comparator for the team privacy."""
   private: BooleanComparator
 
+  """Filters that the team's members must satisfy."""
+  members: UserCollectionFilter
+
   """Comparator for the time at which the team was retired."""
   retiredAt: NullableDateComparator
 
@@ -21874,14 +21956,13 @@ input NumberComparator {
 }
 
 """
-Public API representation of an OAuth application managed by the calling OAuth
-application. Secrets are only returned by create and rotation mutations.
+An OAuth application that can be managed by the calling OAuth application.
 """
 type OAuthApplication {
   """The unique identifier of the OAuth application."""
   id: String!
 
-  """The public client ID used during OAuth authorization flows."""
+  """The client ID used during OAuth authorization flows."""
   clientId: String!
 
   """The human-readable name of the OAuth application."""
@@ -21949,7 +22030,7 @@ input OAuthApplicationCreateInput {
   """
   Optional client-supplied idempotency key. Reusing the same key with the same
   managing OAuth application returns the existing OAuth application instead of
-  creating a duplicate.
+  creating a duplicate. The key does not apply to archived applications.
   """
   idempotencyKey: String
 
@@ -23154,8 +23235,11 @@ input OrganizationLinearAgentSettingsInput {
   mcpServersEnabled: Boolean
 
   """
-  [Internal] The MCP server allowlist for Linear Agent. When unset, all MCP servers are allowed.
+  [Internal] Whether all MCP servers or only approved MCP servers are allowed for Linear Agent.
   """
+  mcpServersMode: LinearAgentMcpServersMode
+
+  """[Internal] Legacy MCP server allowlist for Linear Agent."""
   mcpServersAllowlist: [OrganizationLinearAgentMcpServerAllowlistEntryInput!]
 }
 
@@ -30987,6 +31071,14 @@ input ReleaseCompleteInput {
   """External links to attach to the completed release."""
   links: [ReleaseLinkInput!]
 
+  """
+  Documents to attach to the completed release. Existing documents with the same title are updated.
+  """
+  documents: [ReleaseDocumentInput!]
+
+  """Release notes covering the completed release."""
+  releaseNotes: ReleaseNoteInput
+
   """The identifier of the pipeline to mark a release as completed."""
   pipelineId: String!
 }
@@ -31012,6 +31104,14 @@ input ReleaseCompleteInputBase {
 
   """External links to attach to the completed release."""
   links: [ReleaseLinkInput!]
+
+  """
+  Documents to attach to the completed release. Existing documents with the same title are updated.
+  """
+  documents: [ReleaseDocumentInput!]
+
+  """Release notes covering the completed release."""
+  releaseNotes: ReleaseNoteInput
 }
 
 type ReleaseConnection {
@@ -31095,6 +31195,24 @@ input ReleaseDebugSinkInput {
 
   """List of paths applied during commit scanning."""
   includePaths: [String!]
+
+  """Regex used to filter commit subjects during scanning."""
+  includeSubjects: [String!]
+}
+
+"""
+A document to attach to the release. Existing documents on the release with the
+same title are updated in place. Bad rows (empty title, oversized title/body)
+are skipped with a warning rather than failing the release command.
+"""
+input ReleaseDocumentInput {
+  """
+  The title of the document. Used to match existing documents on the release for upsert.
+  """
+  title: String!
+
+  """The document body as markdown."""
+  content: String!
 }
 
 type ReleaseEdge {
@@ -31295,6 +31413,19 @@ type ReleaseNoteEdge {
 enum ReleaseNoteGenerationStatus {
   pending
   completed
+}
+
+"""
+Release notes to attach to the release. Upserts the existing release notes that
+cover only this release. Bad input (empty title, oversized title/body) is
+skipped with a warning rather than failing the release command.
+"""
+input ReleaseNoteInput {
+  """The release notes body as markdown."""
+  content: String!
+
+  """Optional title. If omitted, the UI derives one from the release range."""
+  title: String
 }
 
 """The result of a release note mutation."""
@@ -31985,6 +32116,16 @@ input ReleaseSyncInput {
   """External links to attach to the release."""
   links: [ReleaseLinkInput!]
 
+  """
+  Documents to attach to the release. Existing documents on the release with the same title are updated.
+  """
+  documents: [ReleaseDocumentInput!]
+
+  """
+  Release notes covering this release. Upserts the existing release notes that cover only this release.
+  """
+  releaseNotes: ReleaseNoteInput
+
   """The identifier of the pipeline this release belongs to."""
   pipelineId: String!
 }
@@ -32025,6 +32166,16 @@ input ReleaseSyncInputBase {
 
   """External links to attach to the release."""
   links: [ReleaseLinkInput!]
+
+  """
+  Documents to attach to the release. Existing documents on the release with the same title are updated.
+  """
+  documents: [ReleaseDocumentInput!]
+
+  """
+  Release notes covering this release. Upserts the existing release notes that cover only this release.
+  """
+  releaseNotes: ReleaseNoteInput
 }
 
 """
@@ -32047,6 +32198,14 @@ input ReleaseUpdateByPipelineInput {
 
   """External links to attach to the updated release."""
   links: [ReleaseLinkInput!]
+
+  """
+  Documents to attach to the updated release. Existing documents with the same title are updated.
+  """
+  documents: [ReleaseDocumentInput!]
+
+  """Release notes covering the updated release."""
+  releaseNotes: ReleaseNoteInput
 
   """The identifier of the pipeline."""
   pipelineId: String!
@@ -32073,6 +32232,14 @@ input ReleaseUpdateByPipelineInputBase {
 
   """External links to attach to the updated release."""
   links: [ReleaseLinkInput!]
+
+  """
+  Documents to attach to the updated release. Existing documents with the same title are updated.
+  """
+  documents: [ReleaseDocumentInput!]
+
+  """Release notes covering the updated release."""
+  releaseNotes: ReleaseNoteInput
 }
 
 """Input for updating an existing release."""
@@ -34647,6 +34814,9 @@ input TeamFilter {
 
   """Comparator for the team privacy."""
   private: BooleanComparator
+
+  """Filters that the team's members must satisfy."""
+  members: UserCollectionFilter
 
   """Comparator for the time at which the team was retired."""
   retiredAt: NullableDateComparator
@@ -37458,6 +37628,9 @@ type ViewPreferencesValues {
 
   """Whether to show week numbers in timeline chronology bar."""
   timelineChronologyShowWeekNumbers: Boolean
+
+  """Whether to show the projects aside panel on the timeline."""
+  timelineShowProjectsAside: Boolean
 
   """The initiative grouping."""
   initiativeGrouping: String
