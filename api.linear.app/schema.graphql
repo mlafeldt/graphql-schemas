@@ -9307,6 +9307,9 @@ input GitHubRepoInput {
 
   """The external identifier (GitHub node ID) for the repository."""
   externalId: String
+
+  """The repository's GitHub description, if any."""
+  description: String
 }
 
 input GitHubRepoMappingInput {
@@ -11042,7 +11045,8 @@ type InitiativeUpdate implements Node {
   infoSnapshot: JSONObject
 
   """
-  Whether the diff between this update and the previous one should be hidden in the UI.
+  Whether the diff between this update and the previous one should be hidden in
+  the UI. Only used for legacy updates. Not settable in the UI.
   """
   isDiffHidden: Boolean!
 
@@ -11343,11 +11347,6 @@ input InitiativeUpdateUpdateInput {
 
   """The health of the initiative at the time of the update."""
   health: InitiativeUpdateHealthType
-
-  """
-  Whether the diff between the current update and the previous one should be hidden.
-  """
-  isDiffHidden: Boolean
 }
 
 """
@@ -18473,6 +18472,11 @@ type Mutation {
     """
     customHeaders: [McpServerCustomHeaderInput!]
 
+    """
+    The workspace-approved MCP server definition used to start this connection.
+    """
+    mcpServerDefinitionId: String
+
     """The URL of the MCP server to connect with."""
     serverUrl: String!
   ): IntegrationPayload!
@@ -18483,6 +18487,11 @@ type Mutation {
     Optional additional HTTP headers to include with requests to this MCP server.
     """
     customHeaders: [McpServerCustomHeaderInput!]
+
+    """
+    The workspace-approved MCP server definition used to start this connection.
+    """
+    mcpServerDefinitionId: String
 
     """The ID of the workflow definition draft to connect the MCP server to."""
     workflowDefinitionDraftId: String
@@ -19471,12 +19480,15 @@ type Mutation {
   ): ReleasePipelineArchivePayload!
 
   """
-  Permanently deletes a release pipeline and all associated stages and releases.
+  Moves a release pipeline to the trash bin. Trashed pipelines are archived and
+  will be permanently deleted after a retention period, along with all their
+  releases. If the pipeline is already archived, it is marked as trashed with a
+  fresh archive timestamp.
   """
   releasePipelineDelete(
     """The identifier of the release pipeline to delete."""
     id: String!
-  ): DeletePayload!
+  ): ReleasePipelineArchivePayload!
 
   """
   Syncs release data by resolving issue and pull request references and
@@ -21056,6 +21068,9 @@ input NullableDocumentContentFilter {
 
   """Filters that the document content initiative must satisfy."""
   initiative: InitiativeFilter
+
+  """Filters that the document content issue must satisfy."""
+  issue: IssueFilter
 
   """Filters that the document content document must satisfy."""
   document: DocumentFilter
@@ -27661,11 +27676,6 @@ input ProjectUpdateUpdateInput {
 
   """The health of the project at the time of the update."""
   health: ProjectUpdateHealthType
-
-  """
-  Whether the diff between the current update and the previous one should be hidden.
-  """
-  isDiffHidden: Boolean
 }
 
 """
@@ -27851,6 +27861,11 @@ type PullRequestCommit {
   are typically filtered out when counting diff stats.
   """
   isMergeCommit: Boolean
+
+  """
+  The parent commit SHAs in provider-reported order. The first parent is used for merge-commit review ranges when available.
+  """
+  parentShas: [String!]
 
   """Linear user IDs for commit authors (includes co-authors)."""
   authorUserIds: [String!]!
@@ -31542,6 +31557,13 @@ type ReleasePipeline implements Node {
   may not reflect the exact count at all times.
   """
   approximateReleaseCount: Int!
+
+  """
+  A flag that indicates whether the pipeline is in the trash bin. Trashed
+  pipelines are archived and will be permanently deleted after a retention
+  period. Null when the pipeline is not trashed.
+  """
+  trashed: Boolean
 
   """
   The document template used to define the release notes format for this
@@ -36507,6 +36529,14 @@ type User implements Node {
 
   """The user's GitHub user ID."""
   gitHubUserId: String
+
+  """
+  [Internal] Whether this user can access GitHub source code through Linear.
+  True when the workspace has connected GitHub code-access repositories and the
+  user has an active personal GitHub code-access token for the same GitHub host.
+  Always false when queried for a user other than the authenticated viewer.
+  """
+  hasGitHubCodeAccess: Boolean!
 }
 
 """User admin operation response."""
