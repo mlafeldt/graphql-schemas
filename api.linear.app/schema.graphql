@@ -18887,6 +18887,33 @@ type Mutation {
   ): IssuePayload!
 
   """
+  Shares an issue with a user who would not otherwise be able to access it. The
+  viewer must have native access to the issue's full sub-issue tree and
+  permission to share issues in the issue's team. Issues that inherit sharing
+  from a parent issue cannot be shared directly.
+  """
+  issueShare(
+    """The identifier of the user to share the issue with."""
+    userId: String!
+
+    """The identifier of the issue to share."""
+    id: String!
+  ): IssuePayload!
+
+  """
+  Stops sharing an issue with a user. The viewer must have native access to the
+  issue's full sub-issue tree and permission to share issues in the issue's
+  team. Issues that inherit sharing from a parent issue cannot be unshared directly.
+  """
+  issueUnshare(
+    """The identifier of the user to remove from the issue share."""
+    userId: String!
+
+    """The identifier of the issue to stop sharing."""
+    id: String!
+  ): IssuePayload!
+
+  """
   Adds an issue reminder. Will cause a notification to be sent when the issue reminder time is reached.
   """
   issueReminder(
@@ -22588,6 +22615,11 @@ type Organization implements Node {
   aiDiscussionSummariesEnabled: Boolean!
 
   """
+  Whether the workspace generates AI Pull Request guides for new pull requests.
+  """
+  pullRequestTourEnabled: Boolean!
+
+  """
   [INTERNAL] Configure per-modality AI host providers and model families.
   """
   aiProviderConfiguration: JSONObject
@@ -23472,6 +23504,11 @@ input OrganizationUpdateInput {
 
   """Whether the workspace has enabled resolved thread AI summaries."""
   aiThreadSummariesEnabled: Boolean
+
+  """
+  Whether the workspace generates AI Pull Request guides for new pull requests.
+  """
+  pullRequestTourEnabled: Boolean
 
   """Whether HIPAA compliance is enabled for the workspace."""
   hipaaComplianceEnabled: Boolean
@@ -33978,6 +34015,12 @@ type Team implements Node {
 
   """[Internal] The team's sub-teams."""
   children: [Team!]!
+
+  """
+  [Internal] For protected teams, the enclosing private team that forms the
+  visibility boundary. Null for public and private teams.
+  """
+  protectedBy: Team
 
   """
   [Internal] Sections shown on the team home that group pinned resources.
