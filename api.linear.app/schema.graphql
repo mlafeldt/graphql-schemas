@@ -1078,6 +1078,7 @@ enum AiConversationEntityCardWidgetArgsAction {
 enum AiConversationEntityCardWidgetArgsType {
   Issue
   IssueDraft
+  Draft
   Project
   Initiative
   InitiativeUpdate
@@ -12914,6 +12915,12 @@ input IssueCollectionFilter {
   hasDismissedAgentSessions: RelationExistsComparator
 
   """
+  [Internal] Comparator for filtering issues bucketed as having an errored agent
+  session, no active sessions, and no merged agent pull requests.
+  """
+  hasErroredAgentSessions: RelationExistsComparator
+
+  """
   [Internal] Comparator for filtering issues which have agent-session-linked pull requests that were merged.
   """
   hasMergedAgentPullRequests: RelationExistsComparator
@@ -13476,6 +13483,12 @@ input IssueFilter {
   sessions dismissed or closed, and no merged agent pull requests.
   """
   hasDismissedAgentSessions: RelationExistsComparator
+
+  """
+  [Internal] Comparator for filtering issues bucketed as having an errored agent
+  session, no active sessions, and no merged agent pull requests.
+  """
+  hasErroredAgentSessions: RelationExistsComparator
 
   """
   [Internal] Comparator for filtering issues which have agent-session-linked pull requests that were merged.
@@ -21414,6 +21427,12 @@ input NullableIssueFilter {
   hasDismissedAgentSessions: RelationExistsComparator
 
   """
+  [Internal] Comparator for filtering issues bucketed as having an errored agent
+  session, no active sessions, and no merged agent pull requests.
+  """
+  hasErroredAgentSessions: RelationExistsComparator
+
+  """
   [Internal] Comparator for filtering issues which have agent-session-linked pull requests that were merged.
   """
   hasMergedAgentPullRequests: RelationExistsComparator
@@ -22630,10 +22649,10 @@ type Organization implements Node {
   """[Internal] Settings for Linear Agent features."""
   linearAgentSettings: JSONObject!
 
-  """[INTERNAL] Whether the workspace has enabled the Coding Agent."""
+  """[INTERNAL] Whether the workspace has enabled Coding Sessions."""
   codingAgentEnabled: Boolean!
 
-  """[Internal] Settings for Coding Agent features."""
+  """[Internal] Settings for Coding Sessions features."""
   codingAgentSettings: JSONObject!
 
   """[DEPRECATED] Which day count to use for SLA calculations."""
@@ -22924,9 +22943,11 @@ type OrganizationCancelDeletePayload {
   success: Boolean!
 }
 
-"""[Internal] Input for updating Coding Agent settings for the workspace."""
+"""
+[Internal] Input for updating Coding Sessions settings for the workspace.
+"""
 input OrganizationCodingAgentSettingsInput {
-  """[Internal] The model preference used for Coding Agent sessions."""
+  """[Internal] The model preference used for Coding Sessions sessions."""
   model: String
 }
 
@@ -23545,10 +23566,10 @@ input OrganizationUpdateInput {
   """[Internal] Settings for Linear Agent features."""
   linearAgentSettings: OrganizationLinearAgentSettingsInput
 
-  """[INTERNAL] Whether the workspace has enabled the Coding Agent."""
+  """[INTERNAL] Whether the workspace has enabled Coding Sessions."""
   codingAgentEnabled: Boolean
 
-  """[Internal] Settings for Coding Agent features."""
+  """[Internal] Settings for Coding Sessions features."""
   codingAgentSettings: OrganizationCodingAgentSettingsInput
 }
 
@@ -36788,8 +36809,11 @@ enum UserFlagType {
   agentHomeHeadlineSeen
   agentCodeIntelligencePromoDismissed
   agentCodeIntelligenceSplashAnimationSeen
+  agentSharedSkillsPromoDismissed
+  agentSharedSkillsSplashAnimationSeen
   slackProjectChannelsPromoDismissed
   slackProjectChannelsPromoShown
+  reviewsPromptToConnectGithubDismissed
   all
 }
 
@@ -37995,7 +38019,7 @@ type ViewPreferencesValues {
   """Whether to show the review avatar field."""
   reviewFieldAvatar: Boolean
 
-  """Whether to show the review preview links field."""
+  """No longer used. Previously controlled the review preview links field."""
   reviewFieldPreviewLinks: Boolean
 
   """Whether to show the review repository field."""
@@ -38004,7 +38028,7 @@ type ViewPreferencesValues {
   """Whether to show the review identifier field."""
   reviewFieldIdentifier: Boolean
 
-  """Whether to show the review checks field."""
+  """No longer used. Previously controlled the review checks field."""
   reviewFieldChecks: Boolean
 
   """Whether completed agent sessions are shown and for how long."""
