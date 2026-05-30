@@ -1094,6 +1094,7 @@ enum AiConversationEntityCardWidgetArgsType {
   PullRequest
   Release
   ReleasePipeline
+  ReleaseNote
   AiPrompt
 }
 
@@ -1158,6 +1159,7 @@ enum AiConversationEntityListWidgetArgsEntitiesType {
   PullRequest
   Release
   ReleasePipeline
+  ReleaseNote
   AiPrompt
 }
 
@@ -1343,6 +1345,39 @@ type AiConversationInvokeMcpToolToolCallArgsTool {
   title: String
 }
 
+type AiConversationListCodingSessionsToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationListCodingSessionsToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationListCodingSessionsToolCallResult
+}
+
+type AiConversationListCodingSessionsToolCallArgs {
+  includeDismissed: Boolean
+}
+
+type AiConversationListCodingSessionsToolCallResult {
+  agentSessions: [AiConversationListCodingSessionsToolCallResultAgentSessions!]!
+  entities: [AiConversationSearchEntitiesToolCallResultEntities!]
+}
+
+type AiConversationListCodingSessionsToolCallResultAgentSessions {
+  type: String!
+  id: String!
+  pullRequests: [AiConversationSearchEntitiesToolCallResultEntities!]
+}
+
 type AiConversationNavigateToPageToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -1414,6 +1449,35 @@ enum AiConversationPartType {
   error
   widget
   widgetPlaceholder
+}
+
+type AiConversationPromptCodingSessionToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationPromptCodingSessionToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationPromptCodingSessionToolCallResult
+}
+
+type AiConversationPromptCodingSessionToolCallArgs {
+  agentSessionId: String!
+  prompt: String!
+}
+
+type AiConversationPromptCodingSessionToolCallResult {
+  agentSession: AiConversationSearchEntitiesToolCallResultEntities!
+  pullRequests: [AiConversationSearchEntitiesToolCallResultEntities!]
+  entities: [AiConversationSearchEntitiesToolCallResultEntities!]
 }
 
 """A prompt part in an AI conversation."""
@@ -1684,6 +1748,34 @@ type AiConversationSearchEntitiesToolCallResultEntities {
   id: String!
 }
 
+type AiConversationStartCodingSessionToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationStartCodingSessionToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationStartCodingSessionToolCallResult
+}
+
+type AiConversationStartCodingSessionToolCallArgs {
+  prompt: String!
+}
+
+type AiConversationStartCodingSessionToolCallResult {
+  agentSession: AiConversationSearchEntitiesToolCallResultEntities!
+  pullRequests: [AiConversationSearchEntitiesToolCallResultEntities!]
+  entities: [AiConversationSearchEntitiesToolCallResultEntities!]
+}
+
 """The status of an AI conversation."""
 enum AiConversationStatus {
   active
@@ -1791,6 +1883,9 @@ enum AiConversationTool {
   RestoreEntity
   Research
   CodeIntelligence
+  StartCodingSession
+  PromptCodingSession
+  ListCodingSessions
   SuggestRepository
   CreateSandbox
   Bash
@@ -1813,7 +1908,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -2186,6 +2281,33 @@ input ApproximateNeedCountSort {
 
   """The order for the individual sort"""
   order: PaginationSortOrder
+}
+
+"""A recently archived integration."""
+type ArchivedIntegrationPayload {
+  """The unique identifier of the integration."""
+  id: String!
+
+  """The integration service type."""
+  service: String!
+
+  """The time at which the integration was archived."""
+  archivedAt: DateTime!
+
+  """The login name of the connected GitHub organization."""
+  orgLogin: String
+
+  """The external identifier of the connected GitHub organization."""
+  externalOrgId: String
+
+  """The avatar URL of the connected GitHub organization."""
+  orgAvatarUrl: String
+
+  """The enterprise URL if this is a GitHub Enterprise Cloud integration."""
+  enterpriseUrl: String
+
+  """Whether the integration had full code access."""
+  codeAccess: Boolean
 }
 
 """A generic payload return from entity archive or deletion mutations."""
@@ -3662,6 +3784,16 @@ input ContactSalesCreateInput {
   PostHog session ID for correlating this inquiry with the user's browsing session.
   """
   sessionId: String
+
+  """
+  JSON serialized last-touch UTM parameters captured from the `utm` cookie at form submission.
+  """
+  utm: String
+
+  """
+  JSON serialized first-touch UTM parameters captured from the `utm_first` cookie at form submission.
+  """
+  utmFirstTouch: String
 }
 
 """[Internal] Comparator for content."""
@@ -3713,6 +3845,11 @@ input CreateOrganizationInput {
   JSON serialized UTM parameters associated with the creation of the workspace.
   """
   utm: String
+
+  """
+  JSON serialized UTM parameters captured on the user's first visit to the marketing site (first-touch attribution).
+  """
+  utmFirstTouch: String
 }
 
 """[INTERNAL] Response from creating or joining a workspace."""
@@ -9799,6 +9936,19 @@ type Initiative implements Node {
   """Initiative URL."""
   url: String!
 
+  """
+  [Internal] The human-readable identifier of the initiative. Returns the custom
+  identifier override when set, otherwise the workspace default
+  `<prefix>-<number>`. Null for legacy initiatives that have not been backfilled.
+  """
+  identifier: String
+
+  """
+  [Internal] Identifiers (default and custom) that this initiative has
+  previously held. Used to resolve URLs that referenced an older identifier.
+  """
+  previousIdentifiers: [String!]!
+
   """Projects associated with the initiative."""
   projects(
     """Whether to include projects from sub-initiatives. Defaults to true."""
@@ -11262,6 +11412,11 @@ input InitiativeUpdateInput {
   [Internal] The identifiers of the initiative labels associated with this initiative.
   """
   labelIds: [String!]
+
+  """
+  [Internal] Sets or clears the custom identifier override for the initiative. Pass null to revert to the workspace default.
+  """
+  customIdentifier: String
 }
 
 """The result of an initiative update mutation."""
@@ -29137,6 +29292,11 @@ type Query {
   ): Integration!
 
   """
+  Recently archived GitHub integrations. Returns integrations archived within the last 30 days.
+  """
+  archivedIntegrations: [ArchivedIntegrationPayload!]!
+
+  """
   Verify that we received the correct response from the GitHub Enterprise Server.
   """
   verifyGitHubEnterpriseServerInstallation(
@@ -34263,12 +34423,6 @@ type Team implements Node {
   """
   autoCloseChildIssues: Boolean
 
-  """
-  The workflow state into which issues are moved when they are marked as a
-  duplicate of another issue. Defaults to the first canceled state.
-  """
-  markedAsDuplicateWorkflowState: WorkflowState
-
   """[Internal] Whether new users should join this team by default."""
   joinByDefault: Boolean
 
@@ -34292,6 +34446,11 @@ type Team implements Node {
   non-private teams inside a private-team boundary.
   """
   visibility: TeamVisibility!
+
+  """
+  [DEPRECATED] No longer in use. Duplicates are now system-managed via the native duplicate state.
+  """
+  markedAsDuplicateWorkflowState: WorkflowState @deprecated(reason: "Duplicates are now system-managed via the native duplicate state.")
 
   """The name of the team including its parent team name if it has one."""
   displayName: String!
@@ -34838,11 +34997,6 @@ input TeamCreateInput {
   """
   autoArchivePeriod: Float
 
-  """
-  The workflow state into which issues are moved when they are marked as a duplicate of another issue.
-  """
-  markedAsDuplicateWorkflowStateId: String
-
   """The parent team ID."""
   parentId: String
 
@@ -35385,11 +35539,6 @@ input TeamUpdateInput {
   Period after which closed (completed, canceled, or duplicate) issues are automatically archived, in months.
   """
   autoArchivePeriod: Float
-
-  """
-  The workflow state into which issues are moved when they are marked as a duplicate of another issue.
-  """
-  markedAsDuplicateWorkflowStateId: String
 
   """
   Whether new users should join this team by default. Mutation restricted to workspace admins or owners!
