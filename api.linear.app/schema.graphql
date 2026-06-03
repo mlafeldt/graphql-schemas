@@ -7020,6 +7020,14 @@ type DocumentContent implements Node {
 }
 
 """
+Whether the checkpoint belongs to a draft-only or live document agent flow.
+"""
+enum DocumentContentAgentCheckpointMode {
+  draft
+  live
+}
+
+"""
 A draft revision of document content, pending user review. Each user can have at
 most one draft per document content. Drafts are seeded from the live document
 state and stored as base64-encoded Yjs state updates, allowing independent
@@ -7065,6 +7073,38 @@ type DocumentContentDraft implements Node {
   userId: String!
 }
 
+"""
+[Internal] An AI-authored checkpoint row included in the document content history timeline.
+"""
+type DocumentContentHistoryCheckpointType {
+  """The unique identifier of the AI document checkpoint."""
+  id: String!
+
+  """The time when this AI document checkpoint record was created."""
+  createdAt: DateTime!
+
+  """
+  Whether this checkpoint belongs to draft-only or live document content.
+  """
+  mode: DocumentContentAgentCheckpointMode!
+
+  """The identifier of the AI conversation that created this checkpoint."""
+  aiConversationId: String!
+
+  """
+  The identifier of the AI conversation turn that created this checkpoint.
+  """
+  aiConversationTurnId: String!
+
+  """
+  The time at which the document content state was captured for this checkpoint.
+  """
+  contentDataSnapshotAt: DateTime!
+
+  """[Internal] Source metadata associated with the AI document checkpoint."""
+  sourceMetadata: JSON
+}
+
 type DocumentContentHistoryPayload {
   """The document content history entries."""
   history: [DocumentContentHistoryType!]!
@@ -7073,9 +7113,28 @@ type DocumentContentHistoryPayload {
   success: Boolean!
 }
 
+"""
+[Internal] The fresh document content history timeline used by the client history dialog.
+"""
+type DocumentContentHistoryTimelinePayload {
+  """The document content history entries."""
+  history: [DocumentContentHistoryType!]!
+
+  """Visible live AI document checkpoints for the same document content."""
+  checkpoints: [DocumentContentHistoryCheckpointType!]!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
 type DocumentContentHistoryType {
   """The unique identifier of the document content history entry."""
   id: String!
+
+  """
+  The identifier of the document content that this history entry snapshots.
+  """
+  documentContentId: String!
 
   """The date when this document content history entry record was created."""
   createdAt: DateTime!
@@ -28945,6 +29004,16 @@ type Query {
   ): DocumentContentHistoryPayload!
 
   """
+  [Internal] Fetches the fresh document content history timeline for the client history dialog.
+  """
+  documentContentHistoryTimeline(
+    """
+    The identifier of the document content to retrieve timeline entries for.
+    """
+    id: String!
+  ): DocumentContentHistoryTimelinePayload!
+
+  """
   [Internal] Fetches document content history entries by their IDs, including content data.
   """
   documentContentHistoryEntries(
@@ -31075,6 +31144,11 @@ type Release implements Node {
   non-canceled stage.
   """
   canceledAt: DateTime
+
+  """
+  The time at which the release was automatically archived by the auto pruning process.
+  """
+  autoArchivedAt: DateTime
 
   """
   A flag that indicates whether the release is in the trash bin. Trashed
@@ -34158,8 +34232,8 @@ input TargetDateSort {
 A team is the primary organizational unit in Linear. Issues belong to teams, and
 each team has its own workflow states, cycles, labels, and settings. Teams can
 be public (visible to all workspace members), private (visible only to team
-members), or protected (visible only within an enclosing private-team boundary).
-Teams can also have sub-teams that inherit settings from their parent.
+members), or restricted (visible only within an enclosing private-team
+boundary). Teams can also have sub-teams that inherit settings from their parent.
 """
 type Team implements Node {
   """The unique identifier of the entity."""
@@ -34456,7 +34530,7 @@ type Team implements Node {
 
   """
   The visibility of the team. Returns public for teams visible to all workspace
-  members, private for teams visible only to members, and protected for
+  members, private for teams visible only to members, and restricted for
   non-private teams inside a private-team boundary.
   """
   visibility: TeamVisibility!
@@ -34474,8 +34548,15 @@ type Team implements Node {
   """
   ancestors: [Team!]!
 
-  """[Internal] Whether this team is protected."""
-  protected: Boolean!
+  """
+  [Internal] For restricted teams, the enclosing private team that forms the visibility boundary. Alias for protectedBy.
+  """
+  restrictedBy: Team
+
+  """
+  [Internal] The identifier of the enclosing private team that forms the visibility boundary for restricted teams.
+  """
+  restrictedById: String
 
   """
   Issues belonging to the team. Supports filtering and optional inclusion of sub-team issues.
@@ -35618,11 +35699,13 @@ input TeamUpdateInput {
 }
 
 """
-The visibility of a team. A team can be public, private, or protected within an enclosing private-team boundary.
+The visibility of a team. A team can be public, private, or restricted within an
+enclosing private-team boundary. The protected enum value remains as a legacy
+alias for compatibility.
 """
 enum TeamVisibility {
   public
-  protected
+  restricted
   private
 }
 
