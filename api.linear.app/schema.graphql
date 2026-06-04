@@ -1038,6 +1038,41 @@ type AiConversationDeleteEntityToolCallArgs {
   entity: AiConversationSearchEntitiesToolCallResultEntities!
 }
 
+"""The kind of input an AI conversation elicitation asks for."""
+enum AiConversationElicitationKind {
+  multipleChoice
+}
+
+"""A selectable option shown in an AI conversation elicitation."""
+type AiConversationElicitationOption {
+  """The short label shown for the option."""
+  label: String!
+
+  """The prompt sent as a normal user reply when selected."""
+  prompt: String!
+}
+
+"""A lightweight question or choice prompt shown with an AI conversation."""
+type AiConversationElicitationPart implements AiConversationBasePart {
+  """The ID of the part."""
+  id: String!
+
+  """The type of the part."""
+  type: AiConversationPartType!
+
+  """The metadata of the part."""
+  metadata: AiConversationPartMetadata!
+
+  """The kind of input this elicitation asks for."""
+  kind: AiConversationElicitationKind!
+
+  """The title shown above the elicitation choices."""
+  title: String
+
+  """Selectable prompt options for multiple-choice elicitations."""
+  options: [AiConversationElicitationOption!]!
+}
+
 type AiConversationEntityCardWidget implements AiConversationBaseWidget {
   """The name of the widget."""
   name: AiConversationWidgetName!
@@ -1410,7 +1445,7 @@ type AiConversationNavigateToPageToolCallResult {
 }
 
 """A part in an AI conversation."""
-union AiConversationPart = AiConversationPromptPart | AiConversationTextPart | AiConversationReasoningPart | AiConversationEventPart | AiConversationErrorPart | AiConversationToolCallPart | AiConversationWidgetPart
+union AiConversationPart = AiConversationPromptPart | AiConversationTextPart | AiConversationReasoningPart | AiConversationEventPart | AiConversationErrorPart | AiConversationToolCallPart | AiConversationWidgetPart | AiConversationElicitationPart
 
 """Metadata about a part in an AI conversation."""
 type AiConversationPartMetadata {
@@ -1449,6 +1484,7 @@ enum AiConversationPartType {
   error
   widget
   widgetPlaceholder
+  elicitation
 }
 
 type AiConversationPromptCodingSessionToolCall implements AiConversationBaseToolCall {
@@ -7096,6 +7132,14 @@ type DocumentContentHistoryCheckpointType {
   """
   aiConversationTurnId: String!
 
+  """The identifier of the user who invoked the AI checkpoint."""
+  invokedByUserId: String
+
+  """
+  Whether this checkpoint is the active head for its conversation branch and mode.
+  """
+  isActive: Boolean!
+
   """
   The time at which the document content state was captured for this checkpoint.
   """
@@ -7993,6 +8037,12 @@ type EmailIntakeAddressPayload {
   emailIntakeAddress: EmailIntakeAddress!
 
   """Whether the operation was successful."""
+  success: Boolean!
+}
+
+"""The result of requesting an on-demand SES domain status refresh."""
+type EmailIntakeAddressRefreshSesDomainStatusPayload {
+  """Whether an on-demand status check was requested."""
   success: Boolean!
 }
 
@@ -9992,6 +10042,16 @@ type Initiative implements Node {
   """
   labelIds: [String!]!
 
+  """
+  [Internal] The priority of the initiative. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
+  """
+  priority: Int!
+
+  """
+  [Internal] The sort order of the initiative within the workspace when ordered by priority.
+  """
+  prioritySortOrder: Float!
+
   """Initiative URL."""
   url: String!
 
@@ -10401,6 +10461,11 @@ input InitiativeCreateInput {
 
   """The initiative's content in markdown format."""
   content: String
+
+  """
+  [Internal] The priority of the initiative. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
+  """
+  priority: Int
 
   """
   [Internal] The identifiers of the initiative labels associated with this initiative.
@@ -11466,6 +11531,11 @@ input InitiativeUpdateInput {
 
   """The hour of the day (0-23) at which to prompt for initiative updates."""
   updateRemindersHour: Int
+
+  """
+  [Internal] The priority of the initiative. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
+  """
+  priority: Int
 
   """
   [Internal] The identifiers of the initiative labels associated with this initiative.
@@ -17869,6 +17939,20 @@ type Mutation {
     id: String!
   ): EmailIntakeAddressPayload!
 
+  """
+  Requests an immediate, on-demand SES domain verification status check for an
+  email intake address and keeps it in the frequent (per-minute) check lane for
+  a short window. Use when a user is actively configuring their custom sending
+  domain so authorization converges quickly instead of waiting for the
+  once-a-day lane.
+  """
+  emailIntakeAddressRefreshSesDomainStatus(
+    """
+    The identifier of the email intake address to refresh the domain status for.
+    """
+    id: String!
+  ): EmailIntakeAddressRefreshSesDomainStatusPayload!
+
   """Deletes an email intake address object."""
   emailIntakeAddressDelete(
     """The identifier of the email intake address to delete."""
@@ -22046,14 +22130,20 @@ input NullableTeamFilter {
   """Comparator for the time at which the team was retired."""
   retiredAt: NullableDateComparator
 
-  """Filters that the teams issues must satisfy."""
+  """Filters that the team's issues must satisfy."""
   issues: IssueCollectionFilter
 
-  """Filters that the teams parent must satisfy."""
+  """Filters that the team's parent must satisfy."""
   parent: NullableTeamFilter
 
   """Filters that the team's ancestors must satisfy."""
   ancestors: TeamCollectionFilter
+
+  """
+  [Internal] Filters that the private team forming this team's visibility
+  boundary must satisfy. Only relevant for non-public teams.
+  """
+  restrictedBy: NullableTeamFilter
 
   """Filters that the team's release pipelines must satisfy."""
   releasePipelines: ReleasePipelineCollectionFilter
@@ -35156,14 +35246,20 @@ input TeamFilter {
   """Comparator for the time at which the team was retired."""
   retiredAt: NullableDateComparator
 
-  """Filters that the teams issues must satisfy."""
+  """Filters that the team's issues must satisfy."""
   issues: IssueCollectionFilter
 
-  """Filters that the teams parent must satisfy."""
+  """Filters that the team's parent must satisfy."""
   parent: NullableTeamFilter
 
   """Filters that the team's ancestors must satisfy."""
   ancestors: TeamCollectionFilter
+
+  """
+  [Internal] Filters that the private team forming this team's visibility
+  boundary must satisfy. Only relevant for non-public teams.
+  """
+  restrictedBy: NullableTeamFilter
 
   """Filters that the team's release pipelines must satisfy."""
   releasePipelines: ReleasePipelineCollectionFilter
