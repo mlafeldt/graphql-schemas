@@ -812,6 +812,167 @@ input AgentSessionUserStateInput {
 }
 
 """
+A user-defined skill that can be saved and reused in conversations with the
+Linear Agent. Skills can be private to a user or shared with a team.
+"""
+type AgentSkill implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The identifier of the team this skill is shared with."""
+  teamId: String
+
+  """The user who owns the skill."""
+  owner: User!
+
+  """The user who created the skill."""
+  creator: User!
+
+  """
+  Whether the skill is shared with everyone in the workspace. When false, only the owner can use the skill.
+  """
+  shared: Boolean!
+
+  """The skill instructions in markdown format."""
+  body: String!
+
+  """The skill's description. Null if no description has been generated."""
+  description: String
+
+  """The skill's title."""
+  title: String!
+
+  """The icon of the skill. Null if no icon is set."""
+  icon: String
+
+  """The skill's color. Null if no color is set."""
+  color: String
+
+  """The user who last updated the skill. Null if unknown."""
+  lastUpdatedBy: User
+
+  """The skill's unique URL slug."""
+  slugId: String!
+
+  """
+  The time the skill was last used by anyone in the workspace. Null if it has never been used.
+  """
+  lastUsedAt: DateTime
+
+  """
+  The number of times the skill was used by anyone in the workspace in the last 30 days.
+  """
+  recentUsageCount: Float!
+}
+
+type AgentSkillConnection {
+  edges: [AgentSkillEdge!]!
+  nodes: [AgentSkill!]!
+  pageInfo: PageInfo!
+}
+
+"""Input for creating an agent skill."""
+input AgentSkillCreateInput {
+  """
+  The identifier in UUID v4 format. If none is provided, the backend will generate one.
+  """
+  id: String
+
+  """The team to associate the skill with."""
+  teamId: String
+
+  """The title of the skill."""
+  title: String
+
+  """The skill instructions in markdown format."""
+  body: String!
+
+  """The icon of the skill."""
+  icon: String
+
+  """The color of the skill icon."""
+  color: String
+}
+
+type AgentSkillEdge {
+  node: AgentSkill!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""Agent skill filtering options."""
+input AgentSkillFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the skill owner's user ID."""
+  ownerId: IDComparator
+
+  """Comparator for whether the skill is shared with the workspace."""
+  shared: BooleanComparator
+
+  """Filters that the skill's team must satisfy."""
+  team: NullableTeamFilter
+
+  """Compound filters, all of which need to be matched by the agent skill."""
+  and: [AgentSkillFilter!]
+
+  """Compound filters, one of which need to be matched by the agent skill."""
+  or: [AgentSkillFilter!]
+}
+
+"""The result of an agent skill mutation."""
+type AgentSkillPayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The agent skill that was created or updated."""
+  agentSkill: AgentSkill!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+"""Input for updating an agent skill."""
+input AgentSkillUpdateInput {
+  """The team to associate the skill with."""
+  teamId: String
+
+  """The skill instructions in markdown format."""
+  body: String
+
+  """The title of the skill."""
+  title: String
+
+  """The icon of the skill."""
+  icon: String
+
+  """The color of the skill icon."""
+  color: String
+}
+
+"""
 [Internal] A conversation between a user and the Linear AI assistant. Each
 conversation tracks the full thread state, context references (issues, projects,
 documents, etc.), and conversation parts (prompts, text responses, tool calls,
@@ -1101,6 +1262,9 @@ type AiConversationEntityCardWidgetArgs {
 
   """The action performed on the entity (leave empty if just found)"""
   action: AiConversationEntityCardWidgetArgsAction
+
+  """[Internal] Snapshot data for the widget."""
+  snapshot: JSONObject
 }
 
 """The action performed on the entity (leave empty if just found)"""
@@ -1131,6 +1295,7 @@ enum AiConversationEntityCardWidgetArgsType {
   ReleasePipeline
   ReleaseNote
   AiPrompt
+  AgentSession
 }
 
 type AiConversationEntityListWidget implements AiConversationBaseWidget {
@@ -1173,6 +1338,9 @@ type AiConversationEntityListWidgetArgsEntities {
 
   """@deprecated Optional note to display about the entity"""
   note: String @deprecated(reason: "Optional note to display about the entity")
+
+  """[Internal] Snapshot data for the widget."""
+  snapshot: JSONObject
 }
 
 """[Internal] The entity type"""
@@ -10359,6 +10527,9 @@ input InitiativeCollectionFilter {
   """Comparator for the initiative status: Planned, Active, Completed"""
   status: StringComparator
 
+  """[Internal] Comparator for the initiative priority."""
+  priority: NullableNumberComparator
+
   """Filters that the initiative teams must satisfy."""
   teams: TeamCollectionFilter
 
@@ -10502,6 +10673,9 @@ input InitiativeFilter {
 
   """Comparator for the initiative status: Planned, Active, Completed"""
   status: StringComparator
+
+  """[Internal] Comparator for the initiative priority."""
+  priority: NullableNumberComparator
 
   """Filters that the initiative teams must satisfy."""
   teams: TeamCollectionFilter
@@ -11043,6 +11217,18 @@ type InitiativePayload {
   success: Boolean!
 }
 
+"""Initiative priority sorting options."""
+input InitiativePrioritySort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+
+  """Whether to consider no priority as the highest or lowest priority"""
+  noPriorityFirst: Boolean = false
+}
+
 """
 A parent-child relation between two initiatives, forming a hierarchy. The
 initiative field is the parent and relatedInitiative is the child. Cycles and
@@ -11157,6 +11343,9 @@ input InitiativeSortInput {
 
   """Sort by initiative owner name."""
   owner: InitiativeOwnerSort
+
+  """Sort by initiative priority."""
+  priority: InitiativePrioritySort
 }
 
 enum InitiativeStatus {
@@ -12422,6 +12611,9 @@ type Issue implements Node {
   existing comment. Null if the issue was not created from a comment.
   """
   sourceComment: Comment
+
+  """[Internal] Whether this issue has been explicitly marked as trusted."""
+  trusted: Boolean
 
   """Integration type that created this issue, if applicable."""
   integrationSourceType: IntegrationService
@@ -15218,6 +15410,9 @@ type IssueSearchResult implements Node {
   """
   sourceComment: Comment
 
+  """[Internal] Whether this issue has been explicitly marked as trusted."""
+  trusted: Boolean
+
   """Integration type that created this issue, if applicable."""
   integrationSourceType: IntegrationService
 
@@ -16412,6 +16607,9 @@ input IssueUpdateInput {
   """Whether this issue should inherit shared access from its parent issue."""
   inheritsSharedAccess: Boolean
 
+  """[Internal] Whether this issue has been explicitly marked as trusted."""
+  trusted: Boolean
+
   """Whether the issue has been trashed."""
   trashed: Boolean
 
@@ -16964,6 +17162,27 @@ type Mutation {
     """The identifier of the agent session to update."""
     id: String!
   ): AgentSessionPayload!
+
+  """Creates an agent skill."""
+  agentSkillCreate(
+    """The agent skill object to create."""
+    input: AgentSkillCreateInput!
+  ): AgentSkillPayload!
+
+  """Updates an agent skill."""
+  agentSkillUpdate(
+    """Data to update the agent skill with."""
+    input: AgentSkillUpdateInput!
+
+    """The identifier of the agent skill to update."""
+    id: String!
+  ): AgentSkillPayload!
+
+  """Deletes an agent skill."""
+  agentSkillDelete(
+    """The identifier of the agent skill to delete."""
+    id: String!
+  ): DeletePayload!
 
   """
   Creates a new attachment, or updates existing if the same `url` and `issueId`
@@ -19978,9 +20197,9 @@ type Mutation {
     includePrivateTeamIds: [String!]
 
     """
-    IDs of protected teams to include in the export. If null, protected team data is omitted.
+    IDs of restricted teams to include in the export. If null, restricted team data is omitted.
     """
-    includeProtectedTeamIds: [String!]
+    includeRestrictedTeamIds: [String!]
   ): CreateCsvExportReportPayload!
 
   """Creates a new roadmap."""
@@ -21489,6 +21708,9 @@ input NullableInitiativeFilter {
   """Comparator for the initiative status: Planned, Active, Completed"""
   status: StringComparator
 
+  """[Internal] Comparator for the initiative priority."""
+  priority: NullableNumberComparator
+
   """Filters that the initiative teams must satisfy."""
   teams: TeamCollectionFilter
 
@@ -21837,10 +22059,10 @@ input NullableProjectFilter {
   """[DEPRECATED] Comparator for the project state."""
   state: StringComparator
 
-  """Filters that the project's status must satisfy."""
+  """Filters that the project status must satisfy."""
   status: ProjectStatusFilter
 
-  """Comparator for the projects priority."""
+  """Comparator for the project priority."""
   priority: NullableNumberComparator
 
   """Filters that project labels must satisfy."""
@@ -22121,8 +22343,11 @@ input NullableTeamFilter {
   """Comparator for the team description."""
   description: NullableStringComparator
 
-  """Comparator for the team privacy."""
+  """[DEPRECATED] Comparator for the team privacy."""
   private: BooleanComparator
+
+  """Comparator for the team visibility."""
+  visibility: TeamVisibilityComparator
 
   """Filters that the team's members must satisfy."""
   members: UserCollectionFilter
@@ -22387,7 +22612,7 @@ input OAuthApplicationCreateInput {
   developer: String!
 
   """URL of the developer's website, homepage, or documentation."""
-  developerUrl: String!
+  developerUrl: String
 
   """Allowed redirect URIs for OAuth authorization flows."""
   redirectUris: [String!]!
@@ -25120,10 +25345,10 @@ input ProjectCollectionFilter {
   """[DEPRECATED] Comparator for the project state."""
   state: StringComparator
 
-  """Filters that the project's status must satisfy."""
+  """Filters that the project status must satisfy."""
   status: ProjectStatusFilter
 
-  """Comparator for the projects priority."""
+  """Comparator for the project priority."""
   priority: NullableNumberComparator
 
   """Filters that project labels must satisfy."""
@@ -25368,10 +25593,10 @@ input ProjectFilter {
   """[DEPRECATED] Comparator for the project state."""
   state: StringComparator
 
-  """Filters that the project's status must satisfy."""
+  """Filters that the project status must satisfy."""
   status: ProjectStatusFilter
 
-  """Comparator for the projects priority."""
+  """Comparator for the project priority."""
   priority: NullableNumberComparator
 
   """Filters that project labels must satisfy."""
@@ -28589,6 +28814,42 @@ type Query {
     """The identifier of the agent session."""
     agentSessionId: String!
   ): CodingAgentSandboxPayload
+
+  """All agent skills."""
+  agentSkills(
+    """Filter returned skills"""
+    filter: AgentSkillFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AgentSkillConnection!
+
+  """A specific agent skill."""
+  agentSkill(
+    """The identifier of the agent skill to retrieve."""
+    id: String!
+  ): AgentSkill!
 
   """
   Retrieves public information about an OAuth application by its client ID. Used
@@ -34376,10 +34637,10 @@ type Team implements Node {
   children: [Team!]!
 
   """
-  [Internal] For protected teams, the enclosing private team that forms the
+  [Internal] For restricted teams, the enclosing private team that forms the
   visibility boundary. Null for public and private teams.
   """
-  protectedBy: Team
+  restrictedBy: Team
 
   """
   [Internal] Sections shown on the team home that group pinned resources.
@@ -34639,14 +34900,19 @@ type Team implements Node {
   ancestors: [Team!]!
 
   """
-  [Internal] For restricted teams, the enclosing private team that forms the visibility boundary. Alias for protectedBy.
+  [Internal] The identifier of the enclosing private team that forms the visibility boundary for restricted teams.
   """
-  restrictedBy: Team
+  restrictedById: String
+
+  """
+  [Internal] For restricted teams, the enclosing private team that forms the visibility boundary.
+  """
+  protectedBy: Team @deprecated(reason: "Use restrictedBy instead.")
 
   """
   [Internal] The identifier of the enclosing private team that forms the visibility boundary for restricted teams.
   """
-  restrictedById: String
+  protectedById: String @deprecated(reason: "Use restrictedById instead.")
 
   """
   Issues belonging to the team. Supports filtering and optional inclusion of sub-team issues.
@@ -35237,8 +35503,11 @@ input TeamFilter {
   """Comparator for the team description."""
   description: NullableStringComparator
 
-  """Comparator for the team privacy."""
+  """[DEPRECATED] Comparator for the team privacy."""
   private: BooleanComparator
+
+  """Comparator for the team visibility."""
+  visibility: TeamVisibilityComparator
 
   """Filters that the team's members must satisfy."""
   members: UserCollectionFilter
@@ -35795,14 +36064,27 @@ input TeamUpdateInput {
 }
 
 """
-The visibility of a team. A team can be public, private, or restricted within an
-enclosing private-team boundary. The protected enum value remains as a legacy
-alias for compatibility.
+The visibility of a team. A team can be public, private, or restricted within an enclosing private-team boundary.
 """
 enum TeamVisibility {
   public
   restricted
   private
+}
+
+"""Comparator for team visibility."""
+input TeamVisibilityComparator {
+  """Equals constraint."""
+  eq: TeamVisibility
+
+  """Not-equals constraint."""
+  neq: TeamVisibility
+
+  """In-array constraint."""
+  in: [TeamVisibility!]
+
+  """Not-in-array constraint."""
+  nin: [TeamVisibility!]
 }
 
 """
@@ -38996,6 +39278,9 @@ type WorkflowDefinition implements Node {
   The type of user view to which this workflow's context is associated with.
   """
   userContextViewType: UserContextViewType
+
+  """Aggregated usage stats for this automation workflow definition."""
+  stats: JSONObject
 }
 
 """
