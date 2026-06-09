@@ -1263,6 +1263,11 @@ type AiConversationEntityCardWidgetArgs {
   """The action performed on the entity (leave empty if just found)"""
   action: AiConversationEntityCardWidgetArgsAction
 
+  """
+  A concise summary shown on specialized entity cards. Leave empty unless specifically instructed.
+  """
+  actionSummary: String
+
   """[Internal] Snapshot data for the widget."""
   snapshot: JSONObject
 }
@@ -1379,6 +1384,18 @@ type AiConversationErrorPart implements AiConversationBasePart {
 
   """The user-facing error message for the failed AI response."""
   message: String!
+
+  """
+  The category of the error. Absent for errors without a specific category, which default to unknown.
+  """
+  errorType: AiConversationErrorType
+}
+
+"""The category of an error part in an AI conversation."""
+enum AiConversationErrorType {
+  billing
+  untrustedSources
+  unknown
 }
 
 """An event part in an AI conversation."""
@@ -1515,6 +1532,7 @@ enum AiConversationInitialSource {
   comment
   pullRequestComment
   workflow
+  onboarding
 }
 
 type AiConversationInvokeMcpToolToolCall implements AiConversationBaseToolCall {
@@ -23478,6 +23496,12 @@ type OrganizationCancelDeletePayload {
 input OrganizationCodingAgentSettingsInput {
   """[Internal] The model preference used for Coding Sessions."""
   model: String
+
+  """
+  [Internal] The provider-agnostic reasoning effort level used for Coding
+  Sessions. Clamped to the selected model's provider when the session runs.
+  """
+  effort: String
 }
 
 """Workspace deletion operation response."""
