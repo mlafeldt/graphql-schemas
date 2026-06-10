@@ -299,6 +299,9 @@ type AgentActivityErrorContent {
   """The error message in Markdown format."""
   body: String!
 
+  """A stable reason code for specialized error handling."""
+  reasonCode: String
+
   """[Internal] The error content as ProseMirror document."""
   bodyData: JSONObject!
 }
@@ -12788,6 +12791,33 @@ type Issue implements Node {
     orderBy: PaginationOrderBy
   ): CommentConnection!
 
+  """[Internal] Agent sessions associated with the issue."""
+  agentSessions(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AgentSessionConnection!
+
   """[Internal] AI prompt progresses associated with this issue."""
   aiPromptProgresses(
     """Filter returned AI prompt progresses."""
@@ -15585,6 +15615,33 @@ type IssueSearchResult implements Node {
     """
     orderBy: PaginationOrderBy
   ): CommentConnection!
+
+  """[Internal] Agent sessions associated with the issue."""
+  agentSessions(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): AgentSessionConnection!
 
   """[Internal] AI prompt progresses associated with this issue."""
   aiPromptProgresses(
@@ -22605,6 +22662,11 @@ type OAuthApplication {
   """Whether webhook delivery is enabled for this OAuth application."""
   webhookEnabled: Boolean!
 
+  """
+  OAuth grant types supported by this application. authorization_code is always included.
+  """
+  grantTypes: [OAuthApplicationGrantType!]!
+
   """The time at which the OAuth application was created."""
   createdAt: DateTime!
 
@@ -22634,6 +22696,11 @@ input OAuthApplicationCreateInput {
 
   """Allowed redirect URIs for OAuth authorization flows."""
   redirectUris: [String!]!
+
+  """
+  OAuth grant capabilities the app may use. authorization_code is required. Defaults to authorization_code.
+  """
+  grantTypes: [OAuthApplicationGrantType!]
 
   """
   Optional client-supplied idempotency key. Reusing the same key with the same
@@ -22678,6 +22745,12 @@ type OAuthApplicationCreatePayload {
 enum OAuthApplicationDistribution {
   private
   public
+}
+
+"""OAuth grant type supported by an OAuth application."""
+enum OAuthApplicationGrantType {
+  authorization_code
+  client_credentials
 }
 
 """The result of an OAuth application mutation."""
@@ -22725,6 +22798,11 @@ input OAuthApplicationUpdateInput {
 
   """Allowed redirect URIs for OAuth authorization flows."""
   redirectUris: [String!]
+
+  """
+  OAuth grant capabilities the app may use. authorization_code is required. Omit to keep the existing grant types.
+  """
+  grantTypes: [OAuthApplicationGrantType!]
 
   """URL of the OAuth application's icon."""
   imageUrl: String
@@ -24016,9 +24094,6 @@ input OrganizationUpdateInput {
   """
   oauthAppReview: Boolean
 
-  """List of services that are allowed to be used for login."""
-  allowedAuthServices: [String!]
-
   """Internal. Whether SLAs have been enabled for the workspace."""
   slaEnabled: Boolean
 
@@ -24052,11 +24127,6 @@ input OrganizationUpdateInput {
 
   """Whether the workspace has enabled the feed feature."""
   feedEnabled: Boolean
-
-  """
-  Whether to hide other workspaces for new users signing up with email domains claimed by this organization.
-  """
-  hideNonPrimaryOrganizations: Boolean
 
   """Default schedule for how often feed summaries are generated."""
   defaultFeedSummarySchedule: FeedSummarySchedule
@@ -32026,6 +32096,11 @@ type ReleaseNote implements Node {
   The time at which the entity was archived. Null if the entity has not been archived.
   """
   archivedAt: DateTime
+
+  """
+  The release pipeline that this note belongs to. A note always belongs to exactly one pipeline.
+  """
+  pipeline: ReleasePipeline!
 
   """
   The release note's unique URL slug, used to construct human-readable URLs for the note.
