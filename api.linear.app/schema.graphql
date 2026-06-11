@@ -560,6 +560,12 @@ type AgentSession implements Node {
   """
   url: String
 
+  """
+  [Internal] Compact display label for the coding harness model used by this
+  session, derived from the latest associated sandbox.
+  """
+  codingHarnessModelLabel: String
+
   """[Internal] Pull requests associated with this agent session."""
   pullRequests(
     """A cursor to be used with last for backward pagination."""
@@ -10194,7 +10200,7 @@ type Initiative implements Node {
   targetDateResolution: DateResolutionType
 
   """
-  The lifecycle status of the initiative. One of Planned, Active, Completed.
+  The lifecycle status of the initiative. One of Proposed, Planned, Active, Completed, Canceled.
   """
   status: InitiativeStatus!
 
@@ -10225,6 +10231,11 @@ type Initiative implements Node {
   The time at which the initiative was moved into Completed status. Null if the initiative has not been completed.
   """
   completedAt: DateTime
+
+  """
+  [Internal] The time at which the initiative was moved into Canceled status. Null if the initiative has not been canceled.
+  """
+  canceledAt: DateTime
 
   """
   [Internal] The IDs of the initiative labels associated with this initiative.
@@ -10545,7 +10556,9 @@ input InitiativeCollectionFilter {
   """Filters that the initiative creator must satisfy."""
   creator: NullableUserFilter
 
-  """Comparator for the initiative status: Planned, Active, Completed"""
+  """
+  Comparator for the initiative status: Proposed, Planned, Active, Completed, Canceled
+  """
   status: StringComparator
 
   """[Internal] Comparator for the initiative priority."""
@@ -10565,6 +10578,9 @@ input InitiativeCollectionFilter {
 
   """Comparator for the initiative completed at date."""
   completedAt: NullableDateComparator
+
+  """[Internal] Comparator for the initiative canceled at date."""
+  canceledAt: NullableDateComparator
 
   """Comparator for the initiative health: onTrack, atRisk, offTrack"""
   health: StringComparator
@@ -10636,6 +10652,11 @@ input InitiativeCreateInput {
   """The sort order of the initiative within the workspace."""
   sortOrder: Float
 
+  """
+  [Internal] The sort order of the initiative within the workspace, when ordered by priority.
+  """
+  prioritySortOrder: Float
+
   """The initiative's color."""
   color: String
 
@@ -10692,7 +10713,9 @@ input InitiativeFilter {
   """Filters that the initiative creator must satisfy."""
   creator: NullableUserFilter
 
-  """Comparator for the initiative status: Planned, Active, Completed"""
+  """
+  Comparator for the initiative status: Proposed, Planned, Active, Completed, Canceled
+  """
   status: StringComparator
 
   """[Internal] Comparator for the initiative priority."""
@@ -10712,6 +10735,9 @@ input InitiativeFilter {
 
   """Comparator for the initiative completed at date."""
   completedAt: NullableDateComparator
+
+  """[Internal] Comparator for the initiative canceled at date."""
+  canceledAt: NullableDateComparator
 
   """Comparator for the initiative health: onTrack, atRisk, offTrack"""
   health: StringComparator
@@ -11370,9 +11396,11 @@ input InitiativeSortInput {
 }
 
 enum InitiativeStatus {
+  Proposed
   Planned
   Active
   Completed
+  Canceled
 }
 
 """Different tabs available inside an initiative."""
@@ -11696,6 +11724,11 @@ input InitiativeUpdateInput {
 
   """The sort order of the initiative within the workspace."""
   sortOrder: Float
+
+  """
+  [Internal] The sort order of the initiative within the workspace, when ordered by priority.
+  """
+  prioritySortOrder: Float
 
   """The initiative's color."""
   color: String
@@ -18773,6 +18806,11 @@ type Mutation {
 
   """[Internal] Updates existing Slack and Asks integration scopes."""
   updateIntegrationSlackScopes(
+    """
+    The Slack OAuth scopes the client requested. Used to warn when Slack grants fewer scopes than requested.
+    """
+    requestedScopes: [String!]
+
     """The ID of the existing Slack integration"""
     integrationId: String!
 
@@ -18785,6 +18823,11 @@ type Mutation {
 
   """Integrates the workspace with Slack."""
   integrationSlack(
+    """
+    The Slack OAuth scopes the client requested. Used to warn when Slack grants fewer scopes than requested.
+    """
+    requestedScopes: [String!]
+
     """
     [DEPRECATED] Whether or not v2 of Slack OAuth should be used. No longer used.
     """
@@ -18799,6 +18842,11 @@ type Mutation {
 
   """Integrates the workspace with the Slack Asks app."""
   integrationSlackAsks(
+    """
+    The Slack OAuth scopes the client requested. Used to warn when Slack grants fewer scopes than requested.
+    """
+    requestedScopes: [String!]
+
     """The Slack OAuth redirect URI."""
     redirectUri: String!
 
@@ -21780,7 +21828,9 @@ input NullableInitiativeFilter {
   """Filters that the initiative creator must satisfy."""
   creator: NullableUserFilter
 
-  """Comparator for the initiative status: Planned, Active, Completed"""
+  """
+  Comparator for the initiative status: Proposed, Planned, Active, Completed, Canceled
+  """
   status: StringComparator
 
   """[Internal] Comparator for the initiative priority."""
@@ -21800,6 +21850,9 @@ input NullableInitiativeFilter {
 
   """Comparator for the initiative completed at date."""
   completedAt: NullableDateComparator
+
+  """[Internal] Comparator for the initiative canceled at date."""
+  canceledAt: NullableDateComparator
 
   """Comparator for the initiative health: onTrack, atRisk, offTrack"""
   health: StringComparator
@@ -32296,7 +32349,6 @@ type ReleasePipeline implements Node {
 
   """
   Whether to automatically generate a release note when a release is completed.
-  Only applies to scheduled pipelines; ignored for continuous pipelines.
   """
   autoGenerateReleaseNotesOnCompletion: Boolean!
 
@@ -32503,9 +32555,7 @@ input ReleasePipelineCreateInput {
   isProduction: Boolean
 
   """
-  Whether to automatically generate a release note when a release is completed.
-  Only applies to scheduled pipelines; ignored for continuous pipelines.
-  Defaults to false.
+  Whether to automatically generate a release note when a release is completed. Defaults to false.
   """
   autoGenerateReleaseNotesOnCompletion: Boolean
 
@@ -32605,7 +32655,6 @@ input ReleasePipelineUpdateInput {
 
   """
   Whether to automatically generate a release note when a release is completed.
-  Only applies to scheduled pipelines; ignored for continuous pipelines.
   """
   autoGenerateReleaseNotesOnCompletion: Boolean
 
@@ -38482,6 +38531,9 @@ type ViewPreferencesValues {
   """Whether to show the initiative target date field."""
   initiativeFieldTargetDate: Boolean
 
+  """[Internal] Whether to show the initiative priority field."""
+  initiativeFieldPriority: Boolean
+
   """Whether to show the initiative completed date field."""
   initiativeFieldDateCompleted: Boolean
 
@@ -38751,6 +38803,9 @@ type ViewPreferencesValues {
   """Whether to show the review identifier field."""
   reviewFieldIdentifier: Boolean
 
+  """Whether to show the review GitHub team field."""
+  reviewFieldGithubTeam: Boolean
+
   """No longer used. Previously controlled the review checks field."""
   reviewFieldChecks: Boolean
 
@@ -38791,7 +38846,9 @@ enum ViewType {
   initiativeOverviewSubInitiatives
   initiatives
   initiativesPlanned
+  initiativesProposed
   initiativesCompleted
+  initiativesCanceled
   projects
   projectsAll
   projectsBacklog
