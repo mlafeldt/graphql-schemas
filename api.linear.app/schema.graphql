@@ -2955,6 +2955,15 @@ input AuditEntryFilter {
   """Comparator for the country code."""
   countryCode: StringComparator
 
+  """Comparator for the audited entity ID stored in metadata."""
+  entityId: StringComparator
+
+  """Comparator for the audited entity type stored in metadata."""
+  entityType: StringComparator
+
+  """Comparator for the audited entity identifier stored in metadata."""
+  entityIdentifier: StringComparator
+
   """Filters that the audit entry actor must satisfy."""
   actor: NullableUserFilter
 
@@ -17044,6 +17053,14 @@ enum LinearAgentMcpServersMode {
   allowlist
 }
 
+"""
+How workspace trusted source access is restricted for agent automations.
+"""
+enum LinearAgentTrustedSourcesMode {
+  none
+  allowlist
+}
+
 """[ALPHA] Issue link count sorting options."""
 input LinkCountSort {
   """Whether nulls should be sorted first or last"""
@@ -23993,6 +24010,24 @@ input OrganizationLinearAgentSettingsInput {
 
   """[Internal] Legacy MCP server allowlist for Linear Agent."""
   mcpServersAllowlist: [OrganizationLinearAgentMcpServerAllowlistEntryInput!]
+
+  """
+  [Internal] Whether external trusted sources are disabled or restricted to approved sources for agent automations.
+  """
+  trustedSourcesMode: LinearAgentTrustedSourcesMode
+
+  """[Internal] Trusted-source allowlist for Linear Agent automations."""
+  trustedSourcesAllowlist: [OrganizationLinearAgentTrustedSourcesAllowlistEntryInput!]
+}
+
+"""
+[Internal] A trusted-source entry for the Linear Agent automation allowlist.
+"""
+input OrganizationLinearAgentTrustedSourcesAllowlistEntryInput {
+  """
+  [Internal] The trusted-source key that Linear Agent automations are allowed to use.
+  """
+  key: String!
 }
 
 """
@@ -24653,6 +24688,173 @@ input PrioritySort {
 
   """Whether to consider no priority as the highest or lowest priority"""
   noPriorityFirst: Boolean = false
+}
+
+"""
+A product announcement shown in targeted workspace inbox notifications. Product
+announcements store reusable launch copy and are sent to specific recipients
+through related notifications.
+"""
+type ProductAnnouncement implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """
+  Stable campaign identifier used to deduplicate product announcement notifications.
+  """
+  campaignId: String!
+
+  """
+  Renderer identifier for this announcement. Unknown values should fall back to
+  generic title, headline, and description rendering.
+  """
+  kind: String!
+
+  """
+  Short title shown in the inbox notification list and push notification.
+  """
+  title: String!
+
+  """Headline shown at the top of the product announcement detail view."""
+  headline: String!
+
+  """Body copy shown in the product announcement detail view."""
+  description: String!
+}
+
+"""A notification related to a product announcement sent by Linear."""
+type ProductAnnouncementNotification implements Notification & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """
+  Notification type. Determines the kind of event that triggered this
+  notification and which associated entity fields will be populated.
+  """
+  type: String!
+
+  """
+  The user that caused the notification. Null if the notification was triggered
+  by a non-user actor such as an integration, external user, or system event.
+  """
+  actor: User
+
+  """
+  The external user that caused the notification. Populated when the
+  notification was triggered by an external user (e.g., a commenter from a
+  connected integration like Slack or GitHub) rather than a Linear workspace member.
+  """
+  externalUserActor: ExternalUser
+
+  """The recipient user of this notification."""
+  user: User!
+
+  """
+  The time at which the user marked the notification as read. Null if the notification is unread.
+  """
+  readAt: DateTime
+
+  """
+  The time at which an email reminder for this notification was sent to the user. Null if no email reminder has been sent.
+  """
+  emailedAt: DateTime
+
+  """
+  The time until which a notification is snoozed. After this time, the
+  notification reappears in the user's inbox. Null if the notification is not
+  currently snoozed.
+  """
+  snoozedUntilAt: DateTime
+
+  """
+  The time at which a notification was unsnoozed. Null if the notification has not been unsnoozed.
+  """
+  unsnoozedAt: DateTime
+
+  """The category of the notification."""
+  category: NotificationCategory!
+
+  """[Internal] URL to the target of the notification."""
+  url: String!
+
+  """[Internal] Inbox URL for the notification."""
+  inboxUrl: String!
+
+  """[Internal] Notification title."""
+  title: String!
+
+  """[Internal] Notification subtitle."""
+  subtitle: String!
+
+  """[Internal] If notification actor was Linear."""
+  isLinearActor: Boolean!
+
+  """[Internal] Notification avatar URL."""
+  actorAvatarUrl: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorInitials: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorAvatarColor: String!
+
+  """[Internal] Issue's status type for issue notifications."""
+  issueStatusType: String
+
+  """[Internal] Project update health for new updates."""
+  projectUpdateHealth: String
+
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
+
+  """
+  [Internal] Notifications with the same grouping key will be grouped together in the UI.
+  """
+  groupingKey: String!
+
+  """
+  [Internal] Priority of the notification with the same grouping key. Higher
+  number means higher priority. If priority is the same, notifications should be
+  sorted by `createdAt`.
+  """
+  groupingPriority: Float!
+
+  """The bot that caused the notification."""
+  botActor: ActorBot
+
+  """Identifier of the associated product announcement."""
+  productAnnouncementId: String!
+
+  """The product announcement related to the notification."""
+  productAnnouncement: ProductAnnouncement!
 }
 
 """
@@ -31601,6 +31803,11 @@ type Release implements Node {
   stage: ReleaseStage!
 
   """
+  [Internal] The primary release note covering this release. Null if no release note covers it.
+  """
+  releaseNote: ReleaseNote
+
+  """
   The user who created the release. Null if the release was created by a
   non-user context such as an access key or automation.
   """
@@ -35612,6 +35819,9 @@ input TeamCreateInput {
   """Whether issue sharing is enabled for this team."""
   issueSharingEnabled: Boolean
 
+  """[ALPHA] Whether initiatives are shown in the team's sidebar."""
+  initiativesEnabled: Boolean
+
   """
   [Internal] Whether the team should inherit its Slack auto-create project
   channel setting from its parent. Only applies to sub-teams.
@@ -36182,6 +36392,9 @@ input TeamUpdateInput {
 
   """Whether issue sharing is enabled for this team."""
   issueSharingEnabled: Boolean
+
+  """[ALPHA] Whether initiatives are shown in the team's sidebar."""
+  initiativesEnabled: Boolean
 
   """
   [Internal] Whether the team should inherit its Slack auto-create project
@@ -37579,8 +37792,6 @@ enum UserFlagType {
   agentExamplesDismissed
   agentHomePageNotice
   agentHomeHeadlineSeen
-  agentCodeIntelligencePromoDismissed
-  agentCodeIntelligenceSplashAnimationSeen
   agentSharedSkillsPromoDismissed
   agentSharedSkillsSplashAnimationSeen
   slackProjectChannelsPromoDismissed
@@ -38560,6 +38771,9 @@ type ViewPreferencesValues {
 
   """Whether to show sub-initiatives nested."""
   showNestedInitiatives: Boolean
+
+  """[ALPHA] Whether to show team-level initiatives in the workspace."""
+  showTeamInitiatives: Boolean
 
   """The customers view ordering."""
   customersViewOrdering: String
