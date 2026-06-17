@@ -1703,6 +1703,7 @@ type AiConversationPromptCodingSessionToolCall implements AiConversationBaseTool
 type AiConversationPromptCodingSessionToolCallArgs {
   agentSessionId: String!
   prompt: String!
+  queued: Boolean
 }
 
 type AiConversationPromptCodingSessionToolCallResult {
@@ -10176,6 +10177,11 @@ type Initiative implements Node {
   owner: User
 
   """
+  [ALPHA] The team that leads the initiative. Null if no lead team is assigned.
+  """
+  leadTeam: Team
+
+  """
   The initiative's unique URL slug, used to construct human-readable URLs.
   """
   slugId: String!
@@ -10657,6 +10663,9 @@ input InitiativeCreateInput {
 
   """The owner of the initiative."""
   ownerId: String
+
+  """[ALPHA] The team that leads the initiative."""
+  leadTeamId: String
 
   """The sort order of the initiative within the workspace."""
   sortOrder: Float
@@ -11731,6 +11740,9 @@ input InitiativeUpdateInput {
   """The owner of the initiative."""
   ownerId: String
 
+  """[ALPHA] The team that leads the initiative. Set to null to clear."""
+  leadTeamId: String
+
   """The sort order of the initiative within the workspace."""
   sortOrder: Float
 
@@ -12451,6 +12463,12 @@ input IntercomSettingsInput {
 
   """Whether Linear Agent should be enabled for this integration."""
   enableAiIntake: Boolean
+
+  """
+  Whether Linear Agent should process supported attachments from Intercom
+  conversations during AI intake. When false, attachments are omitted from the prompt.
+  """
+  enableAiIntakeAttachmentProcessing: Boolean
 }
 
 """
@@ -22724,7 +22742,7 @@ type OAuthApplication {
   distribution: OAuthApplicationDistribution!
 
   """Resource types the OAuth application's webhooks subscribe to."""
-  webhookResourceTypes: [String!]!
+  webhookResourceTypes: [WebhookResourceType!]!
 
   """Webhook URL used for delivering webhook payloads. Null if not set."""
   webhookUrl: String
@@ -22786,7 +22804,7 @@ input OAuthApplicationCreateInput {
   webhookUrl: String
 
   """Resource types the OAuth application's webhooks subscribe to."""
-  webhookResourceTypes: [String!]
+  webhookResourceTypes: [WebhookResourceType!]
 }
 
 """The result of creating an OAuth application."""
@@ -22884,7 +22902,7 @@ input OAuthApplicationUpdateInput {
   webhookEnabled: Boolean
 
   """Resource types the OAuth application's webhooks subscribe to."""
-  webhookResourceTypes: [String!]
+  webhookResourceTypes: [WebhookResourceType!]
 }
 
 """
@@ -32340,7 +32358,7 @@ input ReleaseLinkInput {
 }
 
 """
-A release note. The note body is stored in related document content, and the releases it covers are tracked in releaseIds.
+A note documenting one or more releases. The note body is stored in related document content.
 """
 type ReleaseNote implements Node {
   """The unique identifier of the entity."""
@@ -38736,6 +38754,9 @@ type ViewPreferencesValues {
   """Whether to show the initiative teams field."""
   initiativeFieldTeams: Boolean
 
+  """Whether to show the initiative lead team field."""
+  initiativeFieldLeadTeam: Boolean
+
   """Whether to show the initiative description field."""
   initiativeFieldDescription: Boolean
 
@@ -38927,6 +38948,9 @@ type ViewPreferencesValues {
 
   """Whether to show the automation status field."""
   automationFieldStats: Boolean
+
+  """Whether to show the automation team field."""
+  automationFieldTeam: Boolean
 
   """Whether to show sub-team automations."""
   automationShowDescendants: Boolean
@@ -39302,6 +39326,34 @@ type WebhookPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""
+A webhook event stream resource type that an OAuth application can subscribe to.
+"""
+enum WebhookResourceType {
+  AgentSessionEvent
+  Comment
+  CustomerNeed
+  Customer
+  Cycle
+  Document
+  Reaction
+  AppUserNotification
+  InitiativeUpdate
+  Initiative
+  IssueLabel
+  IssueSLA
+  Attachment
+  Issue
+  OAuthAuthorization
+  PermissionChange
+  ProjectLabel
+  ProjectUpdate
+  Project
+  ReleaseNote
+  Release
+  User
 }
 
 """The result of a webhook secret rotation mutation."""
@@ -40006,5 +40058,11 @@ input ZendeskSettingsInput {
 
   """The host mappings from Zendesk brands."""
   hostMappings: [String!]
+
+  """
+  Whether Linear Agent should process supported attachments from Zendesk tickets
+  during AI intake. When false, attachments are omitted from the prompt.
+  """
+  enableAiIntakeAttachmentProcessing: Boolean
 }
 
