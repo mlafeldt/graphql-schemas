@@ -12480,6 +12480,16 @@ input IntercomSettingsInput {
   conversations during AI intake. When false, attachments are omitted from the prompt.
   """
   enableAiIntakeAttachmentProcessing: Boolean
+
+  """
+  [INTERNAL] Whether new Intercom conversations should automatically create Linear issues with Linear Agent.
+  """
+  enableAutomaticConversationIntake: Boolean
+
+  """
+  [INTERNAL] An optional destination team ID for issues created by automatic Intercom conversation intake.
+  """
+  automaticConversationIntakeTeamId: String
 }
 
 """
@@ -35266,6 +35276,9 @@ type Team implements Node {
   """
   slackAutoCreateProjectChannel: Boolean
 
+  """[ALPHA] Whether initiatives are shown in the team's sidebar."""
+  initiativesEnabled: Boolean!
+
   """Calendar feed URL (iCal) for cycles."""
   cycleCalenderUrl: String!
 
@@ -39696,6 +39709,9 @@ type WorkflowDefinition implements Node {
   been executed for that entity.
   """
   runOnce: Boolean!
+
+  """Whether the workflow should apply to sub teams."""
+  applyToSubTeams: Boolean!
 
   """
   The team associated with the workflow. If not set, the workflow is associated with the entire workspace.
