@@ -11043,6 +11043,27 @@ input InitiativeLabelFilter {
   or: [InitiativeLabelFilter!]
 }
 
+"""[Internal] Impact summary for changing an initiative's lead team."""
+type InitiativeLeadTeamChangeImpact {
+  """
+  The number of editable sub-initiatives whose lead team would change if the update is applied to descendants.
+  """
+  affectedDescendantCount: Int!
+
+  """
+  Whether the changed initiatives may gain or lose access restrictions because the current or next lead team is not public.
+  """
+  visibilityMayChange: Boolean!
+}
+
+"""
+[Internal] Determines how a lead team change is applied to an initiative hierarchy.
+"""
+enum InitiativeLeadTeamChangeMode {
+  selectedOnly
+  includeDescendants
+}
+
 """Initiative manual sorting options."""
 input InitiativeManualSort {
   """Whether nulls should be sorted first or last"""
@@ -18545,6 +18566,22 @@ type Mutation {
     input: InitiativeUpdateInput!
 
     """The identifier of the initiative to update."""
+    id: String!
+  ): InitiativePayload!
+
+  """
+  [Internal] Updates an initiative's lead team, optionally applying it to affected editable sub-initiatives.
+  """
+  initiativeLeadTeamUpdate(
+    """
+    Whether to update only the selected initiative or also affected editable sub-initiatives.
+    """
+    mode: InitiativeLeadTeamChangeMode = selectedOnly
+
+    """The identifier of the new lead team. Pass null to clear the lead team."""
+    leadTeamId: String
+
+    """The identifier of the initiative whose lead team should change."""
     id: String!
   ): InitiativePayload!
 
@@ -30043,6 +30080,17 @@ type Query {
   """Returns a single initiative by its identifier or URL slug."""
   initiative(id: String!): Initiative!
 
+  """
+  [Internal] Returns the impact of changing an initiative's lead team before applying the update.
+  """
+  initiativeLeadTeamChangeImpact(
+    """The identifier of the new lead team. Pass null to clear the lead team."""
+    leadTeamId: String
+
+    """The identifier of the initiative whose lead team would change."""
+    id: String!
+  ): InitiativeLeadTeamChangeImpact!
+
   """Returns all initiative-to-project associations in the workspace."""
   initiativeToProjects(
     """A cursor to be used with last for backward pagination."""
@@ -38381,6 +38429,9 @@ input ViewPreferencesCreateInput {
   """The project label these view preferences are associated with."""
   projectLabelId: String
 
+  """The initiative label these view preferences are associated with."""
+  initiativeLabelId: String
+
   """The release pipeline these view preferences are associated with."""
   releasePipelineId: String
 
@@ -39134,6 +39185,9 @@ type ViewPreferencesValues {
   """Whether to show the review GitHub team field."""
   reviewFieldGithubTeam: Boolean
 
+  """Whether team reviews are shown in the reviews list."""
+  showTeamReviews: Boolean
+
   """No longer used. Previously controlled the review checks field."""
   reviewFieldChecks: Boolean
 
@@ -39185,6 +39239,7 @@ enum ViewType {
   projectsBacklog
   projectsClosed
   projectLabel
+  initiativeLabel
   search
   splitSearch
   teams
