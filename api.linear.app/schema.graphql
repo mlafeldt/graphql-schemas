@@ -10310,6 +10310,11 @@ type Initiative implements Node {
   url: String!
 
   """
+  [ALPHA] The visibility of the initiative, derived from its lead team. Public when no lead team is assigned.
+  """
+  visibility: InitiativeVisibility!
+
+  """
   [Internal] The human-readable identifier of the initiative. Returns the custom
   identifier override when set, otherwise the workspace default
   `<prefix>-<number>`. Null for legacy initiatives that have not been backfilled.
@@ -11046,7 +11051,9 @@ input InitiativeLabelFilter {
 """[Internal] Impact summary for changing an initiative's lead team."""
 type InitiativeLeadTeamChangeImpact {
   """
-  The number of editable sub-initiatives whose lead team would change if the update is applied to descendants.
+  The number of editable matching sub-initiatives whose lead team would change
+  if the update is applied to descendants. Matching sub-initiatives currently
+  have the same lead team as the selected initiative had before the change.
   """
   affectedDescendantCount: Int!
 
@@ -11962,6 +11969,15 @@ input InitiativeUpdateUpdateInput {
 
   """The health of the initiative at the time of the update."""
   health: InitiativeUpdateHealthType
+}
+
+"""
+The visibility of an initiative. Derived from its lead team; public when no lead team is assigned.
+"""
+enum InitiativeVisibility {
+  public
+  restricted
+  private
 }
 
 """
@@ -18568,11 +18584,13 @@ type Mutation {
   ): InitiativePayload!
 
   """
-  [Internal] Updates an initiative's lead team, optionally applying it to affected editable sub-initiatives.
+  [Internal] Updates an initiative's lead team, optionally applying it to matching editable sub-initiatives.
   """
   initiativeLeadTeamUpdate(
     """
-    Whether to update only the selected initiative or also affected editable sub-initiatives.
+    Whether to update only the selected initiative or also matching editable
+    sub-initiatives. Matching sub-initiatives currently have the same lead team
+    as the selected initiative had before the change.
     """
     mode: InitiativeLeadTeamChangeMode = selectedOnly
 
@@ -24805,6 +24823,11 @@ input PrioritySort {
 
   """Whether to consider no priority as the highest or lowest priority"""
   noPriorityFirst: Boolean = false
+
+  """
+  Whether to tiebreak issues sharing a priority by their priority sort order
+  """
+  usePrioritySortOrderTiebreaker: Boolean = true
 }
 
 """
@@ -30077,7 +30100,8 @@ type Query {
   initiative(id: String!): Initiative!
 
   """
-  [Internal] Returns the impact of changing an initiative's lead team before applying the update.
+  [Internal] Returns the impact of changing an initiative's lead team before
+  applying the update to matching sub-initiatives.
   """
   initiativeLeadTeamChangeImpact(
     """The identifier of the new lead team. Pass null to clear the lead team."""
@@ -30904,6 +30928,9 @@ type Query {
 
   """Release notes in the workspace."""
   releaseNotes(
+    """Filter returned release notes."""
+    filter: ReleaseNoteFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -32517,6 +32544,9 @@ type ReleaseNote implements Node {
   """Releases included in the note."""
   releases: [Release!]!
 
+  """The URL to the release note page in the Linear app."""
+  url: String!
+
   """Document content backing the release note body."""
   documentContent: DocumentContent
 }
@@ -32566,6 +32596,36 @@ type ReleaseNoteEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Release note filtering options."""
+input ReleaseNoteFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the release note title."""
+  title: StringComparator
+
+  """Comparator for the release note slug ID."""
+  slugId: StringComparator
+
+  """Filters that the release note's pipeline must satisfy."""
+  pipeline: ReleasePipelineFilter
+
+  """Filters that a release covered by the release note must satisfy."""
+  release: ReleaseFilter
+
+  """Compound filters, all of which need to be matched by the release note."""
+  and: [ReleaseNoteFilter!]
+
+  """Compound filters, one of which need to be matched by the release note."""
+  or: [ReleaseNoteFilter!]
 }
 
 """The generation status of a release note's body content."""
@@ -32837,6 +32897,9 @@ input ReleasePipelineCollectionFilter {
   """Comparator for the pipeline production flag."""
   isProduction: BooleanComparator
 
+  """Comparator for the pipeline type."""
+  type: ReleasePipelineTypeComparator
+
   """Filters that the release pipeline's teams must satisfy."""
   teams: TeamCollectionFilter
 
@@ -32925,6 +32988,9 @@ input ReleasePipelineFilter {
   """Comparator for the pipeline production flag."""
   isProduction: BooleanComparator
 
+  """Comparator for the pipeline type."""
+  type: ReleasePipelineTypeComparator
+
   """Filters that the release pipeline's teams must satisfy."""
   teams: TeamCollectionFilter
 
@@ -32970,6 +33036,26 @@ Scheduled pipelines accumulate issues into a started release that is explicitly 
 enum ReleasePipelineType {
   continuous
   scheduled
+}
+
+"""Comparator for release pipeline type."""
+input ReleasePipelineTypeComparator {
+  """Equals constraint."""
+  eq: ReleasePipelineType
+
+  """Not-equals constraint."""
+  neq: ReleasePipelineType
+
+  """In-array constraint."""
+  in: [ReleasePipelineType!]
+
+  """Not-in-array constraint."""
+  nin: [ReleasePipelineType!]
+
+  """
+  Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.
+  """
+  null: Boolean
 }
 
 """Input for updating an existing release pipeline."""
@@ -38911,6 +38997,14 @@ type ViewPreferencesValues {
 
   """Whether to show sub-initiatives nested."""
   showNestedInitiatives: Boolean
+
+  """
+  [Internal] On the team initiatives page, whether sub-initiatives the team only contributes to are shown.
+  """
+  teamInitiativesShowContributing: Boolean
+
+  """[ALPHA] Whether to show team-level initiatives in the workspace."""
+  showTeamInitiatives: Boolean
 
   """The customers view ordering."""
   customersViewOrdering: String
