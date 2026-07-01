@@ -845,6 +845,11 @@ type AgentSkill implements Node {
   """The identifier of the team this skill is shared with."""
   teamId: String
 
+  """
+  The parent-team skill this skill was inherited from. Null if the skill is not inherited.
+  """
+  inheritedFrom: AgentSkill
+
   """The user who owns the skill."""
   owner: User!
 
@@ -9807,19 +9812,26 @@ input GitHubRepoMappingInput {
   """The unique identifier for this mapping."""
   id: String!
 
-  """The Linear team id to map to the given project."""
+  """The Linear team id to map to the GitHub repository."""
   linearTeamId: String!
 
   """The GitHub repo id."""
   gitHubRepoId: Float!
 
-  """Labels to filter incoming GitHub issue creation by."""
+  """
+  Label names used as a creation filter. When set, only issues matching one of
+  these labels will create a synced issue for this mapping.
+  """
   gitHubLabels: [String!]
 
-  """Whether the sync for this mapping is bidirectional."""
+  """
+  Whether Linear-created issues matching this mapping will create GitHub issues.
+  """
   bidirectional: Boolean
 
-  """Whether this mapping is the default one for issue creation."""
+  """
+  Whether this mapping is the default destination for Linear-created issues that do not match a label-filtered mapping.
+  """
   default: Boolean
 }
 
@@ -23784,6 +23796,11 @@ input OrganizationCodingAgentSettingsInput {
   Sessions. Clamped to the selected model's provider when the session runs.
   """
   effort: String
+
+  """
+  [Internal] Whether Coding Sessions require uploaded user commit signing keys.
+  """
+  commitSigningEnabled: Boolean
 }
 
 """Workspace deletion operation response."""
@@ -35530,6 +35547,13 @@ type Team implements Node {
     includeArchived: Boolean = false
   ): Int!
 
+  """
+  The number of initiatives led by this team that would be deleted along with
+  it. Requires team owner or workspace admin permissions, as it counts
+  initiatives the caller may not otherwise have access to.
+  """
+  ledInitiativeCount: Int!
+
   """Cycles associated with the team."""
   cycles(
     """Filter returned cycles."""
@@ -37786,7 +37810,8 @@ type User implements Node {
 
   """
   Whether the user can be assigned to issues. Regular users are always
-  assignable; app users are assignable only if they have the app:assignable scope.
+  assignable; app users are assignable only if they have the app:assignable
+  scope. The Linear agent also requires coding sessions to be enabled.
   """
   isAssignable: Boolean!
 
