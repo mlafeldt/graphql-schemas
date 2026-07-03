@@ -547,6 +547,13 @@ type AgentSession implements Node {
   plan: JSON
 
   """
+  [Internal] The coding agent's live working-tree diff metadata (changes not yet
+  pushed to origin), reported by the sandbox. Per-file content is fetched on
+  demand from the workspace-diff-blob route. Null when in sync.
+  """
+  workspaceDiff: JSON
+
+  """
   The entity contexts this session is related to, such as issues or projects
   referenced in direct chat sessions. Used to provide contextual awareness to the agent.
   """
@@ -565,6 +572,17 @@ type AgentSession implements Node {
   session, derived from the latest associated sandbox.
   """
   codingHarnessModelLabel: String
+
+  """
+  [Internal] Per-file list of the agent's live working-tree diff at the given
+  content hash. Served behind a repository-read-access gate (the synced summary
+  carries only aggregate counts); null when the requester lacks repository
+  access or there is no current diff.
+  """
+  workspaceDiffFiles(
+    """The diff's content hash, from the session's `workspaceDiff`."""
+    contentHash: String!
+  ): [AgentSessionWorkspaceDiffFile!]
 
   """[Internal] Pull requests associated with this agent session."""
   pullRequests(
@@ -818,6 +836,28 @@ input AgentSessionUserStateInput {
 
   """The time at which the user most recently viewed the session."""
   lastReadAt: DateTime
+}
+
+"""
+[Internal] One changed file in a coding agent's live working-tree diff.
+"""
+type AgentSessionWorkspaceDiffFile {
+  """Path of the changed file (the new path, for renames)."""
+  path: String!
+
+  """Previous path, when the file was renamed or copied."""
+  oldPath: String
+
+  """
+  Kind of change: added, modified, deleted, renamed, copied, type_changed, unmerged, unknown.
+  """
+  state: String!
+
+  """Lines added in this file."""
+  additions: Int!
+
+  """Lines removed in this file."""
+  deletions: Int!
 }
 
 """
@@ -1081,6 +1121,32 @@ type AiConversation implements Node {
 
   """[Internal] The log ID of the AI response."""
   evalLogId: String
+}
+
+"""
+The kind of acknowledgement the agent expresses when it has nothing meaningful to reply.
+"""
+enum AiConversationAckKind {
+  done
+  ignored
+  waiting
+}
+
+"""
+A silent acknowledgement emitted by the agent in place of a generated reply.
+"""
+type AiConversationAckPart implements AiConversationBasePart {
+  """The ID of the part."""
+  id: String!
+
+  """The type of the part."""
+  type: AiConversationPartType!
+
+  """The metadata of the part."""
+  metadata: AiConversationPartMetadata!
+
+  """The kind of acknowledgement the agent expressed."""
+  kind: AiConversationAckKind!
 }
 
 """A base part in an AI conversation."""
@@ -1655,7 +1721,7 @@ type AiConversationNavigateToPageToolCallResult {
 }
 
 """A part in an AI conversation."""
-union AiConversationPart = AiConversationPromptPart | AiConversationTextPart | AiConversationReasoningPart | AiConversationEventPart | AiConversationErrorPart | AiConversationToolCallPart | AiConversationWidgetPart | AiConversationElicitationPart
+union AiConversationPart = AiConversationPromptPart | AiConversationTextPart | AiConversationReasoningPart | AiConversationEventPart | AiConversationErrorPart | AiConversationToolCallPart | AiConversationWidgetPart | AiConversationElicitationPart | AiConversationAckPart
 
 """Metadata about a part in an AI conversation."""
 type AiConversationPartMetadata {
@@ -1695,6 +1761,7 @@ enum AiConversationPartType {
   widget
   widgetPlaceholder
   elicitation
+  ack
 }
 
 type AiConversationPromptCodingSessionToolCall implements AiConversationBaseToolCall {
@@ -13085,7 +13152,9 @@ type Issue implements Node {
     orderBy: PaginationOrderBy
   ): IssueConnection!
 
-  """Comments associated with the issue."""
+  """
+  Comments associated with the issue, including inline comments on the issue's description.
+  """
   comments(
     """Filter returned comments."""
     filter: CommentFilter
@@ -15910,7 +15979,9 @@ type IssueSearchResult implements Node {
     orderBy: PaginationOrderBy
   ): IssueConnection!
 
-  """Comments associated with the issue."""
+  """
+  Comments associated with the issue, including inline comments on the issue's description.
+  """
   comments(
     """Filter returned comments."""
     filter: CommentFilter
@@ -29152,11 +29223,45 @@ type PullRequestCommit {
   """
   parentShas: [String!]
 
+  """
+  Signature verification metadata for this commit. Null if the hosting provider did not return signature information.
+  """
+  signature: PullRequestCommitSignature
+
   """Linear user IDs for commit authors (includes co-authors)."""
   authorUserIds: [String!]!
 
   """External user IDs for commit authors (includes co-authors)."""
   authorExternalUserIds: [String!]!
+}
+
+"""
+Signature verification metadata for a Git commit associated with a pull request.
+"""
+type PullRequestCommitSignature {
+  """The type of signature reported for this commit."""
+  type: String!
+
+  """
+  Whether the hosting provider considers the signature valid and verified.
+  """
+  isVerified: Boolean!
+
+  """The provider-specific verification state for the signature."""
+  state: String!
+
+  """Whether the commit was signed with the hosting provider's signing key."""
+  wasSignedByProvider: Boolean
+
+  """
+  The hex-encoded ID of the GPG key that signed this commit. Null for non-GPG signatures.
+  """
+  keyId: String
+
+  """
+  The hex-encoded fingerprint of the SSH key that signed this commit. Null for non-SSH signatures.
+  """
+  keyFingerprint: String
 }
 
 """The method used to merge a pull request."""
@@ -35689,9 +35794,6 @@ type Team implements Node {
   """
   slackAutoCreateProjectChannel: Boolean
 
-  """[ALPHA] Whether initiatives are shown in the team's sidebar."""
-  initiativesEnabled: Boolean!
-
   """Calendar feed URL (iCal) for cycles."""
   cycleCalenderUrl: String!
 
@@ -36100,6 +36202,11 @@ type Team implements Node {
 
   """Settings for all integrations associated with that team."""
   integrationsSettings: IntegrationsSettings
+
+  """
+  [ALPHA] Whether team initiatives are enabled and shown in the team's sidebar.
+  """
+  initiativesEnabled: Boolean!
 
   """
   [DEPRECATED] Whether to move issues to bottom of the column when changing state.
