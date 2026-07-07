@@ -1065,6 +1065,11 @@ type AiConversation implements Node {
   project: Project
 
   """
+  [Internal] The initiative this shared conversation is attached to. Null if the conversation is private.
+  """
+  initiative: Initiative
+
+  """
   The entity contexts this conversation is related to, such as issues, projects,
   or documents that provide context for the AI assistant.
   """
@@ -1621,6 +1626,7 @@ enum AiConversationInitialSource {
   microsoftTeams
   mcp
   directChat
+  entityChat
   comment
   pullRequestComment
   workflow
@@ -7521,6 +7527,51 @@ type DocumentContentHistoryType {
   metadata: JSON
 }
 
+"""
+A pending revision of document content. Revisions are seeded from the live
+document state and stored as base64-encoded Yjs state updates, allowing
+automation edits to accumulate without affecting the published document until
+the changes are explicitly applied.
+"""
+type DocumentContentRevision implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The document content that this revision is based on."""
+  documentContent: DocumentContent!
+
+  """The identifier of the document content that this revision is based on."""
+  documentContentId: String!
+
+  """
+  The pending revision content state as a base64-encoded Yjs state update. This
+  represents the revision that has not yet been applied to the live document.
+  """
+  contentState: String!
+
+  """
+  The live document content state this revision was last refreshed from, as a base64-encoded Yjs state update.
+  """
+  baseContentState: String!
+
+  """The workflow definitions that contributed edits to this revision."""
+  contributorWorkflowDefinitionIds: [String!]!
+}
+
 """Document creation date sorting options."""
 input DocumentCreatedAtSort {
   """Whether nulls should be sorted first or last"""
@@ -10918,6 +10969,17 @@ input InitiativeFilter {
 
   """Compound filters, one of which need to be matched by the initiative."""
   or: [InitiativeFilter!]
+}
+
+"""
+The result of an AI-generated initiative filter suggestion based on a text prompt.
+"""
+type InitiativeFilterSuggestionPayload {
+  """The json filter that is suggested."""
+  filter: JSONObject
+
+  """The log id of the prompt that created this filter."""
+  logId: String
 }
 
 """Initiative health sorting options."""
@@ -17082,7 +17144,9 @@ input IssueUpdateInput {
   """[Internal] Whether this issue has been explicitly marked as trusted."""
   trusted: Boolean
 
-  """Whether the issue has been trashed."""
+  """
+  Whether the issue has been trashed. Set to true to trash, or null to restore.
+  """
   trashed: Boolean
 
   """
@@ -22907,6 +22971,15 @@ input NullableTeamFilter {
 
   """Filters that the team's members must satisfy."""
   members: UserCollectionFilter
+
+  """
+  [Internal] Filters that the team's members must satisfy. Alias of `members`
+  matching the filter shape produced by the app; prefer `members`.
+  """
+  users: UserCollectionFilter
+
+  """Filters that the team's owners must satisfy."""
+  owners: UserCollectionFilter
 
   """Comparator for the time at which the team was retired."""
   retiredAt: NullableDateComparator
@@ -30385,6 +30458,15 @@ type Query {
   """Returns a single initiative by its identifier or URL slug."""
   initiative(id: String!): Initiative!
 
+  """Suggests filters for an initiative view based on a text prompt."""
+  initiativeFilterSuggestion(
+    """[Internal] The ID of the team if filtering a team view."""
+    teamId: String
+
+    """The text prompt to generate a filter suggestion from."""
+    prompt: String!
+  ): InitiativeFilterSuggestionPayload!
+
   """
   [Internal] Returns the impact of changing an initiative's lead team before
   applying the update to matching sub-initiatives.
@@ -33870,7 +33952,9 @@ input ReleaseUpdateInput {
   """The time at which the release was completed."""
   completedAt: DateTime
 
-  """Whether the release has been trashed."""
+  """
+  Whether the release has been trashed. Set to true to trash, or null to restore.
+  """
   trashed: Boolean
 }
 
@@ -35151,6 +35235,15 @@ type Subscription {
 
   """Triggered when a document content draft is deleted"""
   documentContentDraftDeleted: DocumentContentDraft!
+
+  """Triggered when a document content revision is created"""
+  documentContentRevisionCreated: DocumentContentRevision!
+
+  """Triggered when a document content revision is updated"""
+  documentContentRevisionUpdated: DocumentContentRevision!
+
+  """Triggered when a document content revision is deleted"""
+  documentContentRevisionDeleted: DocumentContentRevision!
 
   """Triggered when a draft is created"""
   draftCreated: Draft!
@@ -36446,6 +36539,15 @@ input TeamFilter {
 
   """Filters that the team's members must satisfy."""
   members: UserCollectionFilter
+
+  """
+  [Internal] Filters that the team's members must satisfy. Alias of `members`
+  matching the filter shape produced by the app; prefer `members`.
+  """
+  users: UserCollectionFilter
+
+  """Filters that the team's owners must satisfy."""
+  owners: UserCollectionFilter
 
   """Comparator for the time at which the team was retired."""
   retiredAt: NullableDateComparator
@@ -40564,6 +40666,9 @@ enum WorkflowTrigger {
 enum WorkflowTriggerType {
   issue
   project
+  document
+  initiative
+  team
   release
   schedule
 }
