@@ -1112,6 +1112,11 @@ type AiConversation implements Node {
   readAt: DateTime
 
   """
+  [Internal] User-specific state for the AI conversation, including per-user read state.
+  """
+  userState: [AiConversationUserState!]!
+
+  """
   The ordered sequence of conversation parts (prompts, text responses, reasoning
   steps, tool calls, errors, and widgets) that make up this conversation's
   visible history.
@@ -2344,6 +2349,17 @@ type AiConversationUpdateEntityToolCall implements AiConversationBaseToolCall {
 type AiConversationUpdateEntityToolCallArgs {
   entity: AiConversationSearchEntitiesToolCallResultEntities
   entities: [AiConversationSearchEntitiesToolCallResultEntities!]
+}
+
+"""
+[Internal] Per-user state for an AI conversation, tracking read status and other user-specific data.
+"""
+type AiConversationUserState {
+  """The ID of the user this state belongs to."""
+  userId: String!
+
+  """The time at which the user most recently viewed the conversation."""
+  lastReadAt: DateTime
 }
 
 type AiConversationWebSearchToolCall implements AiConversationBaseToolCall {
@@ -3842,6 +3858,9 @@ input CommentCollectionFilter {
   """Filters that the comment's project update must satisfy."""
   projectUpdate: NullableProjectUpdateFilter
 
+  """Filters that the comment's initiative update must satisfy."""
+  initiativeUpdate: NullableInitiativeUpdateFilter
+
   """Filters that the comment parent must satisfy."""
   parent: NullableCommentFilter
 
@@ -3994,6 +4013,9 @@ input CommentFilter {
 
   """Filters that the comment's project update must satisfy."""
   projectUpdate: NullableProjectUpdateFilter
+
+  """Filters that the comment's initiative update must satisfy."""
+  initiativeUpdate: NullableInitiativeUpdateFilter
 
   """Filters that the comment parent must satisfy."""
   parent: NullableCommentFilter
@@ -22034,6 +22056,9 @@ input NullableCommentFilter {
   """Filters that the comment's project update must satisfy."""
   projectUpdate: NullableProjectUpdateFilter
 
+  """Filters that the comment's initiative update must satisfy."""
+  initiativeUpdate: NullableInitiativeUpdateFilter
+
   """Filters that the comment parent must satisfy."""
   parent: NullableCommentFilter
 
@@ -22374,6 +22399,40 @@ input NullableInitiativeFilter {
 
   """Compound filters, one of which need to be matched by the initiative."""
   or: [NullableInitiativeFilter!]
+}
+
+"""Nullable initiative update filtering options."""
+input NullableInitiativeUpdateFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Filters that the initiative update creator must satisfy."""
+  user: UserFilter
+
+  """Filters that the initiative update initiative must satisfy."""
+  initiative: InitiativeFilter
+
+  """Filters that the initiative updates reactions must satisfy."""
+  reactions: ReactionCollectionFilter
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
+
+  """
+  Compound filters, all of which need to be matched by the initiative update.
+  """
+  and: [NullableInitiativeUpdateFilter!]
+
+  """
+  Compound filters, one of which need to be matched by the initiative update.
+  """
+  or: [NullableInitiativeUpdateFilter!]
 }
 
 """Issue filtering options."""
@@ -35973,8 +36032,8 @@ type Team implements Node {
 
   """
   The number of initiatives led by this team that would be deleted along with
-  it. Requires team owner or workspace admin permissions, as it counts
-  initiatives the caller may not otherwise have access to.
+  it. Counts every led initiative, including ones not otherwise visible to the
+  caller, to mirror what deleting the team cascades.
   """
   ledInitiativeCount: Int!
 
