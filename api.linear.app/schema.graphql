@@ -10450,18 +10450,16 @@ type Initiative implements Node {
   """
   canceledAt: DateTime
 
-  """
-  [Internal] The IDs of the initiative labels associated with this initiative.
-  """
+  """The IDs of the initiative labels associated with this initiative."""
   labelIds: [String!]!
 
   """
-  [Internal] The priority of the initiative. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
+  The priority of the initiative. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
   """
   priority: Int!
 
   """
-  [Internal] The sort order of the initiative within the workspace when ordered by priority.
+  The sort order of the initiative within the workspace when ordered by priority.
   """
   prioritySortOrder: Float!
 
@@ -10711,7 +10709,7 @@ type Initiative implements Node {
     orderBy: PaginationOrderBy
   ): DocumentConnection!
 
-  """[Internal] Labels associated with this initiative."""
+  """Labels associated with this initiative."""
   labels(
     """Filter returned initiative labels."""
     filter: InitiativeLabelFilter
@@ -10779,7 +10777,7 @@ input InitiativeCollectionFilter {
   """
   status: StringComparator
 
-  """[Internal] Comparator for the initiative priority."""
+  """Comparator for the initiative priority."""
   priority: NullableNumberComparator
 
   """Filters that the initiative teams must satisfy."""
@@ -10817,7 +10815,7 @@ input InitiativeCollectionFilter {
   """Filters that the initiative must be an ancestor of."""
   ancestors: InitiativeCollectionFilter
 
-  """[Internal] Filters that the initiative labels must satisfy."""
+  """Filters that the initiative labels must satisfy."""
   labels: InitiativeLabelCollectionFilter
 
   """Filters that the initiative updates must satisfy."""
@@ -10877,7 +10875,7 @@ input InitiativeCreateInput {
   sortOrder: Float
 
   """
-  [Internal] The sort order of the initiative within the workspace, when ordered by priority.
+  The sort order of the initiative within the workspace, when ordered by priority.
   """
   prioritySortOrder: Float
 
@@ -10900,12 +10898,12 @@ input InitiativeCreateInput {
   content: String
 
   """
-  [Internal] The priority of the initiative. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
+  The priority of the initiative. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
   """
   priority: Int
 
   """
-  [Internal] The identifiers of the initiative labels associated with this initiative.
+  The identifiers of the initiative labels associated with this initiative.
   """
   labelIds: [String!]
 }
@@ -10942,7 +10940,7 @@ input InitiativeFilter {
   """
   status: StringComparator
 
-  """[Internal] Comparator for the initiative priority."""
+  """Comparator for the initiative priority."""
   priority: NullableNumberComparator
 
   """Filters that the initiative teams must satisfy."""
@@ -10980,7 +10978,7 @@ input InitiativeFilter {
   """Filters that the initiative must be an ancestor of."""
   ancestors: InitiativeCollectionFilter
 
-  """[Internal] Filters that the initiative labels must satisfy."""
+  """Filters that the initiative labels must satisfy."""
   labels: InitiativeLabelCollectionFilter
 
   """Filters that the initiative updates must satisfy."""
@@ -12140,7 +12138,7 @@ input InitiativeUpdateInput {
   sortOrder: Float
 
   """
-  [Internal] The sort order of the initiative within the workspace, when ordered by priority.
+  The sort order of the initiative within the workspace, when ordered by priority.
   """
   prioritySortOrder: Float
 
@@ -12190,12 +12188,12 @@ input InitiativeUpdateInput {
   updateRemindersHour: Int
 
   """
-  [Internal] The priority of the initiative. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
+  The priority of the initiative. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.
   """
   priority: Int
 
   """
-  [Internal] The identifiers of the initiative labels associated with this initiative.
+  The identifiers of the initiative labels associated with this initiative.
   """
   labelIds: [String!]
 
@@ -18921,7 +18919,7 @@ type Mutation {
     id: String!
   ): DeletePayload!
 
-  """[Internal]Adds a label to an initiative."""
+  """Adds a label to an initiative."""
   initiativeAddLabel(
     """The identifier of the label to add."""
     labelId: String!
@@ -18930,7 +18928,7 @@ type Mutation {
     id: String!
   ): InitiativePayload!
 
-  """[Internal]Removes a label from an initiative."""
+  """Removes a label from an initiative."""
   initiativeRemoveLabel(
     """The identifier of the label to remove."""
     labelId: String!
@@ -21796,6 +21794,9 @@ input NotificationFilter {
   """Comparator for the notification type."""
   type: StringComparator
 
+  """Comparator for the notification subscription type."""
+  subscriptionType: NotificationSubscriptionTypeComparator
+
   """Comparator for the archived at date."""
   archivedAt: DateComparator
 
@@ -21992,6 +21993,37 @@ type NotificationSubscriptionPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""The delivery target type that caused a notification to be sent."""
+enum NotificationSubscriptionType {
+  customer
+  customView
+  cycle
+  label
+  issue
+  oauthClientApproval
+  project
+  initiative
+  document
+  pullRequest
+  team
+  user
+}
+
+"""Comparator for notification subscription type."""
+input NotificationSubscriptionTypeComparator {
+  """Equals constraint."""
+  eq: NotificationSubscriptionType
+
+  """Not-equals constraint."""
+  neq: NotificationSubscriptionType
+
+  """In-array constraint."""
+  in: [NotificationSubscriptionType!]
+
+  """Not-in-array constraint."""
+  nin: [NotificationSubscriptionType!]
 }
 
 """
@@ -22347,7 +22379,7 @@ input NullableInitiativeFilter {
   """
   status: StringComparator
 
-  """[Internal] Comparator for the initiative priority."""
+  """Comparator for the initiative priority."""
   priority: NullableNumberComparator
 
   """Filters that the initiative teams must satisfy."""
@@ -22385,7 +22417,7 @@ input NullableInitiativeFilter {
   """Filters that the initiative must be an ancestor of."""
   ancestors: InitiativeCollectionFilter
 
-  """[Internal] Filters that the initiative labels must satisfy."""
+  """Filters that the initiative labels must satisfy."""
   labels: InitiativeLabelCollectionFilter
 
   """Filters that the initiative updates must satisfy."""
@@ -26722,6 +26754,12 @@ type ProjectLabel implements Node {
   """The workspace that the project label belongs to."""
   organization: Organization!
 
+  """
+  [Internal] The team that the label is scoped to. If null, the label is a
+  workspace-level label available to all teams in the workspace.
+  """
+  team: Team
+
   """The user who created the label."""
   creator: User
 
@@ -26736,6 +26774,12 @@ type ProjectLabel implements Node {
   child label from each group can be applied to a project at a time.
   """
   parent: ProjectLabel
+
+  """
+  [Internal] The original workspace or parent-team label that this label was
+  inherited from. Null if the label is not inherited.
+  """
+  inheritedFrom: ProjectLabel
 
   """Projects associated with the label."""
   projects(
@@ -39460,10 +39504,10 @@ type ViewPreferencesValues {
   """The initiative grouping."""
   initiativeGrouping: String
 
-  """[Internal] The label group ID used for initiative grouping."""
+  """The label group ID used for initiative grouping."""
   initiativeGroupingLabelGroupId: String
 
-  """[Internal] The initiative label group columns configuration."""
+  """The initiative label group columns configuration."""
   initiativeLabelGroupColumns: [ViewPreferencesInitiativeLabelGroupColumn!]
 
   """The initiative ordering."""
@@ -39490,7 +39534,7 @@ type ViewPreferencesValues {
   """Whether to show the initiative target date field."""
   initiativeFieldTargetDate: Boolean
 
-  """[Internal] Whether to show the initiative priority field."""
+  """Whether to show the initiative priority field."""
   initiativeFieldPriority: Boolean
 
   """Whether to show the initiative completed date field."""
@@ -39514,7 +39558,7 @@ type ViewPreferencesValues {
   """Whether to show the initiative active projects health field."""
   initiativeFieldHealth: Boolean
 
-  """[Internal] Whether to show the initiative labels field."""
+  """Whether to show the initiative labels field."""
   initiativeFieldLabels: Boolean
 
   """Whether to show sub-initiatives nested."""
