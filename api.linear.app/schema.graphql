@@ -8354,6 +8354,11 @@ type EmailIntakeAddress implements Node {
   Whether to reopen completed or canceled issues when a substantive email reply is received.
   """
   reopenOnReply: Boolean!
+
+  """
+  The last time an inbound email was successfully ingested for this address.
+  """
+  lastUsedAt: DateTime
 }
 
 """Input for creating a new email intake address."""
@@ -23783,6 +23788,11 @@ type Organization implements Node {
   workingDays: [Float!]!
 
   """
+  The default home view for members of the workspace who have not chosen their own default.
+  """
+  defaultHomeView: String
+
+  """
   Whether SAML-based single sign-on authentication is enabled for the workspace.
   """
   samlEnabled: Boolean!
@@ -24749,6 +24759,11 @@ input OrganizationUpdateInput {
 
   """The month at which the fiscal year starts."""
   fiscalYearStartMonth: Float
+
+  """
+  The default home view for members of the workspace who have not chosen their own default.
+  """
+  defaultHomeView: String
 
   """[Internal] The list of working days. Sunday is 0, Monday is 1, etc."""
   workingDays: [Float!]
@@ -40519,6 +40534,134 @@ type WorkflowDefinition implements Node {
 
   """Aggregated usage stats for this automation workflow definition."""
   stats: JSONObject
+
+  """
+  The user who owns the workflow. If not defined, it means the creator should be considered as the owner.
+  """
+  owner: User
+}
+
+"""
+A notification related to an automation workflow definition (loop), such as runs that failed to start.
+"""
+type WorkflowDefinitionNotification implements Notification & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """
+  Notification type. Determines the kind of event that triggered this
+  notification and which associated entity fields will be populated.
+  """
+  type: String!
+
+  """
+  The user that caused the notification. Null if the notification was triggered
+  by a non-user actor such as an integration, external user, or system event.
+  """
+  actor: User
+
+  """
+  The external user that caused the notification. Populated when the
+  notification was triggered by an external user (e.g., a commenter from a
+  connected integration like Slack or GitHub) rather than a Linear workspace member.
+  """
+  externalUserActor: ExternalUser
+
+  """The recipient user of this notification."""
+  user: User!
+
+  """
+  The time at which the user marked the notification as read. Null if the notification is unread.
+  """
+  readAt: DateTime
+
+  """
+  The time at which an email reminder for this notification was sent to the user. Null if no email reminder has been sent.
+  """
+  emailedAt: DateTime
+
+  """
+  The time until which a notification is snoozed. After this time, the
+  notification reappears in the user's inbox. Null if the notification is not
+  currently snoozed.
+  """
+  snoozedUntilAt: DateTime
+
+  """
+  The time at which a notification was unsnoozed. Null if the notification has not been unsnoozed.
+  """
+  unsnoozedAt: DateTime
+
+  """The category of the notification."""
+  category: NotificationCategory!
+
+  """[Internal] URL to the target of the notification."""
+  url: String!
+
+  """[Internal] Inbox URL for the notification."""
+  inboxUrl: String!
+
+  """[Internal] Notification title."""
+  title: String!
+
+  """[Internal] Notification subtitle."""
+  subtitle: String!
+
+  """[Internal] If notification actor was Linear."""
+  isLinearActor: Boolean!
+
+  """[Internal] Notification avatar URL."""
+  actorAvatarUrl: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorInitials: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorAvatarColor: String!
+
+  """[Internal] Issue's status type for issue notifications."""
+  issueStatusType: String
+
+  """[Internal] Project update health for new updates."""
+  projectUpdateHealth: String
+
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
+
+  """
+  [Internal] Notifications with the same grouping key will be grouped together in the UI.
+  """
+  groupingKey: String!
+
+  """
+  [Internal] Priority of the notification with the same grouping key. Higher
+  number means higher priority. If priority is the same, notifications should be
+  sorted by `createdAt`.
+  """
+  groupingPriority: Float!
+
+  """The bot that caused the notification."""
+  botActor: ActorBot
+
+  """Identifier of the associated workflow definition (loop)."""
+  workflowDefinitionId: String!
+
+  """The workflow definition (loop) related to the notification."""
+  workflowDefinition: WorkflowDefinition!
 }
 
 """
