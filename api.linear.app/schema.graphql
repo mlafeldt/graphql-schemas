@@ -563,7 +563,7 @@ type AgentSession implements Node {
   type: AgentSessionType @deprecated(reason: "This field is slated for removal.")
 
   """
-  The URL to the agent session page in the Linear app. Null for direct chat sessions without an associated issue.
+  The URL to the agent session page in the Linear app. Null when no issue is associated.
   """
   url: String
 
@@ -641,11 +641,7 @@ input AgentSessionCreateInput {
   """The app user (agent) to create a session for."""
   appUserId: String!
 
-  """
-  [Internal] Serialized JSON representing the page contexts this session is
-  related to. Used for direct chat sessions to provide context about the current
-  page (e.g., Issue, Project).
-  """
+  """[Internal] No longer supported."""
   context: JSONObject
 }
 
@@ -26909,8 +26905,8 @@ type ProjectLabelConnection {
 }
 
 """
-Input for creating a new project label. A name is required. The label is created
-as a workspace-level label available to all projects.
+Input for creating a new project label. A name is required. If no team is
+specified, the label is created as a workspace-level label available to all teams.
 """
 input ProjectLabelCreateInput {
   """
@@ -26937,6 +26933,11 @@ input ProjectLabelCreateInput {
   The time at which the label was retired. Set to null to restore a retired label.
   """
   retiredAt: DateTime
+
+  """
+  [Internal] The team associated with the label. If not given, the label will be associated with the entire workspace.
+  """
+  teamId: String
 }
 
 type ProjectLabelEdge {
@@ -29330,6 +29331,12 @@ type PullRequest implements Node {
   account has been deleted.
   """
   creator: User
+
+  """
+  Emoji reaction summary for this pull request, grouped by emoji type. Each
+  entry contains the emoji name, count, and the IDs of users who reacted.
+  """
+  reactionData: JSONObject!
 }
 
 """
@@ -34958,6 +34965,16 @@ input SlackSettingsInput {
 
   """Whether Linear Agent should be enabled for this Slack integration."""
   enableAgent: Boolean
+
+  """
+  Whether Linear Agent may respond in private channels for this Slack integration.
+  """
+  allowAgentInPrivateChannels: Boolean
+
+  """
+  Whether Linear Agent should automatically sync threads in private channels for this Slack integration.
+  """
+  syncAgentThreadsInPrivateChannels: Boolean
 
   """
   Whether Linear Agent should be given Org-wide access within Slack workflows.
