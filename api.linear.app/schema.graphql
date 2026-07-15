@@ -422,6 +422,29 @@ enum AgentActivityType {
 }
 
 """
+The outcome of retrying a loop run blocked by its trusted-source policy.
+"""
+type AgentAutomationRetryResolution {
+  """
+  Whether a replacement run was scheduled or the loop could no longer be retried.
+  """
+  status: AgentAutomationRetryResolutionStatus!
+
+  """
+  Identifier of the replacement AI conversation. Null when no replacement run was scheduled.
+  """
+  aiConversationId: String
+}
+
+"""
+The outcome of reconsidering a loop run blocked by its trusted-source policy.
+"""
+enum AgentAutomationRetryResolutionStatus {
+  scheduled
+  notScheduled
+}
+
+"""
 A session representing an AI coding agent's work on an issue or conversation.
 Agent sessions track the lifecycle of an agent's engagement, from creation
 through active work to completion or dismissal. Each session is associated with
@@ -1487,6 +1510,11 @@ type AiConversationErrorPart implements AiConversationBasePart {
   The category of the error. Absent for errors without a specific category, which default to unknown.
   """
   errorType: AiConversationErrorType
+
+  """
+  The outcome of retrying this error's loop run. Null when the run has not been reconsidered.
+  """
+  retryResolution: AgentAutomationRetryResolution
 }
 
 """The category of an error part in an AI conversation."""
@@ -23915,6 +23943,11 @@ type Organization implements Node {
   pullRequestTourEnabled: Boolean!
 
   """
+  How Linear suggests and links issues for pull requests that have none linked: 'off', 'suggest', or 'autoOnMerge'.
+  """
+  pullRequestIssueMode: String!
+
+  """
   [INTERNAL] Configure per-modality AI host providers and model families.
   """
   aiProviderConfiguration: JSONObject
@@ -24833,6 +24866,11 @@ input OrganizationUpdateInput {
   Whether the workspace generates AI Pull Request guides for new pull requests.
   """
   pullRequestTourEnabled: Boolean
+
+  """
+  How Linear suggests and links issues for pull requests that have none linked: 'off', 'suggest', or 'autoOnMerge'.
+  """
+  pullRequestIssueMode: String
 
   """Whether HIPAA compliance is enabled for the workspace."""
   hipaaComplianceEnabled: Boolean
@@ -32792,8 +32830,9 @@ input ReleaseCompleteInput {
   version: String
 
   """
-  The commit SHA associated with this completion. If a completed release with
-  this SHA already exists, it will be returned instead of completing a new release.
+  The commit SHA to store when moving a release to completed. With a version, an
+  existing SHA is preserved. Without a version, this SHA replaces the started
+  release's SHA and is used to detect retries.
   """
   commitSha: String
 
@@ -32826,8 +32865,9 @@ input ReleaseCompleteInputBase {
   version: String
 
   """
-  The commit SHA associated with this completion. If a completed release with
-  this SHA already exists, it will be returned instead of completing a new release.
+  The commit SHA to store when moving a release to completed. With a version, an
+  existing SHA is preserved. Without a version, this SHA replaces the started
+  release's SHA and is used to detect retries.
   """
   commitSha: String
 
