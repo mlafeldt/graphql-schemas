@@ -605,7 +605,7 @@ type AgentSession implements Node {
   workspaceDiffFiles(
     """The diff's content hash, from the session's `workspaceDiff`."""
     contentHash: String!
-  ): [AgentSessionWorkspaceDiffFile!]
+  ): [AgentSessionWorkspaceDiffFile!] @deprecated(reason: "Use Diff.files instead.")
 
   """[Internal] Pull requests associated with this agent session."""
   pullRequests(
@@ -1404,6 +1404,7 @@ enum AiConversationEntityCardWidgetArgsType {
   Draft
   Project
   ProjectDraft
+  ProjectMilestone
   Initiative
   InitiativeUpdate
   ProjectUpdate
@@ -1474,6 +1475,7 @@ enum AiConversationEntityListWidgetArgsEntitiesType {
   IssueDraft
   Project
   ProjectDraft
+  ProjectMilestone
   Initiative
   InitiativeUpdate
   ProjectUpdate
@@ -7166,6 +7168,101 @@ type DeletePayload implements ArchivePayload {
 
   """The identifier of the deleted entity."""
   entityId: String!
+}
+
+"""
+[Internal] A first-class code diff. Starts as the live working-tree state of a
+coding session and is promoted to a review by linking it to a pull request,
+while continuing to represent local, uncommitted changes.
+"""
+type Diff implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """
+  [Internal] The opaque content hash identifying the diff's content in code.storage.
+  """
+  contentHash: String!
+
+  """[Internal] The number of changed files in the diff."""
+  fileCount: Float!
+
+  """[Internal] The total number of added lines across the diff."""
+  additions: Float!
+
+  """[Internal] The total number of deleted lines across the diff."""
+  deletions: Float!
+
+  """
+  [Internal] Whether oversized files were omitted when the diff was computed.
+  """
+  truncated: Boolean!
+
+  """[Internal] The diff's unique URL slug."""
+  slugId: String!
+
+  """The workspace the diff belongs to."""
+  organization: Organization!
+
+  """The agent session the diff belongs to."""
+  agentSession: AgentSession
+
+  """The pull request the diff was promoted to when opened for review."""
+  pullRequest: PullRequest
+
+  """The user responsible for the diff."""
+  creator: User
+
+  """
+  [Internal] Per-file metadata for the diff. Served behind a
+  repository-read-access gate (the synced row carries only aggregate counts);
+  null when the requester lacks repository access or the diff is empty.
+  """
+  files: [DiffFile!]
+}
+
+"""[Internal] One changed file in a diff."""
+type DiffFile {
+  """Path of the changed file (the new path, for renames)."""
+  path: String!
+
+  """Previous path, when the file was renamed or copied."""
+  oldPath: String
+
+  """The kind of change for this file."""
+  state: DiffFileState!
+
+  """Lines added in this file."""
+  additions: Int!
+
+  """Lines removed in this file."""
+  deletions: Int!
+}
+
+"""[Internal] The kind of change for a file in a diff."""
+enum DiffFileState {
+  added
+  modified
+  deleted
+  renamed
+  copied
+  type_changed
+  unmerged
+  unknown
 }
 
 """
@@ -30389,6 +30486,12 @@ type Query {
     id: String!
   ): Cycle!
 
+  """[Internal] A specific diff."""
+  diff(
+    """The identifier of the diff to retrieve."""
+    id: String!
+  ): Diff!
+
   """A collection of document content history entries."""
   documentContentHistory(
     """The identifier of the document content to retrieve history for."""
@@ -31500,6 +31603,12 @@ type Query {
 
   """Returns a single project update by its identifier."""
   projectUpdate(
+    """
+    The id or URL slug of the project containing the update. When provided, the
+    update is resolved by id or URL slug within that project.
+    """
+    projectId: String
+
     """The identifier of the project update to retrieve."""
     id: String!
   ): ProjectUpdate!
