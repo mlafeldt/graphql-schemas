@@ -1126,11 +1126,6 @@ type AiConversation implements Node {
   status: AiConversationStatus!
 
   """
-  The time when the user marked the conversation as read. Null if the user hasn't read the conversation.
-  """
-  readAt: DateTime
-
-  """
   [Internal] User-specific state for the AI conversation, including per-user read state.
   """
   userState: [AiConversationUserState!]!
@@ -1150,6 +1145,11 @@ type AiConversation implements Node {
 
   """[Internal] The log ID of the AI response."""
   evalLogId: String
+
+  """
+  The time when the current user marked the conversation as read. Null if the user hasn't read the conversation.
+  """
+  readAt: DateTime
 }
 
 """
@@ -18461,6 +18461,14 @@ type Mutation {
     input: ContactSalesCreateInput!
   ): ContactPayload!
 
+  """
+  [INTERNAL] Submits a Startup Program partner application from the website, creating a triage issue for the startup team.
+  """
+  partnerApplicationCreate(
+    """The partner application to submit."""
+    input: PartnerApplicationCreateInput!
+  ): ContactPayload!
+
   """Creates a new project."""
   projectCreate(
     """
@@ -25159,6 +25167,66 @@ input PartialNotificationChannelPreferencesInput {
   slack: Boolean
 }
 
+"""
+[INTERNAL] Input for a Startup Program partner application submitted from the website.
+"""
+input PartnerApplicationCreateInput {
+  """Full name of the applicant."""
+  fullName: String!
+
+  """Business email of the applicant."""
+  email: String!
+
+  """The applicant's role or title at the organization."""
+  role: String!
+
+  """Name of the partner organization."""
+  organizationName: String!
+
+  """Website of the partner organization."""
+  organizationWebsite: String!
+
+  """
+  Type of the partner organization (e.g., venture capital firm, accelerator).
+  """
+  organizationType: String!
+
+  """Primary countries or regions the organization operates in."""
+  region: String!
+
+  """One-line description of what the organization does."""
+  description: String!
+
+  """Number of active portfolio companies (venture capital firms)."""
+  portfolioCompanies: String
+
+  """Stages the firm primarily invests at (venture capital firms)."""
+  investmentStages: [String!]
+
+  """Number of companies per cohort (accelerators and programs)."""
+  companiesPerCohort: String
+
+  """Number of cohorts run per year (accelerators and programs)."""
+  cohortsPerYear: String
+
+  """Number of active members or startups in the network (communities)."""
+  networkSize: String
+
+  """Channels the organization will use to distribute the offer."""
+  distributionChannels: [String!]
+
+  """
+  Whether the organization already offers software perks from other companies.
+  """
+  offersSoftwarePerks: String
+
+  """Which other software perks the organization offers, when applicable."""
+  otherPerks: String
+
+  """Whether the applicant confirmed the distribution terms."""
+  consent: Boolean!
+}
+
 type PasskeyLoginStartResponse {
   """Whether the operation was successful."""
   success: Boolean!
@@ -29536,10 +29604,14 @@ type PullRequestCommit {
   """The timestamp when the commit was committed, as an ISO 8601 string."""
   committedAt: String!
 
-  """Number of additions in this commit."""
+  """
+  Number of additions in this commit. 0 when the hosting provider did not report per-commit diff stats.
+  """
   additions: Float!
 
-  """Number of deletions in this commit."""
+  """
+  Number of deletions in this commit. 0 when the hosting provider did not report per-commit diff stats.
+  """
   deletions: Float!
 
   """
