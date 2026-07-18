@@ -1089,6 +1089,11 @@ type AiConversation implements Node {
   initiative: Initiative
 
   """
+  [Internal] The pull request this shared conversation is attached to. Null if the conversation is private.
+  """
+  pullRequest: PullRequest
+
+  """
   The entity contexts this conversation is related to, such as issues, projects,
   or documents that provide context for the AI assistant.
   """
@@ -9211,10 +9216,10 @@ enum FacetPageSource {
 """
 A user's bookmarked item that appears in their sidebar for quick access.
 Favorites can reference various entity types including issues, projects, cycles,
-views, documents, initiatives, labels, users, customers, dashboards, and pull
-requests. Favorites can be organized into folders and ordered by the user. Each
-favorite is owned by a single user and links to exactly one target entity (or is
-a folder containing other favorites).
+views, documents, initiatives, labels, users, customers, dashboards, pull
+requests, and Agent conversations. Favorites can be organized into folders and
+ordered by the user. Each favorite is owned by a single user and links to
+exactly one target entity (or is a folder containing other favorites).
 """
 type Favorite implements Node {
   """The unique identifier of the entity."""
@@ -9352,6 +9357,9 @@ type Favorite implements Node {
   """The favorited pull request."""
   pullRequest: PullRequest
 
+  """[INTERNAL] The favorited Agent conversation."""
+  aiConversation: AiConversation
+
   """The favorited release."""
   release: Release
 
@@ -9466,6 +9474,9 @@ input FavoriteCreateInput {
 
   """The identifier of the pull request to favorite."""
   pullRequestId: String
+
+  """[INTERNAL] The identifier of the Agent conversation to favorite."""
+  aiConversationId: String
 
   """The identifier of the release to favorite."""
   releaseId: String
@@ -10395,6 +10406,12 @@ type IdentityProvider implements Node {
   value means higher preference.
   """
   priority: Float
+
+  """
+  The time at which the current SAML configuration was marked as verified. Null
+  if it has not been verified. Cleared whenever the SAML configuration changes.
+  """
+  ssoVerifiedAt: DateTime
 
   """Whether SCIM provisioning is enabled for the workspace."""
   scimEnabled: Boolean!
@@ -29501,6 +29518,9 @@ type PullRequest implements Node {
   The current merge status of the pull request, synced from the hosting provider.
   """
   mergeStatus: String!
+
+  """Whether auto-merge is enabled for the pull request."""
+  autoMergeEnabled: Boolean!
 
   """
   Merge settings and allowed merge methods for this pull request's repository.
