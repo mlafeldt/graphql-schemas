@@ -7256,6 +7256,11 @@ type DiffFile {
 
   """Lines removed in this file."""
   deletions: Int!
+
+  """
+  True when the file's diff was omitted for exceeding the size budget; its contents are not shown.
+  """
+  omitted: Boolean
 }
 
 """[Internal] The kind of change for a file in a diff."""
@@ -13750,6 +13755,9 @@ type Issue implements Node {
 
   """[Internal] Product Intelligence suggestions for the issue."""
   suggestions(
+    """Filter returned suggestions."""
+    filter: IssueSuggestionFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -16577,6 +16585,9 @@ type IssueSearchResult implements Node {
 
   """[Internal] Product Intelligence suggestions for the issue."""
   suggestions(
+    """Filter returned suggestions."""
+    filter: IssueSuggestionFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -20932,9 +20943,9 @@ type Mutation {
 
   """
   Creates a new release stage in a pipeline. Non-started stages must use default
-  names and colors, and only one stage of each non-started type is allowed per
-  pipeline. Started stages can optionally be frozen, but at least one non-frozen
-  started stage must remain.
+  names and colors and are unique by type; creating a canonical duplicate
+  returns the existing stage. Started stages can optionally be frozen, but at
+  least one non-frozen started stage must remain.
   """
   releaseStageCreate(
     """The ReleaseStage object to create."""
@@ -25242,6 +25253,24 @@ input PartnerApplicationCreateInput {
 
   """Whether the applicant confirmed the distribution terms."""
   consent: Boolean!
+}
+
+"""[Internal] Public details of an active partner-program offer."""
+type PartnerOfferDetailsPayload {
+  """The unique identifier of the offer."""
+  id: String!
+
+  """Stable, URL-safe identifier for the partner."""
+  partnerSlug: String!
+
+  """Display name of the partner."""
+  partnerName: String!
+
+  """
+  Short-lived signed token to carry the redemption through signup. Embeds a
+  freshly minted redemption identifier, the offer identifier, and its mint and expiry times.
+  """
+  token: String!
 }
 
 type PasskeyLoginStartResponse {
@@ -31524,6 +31553,15 @@ type Query {
     """The URL key of the workspace to retrieve metadata for."""
     urlKey: String!
   ): OrganizationMeta
+
+  """
+  [Internal] Fetches public details of an active partner-program offer by its
+  partner slug. Returns null when no active offer matches the slug.
+  """
+  partnerOfferDetails(
+    """The URL-safe partner slug, for example "y_combinator"."""
+    slug: String!
+  ): PartnerOfferDetailsPayload
 
   """Returns all project labels in the workspace, with optional filtering."""
   projectLabels(
