@@ -1082,6 +1082,11 @@ type AiConversation implements Node {
   user: User
 
   """
+  [Internal] The issue this shared conversation is attached to. Null if the conversation is private.
+  """
+  issue: Issue
+
+  """
   [Internal] The document this shared conversation is attached to. Null if the conversation is private.
   """
   document: Document
@@ -1682,6 +1687,7 @@ enum AiConversationInitialSource {
   pullRequestComment
   workflow
   onboarding
+  subAgent
 }
 
 type AiConversationInvokeMcpToolToolCall implements AiConversationBaseToolCall {
@@ -10511,6 +10517,9 @@ input InheritanceEntityMapping {
 
   """Mapping of the IssueLabel ID to the new IssueLabel name."""
   issueLabels: JSONObject
+
+  """Mapping of the ProjectLabel ID to the new ProjectLabel name."""
+  projectLabels: JSONObject
 }
 
 """
@@ -17011,6 +17020,11 @@ type IssueSuggestion implements Node {
   label. Can be used to query the label directly.
   """
   suggestedLabelId: String
+
+  """
+  The suggestion reasons with entity mentions resolved to readable labels and structured references.
+  """
+  presentedReasons: [PresentedIssueSuggestionReason!]!
 }
 
 """IssueSuggestion collection filtering options."""
@@ -17159,6 +17173,21 @@ type IssueSuggestionMetadata {
   if no rule attempted to apply it or if the rule applied successfully.
   """
   failedAutomationRuleReason: String
+}
+
+"""An entity referenced by a presented issue suggestion reason."""
+type IssueSuggestionReasonReference {
+  """The referenced entity type."""
+  type: String!
+
+  """The referenced entity identifier."""
+  id: String!
+
+  """The readable label for the referenced entity."""
+  label: String
+
+  """The title of the referenced entity, when available."""
+  title: String
 }
 
 """
@@ -18429,6 +18458,11 @@ type Mutation {
 
   """Creates a new workspace from onboarding."""
   createOrganizationFromOnboarding(
+    """
+    Signed partner-offer signup token minted when the visitor redeemed a partner offer on the marketing website.
+    """
+    partnerOfferToken: String
+
     """PostHog session ID for attribution tracking."""
     sessionId: String
 
@@ -20632,12 +20666,22 @@ type Mutation {
 
   """Creates a new project label."""
   projectLabelCreate(
+    """
+    Whether to replace all team-specific labels with the same name with this newly created workspace label (default: false).
+    """
+    replaceTeamLabels: Boolean
+
     """The project label to create."""
     input: ProjectLabelCreateInput!
   ): ProjectLabelPayload!
 
   """Updates a project label."""
   projectLabelUpdate(
+    """
+    Whether to replace all team-specific labels with the same name with this updated workspace label (default: false).
+    """
+    replaceTeamLabels: Boolean
+
     """A partial label object to update."""
     input: ProjectLabelUpdateInput!
 
@@ -25567,6 +25611,17 @@ type PostNotification implements Notification & Entity & Node {
 enum PostType {
   summary
   update
+}
+
+"""
+A readable issue suggestion reason and its structured entity references.
+"""
+type PresentedIssueSuggestionReason {
+  """The reason with entity mentions rendered as readable text."""
+  text: String!
+
+  """Entities referenced by the reason."""
+  references: [IssueSuggestionReasonReference!]!
 }
 
 """Issue priority sorting options."""
@@ -39930,6 +39985,11 @@ type ViewPreferencesValues {
   showNestedInitiatives: Boolean
 
   """
+  [Internal] Whether parent initiatives that do not match the view are shown. Defaults to true when unset.
+  """
+  showParentInitiatives: Boolean
+
+  """
   [Internal] On the team initiatives page, whether sub-initiatives the team only contributes to are shown.
   """
   teamInitiativesShowContributing: Boolean
@@ -40092,6 +40152,9 @@ type ViewPreferencesValues {
 
   """Whether to show sub-team loops."""
   automationShowDescendants: Boolean
+
+  """Whether to show disabled loops."""
+  automationShowDisabled: Boolean
 
   """The loop stats period."""
   automationStatsPeriod: String
