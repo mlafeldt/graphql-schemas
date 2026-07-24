@@ -2173,6 +2173,32 @@ type AiConversationSearchEntitiesToolCallResultEntities {
   id: String!
 }
 
+type AiConversationSpawnSubagentToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationSpawnSubagentToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationSpawnSubagentToolCallResult
+}
+
+type AiConversationSpawnSubagentToolCallArgs {
+  description: String!
+}
+
+type AiConversationSpawnSubagentToolCallResult {
+  conversationId: String!
+}
+
 type AiConversationStartCodingSessionToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -2307,6 +2333,7 @@ enum AiConversationTool {
   UpdateEntity
   DeleteEntity
   RestoreEntity
+  SpawnSubagent
   Research
   CodeIntelligence
   StartCodingSession
@@ -2335,7 +2362,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -24046,6 +24073,12 @@ type Organization implements Node {
   defaultHomeView: String
 
   """
+  The id of the specific initiative, project, view, dashboard, or page tab used
+  as the default home view. The type of entity is given by defaultHomeView.
+  """
+  defaultHomeViewTargetId: String
+
+  """
   Whether SAML-based single sign-on authentication is enabled for the workspace.
   """
   samlEnabled: Boolean!
@@ -24910,6 +24943,11 @@ input OrganizationSecuritySettingsInput {
   """The minimum role required to create teams."""
   teamCreationRole: UserRoleType
 
+  """
+  The minimum role required to create initiatives without a lead team or move initiatives between workspace and team scopes.
+  """
+  workspaceInitiativesRole: UserRoleType
+
   """The minimum role required to manage workspace labels."""
   labelManagementRole: UserRoleType
 
@@ -25020,6 +25058,12 @@ input OrganizationUpdateInput {
   The default home view for members of the workspace who have not chosen their own default.
   """
   defaultHomeView: String
+
+  """
+  The id of the specific initiative, project, view, or dashboard used as the
+  default home view. The type of entity is given by defaultHomeView.
+  """
+  defaultHomeViewTargetId: String
 
   """[Internal] The list of working days. Sunday is 0, Monday is 1, etc."""
   workingDays: [Float!]
