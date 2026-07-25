@@ -8332,6 +8332,42 @@
             "deprecationReason": null
           },
           {
+            "name": "identifier",
+            "description": "[Internal] The human-readable identifier of the project. Returns the custom identifier override when set, otherwise the workspace default `<prefix>-<number>`. Null for legacy projects that have not been backfilled.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "previousIdentifiers",
+            "description": "[Internal] Identifiers (default and custom) that this project has previously held. Used to resolve URLs that referenced an older identifier.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "initiatives",
             "description": "Initiatives that this project belongs to.",
             "args": [
@@ -85624,14 +85660,14 @@
           },
           {
             "name": "releasePipelineByAccessKey",
-            "description": "Returns a release pipeline by ID. Requires the access key to have access to the pipeline.",
+            "description": "Returns the release pipeline associated with the access key.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ReleasePipeline",
+                "name": "AccessKeyReleasePipeline",
                 "ofType": null
               }
             },
@@ -85644,7 +85680,7 @@
             "args": [],
             "type": {
               "kind": "OBJECT",
-              "name": "Release",
+              "name": "AccessKeyRelease",
               "ofType": null
             },
             "isDeprecated": false,
@@ -85652,7 +85688,7 @@
           },
           {
             "name": "recentReleasesByAccessKey",
-            "description": "Returns recent in-progress and completed releases for the pipeline associated with the access key, ordered with in-progress first then most recently completed. Used by `linear-release` to walk candidates and pick the one whose `commitSha` is an ancestor of the current build commit, which disambiguates concurrent release trains on the same pipeline.",
+            "description": "Returns recent releases for the pipeline associated with the access key, ordered with in-progress releases first, followed by the most recently completed releases.",
             "args": [
               {
                 "name": "limit",
@@ -85676,7 +85712,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "OBJECT",
-                    "name": "Release",
+                    "name": "AccessKeyRelease",
                     "ofType": null
                   }
                 }
@@ -97374,11 +97410,84 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "discountType",
+            "description": "How the offer's benefit is applied, which determines the meaning of `discountValue`.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "PartnerDiscountType",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "discountValue",
+            "description": "The magnitude of the benefit, interpreted according to `discountType`.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "durationMonths",
+            "description": "Duration of the benefit in months, or null when the benefit is not time-bounded.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "PartnerDiscountType",
+        "description": "[Internal] The kind of benefit a partner offer grants, which determines how its discount value is interpreted.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "free_seats",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "percent_off",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "amount_off",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -98074,6 +98183,223 @@
           }
         ],
         "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AccessKeyReleasePipeline",
+        "description": "A release pipeline returned using a release pipeline access key.",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The unique identifier of the release pipeline.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "includePathPatterns",
+            "description": "Glob patterns used to filter commits by changed file path. An empty array means all commits are included.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AccessKeyRelease",
+        "description": "A release returned using a release pipeline access key.",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The unique identifier of the release.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": "The name of the release.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createdAt",
+            "description": "The time at which the release was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "commitSha",
+            "description": "The Git commit SHA associated with the release.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "version",
+            "description": "The version identifier for this release. Null if no version has been assigned.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "completedAt",
+            "description": "The time at which the release was completed. Null if the release has not been completed.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "archivedAt",
+            "description": "The time at which the release was archived. Null if the release has not been archived.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "stage",
+            "description": "The current stage of the release.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AccessKeyReleaseStage",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "url",
+            "description": "The URL to the release page in the Linear app.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AccessKeyReleaseStage",
+        "description": "A release stage returned using a release pipeline access key.",
+        "fields": [
+          {
+            "name": "name",
+            "description": "The name of the release stage.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -100309,6 +100635,42 @@
                 "kind": "SCALAR",
                 "name": "String",
                 "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "identifier",
+            "description": "[Internal] The human-readable identifier of the project. Returns the custom identifier override when set, otherwise the workspace default `<prefix>-<number>`. Null for legacy projects that have not been backfilled.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "previousIdentifiers",
+            "description": "[Internal] Identifiers (default and custom) that this project has previously held. Used to resolve URLs that referenced an older identifier.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,
@@ -119047,7 +119409,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ReleasePayload",
+                "name": "AccessKeyReleasePayload",
                 "ofType": null
               }
             },
@@ -119078,7 +119440,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ReleasePayload",
+                "name": "AccessKeyReleasePayload",
                 "ofType": null
               }
             },
@@ -119109,7 +119471,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ReleasePayload",
+                "name": "AccessKeyReleasePayload",
                 "ofType": null
               }
             },
@@ -124800,6 +125162,16 @@
             "type": {
               "kind": "SCALAR",
               "name": "DateTime",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "customIdentifier",
+            "description": "[Internal] Sets or clears the custom identifier override for the project. Pass null to revert to the workspace default.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "defaultValue": null
@@ -143979,6 +144351,65 @@
         "possibleTypes": null
       },
       {
+        "kind": "OBJECT",
+        "name": "AccessKeyReleasePayload",
+        "description": "The result of a release mutation using a release pipeline access key.",
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "The identifier of the last sync operation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "release",
+            "description": "The release that was created or updated.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AccessKeyRelease",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "INPUT_OBJECT",
         "name": "ReleaseSyncInputBase",
         "description": "Base input for syncing release data, containing the commit SHA, issue references, pull request references, and optional metadata. Does not include the pipeline ID, which is provided separately or inferred from the access key.",
@@ -147453,7 +147884,7 @@
         "inputFields": [
           {
             "name": "settings",
-            "description": "The user's settings.",
+            "description": "The user's settings. Merged key by key into the existing settings: keys missing from the object are left unchanged, and a key set to null is removed.",
             "type": {
               "kind": "SCALAR",
               "name": "JSONObject",

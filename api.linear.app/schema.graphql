@@ -9,6 +9,71 @@ Indicates exactly one field must be supplied and this field must not be `null`.
 """
 directive @oneOf on INPUT_OBJECT
 
+"""A release returned using a release pipeline access key."""
+type AccessKeyRelease {
+  """The unique identifier of the release."""
+  id: ID!
+
+  """The name of the release."""
+  name: String!
+
+  """The time at which the release was created."""
+  createdAt: DateTime!
+
+  """The Git commit SHA associated with the release."""
+  commitSha: String
+
+  """
+  The version identifier for this release. Null if no version has been assigned.
+  """
+  version: String
+
+  """
+  The time at which the release was completed. Null if the release has not been completed.
+  """
+  completedAt: DateTime
+
+  """
+  The time at which the release was archived. Null if the release has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The current stage of the release."""
+  stage: AccessKeyReleaseStage!
+
+  """The URL to the release page in the Linear app."""
+  url: String!
+}
+
+"""The result of a release mutation using a release pipeline access key."""
+type AccessKeyReleasePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The release that was created or updated."""
+  release: AccessKeyRelease!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
+"""A release pipeline returned using a release pipeline access key."""
+type AccessKeyReleasePipeline {
+  """The unique identifier of the release pipeline."""
+  id: ID!
+
+  """
+  Glob patterns used to filter commits by changed file path. An empty array means all commits are included.
+  """
+  includePathPatterns: [String!]!
+}
+
+"""A release stage returned using a release pipeline access key."""
+type AccessKeyReleaseStage {
+  """The name of the release stage."""
+  name: String!
+}
+
 """Activity collection filtering options."""
 input ActivityCollectionFilter {
   """Comparator for the identifier."""
@@ -21046,7 +21111,7 @@ type Mutation {
   releaseSyncByAccessKey(
     """The release data to sync."""
     input: ReleaseSyncInputBase!
-  ): ReleasePayload!
+  ): AccessKeyReleasePayload!
 
   """
   Marks a release as completed using an access key. If version is provided,
@@ -21056,13 +21121,13 @@ type Mutation {
   releaseCompleteByAccessKey(
     """The input containing the optional version."""
     input: ReleaseCompleteInputBase!
-  ): ReleasePayload!
+  ): AccessKeyReleasePayload!
 
   """Updates a release by pipeline using an access key."""
   releaseUpdateByPipelineByAccessKey(
     """The input containing the optional version and optional stage name."""
     input: ReleaseUpdateByPipelineInputBase!
-  ): ReleasePayload!
+  ): AccessKeyReleasePayload!
 
   """
   Creates a new release stage in a pipeline. Non-started stages must use default
@@ -25393,6 +25458,15 @@ input PartnerApplicationCreateInput {
   consent: Boolean!
 }
 
+"""
+[Internal] The kind of benefit a partner offer grants, which determines how its discount value is interpreted.
+"""
+enum PartnerDiscountType {
+  free_seats
+  percent_off
+  amount_off
+}
+
 """[Internal] Public details of an active partner-program offer."""
 type PartnerOfferDetailsPayload {
   """The unique identifier of the offer."""
@@ -25409,6 +25483,19 @@ type PartnerOfferDetailsPayload {
   freshly minted redemption identifier, the offer identifier, and its mint and expiry times.
   """
   token: String!
+
+  """
+  How the offer's benefit is applied, which determines the meaning of `discountValue`.
+  """
+  discountType: PartnerDiscountType!
+
+  """The magnitude of the benefit, interpreted according to `discountType`."""
+  discountValue: Int!
+
+  """
+  Duration of the benefit in months, or null when the benefit is not time-bounded.
+  """
+  durationMonths: Int
 }
 
 type PasskeyLoginStartResponse {
@@ -26087,6 +26174,19 @@ type Project implements Node {
 
   """Project URL."""
   url: String!
+
+  """
+  [Internal] The human-readable identifier of the project. Returns the custom
+  identifier override when set, otherwise the workspace default
+  `<prefix>-<number>`. Null for legacy projects that have not been backfilled.
+  """
+  identifier: String
+
+  """
+  [Internal] Identifiers (default and custom) that this project has previously
+  held. Used to resolve URLs that referenced an older identifier.
+  """
+  previousIdentifiers: [String!]!
 
   """Initiatives that this project belongs to."""
   initiatives(
@@ -28436,6 +28536,19 @@ type ProjectSearchResult implements Node {
   """Project URL."""
   url: String!
 
+  """
+  [Internal] The human-readable identifier of the project. Returns the custom
+  identifier override when set, otherwise the workspace default
+  `<prefix>-<number>`. Null for legacy projects that have not been backfilled.
+  """
+  identifier: String
+
+  """
+  [Internal] Identifiers (default and custom) that this project has previously
+  held. Used to resolve URLs that referenced an older identifier.
+  """
+  previousIdentifiers: [String!]!
+
   """Initiatives that this project belongs to."""
   initiatives(
     """A cursor to be used with last for backward pagination."""
@@ -29448,6 +29561,11 @@ input ProjectUpdateInput {
   The time until which project update reminders are paused. Set to null to resume reminders.
   """
   projectUpdateRemindersPausedUntilAt: DateTime
+
+  """
+  [Internal] Sets or clears the custom identifier override for the project. Pass null to revert to the workspace default.
+  """
+  customIdentifier: String
 
   """
   The n-weekly frequency at which to prompt for project updates. When not set,
@@ -31981,29 +32099,25 @@ type Query {
   """Fetch a single release pipeline by its UUID or slug identifier."""
   releasePipeline(id: String!): ReleasePipeline!
 
-  """
-  Returns a release pipeline by ID. Requires the access key to have access to the pipeline.
-  """
-  releasePipelineByAccessKey: ReleasePipeline!
+  """Returns the release pipeline associated with the access key."""
+  releasePipelineByAccessKey: AccessKeyReleasePipeline!
 
   """
   Returns the latest release for the pipeline associated with the access key.
   """
-  latestReleaseByAccessKey: Release
+  latestReleaseByAccessKey: AccessKeyRelease
 
   """
-  Returns recent in-progress and completed releases for the pipeline associated
-  with the access key, ordered with in-progress first then most recently
-  completed. Used by `linear-release` to walk candidates and pick the one whose
-  `commitSha` is an ancestor of the current build commit, which disambiguates
-  concurrent release trains on the same pipeline.
+  Returns recent releases for the pipeline associated with the access key,
+  ordered with in-progress releases first, followed by the most recently
+  completed releases.
   """
   recentReleasesByAccessKey(
     """
     Maximum number of releases to return. Defaults to 20 and is capped at 100.
     """
     limit: Int
-  ): [Release!]!
+  ): [AccessKeyRelease!]!
 
   """All releases in the workspace, with optional filtering and sorting."""
   releases(
@@ -39381,7 +39495,10 @@ enum UserSettingsThemePreset {
 }
 
 input UserSettingsUpdateInput {
-  """The user's settings."""
+  """
+  The user's settings. Merged key by key into the existing settings: keys
+  missing from the object are left unchanged, and a key set to null is removed.
+  """
   settings: JSONObject
 
   """Whether this user is subscribed to changelog email or not."""
