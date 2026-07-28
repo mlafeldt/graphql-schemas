@@ -19494,6 +19494,18 @@
             "deprecationReason": null
           },
           {
+            "name": "exp",
+            "description": "Copilot experimentation (edge TAS) endpoint",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "originTracker",
             "description": "Copilot origin tracker endpoint",
             "args": [],
@@ -22443,6 +22455,24 @@
                 "ofType": {
                   "kind": "INPUT_OBJECT",
                   "name": "ProjectV2SingleSelectFieldOptionInput",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "multiSelectOptions",
+            "description": "Options for a multi select field. At least one value is required if data_type is MULTI_SELECT",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectV2MultiSelectFieldOptionInput",
                   "ofType": null
                 }
               }
@@ -68136,7 +68166,7 @@
           },
           {
             "name": "clearProjectV2ItemFieldValue",
-            "description": "This mutation clears the value of a field for an item in a Project. Currently only text, number, date, assignees, labels, single-select, iteration and milestone fields are supported.",
+            "description": "This mutation clears the value of a field for an item in a Project. Currently only text, number, date, assignees, labels, single-select, multi-select, iteration and milestone fields are supported.",
             "args": [
               {
                 "name": "input",
@@ -73833,7 +73863,7 @@
           },
           {
             "name": "updateProjectV2ItemFieldValue",
-            "description": "This mutation updates the value of a field for an item in a Project. Currently only single-select, text, number, date, and iteration fields are supported.",
+            "description": "This mutation updates the value of a field for an item in a Project. Currently only single-select, multi-select, text, number, date, and iteration fields are supported.",
             "args": [
               {
                 "name": "input",
@@ -75292,6 +75322,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "ProjectV2ItemFieldMultiSelectValue",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "ProjectV2ItemFieldNumberValue",
             "ofType": null
           },
@@ -75313,6 +75348,11 @@
           {
             "kind": "OBJECT",
             "name": "ProjectV2IterationField",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ProjectV2MultiSelectField",
             "ofType": null
           },
           {
@@ -99314,6 +99354,12 @@
             "deprecationReason": null
           },
           {
+            "name": "MULTI_SELECT",
+            "description": "Multi Select",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "NUMBER",
             "description": "Number",
             "isDeprecated": false,
@@ -99693,6 +99739,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "ProjectV2MultiSelectField",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "ProjectV2SingleSelectField",
             "ofType": null
           }
@@ -99715,6 +99766,11 @@
           {
             "kind": "OBJECT",
             "name": "ProjectV2IterationField",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ProjectV2MultiSelectField",
             "ofType": null
           },
           {
@@ -100083,6 +100139,12 @@
             "deprecationReason": null
           },
           {
+            "name": "MULTI_SELECT",
+            "description": "Multi Select",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "NUMBER",
             "description": "Number",
             "isDeprecated": false,
@@ -100194,6 +100256,24 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "multiSelectOptionIds",
+            "description": "The ids of the multi select options to set on the field.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
             },
             "defaultValue": null
           },
@@ -101152,6 +101232,168 @@
       },
       {
         "kind": "OBJECT",
+        "name": "ProjectV2ItemFieldMultiSelectValue",
+        "description": "The value of a multi select field in a Project item.",
+        "fields": [
+          {
+            "name": "createdAt",
+            "description": "Identifies the date and time when the object was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "creator",
+            "description": "The actor who created the item.",
+            "args": [],
+            "type": {
+              "kind": "INTERFACE",
+              "name": "Actor",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "databaseId",
+            "description": "Identifies the primary key from the database.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "field",
+            "description": "The project field that contains this value.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "UNION",
+                "name": "ProjectV2FieldConfiguration",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "id",
+            "description": "The Node ID of the ProjectV2ItemFieldMultiSelectValue object",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "item",
+            "description": "The project item that contains this value.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectV2Item",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "options",
+            "description": "The selected multi select options.",
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "ProjectV2MultiSelectFieldOption",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Identifies the date and time when the object was last updated.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "value",
+            "description": "Comma-separated names of the selected multi select options.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          },
+          {
+            "kind": "INTERFACE",
+            "name": "ProjectV2ItemFieldValueCommon",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "ProjectV2ItemFieldNumberValue",
         "description": "The value of a number field in a Project item.",
         "fields": [
@@ -101948,6 +102190,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "ProjectV2ItemFieldMultiSelectValue",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "ProjectV2ItemFieldNumberValue",
             "ofType": null
           },
@@ -102110,6 +102357,11 @@
           {
             "kind": "OBJECT",
             "name": "ProjectV2ItemFieldIterationValue",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ProjectV2ItemFieldMultiSelectValue",
             "ofType": null
           },
           {
@@ -102994,6 +103246,349 @@
         ],
         "inputFields": null,
         "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "ProjectV2MultiSelectField",
+        "description": "A multi select field inside a project.",
+        "fields": [
+          {
+            "name": "createdAt",
+            "description": "Identifies the date and time when the object was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "dataType",
+            "description": "The field's type.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "ProjectV2FieldType",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "databaseId",
+            "description": "Identifies the primary key from the database.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "id",
+            "description": "The Node ID of the ProjectV2MultiSelectField object",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "multiSelectOptions",
+            "description": "Options for the multi select field",
+            "args": [
+              {
+                "name": "names",
+                "description": "Filter returned options to only those matching these names, case insensitive.",
+                "type": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "ProjectV2MultiSelectFieldOption",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": "The project field's name.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "project",
+            "description": "The project that contains this field.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectV2",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Identifies the date and time when the object was last updated.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          },
+          {
+            "kind": "INTERFACE",
+            "name": "ProjectV2FieldCommon",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "ProjectV2MultiSelectFieldOption",
+        "description": "Multi select field option for a configuration for a project.",
+        "fields": [
+          {
+            "name": "color",
+            "description": "The option's display color.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "ProjectV2SingleSelectFieldOptionColor",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "description",
+            "description": "The option's plain-text description.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "descriptionHTML",
+            "description": "The option's description, possibly containing HTML.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "id",
+            "description": "The option's ID.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": "The option's name.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "nameHTML",
+            "description": "The option's html name.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectV2MultiSelectFieldOptionInput",
+        "description": "Represents a multi select field option",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "The ID of an existing multi select option. Include this to preserve the option's identity during updates, preventing item field values from being cleared.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "The name of the option",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "color",
+            "description": "The display color of the option",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "ProjectV2SingleSelectFieldOptionColor",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "description",
+            "description": "The description text of the option",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },
@@ -105802,6 +106397,12 @@
           {
             "name": "MFA",
             "description": "Members must satisfy an MFA re-authentication.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SECURITY_KEY",
+            "description": "Members must satisfy a phishing-resistant security key re-authentication (Microsoft Entra only).",
             "isDeprecated": false,
             "deprecationReason": null
           }
@@ -167575,6 +168176,24 @@
             "defaultValue": null
           },
           {
+            "name": "multiSelectOptions",
+            "description": "Options for a field of type MULTI_SELECT. Empty input is ignored, provided values overwrite existing options, and existing options should be fetched for partial updates.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectV2MultiSelectFieldOptionInput",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
             "name": "iterationConfiguration",
             "description": "Configuration for a field of type ITERATION. Empty input is ignored, provided values overwrite the existing configuration, and existing configuration should be fetched for partial updates.",
             "type": {
@@ -178508,6 +179127,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "ProjectV2ItemFieldMultiSelectValue",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "ProjectV2ItemFieldNumberValue",
             "ofType": null
           },
@@ -178529,6 +179153,11 @@
           {
             "kind": "OBJECT",
             "name": "ProjectV2IterationField",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ProjectV2MultiSelectField",
             "ofType": null
           },
           {
