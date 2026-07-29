@@ -2532,6 +2532,9 @@ type AiConversationUserState {
 
   """The time at which the user most recently viewed the conversation."""
   lastReadAt: DateTime
+
+  """The ID of the elicitation part the user dismissed."""
+  dismissedElicitationId: String
 }
 
 type AiConversationWebSearchToolCall implements AiConversationBaseToolCall {
@@ -20759,6 +20762,19 @@ type Mutation {
   """[DEPRECATED] Starts a trial for the workspace."""
   organizationStartTrial: OrganizationStartTrialPayload! @deprecated(reason: "Use organizationStartTrialForPlan")
 
+  """
+  [Internal] Redeems a partner-offer token for one of the viewer's existing
+  workspaces, recording a pending redemption that is applied when the workspace
+  subscribes. Requires an admin or owner role in the workspace.
+  """
+  partnerOfferRedeem(
+    """The identifier of the workspace to redeem the offer for."""
+    organizationId: String!
+
+    """The signed partner-offer token to redeem."""
+    token: String!
+  ): PartnerOfferRedeemPayload!
+
   """Creates a new project label."""
   projectLabelCreate(
     """
@@ -25482,8 +25498,9 @@ type PartnerOfferDetailsPayload {
   partnerName: String!
 
   """
-  Short-lived signed token to carry the redemption through signup. Embeds a
-  freshly minted redemption identifier, the offer identifier, and its mint and expiry times.
+  Short-lived signed token that carries the redemption through signup or an
+  existing-workspace redemption. Embeds a pre-minted redemption identifier, the
+  offer identifier, and its mint and expiry times.
   """
   token: String!
 
@@ -25499,6 +25516,51 @@ type PartnerOfferDetailsPayload {
   Duration of the benefit in months, or null when the benefit is not time-bounded.
   """
   durationMonths: Int
+}
+
+"""[Internal] Why a workspace cannot redeem a partner offer."""
+enum PartnerOfferIneligibilityReason {
+  alreadySubscribed
+  alreadyRedeemed
+  otherOfferPending
+}
+
+"""
+[Internal] The result of redeeming a partner offer for an existing workspace.
+"""
+type PartnerOfferRedeemPayload {
+  """Whether the redemption was recorded."""
+  success: Boolean!
+}
+
+"""
+[Internal] One of the viewer's workspaces and whether it can redeem a partner offer.
+"""
+type PartnerOfferWorkspacePayload {
+  """The identifier of the workspace."""
+  organizationId: String!
+
+  """Whether the workspace can redeem the offer."""
+  eligible: Boolean!
+
+  """
+  Why the workspace cannot redeem the offer. Null when the workspace is eligible.
+  """
+  ineligibilityReason: PartnerOfferIneligibilityReason
+}
+
+"""
+[Internal] The viewer's workspaces hosted in the serving cell, with partner-offer eligibility.
+"""
+type PartnerOfferWorkspacesPayload {
+  """Details of the offer the token was minted for."""
+  offer: PartnerOfferDetailsPayload!
+
+  """
+  The viewer's workspaces hosted in the cell that served this request.
+  Workspaces hosted in other cells are not included; query each cell to assemble the full list.
+  """
+  workspaces: [PartnerOfferWorkspacePayload!]!
 }
 
 type PasskeyLoginStartResponse {
@@ -31832,6 +31894,16 @@ type Query {
     """The URL-safe partner slug, for example "y_combinator"."""
     slug: String!
   ): PartnerOfferDetailsPayload
+
+  """
+  [Internal] Fetches the viewer's workspaces hosted in the serving cell, with
+  each workspace's eligibility to redeem the given partner-offer token. Returns
+  null when the token is invalid or the offer is no longer available.
+  """
+  partnerOfferWorkspaces(
+    """The signed partner-offer token to check eligibility for."""
+    token: String!
+  ): PartnerOfferWorkspacesPayload
 
   """Returns all project labels in the workspace, with optional filtering."""
   projectLabels(

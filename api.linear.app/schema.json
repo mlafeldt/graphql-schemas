@@ -53569,6 +53569,18 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "dismissedElicitationId",
+            "description": "The ID of the elicitation part the user dismissed.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -84765,6 +84777,33 @@
             "deprecationReason": null
           },
           {
+            "name": "partnerOfferWorkspaces",
+            "description": "[Internal] Fetches the viewer's workspaces hosted in the serving cell, with each workspace's eligibility to redeem the given partner-offer token. Returns null when the token is invalid or the offer is no longer available.",
+            "args": [
+              {
+                "name": "token",
+                "description": "The signed partner-offer token to check eligibility for.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PartnerOfferWorkspacesPayload",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "projectLabels",
             "description": "Returns all project labels in the workspace, with optional filtering.",
             "args": [
@@ -97421,7 +97460,7 @@
           },
           {
             "name": "token",
-            "description": "Short-lived signed token to carry the redemption through signup. Embeds a freshly minted redemption identifier, the offer identifier, and its mint and expiry times.",
+            "description": "Short-lived signed token that carries the redemption through signup or an existing-workspace redemption. Embeds a pre-minted redemption identifier, the offer identifier, and its mint and expiry times.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -97507,6 +97546,141 @@
           },
           {
             "name": "amount_off",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "PartnerOfferWorkspacesPayload",
+        "description": "[Internal] The viewer's workspaces hosted in the serving cell, with partner-offer eligibility.",
+        "fields": [
+          {
+            "name": "offer",
+            "description": "Details of the offer the token was minted for.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PartnerOfferDetailsPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "workspaces",
+            "description": "The viewer's workspaces hosted in the cell that served this request. Workspaces hosted in other cells are not included; query each cell to assemble the full list.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "PartnerOfferWorkspacePayload",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "PartnerOfferWorkspacePayload",
+        "description": "[Internal] One of the viewer's workspaces and whether it can redeem a partner offer.",
+        "fields": [
+          {
+            "name": "organizationId",
+            "description": "The identifier of the workspace.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "eligible",
+            "description": "Whether the workspace can redeem the offer.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ineligibilityReason",
+            "description": "Why the workspace cannot redeem the offer. Null when the workspace is eligible.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "PartnerOfferIneligibilityReason",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "PartnerOfferIneligibilityReason",
+        "description": "[Internal] Why a workspace cannot redeem a partner offer.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "alreadySubscribed",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "alreadyRedeemed",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "otherOfferPending",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -117960,6 +118134,51 @@
             },
             "isDeprecated": true,
             "deprecationReason": "Use organizationStartTrialForPlan"
+          },
+          {
+            "name": "partnerOfferRedeem",
+            "description": "[Internal] Redeems a partner-offer token for one of the viewer's existing workspaces, recording a pending redemption that is applied when the workspace subscribes. Requires an admin or owner role in the workspace.",
+            "args": [
+              {
+                "name": "organizationId",
+                "description": "The identifier of the workspace to redeem the offer for.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "token",
+                "description": "The signed partner-offer token to redeem.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PartnerOfferRedeemPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           },
           {
             "name": "projectLabelCreate",
@@ -140712,6 +140931,33 @@
           }
         ],
         "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "PartnerOfferRedeemPayload",
+        "description": "[Internal] The result of redeeming a partner offer for an existing workspace.",
+        "fields": [
+          {
+            "name": "success",
+            "description": "Whether the redemption was recorded.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
         "enumValues": null,
         "possibleTypes": null
       },
