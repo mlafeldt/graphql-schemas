@@ -221,6 +221,12 @@ type AgentActivity implements Node {
   contextualMetadata: JSON
 
   """
+  [Internal] What the turn pushed to its branch, captured in the sandbox at push
+  time. Only set on the activity for a successful push.
+  """
+  pushSummary: AgentActivityPushSummary
+
+  """
   [Internal] Whether this activity is queued for later processing. Queued
   activities are not sent to the agent until the session reaches a terminal state.
   """
@@ -443,6 +449,54 @@ input AgentActivityPromptCreateInputContent {
 
   """[Internal] The prompt content as a ProseMirror document."""
   bodyData: JSON
+}
+
+"""
+[Internal] Diff stats for a single commit a coding agent turn pushed, measured in the sandbox at push time.
+"""
+type AgentActivityPushCommit {
+  """The commit sha."""
+  sha: String!
+
+  """The number of lines the commit added across the files it touched."""
+  additions: Int!
+
+  """The number of lines the commit removed across the files it touched."""
+  deletions: Int!
+
+  """The number of files the commit changed."""
+  changedFiles: Int!
+}
+
+"""
+[Internal] What a coding agent turn pushed to its branch, measured in the
+sandbox at push time. The range is cumulative within a turn, so a turn that
+pushes several times reports every commit each time — consumers use the last
+summary in a turn rather than combining across pushes.
+"""
+type AgentActivityPushSummary {
+  """
+  The commit the turn started from — the sandbox HEAD when the prompt began.
+  """
+  baseSha: String!
+
+  """The commit that was pushed."""
+  headSha: String!
+
+  """
+  The turn's non-merge commits with stats, newest first. Capped, so it may hold fewer commits than commitCount reports.
+  """
+  commits: [AgentActivityPushCommit!]!
+
+  """
+  Shas of the turn's commits beyond the detailed cap, newest first. Stats aren't captured for these.
+  """
+  additionalCommitShas: [String!]!
+
+  """
+  The number of non-merge commits the turn added. Equals the length of commits plus additionalCommitShas.
+  """
+  commitCount: Int!
 }
 
 """Content for a response activity."""
@@ -17932,6 +17986,113 @@ input MilestoneSort {
 }
 
 type Mutation {
+  """Creates a new project."""
+  projectCreate(
+    """
+    The full name for the Slack channel to create (including prefix). When
+    provided, a Slack channel will be created and connected to the project.
+    """
+    slackChannelName: String
+
+    """The project properties to set on the new project."""
+    input: ProjectCreateInput!
+  ): ProjectPayload!
+
+  """Updates a project."""
+  projectUpdate(
+    """A partial project object to update the project with."""
+    input: ProjectUpdateInput!
+
+    """
+    The identifier of the project to update. Also the identifier from the URL is accepted.
+    """
+    id: String!
+  ): ProjectPayload!
+
+  """[Internal] Creates a Slack channel for an existing project."""
+  projectCreateSlackChannel(
+    """
+    The identifier of the Slack integration to use. When not provided, uses the organization's configured integration.
+    """
+    integrationId: String
+
+    """
+    The full name for the Slack channel to create (including prefix). When
+    provided, a Slack channel will be created and connected to the project.
+    """
+    slackChannelName: String!
+
+    """The identifier of the project."""
+    id: String!
+  ): ProjectPayload!
+
+  """
+  [INTERNAL] Reassigns all projects from one project status to another. Used when archiving or deleting a project status.
+  """
+  projectReassignStatus(
+    """The identifier of the new project status to update the projects to."""
+    newProjectStatusId: String!
+
+    """
+    The identifier of the project status with which projects will be updated.
+    """
+    originalProjectStatusId: String!
+  ): SuccessPayload!
+
+  """
+  Deletes (trashes) a project. The project can be restored later with projectUnarchive.
+  """
+  projectDelete(
+    """The identifier of the project to delete."""
+    id: String!
+  ): ProjectArchivePayload!
+
+  """Archives a project."""
+  projectArchive(
+    """Whether to trash the project."""
+    trash: Boolean
+
+    """
+    The identifier of the project to archive. Also the identifier from the URL is accepted.
+    """
+    id: String!
+  ): ProjectArchivePayload! @deprecated(reason: "Deprecated in favor of projectDelete.")
+
+  """Restores a previously trashed or archived project."""
+  projectUnarchive(
+    """
+    The identifier of the project to restore. Also the identifier from the URL is accepted.
+    """
+    id: String!
+  ): ProjectArchivePayload!
+
+  """Adds a label to a project."""
+  projectAddLabel(
+    """The identifier of the label to add."""
+    labelId: String!
+
+    """The identifier of the project to add the label to."""
+    id: String!
+  ): ProjectPayload!
+
+  """Removes a label from a project."""
+  projectRemoveLabel(
+    """The identifier of the label to remove."""
+    labelId: String!
+
+    """The identifier of the project to remove the label from."""
+    id: String!
+  ): ProjectPayload!
+
+  """Disables external sync on a project."""
+  projectExternalSyncDisable(
+    """The source of the external sync to disable."""
+    syncSource: ExternalSyncService!
+
+    """The ID of the project to disable external sync for."""
+    projectId: String!
+  ): ProjectPayload!
+
   """
   XHR request payload to upload an images, video and other attachments directly to Linear's cloud storage.
   """
@@ -18677,113 +18838,6 @@ type Mutation {
     """The partner application to submit."""
     input: PartnerApplicationCreateInput!
   ): ContactPayload!
-
-  """Creates a new project."""
-  projectCreate(
-    """
-    The full name for the Slack channel to create (including prefix). When
-    provided, a Slack channel will be created and connected to the project.
-    """
-    slackChannelName: String
-
-    """The project properties to set on the new project."""
-    input: ProjectCreateInput!
-  ): ProjectPayload!
-
-  """Updates a project."""
-  projectUpdate(
-    """A partial project object to update the project with."""
-    input: ProjectUpdateInput!
-
-    """
-    The identifier of the project to update. Also the identifier from the URL is accepted.
-    """
-    id: String!
-  ): ProjectPayload!
-
-  """[Internal] Creates a Slack channel for an existing project."""
-  projectCreateSlackChannel(
-    """
-    The identifier of the Slack integration to use. When not provided, uses the organization's configured integration.
-    """
-    integrationId: String
-
-    """
-    The full name for the Slack channel to create (including prefix). When
-    provided, a Slack channel will be created and connected to the project.
-    """
-    slackChannelName: String!
-
-    """The identifier of the project."""
-    id: String!
-  ): ProjectPayload!
-
-  """
-  [INTERNAL] Reassigns all projects from one project status to another. Used when archiving or deleting a project status.
-  """
-  projectReassignStatus(
-    """The identifier of the new project status to update the projects to."""
-    newProjectStatusId: String!
-
-    """
-    The identifier of the project status with which projects will be updated.
-    """
-    originalProjectStatusId: String!
-  ): SuccessPayload!
-
-  """
-  Deletes (trashes) a project. The project can be restored later with projectUnarchive.
-  """
-  projectDelete(
-    """The identifier of the project to delete."""
-    id: String!
-  ): ProjectArchivePayload!
-
-  """Archives a project."""
-  projectArchive(
-    """Whether to trash the project."""
-    trash: Boolean
-
-    """
-    The identifier of the project to archive. Also the identifier from the URL is accepted.
-    """
-    id: String!
-  ): ProjectArchivePayload! @deprecated(reason: "Deprecated in favor of projectDelete.")
-
-  """Restores a previously trashed or archived project."""
-  projectUnarchive(
-    """
-    The identifier of the project to restore. Also the identifier from the URL is accepted.
-    """
-    id: String!
-  ): ProjectArchivePayload!
-
-  """Adds a label to a project."""
-  projectAddLabel(
-    """The identifier of the label to add."""
-    labelId: String!
-
-    """The identifier of the project to add the label to."""
-    id: String!
-  ): ProjectPayload!
-
-  """Removes a label from a project."""
-  projectRemoveLabel(
-    """The identifier of the label to remove."""
-    labelId: String!
-
-    """The identifier of the project to remove the label from."""
-    id: String!
-  ): ProjectPayload!
-
-  """Disables external sync on a project."""
-  projectExternalSyncDisable(
-    """The source of the external sync to disable."""
-    syncSource: ExternalSyncService!
-
-    """The ID of the project to disable external sync for."""
-    projectId: String!
-  ): ProjectPayload!
 
   """Creates a new custom view."""
   customViewCreate(
@@ -26089,6 +26143,11 @@ type Project implements Node {
   lead: User
 
   """
+  [Internal] The team that leads the project. Null if no lead team is assigned.
+  """
+  leadTeam: Team
+
+  """
   [Internal] Facets associated with the project, used for filtering and categorization.
   """
   facets: [Facet!]!
@@ -26540,6 +26599,11 @@ type Project implements Node {
     """
     orderBy: PaginationOrderBy
   ): ProjectAttachmentConnection!
+
+  """
+  The number of resources associated with the project, including documents, external links, and attachments.
+  """
+  resourceCount: Int!
 
   """History entries associated with the project."""
   history(
@@ -27042,6 +27106,9 @@ input ProjectCreateInput {
 
   """The identifier of the project lead."""
   leadId: String
+
+  """[Internal] The identifier of the team that leads the project."""
+  leadTeamId: String
 
   """The identifiers of the members of this project."""
   memberIds: [String!]
@@ -28450,6 +28517,11 @@ type ProjectSearchResult implements Node {
   lead: User
 
   """
+  [Internal] The team that leads the project. Null if no lead team is assigned.
+  """
+  leadTeam: Team
+
+  """
   [Internal] Facets associated with the project, used for filtering and categorization.
   """
   facets: [Facet!]!
@@ -28901,6 +28973,11 @@ type ProjectSearchResult implements Node {
     """
     orderBy: PaginationOrderBy
   ): ProjectAttachmentConnection!
+
+  """
+  The number of resources associated with the project, including documents, external links, and attachments.
+  """
+  resourceCount: Int!
 
   """History entries associated with the project."""
   history(
@@ -29628,11 +29705,6 @@ input ProjectUpdateInput {
   projectUpdateRemindersPausedUntilAt: DateTime
 
   """
-  [Internal] Sets or clears the custom identifier override for the project. Pass null to revert to the workspace default.
-  """
-  customIdentifier: String
-
-  """
   The n-weekly frequency at which to prompt for project updates. When not set,
   reminders are inherited from workspace settings.
   """
@@ -29656,6 +29728,9 @@ input ProjectUpdateInput {
 
   """The identifier of the project lead."""
   leadId: String
+
+  """[Internal] The identifier of the team that leads the project."""
+  leadTeamId: String
 
   """The identifiers of the members of this project."""
   memberIds: [String!]
@@ -30329,6 +30404,51 @@ enum PushSubscriptionType {
 }
 
 type Query {
+  """
+  Returns all projects in the workspace, with optional filtering and sorting.
+  """
+  projects(
+    """Filter returned projects."""
+    filter: ProjectFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+
+    """[INTERNAL] Sort returned projects."""
+    sort: [ProjectSortInput!]
+  ): ProjectConnection!
+
+  """Returns a single project by its identifier or URL slug."""
+  project(id: String!): Project!
+
+  """Suggests filters for a project view based on a text prompt."""
+  projectFilterSuggestion(
+    """[Internal] The ID of the team if filtering a team view."""
+    teamId: String
+    prompt: String!
+  ): ProjectFilterSuggestionPayload!
+
   """All agent activities."""
   agentActivities(
     """Filter returned agent activities."""
@@ -30633,51 +30753,6 @@ type Query {
     """The hash of the comment to retrieve."""
     hash: String
   ): Comment!
-
-  """
-  Returns all projects in the workspace, with optional filtering and sorting.
-  """
-  projects(
-    """Filter returned projects."""
-    filter: ProjectFilter
-
-    """A cursor to be used with last for backward pagination."""
-    before: String
-
-    """A cursor to be used with first for forward pagination"""
-    after: String
-
-    """
-    The number of items to forward paginate (used with after). Defaults to 50.
-    """
-    first: Int
-
-    """
-    The number of items to backward paginate (used with before). Defaults to 50.
-    """
-    last: Int
-
-    """Should archived resources be included (default: false)"""
-    includeArchived: Boolean
-
-    """
-    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
-    """
-    orderBy: PaginationOrderBy
-
-    """[INTERNAL] Sort returned projects."""
-    sort: [ProjectSortInput!]
-  ): ProjectConnection!
-
-  """Returns a single project by its identifier or URL slug."""
-  project(id: String!): Project!
-
-  """Suggests filters for a project view based on a text prompt."""
-  projectFilterSuggestion(
-    """[Internal] The ID of the team if filtering a team view."""
-    teamId: String
-    prompt: String!
-  ): ProjectFilterSuggestionPayload!
 
   """
   All custom views accessible to the user, including personal views and shared
@@ -40028,6 +40103,9 @@ type ViewPreferencesValues {
   """How to show empty project sub-groups on the board layout."""
   projectShowEmptySubGroupsBoard: String
 
+  """Whether to show the project identifier field."""
+  projectFieldId: Boolean
+
   """Whether to show the project status field."""
   projectFieldStatus: Boolean
 
@@ -40171,6 +40249,9 @@ type ViewPreferencesValues {
 
   """The initiative ordering."""
   initiativesViewOrdering: String
+
+  """Whether to show the initiative identifier field."""
+  initiativeFieldId: Boolean
 
   """Whether to show the initiative projects field."""
   initiativeFieldProjects: Boolean
