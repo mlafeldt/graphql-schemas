@@ -32052,6 +32052,30 @@
             "deprecationReason": null
           },
           {
+            "name": "previewLinks",
+            "description": "[Internal] The deploy/build preview links parsed from the pull request description and comments.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "PullRequestPreviewLink",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "checks",
             "description": "[Internal] The CI/CD checks and status checks associated with the pull request, synced from the hosting provider.",
             "args": [],
@@ -32613,6 +32637,57 @@
             "type": {
               "kind": "SCALAR",
               "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "PullRequestPreviewLink",
+        "description": "[Internal] A deploy or build preview link (e.g., Vercel, Cloudflare Pages, Netlify) parsed from a pull request's description or comments.",
+        "fields": [
+          {
+            "name": "url",
+            "description": "The URL of the preview.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": "The display name of the preview (e.g., the deploy target). Null if the provider did not supply one.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "isBuilding",
+            "description": "Whether the preview is still building. Null when the build state is unknown.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
               "ofType": null
             },
             "isDeprecated": false,
@@ -52706,7 +52781,7 @@
           },
           {
             "name": "status",
-            "description": "The current processing status of the conversation, indicating whether the AI is actively generating a response or has completed its turn.",
+            "description": "The materialized conversation-level processing summary used by list and gating surfaces. Assistant response lifecycle is recorded on its turn.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -52745,26 +52820,6 @@
             "deprecationReason": null
           },
           {
-            "name": "parts",
-            "description": "The ordered sequence of conversation parts (prompts, text responses, reasoning steps, tool calls, errors, and widgets) that make up this conversation's visible history.",
-            "args": [],
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "UNION",
-                  "name": "AiConversationPart",
-                  "ofType": null
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "iterationId",
             "description": "The iteration ID when this conversation is part of an agentic workflow. Used to track multi-step workflow executions. Null for non-workflow conversations.",
             "args": [],
@@ -52784,6 +52839,26 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "parts",
+            "description": "The ordered sequence of conversation parts (prompts, text responses, reasoning steps, tool calls, errors, and widgets) that make up this conversation's visible history.",
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "UNION",
+                  "name": "AiConversationPart",
+                  "ofType": null
+                }
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -73645,6 +73720,12 @@
           },
           {
             "name": "reviews",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "loops",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -106586,6 +106667,22 @@
             "deprecationReason": null
           },
           {
+            "name": "loops",
+            "description": "The preferences for notifications about loops.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "NotificationChannelPreferences",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "appsAndIntegrations",
             "description": "The preferences for notifications about apps and integrations.",
             "args": [],
@@ -128302,6 +128399,16 @@
             "defaultValue": null
           },
           {
+            "name": "ownerId",
+            "description": "The owner of the document. Set to null to create a document without an owner.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "sortOrder",
             "description": "The order of the item in the resources list.",
             "type": {
@@ -128453,6 +128560,16 @@
           {
             "name": "lastAppliedTemplateId",
             "description": "The ID of the last template applied to the document.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "ownerId",
+            "description": "The owner of the document. Set to null to clear.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -148712,6 +148829,16 @@
             "defaultValue": null
           },
           {
+            "name": "loops",
+            "description": "The preferences for notifications about loops.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "PartialNotificationChannelPreferencesInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "appsAndIntegrations",
             "description": "The preferences for notifications about apps and integrations.",
             "type": {
@@ -151730,6 +151857,22 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "ProjectUpdate",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pullRequestUpdated",
+            "description": "Triggered when a pull request is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PullRequest",
                 "ofType": null
               }
             },

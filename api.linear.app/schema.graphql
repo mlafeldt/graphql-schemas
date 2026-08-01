@@ -1257,8 +1257,8 @@ type AiConversation implements Node {
   clientPlatform: AiConversationClientPlatform
 
   """
-  The current processing status of the conversation, indicating whether the AI
-  is actively generating a response or has completed its turn.
+  The materialized conversation-level processing summary used by list and gating
+  surfaces. Assistant response lifecycle is recorded on its turn.
   """
   status: AiConversationStatus!
 
@@ -1268,13 +1268,6 @@ type AiConversation implements Node {
   userState: [AiConversationUserState!]!
 
   """
-  The ordered sequence of conversation parts (prompts, text responses, reasoning
-  steps, tool calls, errors, and widgets) that make up this conversation's
-  visible history.
-  """
-  parts: [AiConversationPart!]
-
-  """
   The iteration ID when this conversation is part of an agentic workflow. Used
   to track multi-step workflow executions. Null for non-workflow conversations.
   """
@@ -1282,6 +1275,13 @@ type AiConversation implements Node {
 
   """[Internal] The log ID of the AI response."""
   evalLogId: String
+
+  """
+  The ordered sequence of conversation parts (prompts, text responses, reasoning
+  steps, tool calls, errors, and widgets) that make up this conversation's
+  visible history.
+  """
+  parts: [AiConversationPart!]
 
   """
   The time when the current user marked the conversation as read. Null if the user hasn't read the conversation.
@@ -7991,6 +7991,11 @@ input DocumentCreateInput {
   """The ID of the last template applied to the document."""
   lastAppliedTemplateId: String
 
+  """
+  The owner of the document. Set to null to create a document without an owner.
+  """
+  ownerId: String
+
   """The order of the item in the resources list."""
   sortOrder: Float
 
@@ -8464,6 +8469,9 @@ input DocumentUpdateInput {
 
   """The ID of the last template applied to the document."""
   lastAppliedTemplateId: String
+
+  """The owner of the document. Set to null to clear."""
+  ownerId: String
 
   """The time at which the document was hidden. Set to null to unhide."""
   hiddenAt: DateTime
@@ -21910,6 +21918,7 @@ enum NotificationCategory {
   postsAndUpdates
   reminders
   reviews
+  loops
   appsAndIntegrations
   triage
   customers
@@ -21953,6 +21962,9 @@ type NotificationCategoryPreferences {
 
   """The preferences for notifications about reviews."""
   reviews: NotificationChannelPreferences!
+
+  """The preferences for notifications about loops."""
+  loops: NotificationChannelPreferences!
 
   """The preferences for notifications about apps and integrations."""
   appsAndIntegrations: NotificationChannelPreferences!
@@ -22003,6 +22015,9 @@ input NotificationCategoryPreferencesInput {
 
   """The preferences for notifications about reviews."""
   reviews: PartialNotificationChannelPreferencesInput
+
+  """The preferences for notifications about loops."""
+  loops: PartialNotificationChannelPreferencesInput
 
   """The preferences for notifications about apps and integrations."""
   appsAndIntegrations: PartialNotificationChannelPreferencesInput
@@ -29984,6 +29999,11 @@ type PullRequest implements Node {
   mergeCommit: PullRequestCommit
 
   """
+  [Internal] The deploy/build preview links parsed from the pull request description and comments.
+  """
+  previewLinks: [PullRequestPreviewLink!]!
+
+  """
   [Internal] The CI/CD checks and status checks associated with the pull request, synced from the hosting provider.
   """
   checks: [PullRequestCheck!]!
@@ -30305,6 +30325,25 @@ type PullRequestNotification implements Notification & Entity & Node {
 
   """The pull request related to the notification."""
   pullRequest: PullRequest!
+}
+
+"""
+[Internal] A deploy or build preview link (e.g., Vercel, Cloudflare Pages,
+Netlify) parsed from a pull request's description or comments.
+"""
+type PullRequestPreviewLink {
+  """The URL of the preview."""
+  url: String!
+
+  """
+  The display name of the preview (e.g., the deploy target). Null if the provider did not supply one.
+  """
+  name: String
+
+  """
+  Whether the preview is still building. Null when the build state is unknown.
+  """
+  isBuilding: Boolean
 }
 
 """
@@ -36195,6 +36234,9 @@ type Subscription {
 
   """Triggered when a project update is deleted"""
   projectUpdateDeleted: ProjectUpdate!
+
+  """Triggered when a pull request is updated"""
+  pullRequestUpdated: PullRequest!
 
   """Triggered when a roadmap is created"""
   roadmapCreated: Roadmap!
