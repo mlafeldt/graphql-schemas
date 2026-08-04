@@ -18007,6 +18007,16 @@ type Mutation {
   """Creates a new project."""
   projectCreate(
     """
+    [Internal] The identifier of the project draft conversation to attach to this project.
+    """
+    aiConversationId: String
+
+    """
+    [Internal] The identifier of the project draft that produced this project.
+    """
+    projectDraftId: String
+
+    """
     The full name for the Slack channel to create (including prefix). When
     provided, a Slack channel will be created and connected to the project.
     """
@@ -18040,6 +18050,14 @@ type Mutation {
     """
     slackChannelName: String!
 
+    """The identifier of the project."""
+    id: String!
+  ): ProjectPayload!
+
+  """
+  [Internal] Dismisses the Slack channel creation failure notice for a project.
+  """
+  projectDismissSlackChannelCreationFailure(
     """The identifier of the project."""
     id: String!
   ): ProjectPayload!
@@ -30026,6 +30044,9 @@ type PullRequest implements Node {
   entry contains the emoji name, count, and the IDs of users who reacted.
   """
   reactionData: JSONObject!
+
+  """Reactions associated with this pull request."""
+  reactions: [Reaction!]!
 }
 
 """
