@@ -8039,6 +8039,9 @@ input DocumentFilter {
   """Filters that the document's creator must satisfy."""
   creator: UserFilter
 
+  """Filters that the document's owner must satisfy."""
+  owner: NullableUserFilter
+
   """Filters that the document's project must satisfy."""
   project: ProjectFilter
 
@@ -23331,6 +23334,9 @@ input NullableProjectFilter {
   """Filters that the project's team must satisfy."""
   accessibleTeams: TeamCollectionFilter
 
+  """[ALPHA] Filters that the project's lead team must satisfy."""
+  leadTeam: NullableTeamFilter
+
   """Filters that the last applied template must satisfy."""
   lastAppliedTemplate: NullableTemplateFilter
 
@@ -27056,6 +27062,9 @@ input ProjectCollectionFilter {
   """Filters that the project's team must satisfy."""
   accessibleTeams: TeamCollectionFilter
 
+  """[ALPHA] Filters that the project's lead team must satisfy."""
+  leadTeam: NullableTeamFilter
+
   """Filters that the last applied template must satisfy."""
   lastAppliedTemplate: NullableTemplateFilter
 
@@ -27306,6 +27315,9 @@ input ProjectFilter {
 
   """Filters that the project's team must satisfy."""
   accessibleTeams: TeamCollectionFilter
+
+  """[ALPHA] Filters that the project's lead team must satisfy."""
+  leadTeam: NullableTeamFilter
 
   """Filters that the last applied template must satisfy."""
   lastAppliedTemplate: NullableTemplateFilter
@@ -34071,6 +34083,12 @@ type ReleasePipeline implements Node {
   autoGenerateReleaseNotesOnCompletion: Boolean!
 
   """
+  Whether completing a scheduled release moves its open issues to the next
+  release. When false, open issues remain on the completed release.
+  """
+  rolloverIssuesOnCompletion: Boolean!
+
+  """
   Glob patterns to filter commits by file path. When non-empty, only commits
   that modify files matching at least one pattern will be included in release
   syncs. An empty array means all commits are included regardless of file paths.
@@ -34280,6 +34298,12 @@ input ReleasePipelineCreateInput {
   """
   autoGenerateReleaseNotesOnCompletion: Boolean
 
+  """
+  Whether completing a scheduled release moves its open issues to the next
+  release. Defaults to true. When false, open issues remain on the completed release.
+  """
+  rolloverIssuesOnCompletion: Boolean
+
   """Glob patterns to include commits affecting matching file paths."""
   includePathPatterns: [String!]
 
@@ -34401,6 +34425,12 @@ input ReleasePipelineUpdateInput {
   Whether to automatically generate a release note when a release is completed.
   """
   autoGenerateReleaseNotesOnCompletion: Boolean
+
+  """
+  Whether completing a scheduled release moves its open issues to the next
+  release. When false, open issues remain on the completed release.
+  """
+  rolloverIssuesOnCompletion: Boolean
 
   """Glob patterns to include commits affecting matching file paths."""
   includePathPatterns: [String!]
