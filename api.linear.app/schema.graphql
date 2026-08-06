@@ -30014,6 +30014,20 @@ type PullRequest implements Node {
   autoMergeEnabled: Boolean!
 
   """
+  Whether the source branch has conflicts with the target branch. When true, the
+  conflicts must be resolved before the pull request can be merged. This is
+  reported separately from `mergeStatus`, which describes whether the pull
+  request is blocked by required approvals or checks.
+  """
+  hasConflicts: Boolean!
+
+  """
+  Whether the source branch is behind the target branch. When true, the source
+  branch is missing commits that have landed on the target branch since it was last updated.
+  """
+  isBehind: Boolean!
+
+  """
   Merge settings and allowed merge methods for this pull request's repository.
   Null if the settings have not been synced from the provider.
   """
@@ -30021,6 +30035,18 @@ type PullRequest implements Node {
 
   """The time at which the pull request was opened."""
   openedAt: DateTime!
+
+  """
+  The time at which the pull request was closed. Hosting providers also set this
+  when a pull request is merged, so read `status` to tell a closed pull request
+  from a merged one. Null while the pull request is still open.
+  """
+  closedAt: DateTime
+
+  """
+  The time at which the pull request was merged. Null if the pull request has not been merged.
+  """
+  mergedAt: DateTime
 
   """
   The merge commit created when the pull request was merged. Null if the pull
@@ -40697,6 +40723,11 @@ type ViewPreferencesValues {
 
   """Whether to show review status details on a second line."""
   reviewFieldStatusDetails: Boolean
+
+  """
+  Whether to show the quick-to-review badge on review list items. Null if the preference is unset.
+  """
+  reviewFieldQuickToReview: Boolean
 
   """Whether team reviews are shown in the reviews list."""
   showTeamReviews: Boolean
