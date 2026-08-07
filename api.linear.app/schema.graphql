@@ -567,6 +567,14 @@ enum AgentAutomationRetryResolutionStatus {
 }
 
 """
+The scope of the usage limit that blocked a loop run: the loop's own limit or the workspace-wide limit.
+"""
+enum AgentAutomationUsageLimitScope {
+  loop
+  workspace
+}
+
+"""
 A session representing an AI coding agent's work on an issue or conversation.
 Agent sessions track the lifecycle of an agent's engagement, from creation
 through active work to completion or dismissal. Each session is associated with
@@ -1658,6 +1666,16 @@ type AiConversationErrorPart implements AiConversationBasePart {
   errorType: AiConversationErrorType
 
   """
+  The scope of the breached limit for usage-limit errors. Null for other error categories.
+  """
+  usageLimitScope: AgentAutomationUsageLimitScope
+
+  """
+  The time when the breached usage limit resets, as an ISO 8601 string. Null when unknown or for other error categories.
+  """
+  usageLimitResetsAt: String
+
+  """
   The outcome of retrying this error's loop run. Null when the run has not been reconsidered.
   """
   retryResolution: AgentAutomationRetryResolution
@@ -1666,6 +1684,8 @@ type AiConversationErrorPart implements AiConversationBasePart {
 """The category of an error part in an AI conversation."""
 enum AiConversationErrorType {
   billing
+  usageLimit
+  featureDisabled
   untrustedSources
   unknown
 }
