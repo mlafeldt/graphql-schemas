@@ -9166,6 +9166,23 @@ input EntityExternalLinkUpdateInput {
   resourceFolderId: String
 }
 
+"""
+Comparator for project and initiative identifiers. Accepts UUIDs and human-readable identifiers (e.g. "PROJ-123").
+"""
+input EntityIdentifierIDComparator {
+  """Equals constraint."""
+  eq: ID
+
+  """Not-equals constraint."""
+  neq: ID
+
+  """In-array constraint."""
+  in: [ID!]
+
+  """Not-in-array constraint."""
+  nin: [ID!]
+}
+
 """Comparator for estimates."""
 input EstimateComparator {
   """Equals constraint."""
@@ -11154,7 +11171,7 @@ type InitiativeArchivePayload implements ArchivePayload {
 """Initiative collection filtering options."""
 input InitiativeCollectionFilter {
   """Comparator for the identifier."""
-  id: IDComparator
+  id: EntityIdentifierIDComparator
 
   """Comparator for the created at date."""
   createdAt: DateComparator
@@ -11167,6 +11184,9 @@ input InitiativeCollectionFilter {
 
   """Comparator for the initiative slug ID."""
   slugId: StringComparator
+
+  """[Internal] Comparator for the initiative's custom identifier."""
+  customIdentifier: NullableStringComparator
 
   """Filters that the initiative creator must satisfy."""
   creator: NullableUserFilter
@@ -11317,7 +11337,7 @@ type InitiativeEdge {
 """Initiative filtering options."""
 input InitiativeFilter {
   """Comparator for the identifier."""
-  id: IDComparator
+  id: EntityIdentifierIDComparator
 
   """Comparator for the created at date."""
   createdAt: DateComparator
@@ -11330,6 +11350,9 @@ input InitiativeFilter {
 
   """Comparator for the initiative slug ID."""
   slugId: StringComparator
+
+  """[Internal] Comparator for the initiative's custom identifier."""
+  customIdentifier: NullableStringComparator
 
   """Filters that the initiative creator must satisfy."""
   creator: NullableUserFilter
@@ -20058,6 +20081,12 @@ type Mutation {
 
     """The role to assign to the Linear bot user in Zendesk."""
     botUserRole: String
+
+    """
+    [INTERNAL] Custom base URL for Zendesk API requests, such as a proxy in
+    front of Zendesk. OAuth requests always use the standard subdomain URL.
+    """
+    customApiUrl: String
   ): IntegrationPayload!
 
   """Enables Loom integration for the workspace."""
@@ -22846,7 +22875,7 @@ input NullableDurationComparator {
 """Initiative filtering options."""
 input NullableInitiativeFilter {
   """Comparator for the identifier."""
-  id: IDComparator
+  id: EntityIdentifierIDComparator
 
   """Comparator for the created at date."""
   createdAt: DateComparator
@@ -22859,6 +22888,9 @@ input NullableInitiativeFilter {
 
   """Comparator for the initiative slug ID."""
   slugId: StringComparator
+
+  """[Internal] Comparator for the initiative's custom identifier."""
+  customIdentifier: NullableStringComparator
 
   """Filters that the initiative creator must satisfy."""
   creator: NullableUserFilter
@@ -23242,7 +23274,7 @@ input NullableNumberComparator {
 """Project filtering options."""
 input NullableProjectFilter {
   """Comparator for the identifier."""
-  id: IDComparator
+  id: EntityIdentifierIDComparator
 
   """Comparator for the created at date."""
   createdAt: DateComparator
@@ -23255,6 +23287,9 @@ input NullableProjectFilter {
 
   """Comparator for the project slug ID."""
   slugId: StringComparator
+
+  """[Internal] Comparator for the project's custom identifier."""
+  customIdentifier: NullableStringComparator
 
   """[DEPRECATED] Comparator for the project state."""
   state: StringComparator
@@ -26970,7 +27005,7 @@ type ProjectAttachmentEdge {
 """Project filtering options."""
 input ProjectCollectionFilter {
   """Comparator for the identifier."""
-  id: IDComparator
+  id: EntityIdentifierIDComparator
 
   """Comparator for the created at date."""
   createdAt: DateComparator
@@ -26983,6 +27018,9 @@ input ProjectCollectionFilter {
 
   """Comparator for the project slug ID."""
   slugId: StringComparator
+
+  """[Internal] Comparator for the project's custom identifier."""
+  customIdentifier: NullableStringComparator
 
   """[DEPRECATED] Comparator for the project state."""
   state: StringComparator
@@ -27224,7 +27262,7 @@ type ProjectEdge {
 """Project filtering options."""
 input ProjectFilter {
   """Comparator for the identifier."""
-  id: IDComparator
+  id: EntityIdentifierIDComparator
 
   """Comparator for the created at date."""
   createdAt: DateComparator
@@ -27237,6 +27275,9 @@ input ProjectFilter {
 
   """Comparator for the project slug ID."""
   slugId: StringComparator
+
+  """[Internal] Comparator for the project's custom identifier."""
+  customIdentifier: NullableStringComparator
 
   """[DEPRECATED] Comparator for the project state."""
   state: StringComparator
@@ -41555,6 +41596,11 @@ type WorkflowDefinitionNotification implements Notification & Entity & Node {
 
   """The workflow definition (loop) related to the notification."""
   workflowDefinition: WorkflowDefinition!
+
+  """
+  [Internal] The AI conversation identifier for the related loop run, if one was created.
+  """
+  aiConversationId: String
 }
 
 """
@@ -41870,8 +41916,17 @@ input ZendeskSettingsInput {
   """The subdomain of the Zendesk organization being connected."""
   subdomain: String!
 
-  """The URL of the connected Zendesk organization."""
+  """
+  The URL of the connected Zendesk organization, used to link into Zendesk. API requests use `customApiUrl` when it is set.
+  """
   url: String!
+
+  """
+  [INTERNAL] Custom base URL for Zendesk API requests, such as a proxy in front
+  of Zendesk. When unset, API requests use the standard subdomain URL. OAuth
+  requests always use the standard subdomain URL.
+  """
+  customApiUrl: String
 
   """The ID of the Linear bot user."""
   botUserId: String
