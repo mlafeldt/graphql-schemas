@@ -56058,6 +56058,123 @@
         "possibleTypes": null
       },
       {
+        "kind": "INPUT_OBJECT",
+        "name": "IssueFieldValueFilter",
+        "description": "A filter for matching an issue field value. Exactly one value argument should be provided.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "fieldId",
+            "description": "The ID of the issue field to filter by. Exactly one of `fieldId` or `fieldName` must be provided.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "fieldName",
+            "description": "The name of the issue field to filter by. Exactly one of `fieldId` or `fieldName` must be provided.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "textValue",
+            "description": "Matches a text issue field value.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "dateValue",
+            "description": "Matches a date issue field value (YYYY-MM-DD).",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "numberValue",
+            "description": "Matches a numeric issue field value.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "singleSelectOptionId",
+            "description": "Matches a single-select issue field option by ID.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "singleSelectOptionValue",
+            "description": "Matches a single-select issue field option by name.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "multiSelectOptionIds",
+            "description": "Matches issues containing all of the multi-select issue field option IDs.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "multiSelectOptionValues",
+            "description": "Matches issues containing all of the multi-select issue field option names.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "ENUM",
         "name": "IssueFieldVisibility",
         "description": "The visibility of an issue field.",
@@ -56339,6 +56456,24 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "issueFieldValues",
+            "description": "List issues where each supplied issue field value filter matches.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "IssueFieldValueFilter",
+                  "ofType": null
+                }
+              }
             },
             "defaultValue": null
           },
@@ -86777,6 +86912,59 @@
             "deprecationReason": null
           },
           {
+            "name": "pinnedIssueFields",
+            "description": "An ordered list of issue fields pinned to issues when no type is selected.",
+            "args": [
+              {
+                "name": "after",
+                "description": "Returns the elements in the list that come after the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "Returns the elements in the list that come before the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "Returns the first _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "Returns the last _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "IssueFieldsConnection",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "pinnedItems",
             "description": "A list of repositories and gists this profile owner has pinned to their profile",
             "args": [
@@ -99810,6 +99998,34 @@
             "deprecationReason": null
           },
           {
+            "name": "isIssueField",
+            "description": "Returns true if this field is associated with an organization issue field",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueField",
+            "description": "The organization issue field associated with this project field, if any",
+            "args": [],
+            "type": {
+              "kind": "UNION",
+              "name": "IssueFields",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "name",
             "description": "The project field's name.",
             "args": [],
@@ -99933,6 +100149,22 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "isIssueField",
+            "description": "Returns true if this field is associated with an organization issue field",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
                 "ofType": null
               }
             },
@@ -103207,6 +103439,22 @@
             "deprecationReason": null
           },
           {
+            "name": "isIssueField",
+            "description": "Returns true if this field is associated with an organization issue field",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "name",
             "description": "The project field's name.",
             "args": [],
@@ -103575,6 +103823,34 @@
                 "name": "ID",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "isIssueField",
+            "description": "Returns true if this field is associated with an organization issue field",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueField",
+            "description": "The organization issue field associated with this project field, if any",
+            "args": [],
+            "type": {
+              "kind": "UNION",
+              "name": "IssueFields",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -104302,6 +104578,34 @@
                 "name": "ID",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "isIssueField",
+            "description": "Returns true if this field is associated with an organization issue field",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueField",
+            "description": "The organization issue field associated with this project field, if any",
+            "args": [],
+            "type": {
+              "kind": "UNION",
+              "name": "IssueFields",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
