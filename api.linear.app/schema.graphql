@@ -2181,6 +2181,25 @@ type AiConversationReasoningPart implements AiConversationBasePart {
   body: String!
 }
 
+type AiConversationRemoveSpendLimitToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationRemoveSpendLimitToolCallArgs
+}
+
+type AiConversationRemoveSpendLimitToolCallArgs {
+  summary: String
+}
+
 type AiConversationResearchToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -2310,6 +2329,25 @@ type AiConversationSearchEntitiesToolCallResult {
 type AiConversationSearchEntitiesToolCallResultEntities {
   type: String!
   id: String!
+}
+
+type AiConversationSetSpendLimitToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationSetSpendLimitToolCallArgs
+}
+
+type AiConversationSetSpendLimitToolCallArgs {
+  summary: String
 }
 
 type AiConversationSpawnSubagentToolCall implements AiConversationBaseToolCall {
@@ -2496,12 +2534,14 @@ enum AiConversationTool {
   WebSearch
   GetSlackConversationHistory
   GetMicrosoftTeamsConversationHistory
+  SetSpendLimit
+  RemoveSpendLimit
   NavigateToPage
   InvokeMcpTool
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -8596,6 +8636,11 @@ type Draft implements Node {
   The customer need that this draft is referencing. Null if the draft belongs to a different parent entity type.
   """
   customerNeed: CustomerNeed
+
+  """
+  The pull request for which this is a draft comment. Null if the draft belongs to a different parent entity type.
+  """
+  pullRequest: PullRequest
 
   """
   [INTERNAL] Allows for multiple drafts per entity (currently constrained to Pull Requests).
@@ -29408,6 +29453,18 @@ type ProjectStatus implements Node {
   in this status may trigger reminders or auto-archiving after a period of inactivity.
   """
   indefinite: Boolean!
+
+  """
+  [Internal] The team that the status is scoped to. If null, the status is a
+  workspace-level status available to all teams in the workspace.
+  """
+  team: Team
+
+  """
+  [Internal] The original workspace or parent-team status that this status was
+  inherited from. Null if the status is not inherited.
+  """
+  inheritedFrom: ProjectStatus
 }
 
 """A generic payload return from entity archive mutations."""
