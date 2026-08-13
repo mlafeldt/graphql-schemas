@@ -9570,6 +9570,14 @@ type Favorite implements Node {
   """The name of the folder. Only applies to favorites of type folder."""
   folderName: String
 
+  """The predefined live folder represented by this favorite."""
+  liveFolderPreset: String
+
+  """
+  The versioned lazy root and filter represented by this live favorite folder.
+  """
+  liveFolderDefinition: JSONObject
+
   """The targeted tab of the project."""
   projectTab: ProjectTab
 
@@ -9727,6 +9735,9 @@ input FavoriteCreateInput {
 
   """The name of the favorite folder."""
   folderName: String
+
+  """The predefined live folder to create."""
+  liveFolderPreset: String
 
   """The parent folder of the favorite."""
   parentId: String
@@ -20115,14 +20126,14 @@ type Mutation {
     """The Zendesk installation subdomain."""
     subdomain: String!
 
-    """The Zendesk OAuth code."""
-    code: String!
+    """The Zendesk OAuth code. Required unless connecting with `accessToken`."""
+    code: String
 
-    """The Zendesk OAuth scopes."""
-    scope: String!
+    """The Zendesk OAuth scopes. Required when connecting with `code`."""
+    scope: String
 
-    """The Zendesk OAuth redirect URI."""
-    redirectUri: String!
+    """The Zendesk OAuth redirect URI. Required when connecting with `code`."""
+    redirectUri: String
 
     """The role to assign to the Linear bot user in Zendesk."""
     botUserRole: String
@@ -20132,6 +20143,12 @@ type Mutation {
     front of Zendesk. OAuth requests always use the standard subdomain URL.
     """
     customApiUrl: String
+
+    """
+    [INTERNAL] Bearer token that authenticates API requests instead of a Zendesk
+    OAuth token. Requires `customApiUrl`; no OAuth exchange is performed.
+    """
+    accessToken: String
   ): IntegrationPayload!
 
   """Enables Loom integration for the workspace."""
@@ -33096,6 +33113,12 @@ type Query {
     id: String!
   ): Webhook!
 
+  """[INTERNAL] Failure events for an audit log webhook (last 50)."""
+  auditLogWebhookFailureEvents(
+    """The identifier of the audit log webhook."""
+    webhookId: String!
+  ): [WebhookFailureEvent!]!
+
   """
   [INTERNAL] Webhook failure events for webhooks that belong to an OAuth application. (last 50)
   """
@@ -36002,6 +36025,9 @@ input SourceMetadataComparator {
 
   """Comparator for the sub type."""
   subType: SubTypeComparator
+
+  """Comparator for the workflow definition that created the issue."""
+  workflowDefinitionId: WorkflowDefinitionIdComparator
 
   """[INTERNAL] Comparator for the salesforce metadata."""
   salesforceMetadata: SalesforceMetadataIntegrationComparator
@@ -41535,6 +41561,26 @@ type WorkflowDefinition implements Node {
   owner: User
 }
 
+"""Comparator for the workflow definition that created an issue."""
+input WorkflowDefinitionIdComparator {
+  """Equals constraint."""
+  eq: ID
+
+  """Not-equals constraint."""
+  neq: ID
+
+  """In-array constraint."""
+  in: [ID!]
+
+  """Not-in-array constraint."""
+  nin: [ID!]
+
+  """
+  Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.
+  """
+  null: Boolean
+}
+
 """
 A notification related to an automation workflow definition (loop), such as runs that failed to start.
 """
@@ -41987,6 +42033,12 @@ input ZendeskSettingsInput {
   requests always use the standard subdomain URL.
   """
   customApiUrl: String
+
+  """
+  [INTERNAL] Whether API requests authenticate with a user-provided bearer token
+  instead of a Zendesk OAuth token. Only used together with `customApiUrl`.
+  """
+  bearerTokenAuth: Boolean
 
   """The ID of the Linear bot user."""
   botUserId: String

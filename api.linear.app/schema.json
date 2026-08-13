@@ -17099,6 +17099,16 @@
             "defaultValue": null
           },
           {
+            "name": "workflowDefinitionId",
+            "description": "Comparator for the workflow definition that created the issue.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "WorkflowDefinitionIdComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "salesforceMetadata",
             "description": "[INTERNAL] Comparator for the salesforce metadata.",
             "type": {
@@ -17169,6 +17179,83 @@
                 "ofType": {
                   "kind": "SCALAR",
                   "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "null",
+            "description": "Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "WorkflowDefinitionIdComparator",
+        "description": "Comparator for the workflow definition that created an issue.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "eq",
+            "description": "Equals constraint.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "neq",
+            "description": "Not-equals constraint.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "in",
+            "description": "In-array constraint.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "nin",
+            "description": "Not-in-array constraint.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
                   "ofType": null
                 }
               }
@@ -43758,6 +43845,30 @@
             "type": {
               "kind": "SCALAR",
               "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "liveFolderPreset",
+            "description": "The predefined live folder represented by this favorite.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "liveFolderDefinition",
+            "description": "The versioned lazy root and filter represented by this live favorite folder.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSONObject",
               "ofType": null
             },
             "isDeprecated": false,
@@ -88688,6 +88799,45 @@
             "deprecationReason": null
           },
           {
+            "name": "auditLogWebhookFailureEvents",
+            "description": "[INTERNAL] Failure events for an audit log webhook (last 50).",
+            "args": [
+              {
+                "name": "webhookId",
+                "description": "The identifier of the audit log webhook.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "WebhookFailureEvent",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "failuresForOauthWebhooks",
             "description": "[INTERNAL] Webhook failure events for webhooks that belong to an OAuth application. (last 50)",
             "args": [
@@ -115808,43 +115958,31 @@
               },
               {
                 "name": "code",
-                "description": "The Zendesk OAuth code.",
+                "description": "The Zendesk OAuth code. Required unless connecting with `accessToken`.",
                 "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
                 },
                 "defaultValue": null
               },
               {
                 "name": "scope",
-                "description": "The Zendesk OAuth scopes.",
+                "description": "The Zendesk OAuth scopes. Required when connecting with `code`.",
                 "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
                 },
                 "defaultValue": null
               },
               {
                 "name": "redirectUri",
-                "description": "The Zendesk OAuth redirect URI.",
+                "description": "The Zendesk OAuth redirect URI. Required when connecting with `code`.",
                 "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
                 },
                 "defaultValue": null
               },
@@ -115861,6 +115999,16 @@
               {
                 "name": "customApiUrl",
                 "description": "[INTERNAL] Custom base URL for Zendesk API requests, such as a proxy in front of Zendesk. OAuth requests always use the standard subdomain URL.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "accessToken",
+                "description": "[INTERNAL] Bearer token that authenticates API requests instead of a Zendesk OAuth token. Requires `customApiUrl`; no OAuth exchange is performed.",
                 "type": {
                   "kind": "SCALAR",
                   "name": "String",
@@ -130375,6 +130523,16 @@
             "defaultValue": null
           },
           {
+            "name": "liveFolderPreset",
+            "description": "The predefined live folder to create.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "parentId",
             "description": "The parent folder of the favorite.",
             "type": {
@@ -134358,6 +134516,16 @@
             "type": {
               "kind": "SCALAR",
               "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "bearerTokenAuth",
+            "description": "[INTERNAL] Whether API requests authenticate with a user-provided bearer token instead of a Zendesk OAuth token. Only used together with `customApiUrl`.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
               "ofType": null
             },
             "defaultValue": null
