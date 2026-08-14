@@ -7676,6 +7676,39 @@ type Document implements Node {
     orderBy: PaginationOrderBy
   ): CommentConnection!
 
+  """Users who are subscribed to the document."""
+  subscribers(
+    """Filter returned subscribers."""
+    filter: UserFilter
+
+    """Should query return disabled/suspended users (default: false)."""
+    includeDisabled: Boolean
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): UserConnection!
+
   """The document's content in markdown format."""
   content: String
 
@@ -8093,6 +8126,9 @@ input DocumentFilter {
   """Comparator for the document title."""
   title: StringComparator
 
+  """[Internal] Comparator for the document's searchable content."""
+  searchableContent: ContentComparator
+
   """Comparator for the document slug ID."""
   slugId: StringComparator
 
@@ -8431,6 +8467,39 @@ type DocumentSearchResult implements Node {
     """
     orderBy: PaginationOrderBy
   ): CommentConnection!
+
+  """Users who are subscribed to the document."""
+  subscribers(
+    """Filter returned subscribers."""
+    filter: UserFilter
+
+    """Should query return disabled/suspended users (default: false)."""
+    includeDisabled: Boolean
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): UserConnection!
 
   """The document's content in markdown format."""
   content: String
@@ -10846,9 +10915,7 @@ type Initiative implements Node {
   """
   owner: User
 
-  """
-  [ALPHA] The team that leads the initiative. Null if no lead team is assigned.
-  """
+  """The team that leads the initiative. Null if no lead team is assigned."""
   leadTeam: Team
 
   """
@@ -10939,7 +11006,7 @@ type Initiative implements Node {
   url: String!
 
   """
-  [ALPHA] The visibility of the initiative, derived from its lead team. Public when no lead team is assigned.
+  The visibility of the initiative, derived from its lead team. Public when no lead team is assigned.
   """
   visibility: InitiativeVisibility!
 
@@ -11258,7 +11325,7 @@ input InitiativeCollectionFilter {
   """Filters that the initiative teams must satisfy."""
   teams: TeamCollectionFilter
 
-  """[ALPHA] Filters that the initiative lead team must satisfy."""
+  """Filters that the initiative lead team must satisfy."""
   leadTeam: NullableTeamFilter
 
   """Filters that the initiative owner must satisfy."""
@@ -11343,7 +11410,7 @@ input InitiativeCreateInput {
   """The owner of the initiative."""
   ownerId: String
 
-  """[ALPHA] The team that leads the initiative."""
+  """The team that leads the initiative."""
   leadTeamId: String
 
   """The sort order of the initiative within the workspace."""
@@ -11424,7 +11491,7 @@ input InitiativeFilter {
   """Filters that the initiative teams must satisfy."""
   teams: TeamCollectionFilter
 
-  """[ALPHA] Filters that the initiative lead team must satisfy."""
+  """Filters that the initiative lead team must satisfy."""
   leadTeam: NullableTeamFilter
 
   """Filters that the initiative owner must satisfy."""
@@ -12609,7 +12676,7 @@ input InitiativeUpdateInput {
   """The owner of the initiative."""
   ownerId: String
 
-  """[ALPHA] The team that leads the initiative. Set to null to clear."""
+  """The team that leads the initiative. Set to null to clear."""
   leadTeamId: String
 
   """The sort order of the initiative within the workspace."""
@@ -22968,7 +23035,7 @@ input NullableInitiativeFilter {
   """Filters that the initiative teams must satisfy."""
   teams: TeamCollectionFilter
 
-  """[ALPHA] Filters that the initiative lead team must satisfy."""
+  """Filters that the initiative lead team must satisfy."""
   leadTeam: NullableTeamFilter
 
   """Filters that the initiative owner must satisfy."""
@@ -25706,6 +25773,13 @@ enum PartnerDiscountType {
   amount_off
 }
 
+"""The kind of partner program an offer belongs to."""
+enum PartnerOfferCategory {
+  investor
+  accelerator
+  startup_community
+}
+
 """[Internal] Public details of an active partner-program offer."""
 type PartnerOfferDetailsPayload {
   """The unique identifier of the offer."""
@@ -25781,6 +25855,15 @@ type PartnerOfferWorkspacesPayload {
   Workspaces hosted in other cells are not included; query each cell to assemble the full list.
   """
   workspaces: [PartnerOfferWorkspacePayload!]!
+}
+
+"""[Internal] A partner listed in the Linear Startup Program."""
+type PartnerProgramPartnerPayload {
+  """Display name of the partner."""
+  partnerName: String!
+
+  """The kind of partner program the offer belongs to."""
+  category: PartnerOfferCategory!
 }
 
 type PasskeyLoginStartResponse {
@@ -30121,6 +30204,39 @@ type PullRequest implements Node {
   targetBranch: String!
 
   """
+  [Internal] The host-qualified external ID of the native stack that contains
+  this pull request. Null if the pull request is not in a native stack or stack
+  data is unavailable.
+  """
+  nativeStackId: String
+
+  """
+  [Internal] The number the hosting provider assigns to the native stack within
+  its repository. Null if the pull request is not in a native stack or stack
+  data is unavailable.
+  """
+  nativeStackNumber: Float
+
+  """
+  [Internal] The pull request's one-based position in its native stack, where 1
+  is closest to the target branch. Null if the pull request is not in a native
+  stack or stack data is unavailable.
+  """
+  nativeStackPosition: Float
+
+  """
+  [Internal] The total number of pull requests in the native stack. Null if the
+  pull request is not in a native stack or stack data is unavailable.
+  """
+  nativeStackSize: Float
+
+  """
+  [Internal] The target branch shared by the native stack. Null if the pull
+  request is not in a native stack or stack data is unavailable.
+  """
+  nativeStackTargetBranch: String
+
+  """
   The Git SHA of the latest commit on the source branch. Updated as new commits are pushed. Null if not yet synced.
   """
   headSha: String
@@ -32212,6 +32328,12 @@ type Query {
     """The URL-safe partner slug, for example "y_combinator"."""
     slug: String!
   ): PartnerOfferDetailsPayload
+
+  """
+  [Internal] Lists every partner with an active partner-program offer, ordered
+  by display name. Backs the partner directory on the marketing website.
+  """
+  partnerProgramPartners: [PartnerProgramPartnerPayload!]!
 
   """
   [Internal] Fetches the viewer's workspaces hosted in the serving cell, with
@@ -37407,9 +37529,7 @@ type Team implements Node {
   """Settings for all integrations associated with that team."""
   integrationsSettings: IntegrationsSettings
 
-  """
-  [ALPHA] Whether team initiatives are enabled and shown in the team's sidebar.
-  """
+  """Whether team initiatives are enabled and shown in the team's sidebar."""
   initiativesEnabled: Boolean!
 
   """
@@ -37598,7 +37718,7 @@ input TeamCreateInput {
   """Whether issue sharing is enabled for this team."""
   issueSharingEnabled: Boolean
 
-  """[ALPHA] Whether initiatives are shown in the team's sidebar."""
+  """Whether initiatives are shown in the team's sidebar."""
   initiativesEnabled: Boolean
 
   """
@@ -38184,7 +38304,7 @@ input TeamUpdateInput {
   """Whether issue sharing is enabled for this team."""
   issueSharingEnabled: Boolean
 
-  """[ALPHA] Whether initiatives are shown in the team's sidebar."""
+  """Whether initiatives are shown in the team's sidebar."""
   initiativesEnabled: Boolean
 
   """
@@ -38508,11 +38628,31 @@ type TimeSchedule implements Node {
   """The URL to the external schedule."""
   externalUrl: String
 
+  """[ALPHA] The schedule configuration."""
+  config: TimeScheduleConfig
+
   """The workspace of the schedule."""
   organization: Organization!
 
   """The identifier of the Linear integration populating the schedule."""
   integration: Integration
+}
+
+"""[ALPHA] The configuration of a time schedule."""
+type TimeScheduleConfig {
+  """
+  Record of the next two on-call shifts keyed by Linear user id, e.g. `{
+  "<linearUserId>": [{ "startsAt": "X", "endsAt": "Y" }] }`.
+  """
+  nextShiftsByUserId: JSONObject!
+}
+
+input TimeScheduleConfigInput {
+  """
+  Record of the next two on-call shifts keyed by Linear user id, e.g. `{
+  "<linearUserId>": [{ "startsAt": "X", "endsAt": "Y" }] }`.
+  """
+  nextShiftsByUserId: JSONObject!
 }
 
 type TimeScheduleConnection {
@@ -38539,6 +38679,9 @@ input TimeScheduleCreateInput {
 
   """The URL to the external schedule."""
   externalUrl: String
+
+  """[ALPHA] The schedule configuration."""
+  config: TimeScheduleConfigInput
 }
 
 type TimeScheduleEdge {
@@ -38616,6 +38759,9 @@ input TimeScheduleUpdateInput {
 
   """The URL to the external schedule."""
   externalUrl: String
+
+  """[ALPHA] The schedule configuration. Pass null to clear it."""
+  config: TimeScheduleConfigInput
 }
 
 """Issue title sorting options."""
@@ -39587,6 +39733,7 @@ enum UserFlagType {
   agentSharedSkillsPromoDismissed
   agentSharedSkillsSplashAnimationSeen
   agentLoopsPromoShown
+  loopEditRestrictionSpeedbumpShown
   slackProjectChannelsPromoDismissed
   slackProjectChannelsPromoShown
   reviewsPromptToConnectGithubDismissed
@@ -40590,7 +40737,7 @@ type ViewPreferencesValues {
   """
   teamInitiativesShowContributing: Boolean
 
-  """[ALPHA] Whether to show team-level initiatives in the workspace."""
+  """Whether to show team-level initiatives in the workspace."""
   showTeamInitiatives: Boolean
 
   """The customers view ordering."""
@@ -40819,6 +40966,21 @@ type ViewPreferencesValues {
 
   """The search result type filter."""
   searchResultType: String
+
+  """Whether to show the parent field for documents."""
+  documentFieldParent: Boolean
+
+  """Whether to show the creator field for documents."""
+  documentFieldCreator: Boolean
+
+  """Whether to show the owner field for documents."""
+  documentFieldOwner: Boolean
+
+  """Whether to show the created date field for documents."""
+  documentFieldDateCreated: Boolean
+
+  """Whether to show the updated date field for documents."""
+  documentFieldDateUpdated: Boolean
 
   """The inbox view ordering."""
   inboxViewOrdering: String
@@ -41559,6 +41721,11 @@ type WorkflowDefinition implements Node {
   The user who owns the workflow. If not defined, it means the creator should be considered as the owner.
   """
   owner: User
+
+  """
+  Whether editing the workflow is restricted to its owner, team owners, and workspace administrators.
+  """
+  restrictEditing: Boolean!
 }
 
 """Comparator for the workflow definition that created an issue."""

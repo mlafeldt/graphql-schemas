@@ -6774,7 +6774,7 @@
           },
           {
             "name": "initiativesEnabled",
-            "description": "[ALPHA] Whether team initiatives are enabled and shown in the team's sidebar.",
+            "description": "Whether team initiatives are enabled and shown in the team's sidebar.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -7524,6 +7524,103 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "CommentConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "subscribers",
+            "description": "Users who are subscribed to the document.",
+            "args": [
+              {
+                "name": "filter",
+                "description": "Filter returned subscribers.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "UserFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeDisabled",
+                "description": "Should query return disabled/suspended users (default: false).",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "A cursor to be used with last for backward pagination.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "after",
+                "description": "A cursor to be used with first for forward pagination",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "The number of items to forward paginate (used with after). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "The number of items to backward paginate (used with before). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeArchived",
+                "description": "Should archived resources be included (default: false)",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt.",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "PaginationOrderBy",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "UserConnection",
                 "ofType": null
               }
             },
@@ -21921,7 +22018,7 @@
           },
           {
             "name": "leadTeam",
-            "description": "[ALPHA] Filters that the initiative lead team must satisfy.",
+            "description": "Filters that the initiative lead team must satisfy.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableTeamFilter",
@@ -22676,7 +22773,7 @@
           },
           {
             "name": "leadTeam",
-            "description": "[ALPHA] Filters that the initiative lead team must satisfy.",
+            "description": "Filters that the initiative lead team must satisfy.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableTeamFilter",
@@ -24542,6 +24639,16 @@
             "defaultValue": null
           },
           {
+            "name": "searchableContent",
+            "description": "[Internal] Comparator for the document's searchable content.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ContentComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "slugId",
             "description": "Comparator for the document slug ID.",
             "type": {
@@ -25343,7 +25450,7 @@
           },
           {
             "name": "leadTeam",
-            "description": "[ALPHA] Filters that the initiative lead team must satisfy.",
+            "description": "Filters that the initiative lead team must satisfy.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableTeamFilter",
@@ -29092,7 +29199,7 @@
           },
           {
             "name": "leadTeam",
-            "description": "[ALPHA] The team that leads the initiative. Null if no lead team is assigned.",
+            "description": "The team that leads the initiative. Null if no lead team is assigned.",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -29380,7 +29487,7 @@
           },
           {
             "name": "visibility",
-            "description": "[ALPHA] The visibility of the initiative, derived from its lead team. Public when no lead team is assigned.",
+            "description": "The visibility of the initiative, derived from its lead team. Public when no lead team is assigned.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -32197,6 +32304,66 @@
                 "name": "String",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "nativeStackId",
+            "description": "[Internal] The host-qualified external ID of the native stack that contains this pull request. Null if the pull request is not in a native stack or stack data is unavailable.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "nativeStackNumber",
+            "description": "[Internal] The number the hosting provider assigns to the native stack within its repository. Null if the pull request is not in a native stack or stack data is unavailable.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "nativeStackPosition",
+            "description": "[Internal] The pull request's one-based position in its native stack, where 1 is closest to the target branch. Null if the pull request is not in a native stack or stack data is unavailable.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "nativeStackSize",
+            "description": "[Internal] The total number of pull requests in the native stack. Null if the pull request is not in a native stack or stack data is unavailable.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "nativeStackTargetBranch",
+            "description": "[Internal] The target branch shared by the native stack. Null if the pull request is not in a native stack or stack data is unavailable.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -48927,7 +49094,7 @@
           },
           {
             "name": "showTeamInitiatives",
-            "description": "[ALPHA] Whether to show team-level initiatives in the workspace.",
+            "description": "Whether to show team-level initiatives in the workspace.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -49808,6 +49975,66 @@
             "type": {
               "kind": "SCALAR",
               "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentFieldParent",
+            "description": "Whether to show the parent field for documents.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentFieldCreator",
+            "description": "Whether to show the creator field for documents.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentFieldOwner",
+            "description": "Whether to show the owner field for documents.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentFieldDateCreated",
+            "description": "Whether to show the created date field for documents.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentFieldDateUpdated",
+            "description": "Whether to show the updated date field for documents.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
               "ofType": null
             },
             "isDeprecated": false,
@@ -53762,6 +53989,22 @@
               "kind": "OBJECT",
               "name": "User",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "restrictEditing",
+            "description": "Whether editing the workflow is restricted to its owner, team owners, and workspace administrators.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -67783,6 +68026,18 @@
             "deprecationReason": null
           },
           {
+            "name": "config",
+            "description": "[ALPHA] The schedule configuration.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "TimeScheduleConfig",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "organization",
             "description": "The workspace of the schedule.",
             "args": [],
@@ -67879,6 +68134,33 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "TimeScheduleConfig",
+        "description": "[ALPHA] The configuration of a time schedule.",
+        "fields": [
+          {
+            "name": "nextShiftsByUserId",
+            "description": "Record of the next two on-call shifts keyed by Linear user id, e.g. `{ \"<linearUserId>\": [{ \"startsAt\": \"X\", \"endsAt\": \"Y\" }] }`.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "JSONObject",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -85857,6 +86139,30 @@
             "deprecationReason": null
           },
           {
+            "name": "partnerProgramPartners",
+            "description": "[Internal] Lists every partner with an active partner-program offer, ordered by display name. Backs the partner directory on the marketing website.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "PartnerProgramPartnerPayload",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "partnerOfferWorkspaces",
             "description": "[Internal] Fetches the viewer's workspaces hosted in the serving cell, with each workspace's eligibility to redeem the given partner-offer token. Returns null when the token is invalid or the offer is no longer available.",
             "args": [
@@ -98674,6 +98980,78 @@
       },
       {
         "kind": "OBJECT",
+        "name": "PartnerProgramPartnerPayload",
+        "description": "[Internal] A partner listed in the Linear Startup Program.",
+        "fields": [
+          {
+            "name": "partnerName",
+            "description": "Display name of the partner.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "category",
+            "description": "The kind of partner program the offer belongs to.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "PartnerOfferCategory",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "PartnerOfferCategory",
+        "description": "The kind of partner program an offer belongs to.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "investor",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "accelerator",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "startup_community",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "PartnerOfferWorkspacesPayload",
         "description": "[Internal] The viewer's workspaces hosted in the serving cell, with partner-offer eligibility.",
         "fields": [
@@ -100901,6 +101279,103 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "CommentConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "subscribers",
+            "description": "Users who are subscribed to the document.",
+            "args": [
+              {
+                "name": "filter",
+                "description": "Filter returned subscribers.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "UserFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeDisabled",
+                "description": "Should query return disabled/suspended users (default: false).",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "A cursor to be used with last for backward pagination.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "after",
+                "description": "A cursor to be used with first for forward pagination",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "The number of items to forward paginate (used with after). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "The number of items to backward paginate (used with before). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeArchived",
+                "description": "Should archived resources be included (default: false)",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt.",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "PaginationOrderBy",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "UserConnection",
                 "ofType": null
               }
             },
@@ -131267,7 +131742,7 @@
           },
           {
             "name": "leadTeamId",
-            "description": "[ALPHA] The team that leads the initiative.",
+            "description": "The team that leads the initiative.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -131426,7 +131901,7 @@
           },
           {
             "name": "leadTeamId",
-            "description": "[ALPHA] The team that leads the initiative. Set to null to clear.",
+            "description": "The team that leads the initiative. Set to null to clear.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -147628,7 +148103,7 @@
           },
           {
             "name": "initiativesEnabled",
-            "description": "[ALPHA] Whether initiatives are shown in the team's sidebar.",
+            "description": "Whether initiatives are shown in the team's sidebar.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -148248,7 +148723,7 @@
           },
           {
             "name": "initiativesEnabled",
-            "description": "[ALPHA] Whether initiatives are shown in the team's sidebar.",
+            "description": "Whether initiatives are shown in the team's sidebar.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -148902,6 +149377,16 @@
               "ofType": null
             },
             "defaultValue": null
+          },
+          {
+            "name": "config",
+            "description": "[ALPHA] The schedule configuration.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "TimeScheduleConfigInput",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -148969,6 +149454,31 @@
       },
       {
         "kind": "INPUT_OBJECT",
+        "name": "TimeScheduleConfigInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nextShiftsByUserId",
+            "description": "Record of the next two on-call shifts keyed by Linear user id, e.g. `{ \"<linearUserId>\": [{ \"startsAt\": \"X\", \"endsAt\": \"Y\" }] }`.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "JSONObject",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
         "name": "TimeScheduleUpdateInput",
         "description": "Input for updating an existing time schedule.",
         "fields": null,
@@ -149017,6 +149527,16 @@
             "type": {
               "kind": "SCALAR",
               "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "config",
+            "description": "[ALPHA] The schedule configuration. Pass null to clear it.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "TimeScheduleConfigInput",
               "ofType": null
             },
             "defaultValue": null
@@ -150408,6 +150928,12 @@
           },
           {
             "name": "agentLoopsPromoShown",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "loopEditRestrictionSpeedbumpShown",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
