@@ -49753,6 +49753,30 @@
             "deprecationReason": null
           },
           {
+            "name": "automationRunHistoryShowIssueIdentifier",
+            "description": "Whether to show the issue identifier in Loop run history.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "automationRunHistoryShowDuration",
+            "description": "Whether to show the run duration in Loop run history.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "releasePipelineGrouping",
             "description": "The release pipeline grouping.",
             "args": [],
@@ -54625,6 +54649,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "AiConversationElicitationResponsePart",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "AiConversationAckPart",
             "ofType": null
           }
@@ -54839,6 +54868,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "AiConversationElicitationResponsePart",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "AiConversationAckPart",
             "ofType": null
           }
@@ -54902,6 +54936,12 @@
           },
           {
             "name": "elicitation",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "elicitationResponse",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -62945,7 +62985,7 @@
           },
           {
             "name": "prompt",
-            "description": "The prompt sent as a normal user reply when selected.",
+            "description": "The user prompt rendered to the agent when this option is selected.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -62953,6 +62993,174 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AiConversationElicitationResponsePart",
+        "description": "A structured user response to an elicitation in an AI conversation.",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The ID of the part.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "type",
+            "description": "The type of the part.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "AiConversationPartType",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "metadata",
+            "description": "The metadata of the part.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AiConversationPartMetadata",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "elicitationId",
+            "description": "The identifier of the elicitation that was answered.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "data",
+            "description": "The kind-specific response data.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "UNION",
+                "name": "AiConversationElicitationResponseData",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "user",
+            "description": "The user who answered the elicitation.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "User",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "AiConversationBasePart",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "UNION",
+        "name": "AiConversationElicitationResponseData",
+        "description": "The kind-specific data recorded when a user answers an AI conversation elicitation.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "AiConversationMultipleChoiceElicitationResponseData",
+            "ofType": null
+          }
+        ]
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AiConversationMultipleChoiceElicitationResponseData",
+        "description": "The selected option in a multiple-choice AI conversation elicitation.",
+        "fields": [
+          {
+            "name": "kind",
+            "description": "The kind of elicitation that was answered.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "AiConversationElicitationKind",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "selectedOptionIndex",
+            "description": "The zero-based index of the selected option.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
                 "ofType": null
               }
             },
@@ -134702,6 +134910,26 @@
               }
             },
             "defaultValue": null
+          },
+          {
+            "name": "repositoriesSyncedAt",
+            "description": "The date the repository list was last loaded from GitHub. Unset while the first load is still in progress.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "repositoryCount",
+            "description": "The number of repositories the installation can access, as reported by GitHub. Known before the repository list itself has loaded.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -142164,6 +142392,16 @@
         "description": "Input for updating workspace security settings such as role-based access controls.",
         "fields": null,
         "inputFields": [
+          {
+            "name": "adminManagementRole",
+            "description": "The minimum role required to grant or revoke the workspace admin role.",
+            "type": {
+              "kind": "ENUM",
+              "name": "UserRoleType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
           {
             "name": "personalApiKeysRole",
             "description": "The minimum role required to create personal API keys.",
@@ -151741,6 +151979,12 @@
           },
           {
             "name": "automations",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "automationRunHistory",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

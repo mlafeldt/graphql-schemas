@@ -1480,7 +1480,7 @@ type AiConversationElicitationOption {
   """The short label shown for the option."""
   label: String!
 
-  """The prompt sent as a normal user reply when selected."""
+  """The user prompt rendered to the agent when this option is selected."""
   prompt: String!
 }
 
@@ -1503,6 +1503,32 @@ type AiConversationElicitationPart implements AiConversationBasePart {
 
   """Selectable prompt options for multiple-choice elicitations."""
   options: [AiConversationElicitationOption!]!
+}
+
+"""
+The kind-specific data recorded when a user answers an AI conversation elicitation.
+"""
+union AiConversationElicitationResponseData = AiConversationMultipleChoiceElicitationResponseData
+
+"""A structured user response to an elicitation in an AI conversation."""
+type AiConversationElicitationResponsePart implements AiConversationBasePart {
+  """The ID of the part."""
+  id: String!
+
+  """The type of the part."""
+  type: AiConversationPartType!
+
+  """The metadata of the part."""
+  metadata: AiConversationPartMetadata!
+
+  """The identifier of the elicitation that was answered."""
+  elicitationId: String!
+
+  """The kind-specific response data."""
+  data: AiConversationElicitationResponseData!
+
+  """The user who answered the elicitation."""
+  user: User
 }
 
 type AiConversationEntityCardWidget implements AiConversationBaseWidget {
@@ -1893,6 +1919,15 @@ type AiConversationListCodingSessionsToolCallResultAgentSessions {
   pullRequests: [AiConversationSearchEntitiesToolCallResultEntities!]
 }
 
+"""The selected option in a multiple-choice AI conversation elicitation."""
+type AiConversationMultipleChoiceElicitationResponseData {
+  """The kind of elicitation that was answered."""
+  kind: AiConversationElicitationKind!
+
+  """The zero-based index of the selected option."""
+  selectedOptionIndex: Int!
+}
+
 type AiConversationNavigateToPageToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -1945,7 +1980,7 @@ type AiConversationNotifyUsersToolCallArgs {
 }
 
 """A part in an AI conversation."""
-union AiConversationPart = AiConversationPromptPart | AiConversationTextPart | AiConversationReasoningPart | AiConversationEventPart | AiConversationErrorPart | AiConversationToolCallPart | AiConversationWidgetPart | AiConversationElicitationPart | AiConversationAckPart
+union AiConversationPart = AiConversationPromptPart | AiConversationTextPart | AiConversationReasoningPart | AiConversationEventPart | AiConversationErrorPart | AiConversationToolCallPart | AiConversationWidgetPart | AiConversationElicitationPart | AiConversationElicitationResponsePart | AiConversationAckPart
 
 """Metadata about a part in an AI conversation."""
 type AiConversationPartMetadata {
@@ -1985,6 +2020,7 @@ enum AiConversationPartType {
   widget
   widgetPlaceholder
   elicitation
+  elicitationResponse
   ack
 }
 
@@ -10434,6 +10470,17 @@ input GitHubImportSettingsInput {
 
   """The type of Github org"""
   orgType: GithubOrgType!
+
+  """
+  The date the repository list was last loaded from GitHub. Unset while the first load is still in progress.
+  """
+  repositoriesSyncedAt: DateTime
+
+  """
+  The number of repositories the installation can access, as reported by GitHub.
+  Known before the repository list itself has loaded.
+  """
+  repositoryCount: Float
 }
 
 """
@@ -25305,6 +25352,9 @@ type OrganizationPayload {
 Input for updating workspace security settings such as role-based access controls.
 """
 input OrganizationSecuritySettingsInput {
+  """The minimum role required to grant or revoke the workspace admin role."""
+  adminManagementRole: UserRoleType
+
   """The minimum role required to create personal API keys."""
   personalApiKeysRole: UserRoleType
 
@@ -40902,6 +40952,12 @@ type ViewPreferencesValues {
   """The loop stats period."""
   automationStatsPeriod: String
 
+  """Whether to show the issue identifier in Loop run history."""
+  automationRunHistoryShowIssueIdentifier: Boolean
+
+  """Whether to show the run duration in Loop run history."""
+  automationRunHistoryShowDuration: Boolean
+
   """The release pipeline grouping."""
   releasePipelineGrouping: String
 
@@ -41115,6 +41171,7 @@ enum ViewType {
   workspaceMembers
   releasePipelines
   automations
+  automationRunHistory
   roadmapAll
   roadmap
   roadmaps
