@@ -705,11 +705,9 @@ type AgentSession implements Node {
   plan: JSON
 
   """
-  [Internal] The coding agent's live working-tree diff metadata (changes not yet
-  pushed to origin), reported by the sandbox. Per-file content is fetched on
-  demand from the workspace-diff-blob route. Null when in sync.
+  [Internal] Legacy live working-tree diff metadata. Null when the sandbox is in sync.
   """
-  workspaceDiff: JSON
+  workspaceDiff: JSON @deprecated(reason: "Use the session's Diff model instead.")
 
   """
   The entity contexts this session is related to, such as issues or projects
@@ -732,13 +730,10 @@ type AgentSession implements Node {
   codingHarnessModelLabel: String
 
   """
-  [Internal] Per-file list of the agent's live working-tree diff at the given
-  content hash. Served behind a repository-read-access gate (the synced summary
-  carries only aggregate counts); null when the requester lacks repository
-  access or there is no current diff.
+  [Internal] Legacy per-file metadata for the agent session's live working-tree diff.
   """
   workspaceDiffFiles(
-    """The diff's content hash, from the session's `workspaceDiff`."""
+    """The diff content hash from workspaceDiff."""
     contentHash: String!
   ): [AgentSessionWorkspaceDiffFile!] @deprecated(reason: "Use Diff.files instead.")
 
@@ -29606,8 +29601,7 @@ type ProjectStatus implements Node {
   indefinite: Boolean!
 
   """
-  [Internal] The team that the status is scoped to. If null, the status is a
-  workspace-level status available to all teams in the workspace.
+  [Internal] The team that the status is scoped to. If null, the status is a workspace-level status.
   """
   team: Team
 
@@ -29676,6 +29670,11 @@ input ProjectStatusCreateInput {
 
   """Whether or not a project can be in this status indefinitely."""
   indefinite: Boolean = false
+
+  """
+  [Internal] The identifier of the team to scope the status to. If not given, the status is a workspace-level status.
+  """
+  teamId: String
 }
 
 type ProjectStatusEdge {
@@ -35979,6 +35978,11 @@ type SlackChannelNameMapping {
   Whether or not to use AI to generate titles for Asks created in this channel.
   """
   aiTitles: Boolean
+
+  """
+  Whether or not synced Slack threads should be updated with a message when their Ask has an updated assignee.
+  """
+  postAssignmentUpdates: Boolean
 }
 
 input SlackChannelNameMappingInput {
@@ -36042,6 +36046,11 @@ input SlackChannelNameMappingInput {
   Whether or not to use AI to generate titles for Asks created in this channel.
   """
   aiTitles: Boolean
+
+  """
+  Whether or not synced Slack threads should be updated with a message when their Ask has an updated assignee.
+  """
+  postAssignmentUpdates: Boolean
 }
 
 enum SlackChannelType {
@@ -36984,6 +36993,12 @@ type Team implements Node {
   inheritWorkflowStatuses: Boolean!
 
   """
+  [Internal] Whether the team should inherit its project statuses from its
+  parent team, or from the workspace when it has no parent.
+  """
+  inheritProjectStatuses: Boolean!
+
+  """
   Whether the team should inherit its estimation settings from its parent. Only applies to sub-teams.
   """
   inheritIssueEstimation: Boolean!
@@ -37710,6 +37725,12 @@ input TeamCreateInput {
   inheritWorkflowStatuses: Boolean
 
   """
+  [Internal] Whether the team should inherit project statuses from its parent
+  team, or from the workspace when it has no parent.
+  """
+  inheritProjectStatuses: Boolean
+
+  """
   The issue estimation type to use. Must be one of "notUsed", "exponential", "fibonacci", "linear", "tShirt".
   """
   issueEstimationType: String
@@ -38343,6 +38364,12 @@ input TeamUpdateInput {
   inheritWorkflowStatuses: Boolean
 
   """
+  [Internal] Whether the team should inherit project statuses from its parent
+  team, or from the workspace when it has no parent.
+  """
+  inheritProjectStatuses: Boolean
+
+  """
   [Internal] Whether the team should inherit its product intelligence scope from its parent. Only applies to sub-teams.
   """
   inheritProductIntelligenceScope: Boolean
@@ -38692,18 +38719,16 @@ type TimeSchedule implements Node {
 """[ALPHA] The configuration of a time schedule."""
 type TimeScheduleConfig {
   """
-  Record of the next two on-call shifts keyed by Linear user id, e.g. `{
-  "<linearUserId>": [{ "startsAt": "X", "endsAt": "Y" }] }`.
+  Record of the next on-call shift keyed by Linear user id, e.g. `{ "<linearUserId>": { "startsAt": "X", "endsAt": "Y" } }`.
   """
-  nextShiftsByUserId: JSONObject!
+  nextShiftByUserId: JSONObject!
 }
 
 input TimeScheduleConfigInput {
   """
-  Record of the next two on-call shifts keyed by Linear user id, e.g. `{
-  "<linearUserId>": [{ "startsAt": "X", "endsAt": "Y" }] }`.
+  Record of the next on-call shift keyed by Linear user id, e.g. `{ "<linearUserId>": { "startsAt": "X", "endsAt": "Y" } }`.
   """
-  nextShiftsByUserId: JSONObject!
+  nextShiftByUserId: JSONObject!
 }
 
 type TimeScheduleConnection {
@@ -39072,6 +39097,11 @@ type UsageAlert implements Node {
 
   """Type-specific metadata captured when the alert was triggered."""
   metadata: JSONObject!
+
+  """
+  The time when the usage alert was resolved or archived. Null if the alert is still active.
+  """
+  resolvedAt: DateTime
 }
 
 """
@@ -41052,13 +41082,13 @@ type ViewPreferencesValues {
   triageViewOrdering: String
 
   """The focus view grouping."""
-  focusViewGrouping: String
+  focusViewGrouping: String @deprecated(reason: "No longer available")
 
   """The focus view ordering."""
-  focusViewOrdering: String
+  focusViewOrdering: String @deprecated(reason: "No longer available")
 
   """The focus view ordering direction."""
-  focusViewOrderingDirection: String
+  focusViewOrderingDirection: String @deprecated(reason: "No longer available")
 
   """The review grouping."""
   reviewGrouping: String
@@ -41167,7 +41197,7 @@ enum ViewType {
   myReviews
   createdReviews
   agents
-  focus
+  focus @deprecated(reason: "No longer available")
   feedAll
   feedCreated
   feedFollowing

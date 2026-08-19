@@ -4914,6 +4914,22 @@
             "deprecationReason": null
           },
           {
+            "name": "inheritProjectStatuses",
+            "description": "[Internal] Whether the team should inherit its project statuses from its parent team, or from the workspace when it has no parent.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "inheritIssueEstimation",
             "description": "Whether the team should inherit its estimation settings from its parent. Only applies to sub-teams.",
             "args": [],
@@ -10229,7 +10245,7 @@
           },
           {
             "name": "team",
-            "description": "[Internal] The team that the status is scoped to. If null, the status is a workspace-level status available to all teams in the workspace.",
+            "description": "[Internal] The team that the status is scoped to. If null, the status is a workspace-level status.",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -35342,15 +35358,15 @@
           },
           {
             "name": "workspaceDiff",
-            "description": "[Internal] The coding agent's live working-tree diff metadata (changes not yet pushed to origin), reported by the sandbox. Per-file content is fetched on demand from the workspace-diff-blob route. Null when in sync.",
+            "description": "[Internal] Legacy live working-tree diff metadata. Null when the sandbox is in sync.",
             "args": [],
             "type": {
               "kind": "SCALAR",
               "name": "JSON",
               "ofType": null
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "Use the session's Diff model instead."
           },
           {
             "name": "context",
@@ -35406,11 +35422,11 @@
           },
           {
             "name": "workspaceDiffFiles",
-            "description": "[Internal] Per-file list of the agent's live working-tree diff at the given content hash. Served behind a repository-read-access gate (the synced summary carries only aggregate counts); null when the requester lacks repository access or there is no current diff.",
+            "description": "[Internal] Legacy per-file metadata for the agent session's live working-tree diff.",
             "args": [
               {
                 "name": "contentHash",
-                "description": "The diff's content hash, from the session's `workspaceDiff`.",
+                "description": "The diff content hash from workspaceDiff.",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -50109,8 +50125,8 @@
               "name": "String",
               "ofType": null
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "No longer available"
           },
           {
             "name": "focusViewOrdering",
@@ -50121,8 +50137,8 @@
               "name": "String",
               "ofType": null
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "No longer available"
           },
           {
             "name": "focusViewOrderingDirection",
@@ -50133,8 +50149,8 @@
               "name": "String",
               "ofType": null
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "No longer available"
           },
           {
             "name": "reviewGrouping",
@@ -68364,8 +68380,8 @@
         "description": "[ALPHA] The configuration of a time schedule.",
         "fields": [
           {
-            "name": "nextShiftsByUserId",
-            "description": "Record of the next two on-call shifts keyed by Linear user id, e.g. `{ \"<linearUserId>\": [{ \"startsAt\": \"X\", \"endsAt\": \"Y\" }] }`.",
+            "name": "nextShiftByUserId",
+            "description": "Record of the next on-call shift keyed by Linear user id, e.g. `{ \"<linearUserId>\": { \"startsAt\": \"X\", \"endsAt\": \"Y\" } }`.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -79971,6 +79987,18 @@
                 "name": "JSONObject",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "resolvedAt",
+            "description": "The time when the usage alert was resolved or archived. Null if the alert is still active.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -134180,6 +134208,16 @@
               "ofType": null
             },
             "defaultValue": null
+          },
+          {
+            "name": "postAssignmentUpdates",
+            "description": "Whether or not synced Slack threads should be updated with a message when their Ask has an updated assignee.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -137455,6 +137493,18 @@
           {
             "name": "aiTitles",
             "description": "Whether or not to use AI to generate titles for Asks created in this channel.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "postAssignmentUpdates",
+            "description": "Whether or not synced Slack threads should be updated with a message when their Ask has an updated assignee.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -144163,6 +144213,16 @@
               "ofType": null
             },
             "defaultValue": "false"
+          },
+          {
+            "name": "teamId",
+            "description": "[Internal] The identifier of the team to scope the status to. If not given, the status is a workspace-level status.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -148176,6 +148236,16 @@
             "defaultValue": null
           },
           {
+            "name": "inheritProjectStatuses",
+            "description": "[Internal] Whether the team should inherit project statuses from its parent team, or from the workspace when it has no parent.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "issueEstimationType",
             "description": "The issue estimation type to use. Must be one of \"notUsed\", \"exponential\", \"fibonacci\", \"linear\", \"tShirt\".",
             "type": {
@@ -148928,6 +148998,16 @@
           {
             "name": "inheritWorkflowStatuses",
             "description": "[Internal] Whether the team should inherit workflow statuses from its parent.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "inheritProjectStatuses",
+            "description": "[Internal] Whether the team should inherit project statuses from its parent team, or from the workspace when it has no parent.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -149703,8 +149783,8 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "nextShiftsByUserId",
-            "description": "Record of the next two on-call shifts keyed by Linear user id, e.g. `{ \"<linearUserId>\": [{ \"startsAt\": \"X\", \"endsAt\": \"Y\" }] }`.",
+            "name": "nextShiftByUserId",
+            "description": "Record of the next on-call shift keyed by Linear user id, e.g. `{ \"<linearUserId>\": { \"startsAt\": \"X\", \"endsAt\": \"Y\" } }`.",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -151954,8 +152034,8 @@
           {
             "name": "focus",
             "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "No longer available"
           },
           {
             "name": "feedAll",
