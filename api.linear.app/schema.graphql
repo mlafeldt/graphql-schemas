@@ -1468,6 +1468,7 @@ type AiConversationDeleteEntityToolCallArgs {
 """The kind of input an AI conversation elicitation asks for."""
 enum AiConversationElicitationKind {
   multipleChoice
+  mcpServerConnection
 }
 
 """A selectable option shown in an AI conversation elicitation."""
@@ -1479,7 +1480,7 @@ type AiConversationElicitationOption {
   prompt: String!
 }
 
-"""A lightweight question or choice prompt shown with an AI conversation."""
+"""A structured request for user input shown with an AI conversation."""
 type AiConversationElicitationPart implements AiConversationBasePart {
   """The ID of the part."""
   id: String!
@@ -1498,12 +1499,27 @@ type AiConversationElicitationPart implements AiConversationBasePart {
 
   """Selectable prompt options for multiple-choice elicitations."""
   options: [AiConversationElicitationOption!]!
+
+  """
+  The MCP server URL for a new connection. Null for reconnects and other elicitation kinds.
+  """
+  serverUrl: String
+
+  """
+  The requested owner of the MCP server connection. Null for other elicitation kinds.
+  """
+  scope: AiConversationMcpServerConnectionScope
+
+  """
+  The existing MCP integration to reconnect. Null when creating a new connection.
+  """
+  integrationId: String
 }
 
 """
 The kind-specific data recorded when a user answers an AI conversation elicitation.
 """
-union AiConversationElicitationResponseData = AiConversationMultipleChoiceElicitationResponseData
+union AiConversationElicitationResponseData = AiConversationMultipleChoiceElicitationResponseData | AiConversationMcpServerConnectionElicitationResponseData
 
 """A structured user response to an elicitation in an AI conversation."""
 type AiConversationElicitationResponsePart implements AiConversationBasePart {
@@ -1913,6 +1929,42 @@ type AiConversationListCodingSessionsToolCallResultAgentSessions {
   type: String!
   id: String!
   pullRequests: [AiConversationSearchEntitiesToolCallResultEntities!]
+}
+
+"""The integration connected by an MCP server connection elicitation."""
+type AiConversationMcpServerConnectionElicitationResponseData {
+  """The kind of elicitation that was answered."""
+  kind: AiConversationElicitationKind!
+
+  """The identifier of the MCP server integration that was connected."""
+  integrationId: String!
+}
+
+"""
+The owner scope for an MCP server connection requested in an AI conversation.
+"""
+type AiConversationMcpServerConnectionScope {
+  """The type of owner that will receive the MCP server connection."""
+  type: AiConversationMcpServerConnectionScopeType!
+
+  """
+  The identifier of the team that will own the connection. Null for other scope types.
+  """
+  teamId: String
+
+  """
+  The identifier of the Loop that will own the connection. Null for other scope types.
+  """
+  workflowDefinitionId: String
+}
+
+"""
+The owner scope for an MCP server connection requested in an AI conversation.
+"""
+enum AiConversationMcpServerConnectionScopeType {
+  user
+  team
+  workflowDefinition
 }
 
 """The selected option in a multiple-choice AI conversation elicitation."""
@@ -10895,6 +10947,11 @@ input InheritanceEntityMapping {
 
   """Mapping of the ProjectLabel ID to the new ProjectLabel name."""
   projectLabels: JSONObject
+
+  """
+  [Internal] Mapping of the ProjectStatus ID to the workspace or parent team ProjectStatus ID its projects move to.
+  """
+  projectStatuses: JSONObject
 }
 
 """
@@ -17891,6 +17948,14 @@ input JiraProjectDataInput {
   name: String!
 }
 
+type JiraProjectStatusesPayload {
+  """The Jira project's issue statuses (non-Epic)."""
+  issueStatuses: [String!]!
+
+  """The Jira project's project statuses (Epic)."""
+  projectStatuses: [String!]!
+}
+
 input JiraSettingsInput {
   """The mapping of Jira project id => Linear team id."""
   projectMapping: [JiraLinearMappingInput!]
@@ -17928,13 +17993,6 @@ input JiraSettingsInput {
   The label of the Jira instance, for visual identification purposes only
   """
   label: String
-
-  """
-  Jira status names grouped by project, separated into issue statuses (non-Epic)
-  and project statuses (Epic). Structure: projectId -> { issueStatuses:
-  string[], projectStatuses: string[] }
-  """
-  statusNamesPerIssueType: JSONObject
 }
 
 input JiraUpdateInput {
@@ -19865,12 +19923,12 @@ type Mutation {
   ): IntegrationPayload!
 
   """
-  [INTERNAL] Fetches Jira project statuses and stores them in integration settings.
+  [INTERNAL] Fetches Jira project statuses for the status mapping settings UI.
   """
   integrationJiraFetchProjectStatuses(
     """Input for fetching Jira project statuses."""
     input: JiraFetchProjectStatusesInput!
-  ): JiraFetchProjectStatusesPayload!
+  ): JiraFetchProjectStatusesPayload! @deprecated(reason: "Use the `integrationJiraProjectStatuses` query instead.")
 
   """Connect your Jira account to Linear."""
   integrationJiraPersonal(
@@ -30486,6 +30544,16 @@ type PullRequestCommit {
 
   """External user IDs for commit authors (includes co-authors)."""
   authorExternalUserIds: [String!]!
+
+  """
+  The Linear user ID for the commit's committer. Null if no matching Linear user is available.
+  """
+  committerUserId: String
+
+  """
+  The external user ID for the commit's committer. Null if no matching external user is available.
+  """
+  committerExternalUserId: String
 }
 
 """
@@ -31869,6 +31937,17 @@ type Query {
     """The integration ID."""
     integrationId: String!
   ): IntegrationHasScopesPayload!
+
+  """
+  [INTERNAL] Fetches a Jira project's status names, split into issue (non-Epic) and project (Epic) statuses.
+  """
+  integrationJiraProjectStatuses(
+    """The Jira project ID to fetch statuses for."""
+    projectId: String!
+
+    """The id of the Jira integration."""
+    integrationId: String!
+  ): JiraProjectStatusesPayload!
 
   """
   [Internal] Lists Microsoft Teams teams and channels accessible to the
@@ -35983,6 +36062,11 @@ type SlackChannelNameMapping {
   Whether or not synced Slack threads should be updated with a message when their Ask has an updated assignee.
   """
   postAssignmentUpdates: Boolean
+
+  """
+  Whether or not synced Slack threads should be updated with a message when their Ask's SLA is at risk or breached.
+  """
+  postSlaUpdates: Boolean
 }
 
 input SlackChannelNameMappingInput {
@@ -36051,6 +36135,11 @@ input SlackChannelNameMappingInput {
   Whether or not synced Slack threads should be updated with a message when their Ask has an updated assignee.
   """
   postAssignmentUpdates: Boolean
+
+  """
+  Whether or not synced Slack threads should be updated with a message when their Ask's SLA is at risk or breached.
+  """
+  postSlaUpdates: Boolean
 }
 
 enum SlackChannelType {
