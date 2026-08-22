@@ -14664,6 +14664,33 @@ type IssueFieldTimelineOption {
   name: String!
 }
 
+"""Updates an issue field using its user-facing name."""
+input IssueFieldUpdateInput {
+  """The name of the issue field."""
+  fieldName: String!
+
+  """The operation to perform."""
+  operation: IssueFieldUpdateOperation!
+
+  """The value or comma-separated option names for the operation."""
+  value: String
+}
+
+"""The operation to perform on an issue field value."""
+enum IssueFieldUpdateOperation {
+  """Replaces the field value."""
+  SET
+
+  """Sets a scalar field or adds options to a multi-select field."""
+  ADD
+
+  """Removes options from a multi-select field."""
+  REMOVE
+
+  """Clears the field value."""
+  CLEAR
+}
+
 """Issue field values"""
 union IssueFieldValue = IssueFieldDateValue | IssueFieldMultiSelectValue | IssueFieldNumberValue | IssueFieldSingleSelectValue | IssueFieldTextValue
 
@@ -43165,6 +43192,9 @@ input UpdateIssueInput {
   The Issue Type to set on this issue, with optional rationale. Mutually exclusive with `issueTypeId`.
   """
   issueType: IssueTypeUpdateInput
+
+  """Issue field updates resolved by field and option names."""
+  issueFieldUpdates: [IssueFieldUpdateInput!]
 
   """Configuration for assigning an AI agent to this issue."""
   agentAssignment: AgentAssignmentInput
