@@ -1316,6 +1316,12 @@ type AiConversationAckPart implements AiConversationBasePart {
 
   """The kind of acknowledgement the agent expressed."""
   kind: AiConversationAckKind!
+
+  """
+  [Internal] A one-line, third-person summary of the action the agent completed.
+  Null when the agent acknowledged without describing an action.
+  """
+  summary: String
 }
 
 """A base part in an AI conversation."""
@@ -10124,29 +10130,6 @@ enum FeedSummarySchedule {
   daily
   weekly
   never
-}
-
-"""The result of a data fetch query using natural language."""
-type FetchDataPayload {
-  """
-  The fetched data as a JSON object. The shape depends on the natural language
-  query and the resolved GraphQL query. Null if the query returned no results.
-  """
-  data: JSONObject
-
-  """
-  The GraphQL query that was generated from the natural language input and
-  executed to produce the data. Useful for debugging or reusing the query directly.
-  """
-  query: String
-
-  """
-  The filter variables that were generated and applied to the GraphQL query. Null if no filters were needed.
-  """
-  filters: JSONObject
-
-  """Whether the fetch operation was successful."""
-  success: Boolean!
 }
 
 type FileUploadDeletePayload {
@@ -26729,8 +26712,9 @@ type Project implements Node {
 
   """
   [Internal] The human-readable identifier of the project. Returns the custom
-  identifier override when set, otherwise the workspace default
-  `<prefix>-<number>`. Null for legacy projects that have not been backfilled.
+  identifier override when set, otherwise the default
+  `P-<leadTeamKey>-<number>`. Null for projects without a lead team and for
+  legacy projects that have not been backfilled.
   """
   identifier: String
 
@@ -29115,8 +29099,9 @@ type ProjectSearchResult implements Node {
 
   """
   [Internal] The human-readable identifier of the project. Returns the custom
-  identifier override when set, otherwise the workspace default
-  `<prefix>-<number>`. Null for legacy projects that have not been backfilled.
+  identifier override when set, otherwise the default
+  `P-<leadTeamKey>-<number>`. Null for projects without a lead team and for
+  legacy projects that have not been backfilled.
   """
   identifier: String
 
@@ -31749,24 +31734,6 @@ type Query {
   favorite(id: String!): Favorite!
 
   """
-  [Internal] Fetch an arbitrary set of data using natural language query. Be
-  specific about what you want including properties for each entity, sort order,
-  filters, limit and properties.
-  """
-  fetchData(
-    """
-    Natural language query describing what data to fetch.
-        
-        Examples:
-        - "All issues for the project with id 12345678-1234-1234-1234-123456789abc including comments"
-        - "The latest project update for each project that's a part of the
-    initiative with id 12345678-1234-1234-1234-123456789abc, including it's
-    sub-initiatives"
-    """
-    query: String!
-  ): FetchDataPayload!
-
-  """
   Returns all initiatives in the workspace, with optional filtering and sorting.
   """
   initiatives(
@@ -33345,6 +33312,47 @@ type Query {
     """The identifier of the triage responsibility to retrieve."""
     id: String!
   ): TriageResponsibility!
+
+  """
+  The workspace's usage-based billing alerts, such as a low or exhausted usage
+  credit balance. Alerts for expired promotional credits are archived and
+  excluded unless archived resources are requested. Use resolvedAt to tell an
+  open alert from one whose condition has since cleared.
+  """
+  usageAlerts(
+    """Filter returned usage alerts."""
+    filter: UsageAlertFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): UsageAlertConnection!
+
+  """One usage-based billing alert, by its identifier."""
+  usageAlert(
+    """The identifier of the usage alert to retrieve."""
+    id: String!
+  ): UsageAlert!
 
   """
   All users in the workspace. Supports filtering, sorting, and pagination.
@@ -36273,6 +36281,11 @@ input SlackSettingsInput {
 
   """Whether Linear Agent should be enabled for this Slack integration."""
   enableAgent: Boolean
+
+  """
+  Whether Loops may read and send messages through this Slack integration.
+  """
+  enableLoops: Boolean
 
   """
   Whether Linear Agent may respond in private channels for this Slack integration.
@@ -39259,13 +39272,52 @@ type UsageAlert implements Node {
   """The kind of usage alert that was triggered."""
   type: String!
 
-  """Type-specific metadata captured when the alert was triggered."""
+  """
+  Type-specific snapshot captured when the alert was triggered, keyed by the
+  alert type — for example the credit balance and threshold for a lowBalance
+  alert. A resolution entry is added once new usage credits have landed and
+  cleared the alert's condition.
+  """
   metadata: JSONObject!
 
   """
   The time when the usage alert was resolved or archived. Null if the alert is still active.
   """
   resolvedAt: DateTime
+}
+
+type UsageAlertConnection {
+  edges: [UsageAlertEdge!]!
+  nodes: [UsageAlert!]!
+  pageInfo: PageInfo!
+}
+
+type UsageAlertEdge {
+  node: UsageAlert!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""Usage alert filtering options."""
+input UsageAlertFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the condition the alert was triggered by."""
+  type: UsageAlertTypeComparator
+
+  """Compound filters, all of which need to be matched by the alert."""
+  and: [UsageAlertFilter!]
+
+  """Compound filters, one of which need to be matched by the alert."""
+  or: [UsageAlertFilter!]
 }
 
 """
@@ -39389,6 +39441,33 @@ type UsageAlertNotification implements Notification & Entity & Node {
 
   """The usage alert related to the notification."""
   usageAlert: UsageAlert!
+}
+
+"""The condition a usage alert was triggered by."""
+enum UsageAlertType {
+  """Prepaid usage credits crossed below the low-balance threshold."""
+  lowBalance
+
+  """Usage credits ran out."""
+  exhausted
+
+  """A promotional usage credit grant is nearing its expiration."""
+  expiringPromoCredit
+}
+
+"""Comparator for the condition a usage alert was triggered by."""
+input UsageAlertTypeComparator {
+  """Equals constraint."""
+  eq: UsageAlertType
+
+  """Not-equals constraint."""
+  neq: UsageAlertType
+
+  """In-array constraint."""
+  in: [UsageAlertType!]
+
+  """Not-in-array constraint."""
+  nin: [UsageAlertType!]
 }
 
 """
