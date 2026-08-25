@@ -1430,6 +1430,7 @@ type AiConversationCreateEntityToolCallArgs {
 }
 
 type AiConversationCreateEntityToolCallResult {
+  createdEntities: [AiConversationSearchEntitiesToolCallResultEntities!]
   startedAgentSessions: [AiConversationSearchEntitiesToolCallResultEntities!]
 }
 
@@ -1689,6 +1690,7 @@ enum AiConversationEntityListWidgetArgsEntitiesType {
   ReleaseNote
   AiPrompt
   AiPromptRules
+  AgentSession
 }
 
 """An error part in an AI conversation."""
@@ -4705,8 +4707,9 @@ type Customer implements Node {
   tier: CustomerTier
 
   """
-  The approximate count of customer needs (requests) associated with this
-  customer. This is a denormalized counter and may not reflect the exact count at all times.
+  The approximate number of distinct requests associated with this customer,
+  deduplicated per issue or project. This is a denormalized counter and may not
+  reflect the exact count at all times.
   """
   approximateNeedCount: Float!
 
@@ -14907,6 +14910,9 @@ type IssueDraft implements Node {
   """
   releaseIds: [String!]!
 
+  """Serialized issue relations to recreate when the draft is published."""
+  relations: JSONObject!
+
   """Serialized array of JSONs representing the recurring issue's schedule."""
   schedule: JSONObject
 }
@@ -18244,15 +18250,23 @@ type Meeting implements Node {
   attendeesSource: String
 
   """
-  [Internal] The analysis-derived meeting summary. Null before analysis produces a summary.
+  [Internal] The meeting summary in markdown format. Null before a summary exists.
   """
   summary: String
+
+  """
+  [Internal] The meeting summary as a Prosemirror document. Null before a summary exists.
+  """
+  summaryData: String
 
   """
   [Internal] The transcript analysis state: `pending` while analysis runs and
   `completed` after it finishes. Null before analysis starts.
   """
   analysisStatus: MeetingAnalysisStatus
+
+  """[Internal] The meeting's unique URL slug."""
+  slugId: String!
 }
 
 """[Internal] The analysis state of a meeting transcript."""
@@ -20755,7 +20769,7 @@ type Mutation {
     input: IssueCreateInput!
   ): IssuePayload!
 
-  """Creates a list of issues in one transaction."""
+  """Creates a list of issues atomically."""
   issueBatchCreate(
     """A list of issue objects to create."""
     input: IssueBatchCreateInput!
@@ -29825,6 +29839,11 @@ input ProjectStatusFilter {
   """Comparator for the project status type."""
   type: StringComparator
 
+  """
+  Filters that the project status's team must satisfy. Use `{ null: true }` to filter workspace-level statuses.
+  """
+  team: NullableTeamFilter
+
   """Filters that the project status projects must satisfy."""
   projects: ProjectCollectionFilter
 
@@ -30495,6 +30514,21 @@ type PullRequest implements Node {
   account has been deleted.
   """
   creator: User
+
+  """
+  [Internal] The Linear user who merged the pull request. This is the person who
+  merged it, which the hosting provider reports separately from the merge
+  commit's author. Null if the pull request has not been merged, was merged by
+  an external user not mapped to a Linear account, or if that account has been deleted.
+  """
+  mergedByUser: User
+
+  """
+  [Internal] The external user who merged the pull request, when the person who
+  merged it is not mapped to a Linear account. Null if the pull request has not
+  been merged or the merger is a Linear user.
+  """
+  mergedByExternalUser: ExternalUser
 
   """
   Emoji reaction summary for this pull request, grouped by emoji type. Each
