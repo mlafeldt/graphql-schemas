@@ -2080,6 +2080,30 @@ enum AiConversationPartType {
   ack
 }
 
+type AiConversationPostChatMessageToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationPostChatMessageToolCallArgs
+}
+
+type AiConversationPostChatMessageToolCallArgs {
+  platform: AiConversationPostChatMessageToolCallArgsPlatform!
+}
+
+enum AiConversationPostChatMessageToolCallArgsPlatform {
+  slack
+  microsoftTeams
+}
+
 type AiConversationPromptCodingSessionToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -2625,6 +2649,7 @@ enum AiConversationTool {
   SearchDocumentation
   WebSearch
   GetSlackConversationHistory
+  PostChatMessage
   GetMicrosoftTeamsConversationHistory
   SetSpendLimit
   RemoveSpendLimit
@@ -2633,7 +2658,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -5278,6 +5303,11 @@ type CustomerNeedNotification implements Notification & Entity & Node {
   """[Internal] Notification actor initials if avatar is not available."""
   actorAvatarColor: String!
 
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
+
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
 
@@ -5497,6 +5527,11 @@ type CustomerNotification implements Notification & Entity & Node {
 
   """[Internal] Notification actor initials if avatar is not available."""
   actorAvatarColor: String!
+
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
 
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
@@ -8366,6 +8401,11 @@ type DocumentNotification implements Notification & Entity & Node {
   """[Internal] Notification actor initials if avatar is not available."""
   actorAvatarColor: String!
 
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
+
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
 
@@ -10929,6 +10969,13 @@ type ImageUploadFromUrlPayload {
   success: Boolean!
 }
 
+"""Which Inbox notifications contribute to Inbox badges."""
+enum InboxBadgeScope {
+  all
+  priority
+  none
+}
+
 input InheritanceEntityMapping {
   """Mapping of the WorkflowState ID to the new WorkflowState ID."""
   workflowStates: JSONObject!
@@ -12147,6 +12194,11 @@ type InitiativeNotification implements Notification & Entity & Node {
 
   """[Internal] Notification actor initials if avatar is not available."""
   actorAvatarColor: String!
+
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
 
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
@@ -16136,6 +16188,11 @@ type IssueNotification implements Notification & Entity & Node {
 
   """[Internal] Notification actor initials if avatar is not available."""
   actorAvatarColor: String!
+
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
 
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
@@ -22226,6 +22283,11 @@ interface Notification {
   """[Internal] Notification actor initials if avatar is not available."""
   actorAvatarColor: String!
 
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
+
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
 
@@ -24455,6 +24517,11 @@ type OauthClientApprovalNotification implements Notification & Entity & Node {
   """[Internal] Notification actor initials if avatar is not available."""
   actorAvatarColor: String!
 
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
+
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
 
@@ -26254,6 +26321,11 @@ type PostNotification implements Notification & Entity & Node {
   """[Internal] Notification actor initials if avatar is not available."""
   actorAvatarColor: String!
 
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
+
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
 
@@ -26451,6 +26523,11 @@ type ProductAnnouncementNotification implements Notification & Entity & Node {
 
   """[Internal] Notification actor initials if avatar is not available."""
   actorAvatarColor: String!
+
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
 
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
@@ -28562,6 +28639,11 @@ type ProjectNotification implements Notification & Entity & Node {
 
   """[Internal] Notification actor initials if avatar is not available."""
   actorAvatarColor: String!
+
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
 
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
@@ -30812,6 +30894,11 @@ type PullRequestNotification implements Notification & Entity & Node {
 
   """[Internal] Notification actor initials if avatar is not available."""
   actorAvatarColor: String!
+
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
 
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
@@ -39446,6 +39533,11 @@ type UsageAlertNotification implements Notification & Entity & Node {
   """[Internal] Notification actor initials if avatar is not available."""
   actorAvatarColor: String!
 
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
+
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
 
@@ -40474,6 +40566,13 @@ input UserSettingsUpdateInput {
 
   """[Internal] Whether the Priority Inbox is enabled for the user."""
   priorityInboxEnabled: Boolean
+
+  """
+  [Internal] Which Inbox notifications contribute to Inbox badges. 'all'
+  includes all unread notifications; 'priority' includes only Priority Inbox
+  notifications; 'none' hides the count.
+  """
+  inboxBadgeScope: InboxBadgeScope
 }
 
 """User sorting options."""
@@ -41863,6 +41962,11 @@ type WelcomeMessageNotification implements Notification & Entity & Node {
   """[Internal] Notification actor initials if avatar is not available."""
   actorAvatarColor: String!
 
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
+
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
 
@@ -42093,7 +42197,19 @@ type WorkflowDefinition implements Node {
   """
   Whether editing the workflow is restricted to its owner, team owners, and workspace administrators.
   """
-  restrictEditing: Boolean!
+  restrictEditing: Boolean! @deprecated(reason: "Use editAccess instead.")
+
+  """
+  The edit access setting for this workflow definition. When unset, access is derived from restrictEditing.
+  """
+  editAccess: WorkflowDefinitionEditAccess
+}
+
+enum WorkflowDefinitionEditAccess {
+  everyone
+  workspaceAdmins
+  teamOwners
+  owner
 }
 
 """Comparator for the workflow definition that created an issue."""
@@ -42207,6 +42323,11 @@ type WorkflowDefinitionNotification implements Notification & Entity & Node {
 
   """[Internal] Notification actor initials if avatar is not available."""
   actorAvatarColor: String!
+
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
 
   """[Internal] Issue's status type for issue notifications."""
   issueStatusType: String
@@ -42487,6 +42608,8 @@ enum WorkflowTrigger {
   entityCreatedOrUpdated
   entityRemoved
   entityUnarchived
+  cycleStarted
+  cycleEnded
 }
 
 enum WorkflowTriggerType {
@@ -42496,6 +42619,7 @@ enum WorkflowTriggerType {
   initiative
   team
   release
+  cycle
   schedule
 }
 
