@@ -698,6 +698,11 @@ type AgentSession implements Node {
   sourceMetadata: JSON
 
   """
+  [Internal] How Adaptive selected the model route used by this coding session.
+  """
+  modelSelection: JSON
+
+  """
   A dynamically updated plan describing the agent's execution strategy,
   including steps to be taken and their current status. Updated as the agent
   progresses through its work. Null if no plan has been set.
@@ -2276,6 +2281,25 @@ type AiConversationReadSandboxFileToolCallArgs {
   path: String!
 }
 
+type AiConversationReadSettingToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationReadSettingToolCallArgs
+}
+
+type AiConversationReadSettingToolCallArgs {
+  id: String!
+}
+
 """A reasoning part in an AI conversation."""
 type AiConversationReasoningPart implements AiConversationBasePart {
   """The ID of the part."""
@@ -2447,6 +2471,26 @@ type AiConversationSearchEntitiesToolCallResultEntities {
   id: String!
 }
 
+type AiConversationSearchSettingsToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationSearchSettingsToolCallArgs
+}
+
+type AiConversationSearchSettingsToolCallArgs {
+  query: String
+  parentId: String
+}
+
 type AiConversationSetSpendLimitToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -2464,6 +2508,38 @@ type AiConversationSetSpendLimitToolCall implements AiConversationBaseToolCall {
 
 type AiConversationSetSpendLimitToolCallArgs {
   summary: String
+}
+
+type AiConversationSettingWidget implements AiConversationBaseWidget {
+  """The name of the widget."""
+  name: AiConversationWidgetName!
+
+  """The arguments of the widget."""
+  rawArgs: JSON
+
+  """
+  Display information for the widget, including ProseMirror and Markdown representations.
+  """
+  displayInfo: AiConversationWidgetDisplayInfo
+
+  """The arguments to the widget."""
+  args: AiConversationSettingWidgetArgs
+}
+
+type AiConversationSettingWidgetArgs {
+  """The stable semantic setting ID returned by SearchSettings"""
+  id: String!
+
+  """The resolved settings target returned by ReadSetting"""
+  target: AiConversationSettingWidgetArgsTarget
+}
+
+type AiConversationSettingWidgetArgsTarget {
+  """The settings target entity type"""
+  type: String!
+
+  """The settings target UUID, when the scope does not imply it"""
+  id: String
 }
 
 type AiConversationSpawnSubagentToolCall implements AiConversationBaseToolCall {
@@ -2616,6 +2692,8 @@ type AiConversationTextPart implements AiConversationBasePart {
 """The name of a tool that was called in an AI conversation."""
 enum AiConversationTool {
   SearchEntities
+  SearchSettings
+  ReadSetting
   NotifyUsers
   RetrieveEntities
   QueryView
@@ -2658,7 +2736,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -2789,7 +2867,7 @@ type AiConversationWebSearchToolCallArgs {
 }
 
 """The widget."""
-union AiConversationWidget = AiConversationEntityCardWidget | AiConversationEntityListWidget
+union AiConversationWidget = AiConversationEntityCardWidget | AiConversationEntityListWidget | AiConversationSettingWidget
 
 type AiConversationWidgetDisplayInfo {
   """The ProseMirror data representation of the widget content."""
@@ -2803,6 +2881,7 @@ type AiConversationWidgetDisplayInfo {
 enum AiConversationWidgetName {
   EntityCard
   EntityList
+  Setting
 }
 
 """A widget part in an AI conversation."""
@@ -8050,7 +8129,7 @@ type DocumentContentHistoryCheckpointType {
   contentDataSnapshotAt: DateTime!
 
   """[Internal] Source metadata associated with the AI document checkpoint."""
-  sourceMetadata: JSON
+  sourceMetadata: JSONObject
 }
 
 type DocumentContentHistoryPayload {
@@ -8098,7 +8177,7 @@ type DocumentContentHistoryType {
   """
   [Internal] The document content as a ProseMirror document at the time this history entry was captured.
   """
-  contentData: JSON
+  contentData: JSONObject
 
   """IDs of users whose edits are included in this history entry."""
   actorIds: [String!]
@@ -8106,7 +8185,7 @@ type DocumentContentHistoryType {
   """
   Metadata associated with the history entry, including content diffs and AI-generated change summaries.
   """
-  metadata: JSON
+  metadata: JSONObject
 }
 
 """
@@ -8792,8 +8871,23 @@ type Draft implements Node {
   """
   data: JSONObject
 
+  """
+  The health status carried by a project update or initiative update draft.
+  Possible values are onTrack, atRisk, or offTrack. Null for other draft types.
+  This is a computed field derived from 'data', so clients can read the health
+  without parsing that payload.
+  """
+  updateHealth: DraftUpdateHealthType
+
+  """
+  Metadata about the AI generation of the draft. Null when the draft was not
+  auto-generated. This is a computed field derived from 'data', so clients can
+  read the generation metadata without parsing that payload.
+  """
+  generationMetadata: DraftGenerationMetadata
+
   """Whether the draft was autogenerated for the user."""
-  isAutogenerated: Boolean! @deprecated(reason: "Use 'data.generationMetadata' instead")
+  isAutogenerated: Boolean! @deprecated(reason: "Use 'generationMetadata' instead")
 
   """[INTERNAL] Whether the draft was ported from a local draft."""
   wasLocalDraft: Boolean!
@@ -8871,6 +8965,27 @@ type DraftEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Metadata about AI-generated draft content."""
+type DraftGenerationMetadata {
+  """The generated text content as a ProseMirror document."""
+  generatedContent: JSONObject!
+
+  """The time at which the draft content was generated."""
+  generatedAt: DateTime!
+
+  """The number of times the draft content has been generated."""
+  generationCount: Int!
+}
+
+"""
+The health status carried by a project update or initiative update draft.
+"""
+enum DraftUpdateHealthType {
+  onTrack
+  atRisk
+  offTrack
 }
 
 """Issue due date sorting options."""
