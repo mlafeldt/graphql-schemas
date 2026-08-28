@@ -1550,6 +1550,12 @@ type AiConversationElicitationResponsePart implements AiConversationBasePart {
   """The kind-specific response data."""
   data: AiConversationElicitationResponseData!
 
+  """
+  Additional user-authored commentary submitted with the response. For a
+  response batch, only the first response contains it. Null when none was provided.
+  """
+  bodyData: JSONObject
+
   """The user who answered the elicitation."""
   user: User
 }
@@ -19573,7 +19579,7 @@ type Mutation {
   cycleCreate(
     """The cycle object to create."""
     input: CycleCreateInput!
-  ): CyclePayload!
+  ): CyclePayload! @deprecated(reason: "Cycle creation is not supported.")
 
   """Updates a cycle."""
   cycleUpdate(
@@ -33025,14 +33031,13 @@ type Query {
   releasePipelineByAccessKey: AccessKeyReleasePipeline!
 
   """
-  Returns the latest release for the pipeline associated with the access key.
+  Returns the most recently completed or updated release for the pipeline associated with the access key.
   """
   latestReleaseByAccessKey: AccessKeyRelease
 
   """
-  Returns recent releases for the pipeline associated with the access key,
-  ordered with in-progress releases first, followed by the most recently
-  completed releases.
+  Returns releases for the pipeline associated with the access key, ordered with
+  the most recently completed or updated first.
   """
   recentReleasesByAccessKey(
     """
@@ -42110,6 +42115,12 @@ type WelcomeMessageNotification implements Notification & Entity & Node {
   welcomeMessageId: String!
 }
 
+enum WorkflowActivationMode {
+  conditionsStartedMatching
+  anyUpdate
+  watchedPropertyChanged
+}
+
 """
 A time-triggered automation workflow definition that executes on a recurring
 schedule. Cron job definitions are scoped to a team and contain a set of
@@ -42222,6 +42233,11 @@ type WorkflowDefinition implements Node {
   The entity type that triggers this workflow, such as Issue, Project, or Release.
   """
   triggerType: WorkflowTriggerType!
+
+  """
+  The explicit activation semantics for entity updates. When null, the mode is inferred from the legacy trigger fields.
+  """
+  activationMode: WorkflowActivationMode
 
   """
   The filter conditions that must match for the workflow to execute. When null,
