@@ -24135,6 +24135,9 @@ input NullableTemplateFilter {
   """Comparator for the inherited template's ID."""
   inheritedFromId: IDComparator
 
+  """Filters that the template's team must satisfy."""
+  team: NullableTeamFilter
+
   """Filter based on the existence of the relation."""
   null: Boolean
 
@@ -33476,6 +33479,21 @@ type Query {
   """
   templates: [Template!]!
 
+  """
+  Templates matching a filter, in the order they appear in the app. Filter on a
+  null team to return only workspace-level templates.
+  """
+  templateSearch(
+    """Should archived resources be included (default: false)."""
+    includeArchived: Boolean = false
+
+    """Maximum results. Capped at 250."""
+    first: Int = 50
+
+    """Filter to apply to the template results."""
+    filter: TemplateFilter
+  ): [Template!]!
+
   """A specific template."""
   template(
     """The identifier of the template to retrieve."""
@@ -38945,6 +38963,14 @@ type Template implements Node {
   """
   inheritedFrom: Template
 
+  """
+  The template's content in markdown format: the body it pre-fills on the entity
+  it creates. Distinct from `description`, which says what the template is for.
+  Form templates serialize their form fields as markdown placeholders instead.
+  Null when the template has no content.
+  """
+  content: String
+
   """[Internal] Whether the template has form fields"""
   hasFormFields: Boolean!
 }
@@ -39008,6 +39034,36 @@ type TemplateEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""Template filtering options."""
+input TemplateFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the template's name."""
+  name: StringComparator
+
+  """Comparator for the template's type."""
+  type: StringComparator
+
+  """Comparator for the inherited template's ID."""
+  inheritedFromId: IDComparator
+
+  """Filters that the template's team must satisfy."""
+  team: NullableTeamFilter
+
+  """Compound filters, all of which need to be matched by the template."""
+  and: [TemplateFilter!]
+
+  """Compound filters, one of which need to be matched by the template."""
+  or: [TemplateFilter!]
 }
 
 """The result of a template mutation."""
