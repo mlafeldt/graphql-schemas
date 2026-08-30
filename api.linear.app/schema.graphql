@@ -18038,13 +18038,22 @@ input IssueUpdateInput {
 }
 
 input JiraConfigurationInput {
-  """The Jira personal access token."""
+  """
+  The Jira personal access token, or the API key of a Jira Cloud service account.
+  """
   accessToken: String!
 
   """
   The Jira user's email address. A username is also accepted on Jira Server / DC.
   """
   email: String!
+
+  """
+  Whether the access token is the API key of a Jira Cloud service account.
+  Defaults to detecting the service account key prefix. The site's cloudId is
+  resolved from the hostname, and webhooks are always set up manually.
+  """
+  serviceAccount: Boolean
 
   """The Jira installation hostname."""
   hostname: String!
@@ -18144,6 +18153,11 @@ input JiraSettingsInput {
   isCustomOAuth: Boolean
 
   """
+  Whether this integration authenticates with a Jira Cloud service account API key.
+  """
+  isCloudServiceAccount: Boolean
+
+  """
   The OAuth client ID for the personal connection OAuth app, when using custom OAuth.
   """
   personalOAuthClientId: String
@@ -18186,10 +18200,12 @@ input JiraUpdateInput {
   """Whether the Jira instance does not support webhook secrets."""
   noSecret: Boolean
 
-  """The Jira personal access token."""
+  """
+  The Jira personal access token, or the API key of a Jira Cloud service account.
+  """
   accessToken: String
 
-  """The Jira user email address associated with the personal access token."""
+  """The Jira user email address associated with the access token."""
   email: String
 }
 
