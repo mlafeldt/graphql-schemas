@@ -1411,6 +1411,15 @@ type AiConversationCodeIntelligenceToolCallArgs {
   question: String!
 }
 
+"""The affirmative response recorded for a confirmation elicitation."""
+type AiConversationConfirmationElicitationResponseData {
+  """The kind of elicitation that was answered."""
+  kind: AiConversationElicitationKind!
+
+  """True when the user confirmed the action."""
+  confirmed: Boolean!
+}
+
 type AiConversationCreateEntityToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -1435,8 +1444,15 @@ type AiConversationCreateEntityToolCallArgs {
 }
 
 type AiConversationCreateEntityToolCallResult {
-  createdEntities: [AiConversationSearchEntitiesToolCallResultEntities!]
+  createdEntities: [AiConversationCreateEntityToolCallResultCreatedEntities!]
   startedAgentSessions: [AiConversationSearchEntitiesToolCallResultEntities!]
+}
+
+type AiConversationCreateEntityToolCallResultCreatedEntities {
+  type: String!
+  id: String!
+  label: String
+  parent: AiConversationSearchEntitiesToolCallResultEntities
 }
 
 type AiConversationCreateSandboxToolCall implements AiConversationBaseToolCall {
@@ -1471,16 +1487,24 @@ type AiConversationDeleteEntityToolCall implements AiConversationBaseToolCall {
 
   """The arguments to the tool call."""
   args: AiConversationDeleteEntityToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationDeleteEntityToolCallResult
 }
 
 type AiConversationDeleteEntityToolCallArgs {
   entity: AiConversationSearchEntitiesToolCallResultEntities!
 }
 
+type AiConversationDeleteEntityToolCallResult {
+  deletedEntities: [AiConversationCreateEntityToolCallResultCreatedEntities!]
+}
+
 """The kind of input an AI conversation elicitation asks for."""
 enum AiConversationElicitationKind {
   multipleChoice
   mcpServerConnection
+  confirmation
 }
 
 """A selectable option shown in an AI conversation elicitation."""
@@ -1488,8 +1512,11 @@ type AiConversationElicitationOption {
   """The short label shown for the option."""
   label: String!
 
-  """The user prompt rendered to the agent when this option is selected."""
-  prompt: String!
+  """
+  The user prompt rendered to the agent when this option is selected. Null when
+  selecting the option only dismisses the elicitation without replying.
+  """
+  prompt: String
 }
 
 """A structured request for user input shown with an AI conversation."""
@@ -1509,7 +1536,9 @@ type AiConversationElicitationPart implements AiConversationBasePart {
   """The title shown above the elicitation choices."""
   title: String
 
-  """Selectable prompt options for multiple-choice elicitations."""
+  """
+  The selectable actions for multiple-choice and confirmation elicitations.
+  """
   options: [AiConversationElicitationOption!]!
 
   """
@@ -1531,7 +1560,7 @@ type AiConversationElicitationPart implements AiConversationBasePart {
 """
 The kind-specific data recorded when a user answers an AI conversation elicitation.
 """
-union AiConversationElicitationResponseData = AiConversationMultipleChoiceElicitationResponseData | AiConversationMcpServerConnectionElicitationResponseData
+union AiConversationElicitationResponseData = AiConversationMultipleChoiceElicitationResponseData | AiConversationConfirmationElicitationResponseData | AiConversationMcpServerConnectionElicitationResponseData
 
 """A structured user response to an elicitation in an AI conversation."""
 type AiConversationElicitationResponsePart implements AiConversationBasePart {
@@ -2039,11 +2068,19 @@ type AiConversationNotifyUsersToolCall implements AiConversationBaseToolCall {
 
   """The arguments to the tool call."""
   args: AiConversationNotifyUsersToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationNotifyUsersToolCallResult
 }
 
 type AiConversationNotifyUsersToolCallArgs {
   userIds: [String!]!
   summary: String
+}
+
+type AiConversationNotifyUsersToolCallResult {
+  notifiedUserIds: [String!]
+  skippedUserIds: [String!]
 }
 
 """A part in an AI conversation."""
@@ -2142,6 +2179,8 @@ type AiConversationPromptCodingSessionToolCallResult {
   agentSession: AiConversationSearchEntitiesToolCallResultEntities!
   pullRequests: [AiConversationSearchEntitiesToolCallResultEntities!]
   entities: [AiConversationSearchEntitiesToolCallResultEntities!]
+  quotaBlocked: Boolean
+  created: Boolean
 }
 
 """A prompt part in an AI conversation."""
@@ -2387,10 +2426,17 @@ type AiConversationRestoreEntityToolCall implements AiConversationBaseToolCall {
 
   """The arguments to the tool call."""
   args: AiConversationRestoreEntityToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationRestoreEntityToolCallResult
 }
 
 type AiConversationRestoreEntityToolCallArgs {
   entity: AiConversationSearchEntitiesToolCallResultEntities!
+}
+
+type AiConversationRestoreEntityToolCallResult {
+  restoredEntities: [AiConversationCreateEntityToolCallResultCreatedEntities!]
 }
 
 type AiConversationRetrieveEntitiesToolCall implements AiConversationBaseToolCall {
@@ -2835,6 +2881,7 @@ type AiConversationUpdateEntityToolCallArgs {
 }
 
 type AiConversationUpdateEntityToolCallResult {
+  updatedEntities: [AiConversationCreateEntityToolCallResultCreatedEntities!]
   startedAgentSessions: [AiConversationSearchEntitiesToolCallResultEntities!]
 }
 
@@ -10023,6 +10070,9 @@ type Favorite implements Node {
   """The favorited team."""
   team: Team
 
+  """The favorited loop."""
+  workflowDefinition: WorkflowDefinition
+
   """URL of the favorited entity. Folders return 'null' value."""
   url: String
 
@@ -10146,6 +10196,9 @@ input FavoriteCreateInput {
 
   """The identifier of the team to favorite."""
   teamId: String
+
+  """The identifier of the loop to favorite."""
+  workflowDefinitionId: String
 }
 
 type FavoriteEdge {
@@ -41695,6 +41748,11 @@ type ViewPreferencesValues {
   Whether to show the quick-to-review badge on review list items. Null if the preference is unset.
   """
   reviewFieldQuickToReview: Boolean
+
+  """
+  Whether to show the most pressing SLA from connected issues on review list items. Null if the preference is unset.
+  """
+  reviewFieldSla: Boolean
 
   """Whether team reviews are shown in the reviews list."""
   showTeamReviews: Boolean
