@@ -18643,7 +18643,7 @@
         "inputFields": [
           {
             "name": "null",
-            "description": "Null constraint. Matches any non-null values if the given value is false, otherwise it matches null values.",
+            "description": "Null constraint. When true, matches issues without an external source: issues with no source metadata and issues created through the API, an OAuth application, or a loop. When false, matches issues created by an integration or an intake source such as email.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -57633,6 +57633,18 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "message",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -64256,7 +64268,7 @@
           },
           {
             "name": "title",
-            "description": "The title shown above the elicitation choices.",
+            "description": "The optional title shown above the elicitation choices.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -102453,6 +102465,22 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "type",
+            "description": "The type of the release stage.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "ReleaseStageType",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -109303,6 +109331,18 @@
             "deprecationReason": null
           },
           {
+            "name": "startMode",
+            "description": "When SLA timing begins. Null when the rule removes an SLA.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "SLAStartMode",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "removesSla",
             "description": "Whether the rule removes an SLA instead of setting one.",
             "args": [],
@@ -109322,6 +109362,29 @@
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "SLAStartMode",
+        "description": "Determines when timing begins for an SLA applied by a rule.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "ruleMatch",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueCreation",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -112093,6 +112156,37 @@
                   "ofType": {
                     "kind": "INPUT_OBJECT",
                     "name": "AgentSessionCreateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentSessionPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentSessionRestartWithDefaultModel",
+            "description": "[Internal] Restarts a routed coding session with the default model.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The identifier of the agent session to restart.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   }
                 },
@@ -138706,6 +138800,16 @@
               "ofType": null
             },
             "defaultValue": null
+          },
+          {
+            "name": "workspaceIntegrationId",
+            "description": "The id of the workspace Jira integration this personal integration authenticates through.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -148279,6 +148383,16 @@
             "defaultValue": null
           },
           {
+            "name": "preserveStoredCommitSha",
+            "description": "When true, an existing scheduled release keeps its stored commit SHA instead of taking this sync's commit. Set by CLI syncs from a checkout behind the stored commit, so the scan baseline does not move backwards. Has no effect on continuous pipelines, which identify releases by commit SHA.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "issueReferences",
             "description": "Issue references (e.g. ENG-123) to associate with this release.",
             "type": {
@@ -149419,6 +149533,16 @@
                 "name": "String",
                 "ofType": null
               }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "preserveStoredCommitSha",
+            "description": "When true, an existing scheduled release keeps its stored commit SHA instead of taking this sync's commit. Set by CLI syncs from a checkout behind the stored commit, so the scan baseline does not move backwards. Has no effect on continuous pipelines, which identify releases by commit SHA.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
             },
             "defaultValue": null
           },
