@@ -36216,6 +36216,18 @@
             "deprecationReason": null
           },
           {
+            "name": "executionSkippedReason",
+            "description": "[Internal] The reason this activity was persisted without being sent to the agent runtime.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "AgentActivityExecutionSkippedReason",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "signal",
             "description": "An optional modifier that provides additional instructions on how the activity should be interpreted.",
             "args": [],
@@ -36817,6 +36829,23 @@
         "inputFields": null,
         "interfaces": null,
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "AgentActivityExecutionSkippedReason",
+        "description": "The reason an agent activity was persisted without being sent to the agent runtime.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "quotaExceeded",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -64142,7 +64171,7 @@
           },
           {
             "name": "target",
-            "description": "The resolved settings target returned by ReadSetting",
+            "description": "The settings target when the setting scope does not imply it",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -85323,6 +85352,16 @@
             "description": "All custom emojis in the workspace.",
             "args": [
               {
+                "name": "filter",
+                "description": "Filter returned emojis.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "EmojiFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
                 "name": "before",
                 "description": "A cursor to be used with last for backward pagination.",
                 "type": {
@@ -85379,6 +85418,24 @@
                   "kind": "ENUM",
                   "name": "PaginationOrderBy",
                   "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "sort",
+                "description": "[INTERNAL] Sort returned emojis.",
+                "type": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "EmojiSortInput",
+                      "ofType": null
+                    }
+                  }
                 },
                 "defaultValue": null
               }
@@ -97761,6 +97818,145 @@
             "ofType": null
           }
         ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "EmojiFilter",
+        "description": "Custom emoji filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "Comparator for the emoji name.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the emoji.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "EmojiFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which needs to be matched by the emoji.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "EmojiFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "EmojiSortInput",
+        "description": "Custom emoji sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "createdAt",
+            "description": "Sort by emoji creation date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "EmojiCreatedAtSort",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "EmojiCreatedAtSort",
+        "description": "Emoji creation date sorting options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "nulls",
+            "description": "Whether nulls should be sorted first or last",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationNulls",
+              "ofType": null
+            },
+            "defaultValue": "last"
+          },
+          {
+            "name": "order",
+            "description": "The order for the individual sort",
+            "type": {
+              "kind": "ENUM",
+              "name": "PaginationSortOrder",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },
@@ -110290,6 +110486,18 @@
                 "name": "Boolean",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pullRequestMergeStrategyPreference",
+            "description": "[Internal] The user's preferred merge method for pull requests. Null if the user chooses a method for each pull request.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "PullRequestMergeMethod",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -149312,6 +149520,16 @@
             "defaultValue": null
           },
           {
+            "name": "description",
+            "description": "Optional release description to apply when updating the release. Pass null to clear it.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "links",
             "description": "External links to attach to the updated release.",
             "type": {
@@ -149787,6 +150005,16 @@
           {
             "name": "name",
             "description": "Optional release name to apply when updating the release.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "description",
+            "description": "Optional release description to apply when updating the release. Pass null to clear it.",
             "type": {
               "kind": "SCALAR",
               "name": "String",

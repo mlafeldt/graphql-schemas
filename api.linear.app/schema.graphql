@@ -209,6 +209,11 @@ type AgentActivity implements Node {
   sourceMetadata: JSON
 
   """
+  [Internal] The reason this activity was persisted without being sent to the agent runtime.
+  """
+  executionSkippedReason: AgentActivityExecutionSkippedReason
+
+  """
   An optional modifier that provides additional instructions on how the activity should be interpreted.
   """
   signal: AgentActivitySignal
@@ -378,6 +383,13 @@ type AgentActivityErrorContent {
 
   """[Internal] The error content as ProseMirror document."""
   bodyData: JSONObject!
+}
+
+"""
+The reason an agent activity was persisted without being sent to the agent runtime.
+"""
+enum AgentActivityExecutionSkippedReason {
+  quotaExceeded
 }
 
 """Agent activity filtering options."""
@@ -2586,7 +2598,7 @@ type AiConversationSettingWidgetArgs {
   """The stable semantic setting ID returned by SearchSettings"""
   id: String!
 
-  """The resolved settings target returned by ReadSetting"""
+  """The settings target when the setting scope does not imply it"""
   target: AiConversationSettingWidgetArgsTarget
 }
 
@@ -9410,6 +9422,15 @@ type EmojiConnection {
   pageInfo: PageInfo!
 }
 
+"""Emoji creation date sorting options."""
+input EmojiCreatedAtSort {
+  """Whether nulls should be sorted first or last"""
+  nulls: PaginationNulls = last
+
+  """The order for the individual sort"""
+  order: PaginationSortOrder
+}
+
 """Input for creating a new custom emoji."""
 input EmojiCreateInput {
   """
@@ -9431,6 +9452,27 @@ type EmojiEdge {
   cursor: String!
 }
 
+"""Custom emoji filtering options."""
+input EmojiFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the emoji name."""
+  name: StringComparator
+
+  """Compound filters, all of which need to be matched by the emoji."""
+  and: [EmojiFilter!]
+
+  """Compound filters, one of which needs to be matched by the emoji."""
+  or: [EmojiFilter!]
+}
+
 """The result of a custom emoji mutation."""
 type EmojiPayload {
   """The identifier of the last sync operation."""
@@ -9441,6 +9483,12 @@ type EmojiPayload {
 
   """Whether the operation was successful."""
   success: Boolean!
+}
+
+"""Custom emoji sorting options."""
+input EmojiSortInput {
+  """Sort by emoji creation date."""
+  createdAt: EmojiCreatedAtSort
 }
 
 """A basic entity."""
@@ -31956,6 +32004,9 @@ type Query {
 
   """All custom emojis in the workspace."""
   emojis(
+    """Filter returned emojis."""
+    filter: EmojiFilter
+
     """A cursor to be used with last for backward pagination."""
     before: String
 
@@ -31979,6 +32030,9 @@ type Query {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
+
+    """[INTERNAL] Sort returned emojis."""
+    sort: [EmojiSortInput!]
   ): EmojiConnection!
 
   """A specific custom emoji by ID or name."""
@@ -35657,6 +35711,11 @@ input ReleaseUpdateByPipelineInput {
   """Optional release name to apply when updating the release."""
   name: String
 
+  """
+  Optional release description to apply when updating the release. Pass null to clear it.
+  """
+  description: String
+
   """External links to attach to the updated release."""
   links: [ReleaseLinkInput!]
 
@@ -35690,6 +35749,11 @@ input ReleaseUpdateByPipelineInputBase {
 
   """Optional release name to apply when updating the release."""
   name: String
+
+  """
+  Optional release description to apply when updating the release. Pass null to clear it.
+  """
+  description: String
 
   """External links to attach to the updated release."""
   links: [ReleaseLinkInput!]
@@ -40683,6 +40747,11 @@ type UserSettings implements Node {
   Whether to auto-assign newly created issues to the current user by default.
   """
   autoAssignToSelf: Boolean!
+
+  """
+  [Internal] The user's preferred merge method for pull requests. Null if the user chooses a method for each pull request.
+  """
+  pullRequestMergeStrategyPreference: PullRequestMergeMethod
 
   """
   The user's notification category preferences, indicating which notification
