@@ -5686,7 +5686,11 @@ input CreateEnterpriseOrganizationInput {
   """The email used for sending billing receipts."""
   billingEmail: String!
 
-  """The logins for the administrators of the new organization."""
+  """
+  For user-authenticated requests, the logins of additional owners to invite.
+  For installation requests, existing enterprise members are added directly and
+  other listed users are invited.
+  """
   adminLogins: [String!]!
 }
 
@@ -18111,7 +18115,11 @@ type Mutation {
   ): CreateDiscussionPayload
 
   """
-  Creates an organization as part of an enterprise account. A personal access
+  Creates an organization as part of an enterprise account. User-authenticated
+  requests make the viewer an owner and invite users in `adminLogins`.
+  Installation requests directly add listed enterprise members and invite other
+  listed users. Enterprise Managed User enterprises directly add managed users.
+  Invitation failures do not roll back organization creation. A personal access
   token used to create an organization is implicitly permitted to update the
   organization it created, if the organization is part of an enterprise that has
   SAML enabled or uses Enterprise Managed Users. If the organization is not part
@@ -21248,6 +21256,9 @@ enum OrganizationInvitationSource {
 
   """The invitation was created from SCIM"""
   SCIM
+
+  """The invitation was created with an enterprise organization"""
+  ENTERPRISE_ORGANIZATION_CREATION
 }
 
 """The possible organization invitation types."""
@@ -29384,6 +29395,9 @@ enum PullRequestTimelineItemsItemType {
   """Represents an 'added_to_merge_queue' event on a given pull request."""
   ADDED_TO_MERGE_QUEUE_EVENT
 
+  """Represents an 'added_to_stack' event on a given pull request."""
+  ADDED_TO_STACK_EVENT
+
   """Represents an 'archived' event on a given pull request."""
   ARCHIVED_EVENT
 
@@ -29448,6 +29462,9 @@ enum PullRequestTimelineItemsItemType {
 
   """Represents a 'removed_from_merge_queue' event on a given pull request."""
   REMOVED_FROM_MERGE_QUEUE_EVENT
+
+  """Represents a 'removed_from_stack' event on a given pull request."""
+  REMOVED_FROM_STACK_EVENT
 
   """
   Represents a 'review_dismissed' event on a given issue or pull request.
