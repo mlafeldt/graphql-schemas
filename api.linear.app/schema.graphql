@@ -13336,6 +13336,7 @@ enum IntegrationService {
   githubPersonal
   githubCodeAccessPersonal
   gitlab
+  origin
   googleCalendarPersonal
   googleSheets
   intercom
@@ -18539,9 +18540,19 @@ type Meeting implements Node {
   creator: User
 
   """
+  [Internal] The meeting title generated during import. Null when the import produced no title.
+  """
+  title: String
+
+  """
   [Internal] The date when the meeting occurred. Null when clients should use the creation date.
   """
   date: TimelessDate
+
+  """
+  [Internal] The IDs of the workspace users who attended the meeting, identified during import.
+  """
+  attendeeIds: [String!]!
 
   """
   [Internal] The meeting attendees. Each entry has a name and may include an active workspace user identifier.
@@ -26901,7 +26912,7 @@ type Project implements Node {
   lead: User
 
   """
-  [Internal] The team that leads the project. Null if no lead team is assigned.
+  [Internal] The team that leads the project. Null if the viewer does not have access to the team.
   """
   leadTeam: Team
 
@@ -29293,7 +29304,7 @@ type ProjectSearchResult implements Node {
   lead: User
 
   """
-  [Internal] The team that leads the project. Null if no lead team is assigned.
+  [Internal] The team that leads the project. Null if the viewer does not have access to the team.
   """
   leadTeam: Team
 
@@ -34471,6 +34482,11 @@ input ReleaseCompleteInput {
   """Optional release name to apply when completing the release."""
   name: String
 
+  """
+  Optional release description to apply when completing the release. Pass null to clear it.
+  """
+  description: String
+
   """External links to attach to the completed release."""
   links: [ReleaseLinkInput!]
 
@@ -34505,6 +34521,11 @@ input ReleaseCompleteInputBase {
 
   """Optional release name to apply when completing the release."""
   name: String
+
+  """
+  Optional release description to apply when completing the release. Pass null to clear it.
+  """
+  description: String
 
   """External links to attach to the completed release."""
   links: [ReleaseLinkInput!]
@@ -35587,6 +35608,11 @@ input ReleaseSyncInput {
   """The name of the release."""
   name: String
 
+  """
+  The description of the release. Pass null to clear an existing description.
+  """
+  description: String
+
   """The version of the release."""
   version: String
 
@@ -35645,6 +35671,11 @@ pipeline ID, which is provided separately or inferred from the access key.
 input ReleaseSyncInputBase {
   """The name of the release."""
   name: String
+
+  """
+  The description of the release. Pass null to clear an existing description.
+  """
+  description: String
 
   """The version of the release."""
   version: String
