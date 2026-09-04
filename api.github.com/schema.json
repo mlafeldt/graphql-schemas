@@ -21155,7 +21155,7 @@
           },
           {
             "name": "adminLogins",
-            "description": "For user-authenticated requests, the logins of additional owners to invite. For installation requests, existing enterprise members are added directly and other listed users are invited.",
+            "description": "The logins of additional organization owners. Listed users are invited unless owner invitations are disabled, in which case they are added directly. Installation requests also add existing enterprise members directly.",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -69307,7 +69307,7 @@
           },
           {
             "name": "createEnterpriseOrganization",
-            "description": "Creates an organization as part of an enterprise account. User-authenticated requests make the viewer an owner and invite users in `adminLogins`. Installation requests directly add listed enterprise members and invite other listed users. Enterprise Managed User enterprises directly add managed users. Invitation failures do not roll back organization creation. A personal access token used to create an organization is implicitly permitted to update the organization it created, if the organization is part of an enterprise that has SAML enabled or uses Enterprise Managed Users. If the organization is not part of such an enterprise, and instead has SAML enabled for it individually, the token will then require SAML authorization to continue working against that organization.",
+            "description": "Creates an organization as part of an enterprise account. User-authenticated requests make the viewer an owner. Users listed in `adminLogins` are invited as owners unless owner invitations are disabled, in which case they are added directly. Installation requests also add existing enterprise members directly. Invitation failures do not roll back organization creation. A personal access token used to create an organization is implicitly permitted to update the organization it created, if the organization is part of an enterprise that has SAML enabled or uses Enterprise Managed Users. If the organization is not part of such an enterprise, and instead has SAML enabled for it individually, the token will then require SAML authorization to continue working against that organization.",
             "args": [
               {
                 "name": "input",
@@ -140593,6 +140593,18 @@
             "deprecationReason": null
           },
           {
+            "name": "enterpriseRoleDatabaseId",
+            "description": "If the actor is an enterprise role, the enterprise role's ID that can bypass",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "id",
             "description": "The Node ID of the RepositoryRulesetBypassActor object",
             "args": [],
@@ -140818,7 +140830,7 @@
       {
         "kind": "INPUT_OBJECT",
         "name": "RepositoryRulesetBypassActorInput",
-        "description": "Specifies the attributes for a new or updated ruleset bypass actor. Only one of `actor_id`, `repository_role_database_id`, `organization_admin`, `enterprise_owner`, or `deploy_key` should be specified.",
+        "description": "Specifies the attributes for a new or updated ruleset bypass actor. Exactly one of `actor_id`, `repository_role_database_id`, `organization_admin`, `enterprise_owner`, `enterprise_role_database_id`, or `deploy_key` should be specified.",
         "fields": null,
         "inputFields": [
           {
@@ -140862,11 +140874,11 @@
             "defaultValue": null
           },
           {
-            "name": "enterpriseRole",
-            "description": "For enterprise role bypasses, true. NOTE: This bypass actor is in beta.",
+            "name": "enterpriseRoleDatabaseId",
+            "description": "For enterprise role bypasses, the enterprise role database ID. NOTE: This bypass actor is in beta.",
             "type": {
               "kind": "SCALAR",
-              "name": "Boolean",
+              "name": "BigInt",
               "ofType": null
             },
             "defaultValue": null
