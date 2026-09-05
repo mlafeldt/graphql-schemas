@@ -1223,6 +1223,9 @@ type AiConversation implements Node {
   """The user who the conversation belongs to."""
   user: User
 
+  """[Internal] The Loop execution that created this conversation."""
+  loopExecution: LoopExecution
+
   """
   [Internal] The issue this shared conversation is attached to. Null if the conversation is private.
   """
@@ -2495,6 +2498,26 @@ type AiConversationRetryPullRequestCheckToolCallArgs {
   workflowName: String
 }
 
+type AiConversationSearchChatChannelsToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationSearchChatChannelsToolCallArgs
+}
+
+type AiConversationSearchChatChannelsToolCallArgs {
+  platform: AiConversationPostChatMessageToolCallArgsPlatform!
+  filter: String!
+}
+
 type AiConversationSearchDocumentationToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -2796,6 +2819,7 @@ enum AiConversationTool {
   WebSearch
   GetSlackConversationHistory
   PostChatMessage
+  SearchChatChannels
   GetMicrosoftTeamsConversationHistory
   SetSpendLimit
   RemoveSpendLimit
@@ -2804,7 +2828,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -11202,6 +11226,32 @@ enum InboxBadgeScope {
   none
 }
 
+"""State changes to apply to an inbox notification stack."""
+input InboxNotificationUpdateInput {
+  """Whether to mark the notification stack as read."""
+  read: Boolean
+
+  """
+  The time until which to snooze the notification stack. Null unsnoozes it.
+  """
+  snoozedUntilAt: DateTime
+}
+
+"""Return type for inbox notification updates."""
+type InboxNotificationUpdatePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """The requested notification after the update."""
+  notification: Notification!
+
+  """The notifications changed by the stack update."""
+  updatedNotifications: [Notification!]!
+
+  """Whether the operation was successful."""
+  success: Boolean!
+}
+
 input InheritanceEntityMapping {
   """Mapping of the WorkflowState ID to the new WorkflowState ID."""
   workflowStates: JSONObject!
@@ -18483,6 +18533,50 @@ type LogoutResponse {
   success: Boolean!
 }
 
+"""[Internal] A Loop execution and the entity that triggered it."""
+type LoopExecution implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """[Internal] The AI conversation created for this Loop execution."""
+  aiConversation: AiConversation!
+
+  """[Internal] The Loop that was executed."""
+  workflowDefinition: WorkflowDefinition
+
+  """[Internal] The issue that triggered this Loop execution."""
+  issue: Issue
+
+  """[Internal] The project that triggered this Loop execution."""
+  project: Project
+
+  """[Internal] The initiative that triggered this Loop execution."""
+  initiative: Initiative
+
+  """[Internal] The document that triggered this Loop execution."""
+  document: Document
+
+  """[Internal] The team that triggered this Loop execution."""
+  team: Team
+
+  """[Internal] The cycle that triggered this Loop execution."""
+  cycle: Cycle
+}
+
 """Issue manual sorting options."""
 input ManualSort {
   """Whether nulls should be sorted first or last"""
@@ -18553,41 +18647,6 @@ type Meeting implements Node {
   [Internal] The IDs of the workspace users who attended the meeting, identified during import.
   """
   attendeeIds: [String!]!
-
-  """
-  [Internal] The meeting attendees. Each entry has a name and may include an active workspace user identifier.
-  """
-  attendees: [JSONObject!]
-
-  """
-  [Internal] The source that owns the attendee list. Null when attendees have not been set.
-  """
-  attendeesSource: String
-
-  """
-  [Internal] The meeting summary in markdown format. Null before a summary exists.
-  """
-  summary: String
-
-  """
-  [Internal] The meeting summary as a Prosemirror document. Null before a summary exists.
-  """
-  summaryData: String
-
-  """
-  [Internal] The transcript analysis state: `pending` while analysis runs and
-  `completed` after it finishes. Null before analysis starts.
-  """
-  analysisStatus: MeetingAnalysisStatus
-
-  """[Internal] The meeting's unique URL slug."""
-  slugId: String!
-}
-
-"""[Internal] The analysis state of a meeting transcript."""
-enum MeetingAnalysisStatus {
-  pending
-  completed
 }
 
 type MicrosoftTeamsChannel {
@@ -21277,6 +21336,17 @@ type Mutation {
     """The identifier of the notification to update."""
     id: String!
   ): NotificationPayload!
+
+  """
+  Updates a notification in the authenticated user's inbox using inbox grouping behavior.
+  """
+  inboxNotificationUpdate(
+    """The inbox state changes to apply."""
+    input: InboxNotificationUpdateInput!
+
+    """The identifier of the inbox notification to update."""
+    id: String!
+  ): InboxNotificationUpdatePayload!
 
   """Marks notification and all related notifications as read."""
   notificationMarkReadAll(
@@ -32758,6 +32828,22 @@ type Query {
     By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
     """
     orderBy: PaginationOrderBy
+  ): NotificationConnection!
+
+  """
+  The authenticated user's active inbox notifications, grouped according to inbox behavior.
+  """
+  inboxNotifications(
+    """
+    The maximum number of inbox notification stacks to return. Defaults to 50.
+    """
+    first: Int
+
+    """The cursor after which to return inbox notification stacks."""
+    after: String
+
+    """Whether to return only unread inbox notification stacks."""
+    unreadOnly: Boolean
   ): NotificationConnection!
 
   """[Internal] A number of unread notifications."""
