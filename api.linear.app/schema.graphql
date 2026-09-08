@@ -42478,6 +42478,7 @@ enum WorkflowActivationMode {
   conditionsStartedMatching
   anyUpdate
   watchedPropertyChanged
+  collectionChanged
 }
 
 """
@@ -42599,6 +42600,11 @@ type WorkflowDefinition implements Node {
   activationMode: WorkflowActivationMode
 
   """
+  The intelligence level used to run the workflow. When null, Auto is used.
+  """
+  intelligence: WorkflowIntelligence
+
+  """
   The filter conditions that must match for the workflow to execute. When null,
   the workflow triggers on all matching events.
   """
@@ -42606,6 +42612,11 @@ type WorkflowDefinition implements Node {
 
   """Recurring schedule which is used to execute the workflow."""
   schedule: JSONObject
+
+  """
+  [Internal] The configuration for the selected trigger type. Null when that type does not use this field.
+  """
+  triggerConfig: JSONObject
 
   """
   Whether the workflow is enabled and will execute when its trigger conditions are met.
@@ -42855,6 +42866,13 @@ type WorkflowDefinitionNotification implements Notification & Entity & Node {
   aiConversationId: String
 }
 
+enum WorkflowIntelligence {
+  auto
+  low
+  medium
+  high
+}
+
 """
 A state in a team's workflow, representing an issue status such as Triage,
 Backlog, Todo, In Progress, In Review, Done, or Canceled. Each team has its own
@@ -43100,6 +43118,8 @@ enum WorkflowTrigger {
   entityUnarchived
   cycleStarted
   cycleEnded
+  commentAdded
+  updatePosted
 }
 
 enum WorkflowTriggerType {
