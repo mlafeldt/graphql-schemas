@@ -2033,6 +2033,33 @@ enum AiConversationMcpServerConnectionScopeType {
   workflowDefinition
 }
 
+type AiConversationMemoryToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationMemoryToolCallArgs
+}
+
+type AiConversationMemoryToolCallArgs {
+  action: AiConversationMemoryToolCallArgsAction!
+  name: String
+}
+
+enum AiConversationMemoryToolCallArgsAction {
+  list
+  read
+  save
+  delete
+}
+
 """The selected option in a multiple-choice AI conversation elicitation."""
 type AiConversationMultipleChoiceElicitationResponseData {
   """The kind of elicitation that was answered."""
@@ -2145,6 +2172,25 @@ enum AiConversationPartType {
   elicitation
   elicitationResponse
   ack
+}
+
+type AiConversationPatchSettingsToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationPatchSettingsToolCallArgs
+}
+
+type AiConversationPatchSettingsToolCallArgs {
+  ids: [String!]!
 }
 
 type AiConversationPostChatMessageToolCall implements AiConversationBaseToolCall {
@@ -2785,6 +2831,7 @@ enum AiConversationTool {
   SearchEntities
   SearchSettings
   ReadSetting
+  PatchSettings
   NotifyUsers
   RetrieveEntities
   QueryView
@@ -2815,6 +2862,7 @@ enum AiConversationTool {
   UnsubscribeFromEvent
   TranscribeVideo
   TranscribeMedia
+  Memory
   SearchDocumentation
   WebSearch
   GetSlackConversationHistory
@@ -2828,7 +2876,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -10891,8 +10939,6 @@ input GitHubRepoMappingInput {
 }
 
 input GitHubSettingsInput {
-  pullRequestReviewTool: PullRequestReviewTool
-
   """The avatar URL for the GitHub organization."""
   orgAvatarUrl: String
 
@@ -11427,7 +11473,8 @@ type Initiative implements Node {
   """
   [Internal] The human-readable identifier of the initiative. Returns the custom
   identifier override when set, otherwise the workspace default
-  `<prefix>-<number>`. Null for legacy initiatives that have not been backfilled.
+  `<prefix>-<number>`. Null for legacy initiatives that have not been backfilled
+  and while initiative identifiers are not enabled for the workspace.
   """
   identifier: String
 
@@ -27141,8 +27188,9 @@ type Project implements Node {
   """
   [Internal] The human-readable identifier of the project. Returns the custom
   identifier override when set, otherwise the default
-  `P-<leadTeamKey>-<number>`. Null for projects without a lead team and for
-  legacy projects that have not been backfilled.
+  `P-<leadTeamKey>-<number>`. Null for projects without a lead team, for legacy
+  projects that have not been backfilled, and while project identifiers are not
+  enabled for the workspace.
   """
   identifier: String
 
@@ -29533,8 +29581,9 @@ type ProjectSearchResult implements Node {
   """
   [Internal] The human-readable identifier of the project. Returns the custom
   identifier override when set, otherwise the default
-  `P-<leadTeamKey>-<number>`. Null for projects without a lead team and for
-  legacy projects that have not been backfilled.
+  `P-<leadTeamKey>-<number>`. Null for projects without a lead team, for legacy
+  projects that have not been backfilled, and while project identifiers are not
+  enabled for the workspace.
   """
   identifier: String
 
@@ -31308,11 +31357,6 @@ input PullRequestReferenceInput {
   number: Int!
 }
 
-enum PullRequestReviewTool {
-  source
-  graphite
-}
-
 """The status of a pull request."""
 enum PullRequestStatus {
   draft
@@ -31512,6 +31556,14 @@ type Query {
     """The identifier of the agent session to retrieve."""
     id: String!
   ): AgentSession!
+
+  """
+  [Internal] SSH address of the current user's running coding sandbox for this agent session.
+  """
+  agentSessionSshAddress(
+    """The identifier of the agent session."""
+    agentSessionId: String!
+  ): String
 
   """
   [Internal] Retrieves coding agent sandbox details for a given agent session ID.
@@ -41363,6 +41415,11 @@ type ViewPreferencesValues {
 
   """Whether to show the SLA field."""
   fieldSla: Boolean
+
+  """
+  Whether to show the avatars of the other people currently viewing an issue.
+  """
+  fieldUserPresence: Boolean
 
   """Whether to show the labels field."""
   fieldLabels: Boolean
