@@ -705,7 +705,7 @@ type AgentSession implements Node {
   externalLink: String @deprecated(reason: "Use externalUrls instead.")
 
   """
-  A human-readable summary of the work performed in this session. Null if no summary has been generated yet.
+  The session title, generated automatically or set by the owning OAuth application. Null if no title is set.
   """
   summary: String
 
@@ -958,6 +958,15 @@ input AgentSessionUpdateExternalUrlInput {
 
 """Input for updating an agent session."""
 input AgentSessionUpdateInput {
+  """
+  The session title, displayed as its summary. Must contain 1 to 255 characters,
+  including a non-whitespace character, with no line breaks or NUL bytes. Set to
+  null to clear it and allow automatic title generation. Updating only this
+  field does not acknowledge the session. Only updatable by the OAuth
+  application that owns the session.
+  """
+  summary: String
+
   """
   The URL of an external agent-hosted page associated with this session. Only
   updatable by the OAuth application that owns the session.
@@ -1489,7 +1498,7 @@ type AiConversationCreateSandboxToolCall implements AiConversationBaseToolCall {
 }
 
 type AiConversationCreateSandboxToolCallArgs {
-  repository: String!
+  repository: String
 }
 
 type AiConversationDeleteEntityToolCall implements AiConversationBaseToolCall {
@@ -1897,6 +1906,29 @@ type AiConversationGetSlackConversationHistoryToolCall implements AiConversation
 
   """The result of the tool call."""
   rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationGetSlackConversationHistoryToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationGetSlackConversationHistoryToolCallResult
+}
+
+type AiConversationGetSlackConversationHistoryToolCallArgs {
+  targetType: AiConversationGetSlackConversationHistoryToolCallArgsTargetType
+  channel: String
+}
+
+enum AiConversationGetSlackConversationHistoryToolCallArgsTargetType {
+  channel
+  thread
+}
+
+type AiConversationGetSlackConversationHistoryToolCallResult {
+  conversationUrl: String
+  messageCount: Float
+  hasMore: Boolean
+  error: String
 }
 
 type AiConversationHandoffToCodingSessionToolCall implements AiConversationBaseToolCall {
@@ -2206,15 +2238,29 @@ type AiConversationPostChatMessageToolCall implements AiConversationBaseToolCall
 
   """The arguments to the tool call."""
   args: AiConversationPostChatMessageToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationPostChatMessageToolCallResult
 }
 
 type AiConversationPostChatMessageToolCallArgs {
   platform: AiConversationPostChatMessageToolCallArgsPlatform!
+  channel: String
+  recipient: String
+  recipientId: String
+  isReply: Boolean
 }
 
 enum AiConversationPostChatMessageToolCallArgsPlatform {
   slack
   microsoftTeams
+}
+
+type AiConversationPostChatMessageToolCallResult {
+  posted: Boolean!
+  error: String
+  message: String
+  conversationUrl: String
 }
 
 type AiConversationPromptCodingSessionToolCall implements AiConversationBaseToolCall {
@@ -2544,6 +2590,33 @@ type AiConversationRetryPullRequestCheckToolCallArgs {
   workflowName: String
 }
 
+type AiConversationSandboxGitHistoryToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationSandboxGitHistoryToolCallArgs
+}
+
+type AiConversationSandboxGitHistoryToolCallArgs {
+  operation: AiConversationSandboxGitHistoryToolCallArgsOperation!
+  paths: [String!]
+}
+
+enum AiConversationSandboxGitHistoryToolCallArgsOperation {
+  log
+  blame
+  search
+  show
+}
+
 type AiConversationSearchChatChannelsToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -2557,11 +2630,18 @@ type AiConversationSearchChatChannelsToolCall implements AiConversationBaseToolC
 
   """The arguments to the tool call."""
   args: AiConversationSearchChatChannelsToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationSearchChatChannelsToolCallResult
 }
 
 type AiConversationSearchChatChannelsToolCallArgs {
   platform: AiConversationPostChatMessageToolCallArgsPlatform!
   filter: String!
+}
+
+type AiConversationSearchChatChannelsToolCallResult {
+  totalCount: Float!
 }
 
 type AiConversationSearchDocumentationToolCall implements AiConversationBaseToolCall {
@@ -2851,6 +2931,7 @@ enum AiConversationTool {
   SuggestRepository
   CreateSandbox
   Bash
+  SandboxGitHistory
   ReadSandboxFile
   ReadFile
   GetPullRequestDiff
@@ -2876,7 +2957,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -30383,6 +30464,7 @@ enum ProjectTab {
   customers
   documents
   issues
+  loops
   updates
 }
 
@@ -33959,6 +34041,16 @@ type Query {
 
   """The authenticated user's notification and UI settings."""
   userSettings: UserSettings!
+
+  """
+  The authenticated user's workspace-level view display preferences for a view
+  type. Returns the user-type preferences that are not scoped to a team,
+  project, or other entity. Null if the user has not customized the view.
+  """
+  userViewPreferences(
+    """The view type the preferences are associated with."""
+    viewType: ViewType!
+  ): ViewPreferences
 
   """All webhooks for the current workspace."""
   webhooks(
@@ -43177,6 +43269,8 @@ enum WorkflowTrigger {
   cycleEnded
   commentAdded
   updatePosted
+  chatMessagePosted
+  chatReactionAdded
 }
 
 enum WorkflowTriggerType {
@@ -43188,6 +43282,7 @@ enum WorkflowTriggerType {
   release
   cycle
   schedule
+  chat
 }
 
 enum WorkflowType {
