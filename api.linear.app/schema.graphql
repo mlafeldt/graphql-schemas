@@ -1677,6 +1677,7 @@ enum AiConversationEntityCardWidgetArgsType {
   Customer
   CustomerNeed
   Document
+  Meeting
   CustomView
   Dashboard
   PullRequest
@@ -8173,10 +8174,11 @@ type DocumentConnection {
 
 """
 The rich-text content body of a document, issue, project, initiative, project
-milestone, pull request, release note, automation prompt, AI prompt rules, or
-welcome message. Content is stored as a base64-encoded Yjs state and can be
-converted to Markdown or ProseMirror JSON. Each DocumentContent belongs to
-exactly one parent entity and supports real-time collaborative editing.
+milestone, pull request, release note, automation prompt, AI prompt rules,
+welcome message, or workspace announcement. Content is stored as a
+base64-encoded Yjs state and can be converted to Markdown or ProseMirror JSON.
+Each DocumentContent belongs to exactly one parent entity and supports real-time
+collaborative editing.
 """
 type DocumentContent implements Node {
   """The unique identifier of the entity."""
@@ -25607,6 +25609,14 @@ input OrganizationCodingAgentSettingsInput {
   [Internal] Whether Coding Sessions require uploaded user commit signing keys.
   """
   commitSigningEnabled: Boolean
+
+  """[Internal] The default sandbox size used for Coding Sessions."""
+  sandboxSize: String
+
+  """
+  [Internal] Whether new Coding Session sandboxes should use workspace region pinning.
+  """
+  regionPinning: Boolean
 }
 
 """Workspace deletion operation response."""
@@ -30505,6 +30515,11 @@ type ProjectUpdate implements Node {
 
   """The update's unique URL slug."""
   slugId: String!
+
+  """
+  A short AI-generated summary of the project update. Null if no short summary is available.
+  """
+  shortSummary: String
 
   """The project that this status update was posted to."""
   project: Project!
@@ -41582,6 +41597,12 @@ type ViewPreferencesValues {
   """Whether to show sub-team projects."""
   showSubTeamProjects: Boolean
 
+  """
+  Whether a team's project views show only the projects that team leads. When
+  true, projects the team only contributes to are hidden. Null if the preference is unset.
+  """
+  showOnlyLeadTeamProjects: Boolean
+
   """Whether to show sub-initiative projects."""
   showSubInitiativeProjects: Boolean
 
@@ -43271,6 +43292,7 @@ enum WorkflowTrigger {
   updatePosted
   chatMessagePosted
   chatReactionAdded
+  customerRequestAdded
 }
 
 enum WorkflowTriggerType {
