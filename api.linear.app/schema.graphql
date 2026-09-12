@@ -2055,6 +2055,11 @@ type AiConversationMcpServerConnectionScope {
   The identifier of the Loop that will own the connection. Null for other scope types.
   """
   workflowDefinitionId: String
+
+  """
+  The identifier of the Loop draft that will own the connection. Null for other scope types.
+  """
+  workflowDefinitionDraftId: String
 }
 
 """
@@ -2064,6 +2069,7 @@ enum AiConversationMcpServerConnectionScopeType {
   user
   team
   workflowDefinition
+  workflowDefinitionDraft
 }
 
 type AiConversationMemoryToolCall implements AiConversationBaseToolCall {
@@ -31168,6 +31174,11 @@ type PullRequestCommit {
   committedAt: String!
 
   """
+  The time when the commit was authored, as an ISO 8601 string. Null if unavailable.
+  """
+  authoredAt: String
+
+  """
   Number of additions in this commit. 0 when the hosting provider did not report per-commit diff stats.
   """
   additions: Float!
@@ -43314,6 +43325,129 @@ enum WorkflowType {
   triage
   triageAutomation
   release
+}
+
+"""A workspace announcement delivered to a member's inbox."""
+type WorkspaceAnnouncementNotification implements Notification & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """
+  Notification type. Determines the kind of event that triggered this
+  notification and which associated entity fields will be populated.
+  """
+  type: String!
+
+  """
+  The user that caused the notification. Null if the notification was triggered
+  by a non-user actor such as an integration, external user, or system event.
+  """
+  actor: User
+
+  """
+  The external user that caused the notification. Populated when the
+  notification was triggered by an external user (e.g., a commenter from a
+  connected integration like Slack or GitHub) rather than a Linear workspace member.
+  """
+  externalUserActor: ExternalUser
+
+  """The recipient user of this notification."""
+  user: User!
+
+  """
+  The time at which the user marked the notification as read. Null if the notification is unread.
+  """
+  readAt: DateTime
+
+  """
+  The time at which an email reminder for this notification was sent to the user. Null if no email reminder has been sent.
+  """
+  emailedAt: DateTime
+
+  """
+  The time until which a notification is snoozed. After this time, the
+  notification reappears in the user's inbox. Null if the notification is not
+  currently snoozed.
+  """
+  snoozedUntilAt: DateTime
+
+  """
+  The time at which a notification was unsnoozed. Null if the notification has not been unsnoozed.
+  """
+  unsnoozedAt: DateTime
+
+  """The category of the notification."""
+  category: NotificationCategory!
+
+  """[Internal] URL to the target of the notification."""
+  url: String!
+
+  """[Internal] Inbox URL for the notification."""
+  inboxUrl: String!
+
+  """[Internal] Notification title."""
+  title: String!
+
+  """[Internal] Notification subtitle."""
+  subtitle: String!
+
+  """[Internal] If notification actor was Linear."""
+  isLinearActor: Boolean!
+
+  """[Internal] Notification avatar URL."""
+  actorAvatarUrl: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorInitials: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorAvatarColor: String!
+
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
+
+  """[Internal] Issue's status type for issue notifications."""
+  issueStatusType: String
+
+  """[Internal] Project update health for new updates."""
+  projectUpdateHealth: String
+
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
+
+  """
+  [Internal] Notifications with the same grouping key will be grouped together in the UI.
+  """
+  groupingKey: String!
+
+  """
+  [Internal] Priority of the notification with the same grouping key. Higher
+  number means higher priority. If priority is the same, notifications should be
+  sorted by `createdAt`.
+  """
+  groupingPriority: Float!
+
+  """The bot that caused the notification."""
+  botActor: ActorBot
+
+  """Related workspace announcement."""
+  workspaceAnnouncementId: String!
 }
 
 input ZendeskSettingsInput {
