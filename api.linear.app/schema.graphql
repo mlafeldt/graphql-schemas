@@ -1687,6 +1687,7 @@ enum AiConversationEntityCardWidgetArgsType {
   AiPrompt
   AiPromptRules
   AgentSession
+  AiConversation
 }
 
 type AiConversationEntityListWidget implements AiConversationBaseWidget {
@@ -2597,6 +2598,34 @@ type AiConversationRetryPullRequestCheckToolCallArgs {
   workflowName: String
 }
 
+type AiConversationRunLoopToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationRunLoopToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationRunLoopToolCallResult
+}
+
+type AiConversationRunLoopToolCallArgs {
+  workflowDefinitionId: String!
+}
+
+type AiConversationRunLoopToolCallResult {
+  conversationId: String!
+  createdEntities: [AiConversationCreateEntityToolCallResultCreatedEntities!]
+  url: String!
+}
+
 type AiConversationSandboxGitHistoryToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -2929,6 +2958,7 @@ enum AiConversationTool {
   UpdateEntity
   DeleteEntity
   RestoreEntity
+  RunLoop
   SpawnSubagent
   Research
   CodeIntelligence
@@ -2964,7 +2994,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationSearchDocumentationToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -13453,6 +13483,17 @@ input IntegrationCustomerDataAttributesRefreshInput {
   service: String!
 }
 
+"""A Datadog feature flag environment."""
+type IntegrationDatadogEnvironment {
+  id: String!
+  name: String!
+}
+
+"""Datadog environments available to connect."""
+type IntegrationDatadogEnvironmentsPayload {
+  environments: [IntegrationDatadogEnvironment!]!
+}
+
 type IntegrationEdge {
   node: Integration!
 
@@ -13510,6 +13551,7 @@ type IntegrationRequestPayload {
 """Linear supported integration services."""
 enum IntegrationService {
   airbyte
+  datadog
   discord
   figma
   figmaPlugin
@@ -20479,6 +20521,33 @@ type Mutation {
     code: String!
   ): IntegrationPayload!
 
+  """[Internal] Lists Datadog environments available to connect."""
+  integrationDatadogEnvironments(
+    """The Datadog site domain."""
+    site: String!
+
+    """The Datadog API key."""
+    apiKey: String!
+
+    """The Datadog application key with feature flag read access."""
+    applicationKey: String!
+  ): IntegrationDatadogEnvironmentsPayload!
+
+  """[Internal] Connects Datadog feature flags to the workspace."""
+  integrationDatadogConnect(
+    """The Datadog site domain."""
+    site: String!
+
+    """The Datadog API key."""
+    apiKey: String!
+
+    """The Datadog application key with feature flag read access."""
+    applicationKey: String!
+
+    """The Datadog environment ID."""
+    environmentId: String!
+  ): IntegrationPayload!
+
   """[INTERNAL] Integrates the workspace with LaunchDarkly."""
   integrationLaunchDarklyConnect(
     """The LaunchDarkly OAuth code."""
@@ -26065,6 +26134,11 @@ input OrganizationSecuritySettingsInput {
 
   """The minimum role required to install and connect new integrations."""
   integrationCreationRole: UserRoleType
+
+  """
+  The minimum role required to pin views to workspace pages and to change the views pinned there.
+  """
+  pinnedViewManagementRole: UserRoleType
 }
 
 """Input for starting a workspace trial on a specific plan."""
@@ -39101,6 +39175,11 @@ input TeamSecuritySettingsInput {
 
   """The minimum team role required to manage loops in the team."""
   automationManagement: TeamRoleType
+
+  """
+  The minimum team role required to pin views to the team's pages and to change the views pinned there.
+  """
+  pinnedViewManagement: TeamRoleType
 }
 
 """Issue team sorting options."""
@@ -39708,6 +39787,17 @@ type TimeScheduleEdge {
 A single entry in a time schedule, defining a time range and the user responsible during that period.
 """
 type TimeScheduleEntry {
+  """
+  The Linear user id of the referenced user. If the reference cannot be mapped
+  to a Linear user then `userEmail` can be used instead.
+  """
+  userId: String
+
+  """
+  The external email, name or reference text for the user when the reference cannot be mapped to a Linear user id.
+  """
+  userEmail: String
+
   """The start time of the schedule entry in ISO 8601 date-time format."""
   startsAt: DateTime!
 
@@ -39715,19 +39805,23 @@ type TimeScheduleEntry {
   endsAt: DateTime!
 
   """
-  The Linear user id of the user on schedule. If the user cannot be mapped to a
-  Linear user then `userEmail` can be used as a reference.
+  [ALPHA] The user this entry replaced, set when the entry is an override.
   """
-  userId: String
-
-  """
-  The email, name or reference to the user on schedule. This is used in case the
-  external user could not be mapped to a Linear user id.
-  """
-  userEmail: String
+  overriddenUser: TimeScheduleUser
 }
 
 input TimeScheduleEntryInput {
+  """
+  The Linear user id of the referenced user. If the reference cannot be mapped
+  to a Linear user then `userEmail` can be used instead.
+  """
+  userId: String
+
+  """
+  The external email, name or reference text for the user when the reference cannot be mapped to a Linear user id.
+  """
+  userEmail: String
+
   """The start time of the schedule entry in ISO 8601 date-time format."""
   startsAt: DateTime!
 
@@ -39735,16 +39829,9 @@ input TimeScheduleEntryInput {
   endsAt: DateTime!
 
   """
-  The Linear user id of the user on schedule. If the user cannot be mapped to a
-  Linear user then `userEmail` can be used as a reference.
+  [ALPHA] The user this entry replaced, set when the entry is an override.
   """
-  userId: String
-
-  """
-  The email, name or reference to the user on schedule. This is used in case the
-  external user could not be mapped to a Linear user id.
-  """
-  userEmail: String
+  overriddenUser: TimeScheduleUserInput
 }
 
 """The result of a time schedule mutation."""
@@ -39775,6 +39862,33 @@ input TimeScheduleUpdateInput {
 
   """[ALPHA] The schedule configuration. Pass null to clear it."""
   config: TimeScheduleConfigInput
+}
+
+"""A reference to a user on a time schedule."""
+type TimeScheduleUser {
+  """
+  The Linear user id of the referenced user. If the reference cannot be mapped
+  to a Linear user then `userEmail` can be used instead.
+  """
+  userId: String
+
+  """
+  The external email, name or reference text for the user when the reference cannot be mapped to a Linear user id.
+  """
+  userEmail: String
+}
+
+input TimeScheduleUserInput {
+  """
+  The Linear user id of the referenced user. If the reference cannot be mapped
+  to a Linear user then `userEmail` can be used instead.
+  """
+  userId: String
+
+  """
+  The external email, name or reference text for the user when the reference cannot be mapped to a Linear user id.
+  """
+  userEmail: String
 }
 
 """Issue title sorting options."""
