@@ -12964,6 +12964,72 @@
       },
       {
         "kind": "OBJECT",
+        "name": "CodeCoverageParameters",
+        "description": "Enforce minimum line coverage thresholds on pull requests. When configured, uploaded coverage data must meet the specified criteria before changes can be merged.",
+        "fields": [
+          {
+            "name": "maxCoverageDrop",
+            "description": "The maximum percentage points that line coverage may drop relative to the default branch. Pull requests that reduce line coverage by more than this amount will be blocked.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "minimumCoverage",
+            "description": "The absolute minimum line coverage percentage required. Pull requests with line coverage below this threshold will be blocked.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "CodeCoverageParametersInput",
+        "description": "Enforce minimum line coverage thresholds on pull requests. When configured, uploaded coverage data must meet the specified criteria before changes can be merged.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "maxCoverageDrop",
+            "description": "The maximum percentage points that line coverage may drop relative to the default branch. Pull requests that reduce line coverage by more than this amount will be blocked.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "minimumCoverage",
+            "description": "The absolute minimum line coverage percentage required. Pull requests with line coverage below this threshold will be blocked.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "CodeOfConduct",
         "description": "The Code of Conduct for a repository",
         "fields": [
@@ -13061,6 +13127,93 @@
           }
         ],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "CodeQualityParameters",
+        "description": "Choose which severity levels of code quality results should block pull request merges. When configured, a code quality analysis must be done on the pull request before the changes can be merged.",
+        "fields": [
+          {
+            "name": "severity",
+            "description": "The lowest severity level at which code quality reviews need to be resolved before commits can be merged.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "CodeQualitySeverity",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "CodeQualityParametersInput",
+        "description": "Choose which severity levels of code quality results should block pull request merges. When configured, a code quality analysis must be done on the pull request before the changes can be merged.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "severity",
+            "description": "The lowest severity level at which code quality reviews need to be resolved before commits can be merged.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "CodeQualitySeverity",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "CodeQualitySeverity",
+        "description": "The lowest severity level at which code quality reviews need to be resolved before commits can be merged.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "ERRORS",
+            "description": "Errors",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "WARNINGS",
+            "description": "Warnings and higher",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NOTES",
+            "description": "Notes and higher",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ALL",
+            "description": "All",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -50545,30 +50698,6 @@
             "deprecationReason": null
           },
           {
-            "name": "eventRationales",
-            "description": "A list of rationales associated with this issue's timeline events. Always returns an empty list; use the `intent` field on individual timeline events instead.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "IssueEventRationale",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Use the `intent` field on individual timeline events instead. This field is being removed and now always returns an empty list."
-          },
-          {
             "name": "fullDatabaseId",
             "description": "Identifies the primary key from the database as a BigInt.",
             "args": [],
@@ -53810,129 +53939,6 @@
       },
       {
         "kind": "OBJECT",
-        "name": "IssueEventRationale",
-        "description": "Rationale text associated with an issue timeline event. Deprecated: the fields that return this type are being removed and now return null/empty. Use the `intent` field on individual timeline events instead.",
-        "fields": [
-          {
-            "name": "actor",
-            "description": "The agent or user who produced the rationale.",
-            "args": [],
-            "type": {
-              "kind": "INTERFACE",
-              "name": "Actor",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "createdAt",
-            "description": "Identifies the date and time when the rationale was created.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "DateTime",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueEvent",
-            "description": "The issue timeline event this rationale is associated with.",
-            "args": [],
-            "type": {
-              "kind": "UNION",
-              "name": "IssueEventWithRationale",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "rationale",
-            "description": "The reasoning or explanation text for the event.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "UNION",
-        "name": "IssueEventWithRationale",
-        "description": "An issue timeline event that may have an associated rationale. Deprecated: this union is only reachable via the deprecated `IssueEventRationale` type, which is being removed. Use the `intent` field on individual timeline events instead.",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": [
-          {
-            "kind": "OBJECT",
-            "name": "ClosedEvent",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "IssueFieldAddedEvent",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "IssueFieldChangedEvent",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "IssueFieldRemovedEvent",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "IssueTypeAddedEvent",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "IssueTypeChangedEvent",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "IssueTypeRemovedEvent",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "LabeledEvent",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "UnlabeledEvent",
-            "ofType": null
-          }
-        ]
-      },
-      {
-        "kind": "OBJECT",
         "name": "IssueFieldAddedEvent",
         "description": "Represents a 'issue_field_added' event on a given issue.",
         "fields": [
@@ -54035,18 +54041,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "rationale",
-            "description": "The rationale associated with this event. Always returns null; use `intent` instead.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "IssueEventRationale",
-              "ofType": null
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Use `intent` instead. This field is being removed and now always returns null."
           },
           {
             "name": "value",
@@ -54232,18 +54226,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "rationale",
-            "description": "The rationale associated with this event. Always returns null; use `intent` instead.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "IssueEventRationale",
-              "ofType": null
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Use `intent` instead. This field is being removed and now always returns null."
           }
         ],
         "inputFields": null,
@@ -55320,18 +55302,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "rationale",
-            "description": "The rationale associated with this event. Always returns null; use `intent` instead.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "IssueEventRationale",
-              "ofType": null
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Use `intent` instead. This field is being removed and now always returns null."
           }
         ],
         "inputFields": null,
@@ -58556,18 +58526,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "rationale",
-            "description": "The rationale associated with this event. Always returns null; use `intent` instead.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "IssueEventRationale",
-              "ofType": null
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Use `intent` instead. This field is being removed and now always returns null."
           }
         ],
         "inputFields": null,
@@ -58665,18 +58623,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "rationale",
-            "description": "The rationale associated with this event. Always returns null; use `intent` instead.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "IssueEventRationale",
-              "ofType": null
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Use `intent` instead. This field is being removed and now always returns null."
           }
         ],
         "inputFields": null,
@@ -58997,18 +58943,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "rationale",
-            "description": "The rationale associated with this event. Always returns null; use `intent` instead.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "IssueEventRationale",
-              "ofType": null
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Use `intent` instead. This field is being removed and now always returns null."
           }
         ],
         "inputFields": null,
@@ -60065,18 +59999,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "rationale",
-            "description": "The rationale associated with this event. Always returns null; use `intent` instead.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "IssueEventRationale",
-              "ofType": null
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Use `intent` instead. This field is being removed and now always returns null."
           }
         ],
         "inputFields": null,
@@ -75979,6 +75901,31 @@
           {
             "kind": "OBJECT",
             "name": "ParentIssueRemovedEvent",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "PendingAssigneeSuggestion",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "PendingCloseSuggestion",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "PendingFieldSuggestion",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "PendingLabelSuggestion",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "PendingTypeSuggestion",
             "ofType": null
           },
           {
@@ -93896,6 +93843,22 @@
             "deprecationReason": null
           },
           {
+            "name": "id",
+            "description": "The Node ID of the PendingAssigneeSuggestion object",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "rationale",
             "description": "The rationale provided for suggesting this assignee.",
             "args": [],
@@ -93921,7 +93884,13 @@
           }
         ],
         "inputFields": null,
-        "interfaces": [],
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -93971,6 +93940,22 @@
             "deprecationReason": null
           },
           {
+            "name": "id",
+            "description": "The Node ID of the PendingCloseSuggestion object",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "rationale",
             "description": "The rationale provided for suggesting this close.",
             "args": [],
@@ -94008,7 +93993,13 @@
           }
         ],
         "inputFields": null,
-        "interfaces": [],
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -94039,6 +94030,22 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "id",
+            "description": "The Node ID of the PendingFieldSuggestion object",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
                 "ofType": null
               }
             },
@@ -94095,7 +94102,13 @@
           }
         ],
         "inputFields": null,
-        "interfaces": [],
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -94275,6 +94288,22 @@
             "deprecationReason": null
           },
           {
+            "name": "id",
+            "description": "The Node ID of the PendingLabelSuggestion object",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "label",
             "description": "The suggested label.",
             "args": [],
@@ -94312,7 +94341,13 @@
           }
         ],
         "inputFields": null,
-        "interfaces": [],
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -94343,6 +94378,22 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "id",
+            "description": "The Node ID of the PendingTypeSuggestion object",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
                 "ofType": null
               }
             },
@@ -94387,7 +94438,13 @@
           }
         ],
         "inputFields": null,
-        "interfaces": [],
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -140146,6 +140203,18 @@
             "deprecationReason": null
           },
           {
+            "name": "CODE_QUALITY",
+            "description": "Choose which severity levels of code quality results should block pull request merges. When configured, a code quality analysis must be done on the pull request before the changes can be merged.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CODE_COVERAGE",
+            "description": "Enforce minimum line coverage thresholds on pull requests. When configured, uploaded coverage data must meet the specified criteria before changes can be merged.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "COPILOT_CODE_REVIEW",
             "description": "Request Copilot code review for new pull requests automatically if the author has access to Copilot code review and their premium requests quota has not reached the limit.",
             "isDeprecated": false,
@@ -144967,6 +145036,16 @@
           },
           {
             "kind": "OBJECT",
+            "name": "CodeCoverageParameters",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "CodeQualityParameters",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "CodeScanningParameters",
             "ofType": null
           },
@@ -145169,6 +145248,26 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "CodeScanningParametersInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "codeQuality",
+            "description": "Parameters used for the `code_quality` rule type",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "CodeQualityParametersInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "codeCoverage",
+            "description": "Parameters used for the `code_coverage` rule type",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "CodeCoverageParametersInput",
               "ofType": null
             },
             "defaultValue": null
@@ -162921,18 +163020,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "rationale",
-            "description": "The rationale associated with this event. Always returns null; use `intent` instead.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "IssueEventRationale",
-              "ofType": null
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Use `intent` instead. This field is being removed and now always returns null."
           }
         ],
         "inputFields": null,
@@ -180339,6 +180426,31 @@
           {
             "kind": "OBJECT",
             "name": "ParentIssueRemovedEvent",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "PendingAssigneeSuggestion",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "PendingCloseSuggestion",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "PendingFieldSuggestion",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "PendingLabelSuggestion",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "PendingTypeSuggestion",
             "ofType": null
           },
           {
