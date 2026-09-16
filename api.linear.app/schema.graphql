@@ -2269,6 +2269,14 @@ type AiConversationPostChatMessageToolCallResult {
   error: String
   message: String
   conversationUrl: String
+  destination: AiConversationPostChatMessageToolCallResultDestination
+}
+
+type AiConversationPostChatMessageToolCallResultDestination {
+  integrationId: String!
+  channelId: String!
+  threadId: String!
+  messageId: String!
 }
 
 type AiConversationPromptCodingSessionToolCall implements AiConversationBaseToolCall {
@@ -11940,6 +11948,9 @@ input InitiativeCollectionFilter {
   """Filters that the initiative labels must satisfy."""
   labels: InitiativeLabelCollectionFilter
 
+  """Filters that the initiative projects must satisfy."""
+  projects: ProjectCollectionFilter
+
   """Filters that the initiative updates must satisfy."""
   initiativeUpdates: InitiativeUpdatesCollectionFilter
 
@@ -12105,6 +12116,9 @@ input InitiativeFilter {
 
   """Filters that the initiative labels must satisfy."""
   labels: InitiativeLabelCollectionFilter
+
+  """Filters that the initiative projects must satisfy."""
+  projects: ProjectCollectionFilter
 
   """Filters that the initiative updates must satisfy."""
   initiativeUpdates: InitiativeUpdatesCollectionFilter
@@ -16288,6 +16302,11 @@ type IssueLabel implements Node {
 
   """[Internal] When the label was retired."""
   retiredAt: DateTime
+
+  """
+  The selection mode of this label group. Null for regular labels. Groups without a type use single-select behavior.
+  """
+  groupType: LabelGroupType
   organization: Organization! @deprecated(reason: "Workspace labels are identified by their team being null.")
 
   """
@@ -16455,6 +16474,11 @@ input IssueLabelCreateInput {
   retiredAt: DateTime
 
   """
+  The selection mode of the label group. Defaults to singleSelect for groups and null for regular labels.
+  """
+  groupType: LabelGroupType
+
+  """
   The team associated with the label. If not given, the label will be associated with the entire workspace.
   """
   teamId: String
@@ -16537,6 +16561,12 @@ input IssueLabelUpdateInput {
   The time at which the label was retired. Set to null to restore a retired label.
   """
   retiredAt: DateTime
+
+  """
+  The selection mode of the label group. Omit to keep the current value. Null
+  resets groups to singleSelect. Regular labels always use null.
+  """
+  groupType: LabelGroupType
 }
 
 """
@@ -18576,6 +18606,12 @@ input LabelGroupSort {
 
   """The label-group id to sort by"""
   labelGroupId: String!
+}
+
+"""The selection mode of an issue label group."""
+enum LabelGroupType {
+  singleSelect
+  multiSelect
 }
 
 """
@@ -23843,6 +23879,9 @@ input NullableInitiativeFilter {
 
   """Filters that the initiative labels must satisfy."""
   labels: InitiativeLabelCollectionFilter
+
+  """Filters that the initiative projects must satisfy."""
+  projects: ProjectCollectionFilter
 
   """Filters that the initiative updates must satisfy."""
   initiativeUpdates: InitiativeUpdatesCollectionFilter
@@ -42249,6 +42288,11 @@ type ViewPreferencesValues {
 
   """Whether to show the review avatar field."""
   reviewFieldAvatar: Boolean
+
+  """
+  Whether to show reviewer avatars on review list items. Null if the preference is unset.
+  """
+  reviewFieldReviewers: Boolean
 
   """No longer used. Previously controlled the review preview links field."""
   reviewFieldPreviewLinks: Boolean
