@@ -1261,6 +1261,11 @@ type AiConversation implements Node {
   pullRequest: PullRequest
 
   """
+  [Internal] The live diff that owns this conversation. Ownership moves to the review on promotion.
+  """
+  diff: Diff
+
+  """
   The entity contexts this conversation is related to, such as issues, projects,
   or documents that provide context for the AI assistant.
   """
@@ -13708,6 +13713,13 @@ type IntegrationsSettings implements Node {
   slackProjectUpdateCreated: Boolean
 
   """
+  Whether to send a Slack message when a top-level project comment is created.
+  New settings default to true. Existing unset settings inherit the project
+  update preference until first edited.
+  """
+  slackProjectCommentCreated: Boolean
+
+  """
   Whether to send a Microsoft Teams message when a project update is created.
   """
   microsoftTeamsProjectUpdateCreated: Boolean
@@ -13720,6 +13732,13 @@ type IntegrationsSettings implements Node {
 
   """Whether to send a Slack message when an initiative update is created."""
   slackInitiativeUpdateCreated: Boolean
+
+  """
+  Whether to send a Slack message when a top-level initiative comment is
+  created. New settings default to true. Existing unset settings inherit the
+  initiative update preference until first edited.
+  """
+  slackInitiativeCommentCreated: Boolean
 
   """Whether to send a Slack message when a new issue is added to triage."""
   slackIssueAddedToTriage: Boolean
@@ -13768,6 +13787,11 @@ input IntegrationsSettingsCreateInput {
   slackProjectUpdateCreated: Boolean
 
   """
+  Whether to send a Slack message when a top-level project comment is created.
+  """
+  slackProjectCommentCreated: Boolean
+
+  """
   Whether to send a Microsoft Teams message when a project update is created.
   """
   microsoftTeamsProjectUpdateCreated: Boolean
@@ -13784,6 +13808,11 @@ input IntegrationsSettingsCreateInput {
 
   """Whether to send a Slack message when an initiative update is created."""
   slackInitiativeUpdateCreated: Boolean
+
+  """
+  Whether to send a Slack message when a top-level initiative comment is created.
+  """
+  slackInitiativeCommentCreated: Boolean
 
   """Whether to send a Slack message when a new issue is added to triage."""
   slackIssueAddedToTriage: Boolean
@@ -13856,6 +13885,11 @@ input IntegrationsSettingsUpdateInput {
   slackProjectUpdateCreated: Boolean
 
   """
+  Whether to send a Slack message when a top-level project comment is created.
+  """
+  slackProjectCommentCreated: Boolean
+
+  """
   Whether to send a Microsoft Teams message when a project update is created.
   """
   microsoftTeamsProjectUpdateCreated: Boolean
@@ -13872,6 +13906,11 @@ input IntegrationsSettingsUpdateInput {
 
   """Whether to send a Slack message when an initiative update is created."""
   slackInitiativeUpdateCreated: Boolean
+
+  """
+  Whether to send a Slack message when a top-level initiative comment is created.
+  """
+  slackInitiativeCommentCreated: Boolean
 
   """Whether to send a Slack message when a new issue is added to triage."""
   slackIssueAddedToTriage: Boolean
@@ -18789,6 +18828,9 @@ type LoopExecution implements Node {
 
   """[Internal] The cycle that triggered this Loop execution."""
   cycle: Cycle
+
+  """[Internal] The release that triggered this Loop execution."""
+  release: Release
 }
 
 """Issue manual sorting options."""
@@ -27244,6 +27286,11 @@ type Project implements Node {
   leadTeam: Team
 
   """
+  [Internal] The ID of the team that leads the project, even when the viewer cannot access the team.
+  """
+  leadTeamId: String!
+
+  """
   [Internal] Facets associated with the project, used for filtering and categorization.
   """
   facets: [Facet!]!
@@ -28454,9 +28501,11 @@ type ProjectHistoryEdge {
 }
 
 """
-A label that can be applied to projects for categorization. Project labels are
-workspace-level and can be organized into groups with a parent-child hierarchy.
-Only child labels (not group labels) can be directly applied to projects.
+A label that can be applied to projects for categorization. Project labels can
+be workspace-level (available to all teams) or team-scoped, and can be organized
+into groups with a parent-child hierarchy. Only child labels (not group labels)
+can be directly applied to projects. Team-scoped labels may be inherited from
+parent teams to sub-teams.
 """
 type ProjectLabel implements Node {
   """The unique identifier of the entity."""
@@ -28506,8 +28555,8 @@ type ProjectLabel implements Node {
   organization: Organization!
 
   """
-  [Internal] The team that the label is scoped to. If null, the label is a
-  workspace-level label available to all teams in the workspace.
+  The team that the label is scoped to. If null, the label is a workspace-level
+  label available to all teams in the workspace.
   """
   team: Team
 
@@ -28527,8 +28576,7 @@ type ProjectLabel implements Node {
   parent: ProjectLabel
 
   """
-  [Internal] The original workspace or parent-team label that this label was
-  inherited from. Null if the label is not inherited.
+  The original workspace or parent-team label that this label was inherited from. Null if the label is not inherited.
   """
   inheritedFrom: ProjectLabel
 
@@ -28616,6 +28664,11 @@ input ProjectLabelCollectionFilter {
   """Filters that the project labels creator must satisfy."""
   creator: NullableUserFilter
 
+  """
+  Filters that the project label's team must satisfy. Use `{ null: true }` to filter workspace-level labels.
+  """
+  team: NullableTeamFilter
+
   """Filters that the project label's parent label must satisfy."""
   parent: ProjectLabelFilter
 
@@ -28675,7 +28728,8 @@ input ProjectLabelCreateInput {
   retiredAt: DateTime
 
   """
-  [Internal] The team associated with the label. If not given, the label will be associated with the entire workspace.
+  The identifier of the team to scope the label to. If not given, the label is a
+  workspace-level label available to all teams.
   """
   teamId: String
 }
@@ -28706,6 +28760,11 @@ input ProjectLabelFilter {
 
   """Filters that the project labels creator must satisfy."""
   creator: NullableUserFilter
+
+  """
+  Filters that the project label's team must satisfy. Use `{ null: true }` to filter workspace-level labels.
+  """
+  team: NullableTeamFilter
 
   """Filters that the project label's parent label must satisfy."""
   parent: ProjectLabelFilter
@@ -29637,6 +29696,11 @@ type ProjectSearchResult implements Node {
   leadTeam: Team
 
   """
+  [Internal] The ID of the team that leads the project, even when the viewer cannot access the team.
+  """
+  leadTeamId: String!
+
+  """
   [Internal] Facets associated with the project, used for filtering and categorization.
   """
   facets: [Facet!]!
@@ -30414,6 +30478,12 @@ type ProjectStatus implements Node {
   [Internal] The team that the status is scoped to. If null, the status is a workspace-level status.
   """
   team: Team
+
+  """
+  [Internal] The ID of the team that owns the status, even when the viewer
+  cannot access the team. Null for workspace statuses.
+  """
+  teamId: String
 
   """
   [Internal] The original workspace or parent-team status that this status was
@@ -33269,7 +33339,11 @@ type Query {
     token: String!
   ): PartnerOfferWorkspacesPayload
 
-  """Returns all project labels in the workspace, with optional filtering."""
+  """
+  All project labels. Returns a paginated list of labels visible to the
+  authenticated user, including both workspace-level and team-scoped labels,
+  with optional filtering.
+  """
   projectLabels(
     """Filter returned project labels."""
     filter: ProjectLabelFilter
@@ -40482,9 +40556,6 @@ type User implements Node {
   """Whether the user is an app."""
   app: Boolean!
 
-  """Whether the user is mentionable."""
-  isMentionable: Boolean!
-
   """Whether the user account is active or disabled (suspended)."""
   active: Boolean!
 
@@ -40744,11 +40815,15 @@ type User implements Node {
   owner: Boolean!
 
   """
-  Whether the user can be assigned to issues. Regular users are always
-  assignable; app users are assignable only if they have the app:assignable
-  scope. The Linear agent also requires coding sessions to be enabled.
+  Whether the user can be assigned to issues. Active app users require the
+  assignments capability. The Linear agent also requires coding sessions to be enabled.
   """
   isAssignable: Boolean!
+
+  """
+  Whether the user can be mentioned. Active app users require the mentions capability.
+  """
+  isMentionable: Boolean!
 
   """Whether this agent user supports agent sessions."""
   supportsAgentSessions: Boolean!
@@ -40967,6 +41042,7 @@ enum UserFlagType {
   initiativesBannerDismissed
   commandMenuClearShortcutTip
   slackBotWelcomeMessageShown
+  slackAiFeedbackAcknowledgementShown
   teamsBotWelcomeMessageShown
   slackAgentPromoFromCreateNewIssueShown
   agentExamplesDismissed

@@ -1058,6 +1058,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "Diff",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "WorkflowCronJobDefinition",
             "ofType": null
           },
@@ -1274,11 +1279,6 @@
           {
             "kind": "OBJECT",
             "name": "AuditEntry",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "Diff",
             "ofType": null
           },
           {
@@ -1705,22 +1705,6 @@
           {
             "name": "app",
             "description": "Whether the user is an app.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "isMentionable",
-            "description": "Whether the user is mentionable.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -2504,7 +2488,23 @@
           },
           {
             "name": "isAssignable",
-            "description": "Whether the user can be assigned to issues. Regular users are always assignable; app users are assignable only if they have the app:assignable scope. The Linear agent also requires coding sessions to be enabled.",
+            "description": "Whether the user can be assigned to issues. Active app users require the assignments capability. The Linear agent also requires coding sessions to be enabled.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "isMentionable",
+            "description": "Whether the user can be mentioned. Active app users require the mentions capability.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -7985,6 +7985,22 @@
             "deprecationReason": null
           },
           {
+            "name": "leadTeamId",
+            "description": "[Internal] The ID of the team that leads the project, even when the viewer cannot access the team.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "facets",
             "description": "[Internal] Facets associated with the project, used for filtering and categorization.",
             "args": [],
@@ -10270,6 +10286,18 @@
             "type": {
               "kind": "OBJECT",
               "name": "Team",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "teamId",
+            "description": "[Internal] The ID of the team that owns the status, even when the viewer cannot access the team. Null for workspace statuses.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "isDeprecated": false,
@@ -21280,6 +21308,16 @@
             "defaultValue": null
           },
           {
+            "name": "team",
+            "description": "Filters that the project label's team must satisfy. Use `{ null: true }` to filter workspace-level labels.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableTeamFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "parent",
             "description": "Filters that the project label's parent label must satisfy.",
             "type": {
@@ -21432,6 +21470,16 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableUserFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "team",
+            "description": "Filters that the project label's team must satisfy. Use `{ null: true }` to filter workspace-level labels.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableTeamFilter",
               "ofType": null
             },
             "defaultValue": null
@@ -39555,6 +39603,18 @@
             "deprecationReason": null
           },
           {
+            "name": "slackProjectCommentCreated",
+            "description": "Whether to send a Slack message when a top-level project comment is created. New settings default to true. Existing unset settings inherit the project update preference until first edited.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "microsoftTeamsProjectUpdateCreated",
             "description": "Whether to send a Microsoft Teams message when a project update is created.",
             "args": [],
@@ -39593,6 +39653,18 @@
           {
             "name": "slackInitiativeUpdateCreated",
             "description": "Whether to send a Slack message when an initiative update is created.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "slackInitiativeCommentCreated",
+            "description": "Whether to send a Slack message when a top-level initiative comment is created. New settings default to true. Existing unset settings inherit the initiative update preference until first edited.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -51437,7 +51509,7 @@
       {
         "kind": "OBJECT",
         "name": "ProjectLabel",
-        "description": "A label that can be applied to projects for categorization. Project labels are workspace-level and can be organized into groups with a parent-child hierarchy. Only child labels (not group labels) can be directly applied to projects.",
+        "description": "A label that can be applied to projects for categorization. Project labels can be workspace-level (available to all teams) or team-scoped, and can be organized into groups with a parent-child hierarchy. Only child labels (not group labels) can be directly applied to projects. Team-scoped labels may be inherited from parent teams to sub-teams.",
         "fields": [
           {
             "name": "id",
@@ -51601,7 +51673,7 @@
           },
           {
             "name": "team",
-            "description": "[Internal] The team that the label is scoped to. If null, the label is a workspace-level label available to all teams in the workspace.",
+            "description": "The team that the label is scoped to. If null, the label is a workspace-level label available to all teams in the workspace.",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -51649,7 +51721,7 @@
           },
           {
             "name": "inheritedFrom",
-            "description": "[Internal] The original workspace or parent-team label that this label was inherited from. Null if the label is not inherited.",
+            "description": "The original workspace or parent-team label that this label was inherited from. Null if the label is not inherited.",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -53854,6 +53926,18 @@
             "deprecationReason": null
           },
           {
+            "name": "diff",
+            "description": "[Internal] The live diff that owns this conversation. Ownership moves to the review on promotion.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Diff",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "context",
             "description": "The entity contexts this conversation is related to, such as issues, projects, or documents that provide context for the AI assistant.",
             "args": [],
@@ -54217,6 +54301,18 @@
             "type": {
               "kind": "OBJECT",
               "name": "Cycle",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "release",
+            "description": "[Internal] The release that triggered this Loop execution.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Release",
               "ofType": null
             },
             "isDeprecated": false,
@@ -55089,6 +55185,409 @@
           },
           {
             "name": "owner",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "Diff",
+        "description": "[Internal] A first-class code diff. Starts as the live working-tree state of a coding session and is promoted to a review by linking it to a pull request, while continuing to represent local, uncommitted changes.",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The unique identifier of the entity.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createdAt",
+            "description": "The time at which the entity was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't\n    been updated after creation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "archivedAt",
+            "description": "The time at which the entity was archived. Null if the entity has not been archived.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "contentHash",
+            "description": "[Internal] The opaque content hash identifying the diff's content in code.storage.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "fileCount",
+            "description": "[Internal] The number of changed files in the diff.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "additions",
+            "description": "[Internal] The total number of added lines across the diff.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "deletions",
+            "description": "[Internal] The total number of deleted lines across the diff.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "truncated",
+            "description": "[Internal] Whether oversized files were omitted when the diff was computed.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "slugId",
+            "description": "[Internal] The diff's unique URL slug.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organization",
+            "description": "The workspace the diff belongs to.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Organization",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentSession",
+            "description": "The agent session the diff belongs to.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "AgentSession",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pullRequest",
+            "description": "The pull request the diff was promoted to when opened for review.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PullRequest",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "creator",
+            "description": "The user responsible for the diff.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "User",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "files",
+            "description": "[Internal] Per-file metadata for the diff. Served behind a repository-read-access gate (the synced row carries only aggregate counts); null when the requester lacks repository access or the diff is empty.",
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "DiffFile",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "DiffFile",
+        "description": "[Internal] One changed file in a diff.",
+        "fields": [
+          {
+            "name": "path",
+            "description": "Path of the changed file (the new path, for renames).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "oldPath",
+            "description": "Previous path, when the file was renamed or copied.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "state",
+            "description": "The kind of change for this file.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "DiffFileState",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "additions",
+            "description": "Lines added in this file.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "deletions",
+            "description": "Lines removed in this file.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "omitted",
+            "description": "True when the file's diff was omitted for exceeding the size budget; its contents are not shown.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "DiffFileState",
+        "description": "[Internal] The kind of change for a file in a diff.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "added",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "modified",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "deleted",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "renamed",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "copied",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "type_changed",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "unmerged",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "unknown",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -90646,7 +91145,7 @@
           },
           {
             "name": "projectLabels",
-            "description": "Returns all project labels in the workspace, with optional filtering.",
+            "description": "All project labels. Returns a paginated list of labels visible to the authenticated user, including both workspace-level and team-scoped labels, with optional filtering.",
             "args": [
               {
                 "name": "filter",
@@ -98080,409 +98579,6 @@
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "Diff",
-        "description": "[Internal] A first-class code diff. Starts as the live working-tree state of a coding session and is promoted to a review by linking it to a pull request, while continuing to represent local, uncommitted changes.",
-        "fields": [
-          {
-            "name": "id",
-            "description": "The unique identifier of the entity.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "createdAt",
-            "description": "The time at which the entity was created.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "DateTime",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't\n    been updated after creation.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "DateTime",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "archivedAt",
-            "description": "The time at which the entity was archived. Null if the entity has not been archived.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTime",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "contentHash",
-            "description": "[Internal] The opaque content hash identifying the diff's content in code.storage.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "fileCount",
-            "description": "[Internal] The number of changed files in the diff.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "additions",
-            "description": "[Internal] The total number of added lines across the diff.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "deletions",
-            "description": "[Internal] The total number of deleted lines across the diff.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "truncated",
-            "description": "[Internal] Whether oversized files were omitted when the diff was computed.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "slugId",
-            "description": "[Internal] The diff's unique URL slug.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organization",
-            "description": "The workspace the diff belongs to.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Organization",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentSession",
-            "description": "The agent session the diff belongs to.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "AgentSession",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "pullRequest",
-            "description": "The pull request the diff was promoted to when opened for review.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "PullRequest",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "creator",
-            "description": "The user responsible for the diff.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "User",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "files",
-            "description": "[Internal] Per-file metadata for the diff. Served behind a repository-read-access gate (the synced row carries only aggregate counts); null when the requester lacks repository access or the diff is empty.",
-            "args": [],
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "DiffFile",
-                  "ofType": null
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [
-          {
-            "kind": "INTERFACE",
-            "name": "Node",
-            "ofType": null
-          }
-        ],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "DiffFile",
-        "description": "[Internal] One changed file in a diff.",
-        "fields": [
-          {
-            "name": "path",
-            "description": "Path of the changed file (the new path, for renames).",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "oldPath",
-            "description": "Previous path, when the file was renamed or copied.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "state",
-            "description": "The kind of change for this file.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "DiffFileState",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "additions",
-            "description": "Lines added in this file.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "deletions",
-            "description": "Lines removed in this file.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "omitted",
-            "description": "True when the file's diff was omitted for exceeding the size budget; its contents are not shown.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "ENUM",
-        "name": "DiffFileState",
-        "description": "[Internal] The kind of change for a file in a diff.",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "added",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "modified",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "deleted",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "renamed",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "copied",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "type_changed",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "unmerged",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "unknown",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
         "possibleTypes": null
       },
       {
@@ -106760,6 +106856,22 @@
               "kind": "OBJECT",
               "name": "Team",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "leadTeamId",
+            "description": "[Internal] The ID of the team that leads the project, even when the viewer cannot access the team.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -143750,6 +143862,16 @@
             "defaultValue": null
           },
           {
+            "name": "slackProjectCommentCreated",
+            "description": "Whether to send a Slack message when a top-level project comment is created.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "microsoftTeamsProjectUpdateCreated",
             "description": "Whether to send a Microsoft Teams message when a project update is created.",
             "type": {
@@ -143782,6 +143904,16 @@
           {
             "name": "slackInitiativeUpdateCreated",
             "description": "Whether to send a Slack message when an initiative update is created.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slackInitiativeCommentCreated",
+            "description": "Whether to send a Slack message when a top-level initiative comment is created.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -143951,6 +144083,16 @@
             "defaultValue": null
           },
           {
+            "name": "slackProjectCommentCreated",
+            "description": "Whether to send a Slack message when a top-level project comment is created.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "microsoftTeamsProjectUpdateCreated",
             "description": "Whether to send a Microsoft Teams message when a project update is created.",
             "type": {
@@ -143983,6 +144125,16 @@
           {
             "name": "slackInitiativeUpdateCreated",
             "description": "Whether to send a Slack message when an initiative update is created.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slackInitiativeCommentCreated",
+            "description": "Whether to send a Slack message when a top-level initiative comment is created.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -149126,7 +149278,7 @@
           },
           {
             "name": "teamId",
-            "description": "[Internal] The team associated with the label. If not given, the label will be associated with the entire workspace.",
+            "description": "The identifier of the team to scope the label to. If not given, the label is a workspace-level label available to all teams.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -157355,6 +157507,12 @@
           },
           {
             "name": "slackBotWelcomeMessageShown",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "slackAiFeedbackAcknowledgementShown",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
