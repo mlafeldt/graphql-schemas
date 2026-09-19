@@ -13645,6 +13645,9 @@ input IntegrationSettingsInput {
   launchDarkly: LaunchDarklySettingsInput
   jiraPersonal: JiraPersonalSettingsInput
   salesforce: SalesforceSettingsInput
+
+  """Settings shared by personal and shared MCP server connections."""
+  mcpServer: McpServerIntegrationSettingsInput
 }
 
 type IntegrationSlackWorkspaceNamePayload {
@@ -18851,6 +18854,11 @@ input McpServerCustomHeaderInput {
 
   """The HTTP header value."""
   value: String!
+}
+
+input McpServerIntegrationSettingsInput {
+  """The connection-specific display name."""
+  name: String
 }
 
 """
@@ -26664,6 +26672,7 @@ enum PartnerOfferCategory {
   investor
   accelerator
   startup_community
+  creator
 }
 
 """[Internal] Public details of an active partner-program offer."""
@@ -42255,6 +42264,12 @@ type ViewPreferencesValues {
 
   """Whether to show the issue identifier in Loop run history."""
   automationRunHistoryShowIssueIdentifier: Boolean
+
+  """Whether to show the project identifier in Loop run history."""
+  automationRunHistoryShowProjectIdentifier: Boolean
+
+  """Whether to show the initiative identifier in Loop run history."""
+  automationRunHistoryShowInitiativeIdentifier: Boolean
 
   """Whether to show the run duration in Loop run history."""
   automationRunHistoryShowDuration: Boolean
