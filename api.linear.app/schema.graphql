@@ -20674,6 +20674,11 @@ type Mutation {
 
   """Connect your Jira account to Linear."""
   integrationJiraPersonal(
+    """
+    The workspace Jira integration to connect to. Required when the connection would otherwise be ambiguous.
+    """
+    workspaceIntegrationId: String
+
     """The Jira OAuth code, when connecting using OAuth."""
     code: String
 
@@ -22592,6 +22597,12 @@ type Mutation {
 
   """Disconnects the external user from this Linear account."""
   userExternalUserDisconnect(
+    """
+    The workspace Jira integration whose account mapping to remove. If omitted,
+    removes all Jira mappings without a personal connection.
+    """
+    workspaceIntegrationId: String
+
     """The external service to disconnect."""
     service: String!
   ): UserPayload!
@@ -41271,6 +41282,9 @@ type UserSettings implements Node {
 
   """Whether to show full user names instead of display names."""
   showFullUserNames: Boolean!
+
+  """Whether to show line numbers in code blocks."""
+  showCodeBlockLineNumbers: Boolean!
 
   """The user's last seen time for the pulse feed."""
   feedLastSeenTime: DateTime
