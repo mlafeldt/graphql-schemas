@@ -645,7 +645,7 @@ type AgentSession implements Node {
   slugId: String!
 
   """
-  The current status of the agent session, such as pending, active, awaiting input, complete, error, or stale.
+  The current status of the agent session, such as pending, active, stopping, awaiting input, complete, error, or stale.
   """
   status: AgentSessionStatus!
 
@@ -899,6 +899,7 @@ type AgentSessionPayload {
 enum AgentSessionStatus {
   pending
   active
+  stopping
   complete
   awaitingInput
   error
@@ -1349,6 +1350,7 @@ The kind of acknowledgement the agent expresses when it has nothing meaningful t
 """
 enum AiConversationAckKind {
   done
+  skipped
   ignored
   waiting
 }
@@ -1564,6 +1566,7 @@ enum AiConversationElicitationKind {
   multipleChoice
   mcpServerConnection
   confirmation
+  entitySelection
 }
 
 """A selectable option shown in an AI conversation elicitation."""
@@ -1614,12 +1617,21 @@ type AiConversationElicitationPart implements AiConversationBasePart {
   The existing MCP integration to reconnect. Null when creating a new connection.
   """
   integrationId: String
+
+  """Entity type for entity selection."""
+  entityType: String
+
+  """Suggested entity identifiers."""
+  suggestedEntityIds: [String!]
+
+  """Whether to select one or multiple entities."""
+  selection: String
 }
 
 """
 The kind-specific data recorded when a user answers an AI conversation elicitation.
 """
-union AiConversationElicitationResponseData = AiConversationMultipleChoiceElicitationResponseData | AiConversationConfirmationElicitationResponseData | AiConversationMcpServerConnectionElicitationResponseData
+union AiConversationElicitationResponseData = AiConversationMultipleChoiceElicitationResponseData | AiConversationConfirmationElicitationResponseData | AiConversationMcpServerConnectionElicitationResponseData | AiConversationEntitySelectionElicitationResponseData
 
 """A structured user response to an elicitation in an AI conversation."""
 type AiConversationElicitationResponsePart implements AiConversationBasePart {
@@ -1792,6 +1804,12 @@ enum AiConversationEntityListWidgetArgsEntitiesType {
   AiPrompt
   AiPromptRules
   AgentSession
+}
+
+"""Selected entities in an entity selection elicitation."""
+type AiConversationEntitySelectionElicitationResponseData {
+  kind: AiConversationElicitationKind!
+  selectedEntityIds: [String!]!
 }
 
 """An error part in an AI conversation."""
@@ -11234,6 +11252,24 @@ type GitLabIntegrationCreatePayload {
 }
 
 input GitLabSettingsInput {
+  """Verified scopes of the GitLab access token."""
+  scopes: [String!]
+
+  """Whether the token supports self-rotation."""
+  canSelfRotate: Boolean
+
+  """Whether Linear automatically rotates the token."""
+  rotationEnabled: Boolean
+
+  """The ISO timestamp of the next automatic token rotation."""
+  nextRotationAt: String
+
+  """The ISO timestamp of the last successful token rotation."""
+  lastRotatedAt: String
+
+  """The reason token rotation needs attention."""
+  rotationFailureReason: String
+
   """The self-hosted URL of the GitLab instance."""
   url: String
 
@@ -18727,9 +18763,6 @@ input JiraUpdateInput {
   """Webhook secret for a new manual configuration."""
   webhookSecret: String
 
-  """Whether the Jira instance does not support webhook secrets."""
-  noSecret: Boolean
-
   """
   The Jira personal access token, or the API key of a Jira Cloud service account.
   """
@@ -18985,6 +19018,12 @@ input McpServerCustomHeaderInput {
 input McpServerIntegrationSettingsInput {
   """The connection-specific display name."""
   name: String
+
+  """Who may add this connector to a Loop."""
+  loopAccess: String
+
+  """Who may use this connector in conversations."""
+  conversationAccess: String
 }
 
 """
@@ -20712,6 +20751,31 @@ type Mutation {
   ): GitLabIntegrationCreatePayload!
 
   """
+  Replaces the GitLab access token while preserving the connected host and webhook.
+  """
+  integrationGitlabUpdateToken(
+    """
+    The time at which the replacement token expires. Used when GitLab cannot return its expiry.
+    """
+    expiresAt: DateTime
+
+    """
+    Whether the replacement token has read-only access. Required when GitLab cannot return its scopes.
+    """
+    readonly: Boolean
+    accessToken: String!
+    integrationId: String!
+  ): IntegrationPayload!
+
+  """Enables or disables automatic self-rotation of the GitLab token."""
+  integrationGitlabUpdateRotationSettings(enabled: Boolean!, integrationId: String!): IntegrationPayload!
+
+  """
+  Rotates the GitLab token, revoking the previous token and saving its replacement.
+  """
+  integrationGitlabRotate(integrationId: String!): IntegrationPayload!
+
+  """
   Tests connectivity to a self-hosted GitLab instance and clears auth errors if successful.
   """
   integrationGitlabTestConnection(
@@ -21243,6 +21307,9 @@ type Mutation {
 
   """[INTERNAL] Connects the workspace with an MCP server."""
   integrationMcpServerConnect(
+    """Access settings for a new team MCP connector."""
+    settings: McpServerIntegrationSettingsInput
+
     """
     Optional additional HTTP headers to include with requests to this MCP server.
     """
@@ -23628,6 +23695,9 @@ input NotificationSubscriptionCreateInput {
   Whether the subscription is active. Set to false to pause notifications without deleting the subscription.
   """
   active: Boolean
+
+  """Whether to include updates from sub-initiatives."""
+  includeSubInitiativeUpdates: Boolean
 }
 
 type NotificationSubscriptionEdge {
@@ -23689,6 +23759,9 @@ Input for updating an existing notification subscription. Allows changing the
 subscribed notification types and active state.
 """
 input NotificationSubscriptionUpdateInput {
+  """Whether to include updates from sub-initiatives."""
+  includeSubInitiativeUpdates: Boolean
+
   """
   The specific notification event types the subscriber wants to receive. Replaces all previously configured types.
   """
