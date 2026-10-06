@@ -89769,6 +89769,53 @@
             "deprecationReason": null
           },
           {
+            "name": "originInstallUrl",
+            "description": "[Internal] Builds the URL that starts installing Linear's Origin app into a codebase.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OriginInstallUrlPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "originInstallation",
+            "description": "[Internal] Describes an Origin installation that started on Origin, for its installer to confirm before connecting.",
+            "args": [
+              {
+                "name": "installationId",
+                "description": "The Origin installation id from the install redirect.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OriginInstallationDetails",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "integrationJiraProjectStatuses",
             "description": "[INTERNAL] Fetches a Jira project's status names, split into issue (non-Epic) and project (Epic) statuses.",
             "args": [
@@ -101672,6 +101719,128 @@
                   "name": "String",
                   "ofType": null
                 }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "OriginInstallUrlPayload",
+        "description": null,
+        "fields": [
+          {
+            "name": "installUrl",
+            "description": "The Origin URL to send the user to in order to install Linear's app.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "OriginInstallationDetails",
+        "description": null,
+        "fields": [
+          {
+            "name": "ownerSlug",
+            "description": "The slug of the Origin owner the app was installed on.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ownerType",
+            "description": "Whether the Origin owner is a `team` or a `user`.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "repositorySelection",
+            "description": "Whether the installation covers `all` repositories of the owner or only `selected` ones.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "installedByEmail",
+            "description": "The email of the Origin user who installed the app.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "installedByName",
+            "description": "The name of the Origin user who installed the app.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "installedByMatchesUser",
+            "description": "Whether the current user installed the app on Origin, which connecting requires.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
               }
             },
             "isDeprecated": false,
@@ -121182,6 +121351,99 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "IntegrationPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "integrationOriginConnect",
+            "description": "[Internal] Completes the Origin app installation so the workspace receives Origin webhooks.",
+            "args": [
+              {
+                "name": "installationReceipt",
+                "description": "The signed `installation_receipt` Origin returned to the install callback.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IntegrationPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "integrationOriginConnectInstallation",
+            "description": "[Internal] Connects an Origin installation that started on Origin, after the workspace admin who installed it confirms.",
+            "args": [
+              {
+                "name": "installationId",
+                "description": "The Origin installation id from the install redirect.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IntegrationPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "originInstallationCancel",
+            "description": "[Internal] Removes Linear's app from an Origin installation that started on Origin and that no workspace connected.",
+            "args": [
+              {
+                "name": "installationId",
+                "description": "The Origin installation id from the install redirect.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OriginInstallationCancelPayload",
                 "ofType": null
               }
             },
@@ -143461,6 +143723,33 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "OriginInstallationCancelPayload",
+        "description": null,
+        "fields": [
+          {
+            "name": "success",
+            "description": "Whether Linear's app was removed from the installation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
