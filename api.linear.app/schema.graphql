@@ -8209,6 +8209,16 @@ type Document implements Node {
   """
   cycle: Cycle
 
+  """
+  [Internal] The parent document. Null if the document is not a sub-document.
+  """
+  parentDocument: Document
+
+  """
+  [Internal] The sort order of the sub-document among its siblings. Null if the document is not a sub-document.
+  """
+  subDocumentSortOrder: Float
+
   """The document's unique URL slug, used to construct human-readable URLs."""
   slugId: String!
 
@@ -8678,6 +8688,18 @@ input DocumentCreateInput {
   """[Internal] The resource folder containing the document."""
   resourceFolderId: String
 
+  """
+  [Internal] The parent document of the sub-document. The container of the
+  document must match the container of the parent document.
+  """
+  parentDocumentId: String
+
+  """
+  [Internal] The sort order of the sub-document among its siblings. Defaults to
+  the last position. Requires `parentDocumentId`.
+  """
+  subDocumentSortOrder: Float
+
   """The ID of the last template applied to the document."""
   lastAppliedTemplateId: String
 
@@ -9016,6 +9038,16 @@ type DocumentSearchResult implements Node {
   """
   cycle: Cycle
 
+  """
+  [Internal] The parent document. Null if the document is not a sub-document.
+  """
+  parentDocument: Document
+
+  """
+  [Internal] The sort order of the sub-document among its siblings. Null if the document is not a sub-document.
+  """
+  subDocumentSortOrder: Float
+
   """The document's unique URL slug, used to construct human-readable URLs."""
   slugId: String!
 
@@ -9204,6 +9236,16 @@ input DocumentUpdateInput {
 
   """[Internal] The resource folder containing the document."""
   resourceFolderId: String
+
+  """
+  [Internal] The parent document of the sub-document. The document and its
+  sub-documents move to the container of the parent document. Set to null to
+  make the document a top-level document in its container.
+  """
+  parentDocumentId: String
+
+  """[Internal] The sort order of the sub-document among its siblings."""
+  subDocumentSortOrder: Float
 
   """The ID of the last template applied to the document."""
   lastAppliedTemplateId: String
@@ -20271,6 +20313,12 @@ type Mutation {
   Deletes (trashes) a document. The document is marked as trashed and archived, but not permanently removed.
   """
   documentDelete(
+    """
+    [Internal] Only trash the document if it is still a sub-document of this
+    document. Otherwise the mutation fails and the document is left unchanged.
+    """
+    ifParentDocumentId: String
+
     """The identifier of the document to delete."""
     id: String!
   ): DocumentArchivePayload!
@@ -25521,6 +25569,11 @@ type Organization implements Node {
   """
   gitLinkbackDescriptionsEnabled: Boolean!
 
+  """
+  Whether the default prompt for copying an issue or opening it in a coding tool includes a suggested Git branch name.
+  """
+  suggestedBranchNameEnabled: Boolean!
+
   """Whether the roadmap feature is enabled for the workspace."""
   roadmapEnabled: Boolean!
 
@@ -26535,6 +26588,11 @@ input OrganizationUpdateInput {
   """
   gitLinkbackDescriptionsEnabled: Boolean
 
+  """
+  Whether the default prompt for copying an issue or opening it in a coding tool includes a suggested Git branch name.
+  """
+  suggestedBranchNameEnabled: Boolean
+
   """Whether the workspace is using roadmap."""
   roadmapEnabled: Boolean
 
@@ -26698,6 +26756,9 @@ type OriginInstallationCancelPayload {
 }
 
 type OriginInstallationDetails {
+  """The Origin installation id."""
+  installationId: String!
+
   """The slug of the Origin owner the app was installed on."""
   ownerSlug: String!
 
@@ -26709,16 +26770,10 @@ type OriginInstallationDetails {
   """
   repositorySelection: String!
 
-  """The email of the Origin user who installed the app."""
-  installedByEmail: String
-
-  """The name of the Origin user who installed the app."""
-  installedByName: String
-
   """
-  Whether the current user installed the app on Origin, which connecting requires.
+  Whether the installation is already connected to the current workspace, as after a reinstall that updated it.
   """
-  installedByMatchesUser: Boolean!
+  connectedToWorkspace: Boolean!
 }
 
 type OriginInstallUrlPayload {
@@ -33110,7 +33165,8 @@ type Query {
   ): IntegrationHasScopesPayload!
 
   """
-  [Internal] Builds the URL that starts installing Linear's Origin app into a codebase.
+  [Internal] Builds the URL that starts installing Linear's Origin app into a
+  codebase, or reinstalling it to grant new scopes.
   """
   originInstallUrl: OriginInstallUrlPayload!
 
@@ -33121,6 +33177,12 @@ type Query {
     """The Origin installation id from the install redirect."""
     installationId: String!
   ): OriginInstallationDetails!
+
+  """
+  [Internal] Lists the Origin installations the current user started on Origin
+  that no workspace has connected yet, matched by the user's email.
+  """
+  originPendingInstallations: [OriginInstallationDetails!]!
 
   """
   [INTERNAL] Fetches a Jira project's status names, split into issue (non-Epic) and project (Epic) statuses.

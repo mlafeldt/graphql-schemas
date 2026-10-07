@@ -3308,6 +3308,22 @@
             "deprecationReason": null
           },
           {
+            "name": "suggestedBranchNameEnabled",
+            "description": "Whether the default prompt for copying an issue or opening it in a coding tool includes a suggested Git branch name.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "roadmapEnabled",
             "description": "Whether the roadmap feature is enabled for the workspace.",
             "args": [],
@@ -7904,6 +7920,30 @@
             "type": {
               "kind": "OBJECT",
               "name": "Cycle",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "parentDocument",
+            "description": "[Internal] The parent document. Null if the document is not a sub-document.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Document",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "subDocumentSortOrder",
+            "description": "[Internal] The sort order of the sub-document among its siblings. Null if the document is not a sub-document.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
               "ofType": null
             },
             "isDeprecated": false,
@@ -89770,7 +89810,7 @@
           },
           {
             "name": "originInstallUrl",
-            "description": "[Internal] Builds the URL that starts installing Linear's Origin app into a codebase.",
+            "description": "[Internal] Builds the URL that starts installing Linear's Origin app into a codebase, or reinstalling it to grant new scopes.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -89810,6 +89850,30 @@
                 "kind": "OBJECT",
                 "name": "OriginInstallationDetails",
                 "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "originPendingInstallations",
+            "description": "[Internal] Lists the Origin installations the current user started on Origin that no workspace has connected yet, matched by the user's email.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "OriginInstallationDetails",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,
@@ -101763,6 +101827,22 @@
         "description": null,
         "fields": [
           {
+            "name": "installationId",
+            "description": "The Origin installation id.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "ownerSlug",
             "description": "The slug of the Origin owner the app was installed on.",
             "args": [],
@@ -101807,32 +101887,8 @@
             "deprecationReason": null
           },
           {
-            "name": "installedByEmail",
-            "description": "The email of the Origin user who installed the app.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "installedByName",
-            "description": "The name of the Origin user who installed the app.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "installedByMatchesUser",
-            "description": "Whether the current user installed the app on Origin, which connecting requires.",
+            "name": "connectedToWorkspace",
+            "description": "Whether the installation is already connected to the current workspace, as after a reinstall that updated it.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -106858,6 +106914,30 @@
             "type": {
               "kind": "OBJECT",
               "name": "Cycle",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "parentDocument",
+            "description": "[Internal] The parent document. Null if the document is not a sub-document.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Document",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "subDocumentSortOrder",
+            "description": "[Internal] The sort order of the sub-document among its siblings. Null if the document is not a sub-document.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
               "ofType": null
             },
             "isDeprecated": false,
@@ -119126,6 +119206,16 @@
             "name": "documentDelete",
             "description": "Deletes (trashes) a document. The document is marked as trashed and archived, but not permanently removed.",
             "args": [
+              {
+                "name": "ifParentDocumentId",
+                "description": "[Internal] Only trash the document if it is still a sub-document of this document. Otherwise the mutation fails and the document is left unchanged.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
               {
                 "name": "id",
                 "description": "The identifier of the document to delete.",
@@ -136862,6 +136952,26 @@
             "defaultValue": null
           },
           {
+            "name": "parentDocumentId",
+            "description": "[Internal] The parent document of the sub-document. The container of the document must match the container of the parent document.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "subDocumentSortOrder",
+            "description": "[Internal] The sort order of the sub-document among its siblings. Defaults to the last position. Requires `parentDocumentId`.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "lastAppliedTemplateId",
             "description": "The ID of the last template applied to the document.",
             "type": {
@@ -137026,6 +137136,26 @@
             "type": {
               "kind": "SCALAR",
               "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "parentDocumentId",
+            "description": "[Internal] The parent document of the sub-document. The document and its sub-documents move to the container of the parent document. Set to null to make the document a top-level document in its container.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "subDocumentSortOrder",
+            "description": "[Internal] The sort order of the sub-document among its siblings.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
               "ofType": null
             },
             "defaultValue": null
@@ -149069,6 +149199,16 @@
           {
             "name": "gitLinkbackDescriptionsEnabled",
             "description": "Whether issue descriptions should be included in Git integration linkback messages.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "suggestedBranchNameEnabled",
+            "description": "Whether the default prompt for copying an issue or opening it in a coding tool includes a suggested Git branch name.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
