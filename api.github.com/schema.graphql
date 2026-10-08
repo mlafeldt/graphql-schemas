@@ -18011,7 +18011,8 @@ type Mutation {
   ): ArchiveProjectV2ItemPayload
 
   """
-  Archive a pull request. Closes and marks the pull request as archived. Only repository admins can archive pull requests.
+  Archive a pull request. Closes and marks the pull request as archived. Users
+  with the triage role or higher can archive pull requests.
   """
   archivePullRequest(
     """Parameters for ArchivePullRequest"""
@@ -19086,8 +19087,8 @@ type Mutation {
 
   """
   Unarchive a pull request. Removes the archived flag from the pull request.
-  Does not automatically reopen or unlock the pull request. Only repository
-  admins can unarchive pull requests.
+  Does not automatically reopen or unlock the pull request. Users with the
+  triage role or higher can unarchive pull requests.
   """
   unarchivePullRequest(
     """Parameters for UnarchivePullRequest"""
@@ -33616,6 +33617,9 @@ type Repository implements Node & PackageOwner & ProjectOwner & ProjectV2Recent 
     """Returns the last _n_ elements from the list."""
     last: Int
   ): RepositoryConnection!
+
+  """Identifies the primary key from the database as a BigInt."""
+  fullDatabaseId: BigInt
 
   """The funding links for this repository"""
   fundingLinks: [FundingLink!]!
