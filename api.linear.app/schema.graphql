@@ -4152,7 +4152,7 @@ type AuthResolverResponse {
   token: String @deprecated(reason: "Deprecated and not used anymore. Never populated.")
 }
 
-"""A user that has access to the the resources of an organization."""
+"""A user that has access to the resources of an organization."""
 type AuthUser {
   """The time at which the entity was created."""
   createdAt: DateTime!
@@ -9266,6 +9266,11 @@ input DocumentUpdateInput {
 
   """[INTERNAL] The identifiers of the users subscribing to this document."""
   subscriberIds: [String!]
+
+  """
+  [Internal] Moves the document and its sub-documents into this user's personal space. Must be the acting user.
+  """
+  personalUserId: String
 }
 
 """
@@ -26482,6 +26487,40 @@ type OrganizationPayload {
   success: Boolean!
 }
 
+"""A public resource quota for the current workspace."""
+type OrganizationQuota implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """Stable quota key."""
+  key: String!
+
+  """Effective quota limit, including workspace overrides."""
+  limit: Float!
+  name: String!
+  description: String!
+}
+
+type OrganizationQuotaConnection {
+  edges: [OrganizationQuotaEdge!]!
+  nodes: [OrganizationQuota!]!
+  pageInfo: PageInfo!
+}
+
+type OrganizationQuotaEdge {
+  node: OrganizationQuota!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""Filter public workspace quotas by key."""
+input OrganizationQuotaFilter {
+  key: StringComparator
+  and: [OrganizationQuotaFilter!]
+  or: [OrganizationQuotaFilter!]
+}
+
 """
 Input for updating workspace security settings such as role-based access controls.
 """
@@ -33693,6 +33732,29 @@ type Query {
     id: String!
   ): OrganizationInviteDetailsPayload!
 
+  """
+  Public resource quotas for the authenticated workspace. These are not subscription limits.
+  """
+  quotas(
+    filter: OrganizationQuotaFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+  ): OrganizationQuotaConnection!
+
   """The authenticated user's workspace."""
   organization: Organization!
 
@@ -37959,7 +38021,7 @@ type Subscription {
   """Triggered when a comment is archived"""
   commentArchived: Comment!
 
-  """Triggered when a a comment is unarchived"""
+  """Triggered when a comment is unarchived"""
   commentUnarchived: Comment!
 
   """Triggered when a comment is deleted"""
@@ -37983,7 +38045,7 @@ type Subscription {
   """Triggered when a document is archived"""
   documentArchived: Document!
 
-  """Triggered when a a document is unarchived"""
+  """Triggered when a document is unarchived"""
   documentUnarchived: Document!
 
   """Triggered when a document content is created"""
@@ -38043,7 +38105,7 @@ type Subscription {
   """Triggered when an issue is archived"""
   issueArchived: Issue!
 
-  """Triggered when a an issue is unarchived"""
+  """Triggered when an issue is unarchived"""
   issueUnarchived: Issue!
 
   """Triggered when an issue history is created"""
@@ -38088,7 +38150,7 @@ type Subscription {
   """Triggered when a notification is archived"""
   notificationArchived: Notification!
 
-  """Triggered when a a notification is unarchived"""
+  """Triggered when a notification is unarchived"""
   notificationUnarchived: Notification!
 
   """Triggered when a notification is deleted"""
@@ -38106,7 +38168,7 @@ type Subscription {
   """Triggered when a project is archived"""
   projectArchived: Project!
 
-  """Triggered when a a project is unarchived"""
+  """Triggered when a project is unarchived"""
   projectUnarchived: Project!
 
   """Triggered when a project label is created"""
@@ -38630,6 +38692,12 @@ type Team implements Node {
   """Whether to enable AI discussion summaries for issues in this team."""
   aiDiscussionSummariesEnabled: Boolean!
 
+  """[Internal] Whether the team has enabled agent automation."""
+  agentAutomationEnabled: Boolean!
+
+  """[Internal] Whether the team has enabled Coding Sessions."""
+  codingAgentEnabled: Boolean!
+
   """Whether to send new issue notifications to Slack."""
   slackNewIssue: Boolean! @deprecated(reason: "No longer is use")
 
@@ -38844,6 +38912,15 @@ type Team implements Node {
     """The user ID."""
     userId: String!
   ): TeamMembership
+
+  """
+  Whether the viewer can add themselves to the team. False when the viewer is
+  already a member, the team is archived, retired, or SCIM-managed, the viewer
+  lacks the plan access or permission to add themselves, or the viewer has
+  reached their team membership limit. Runs the same checks
+  `teamMembershipCreate` applies to a viewer joining on their own.
+  """
+  viewerCanJoin: Boolean!
 
   """
   Memberships associated with the team. For easier access of the same data, use `members` query.
@@ -39191,7 +39268,7 @@ input TeamCreateInput {
   """Auto assign completed issues to current active cycle setting."""
   cycleIssueAutoAssignCompleted: Boolean
 
-  """Only allow issues issues with cycles in Active Issues."""
+  """Only allow issues with cycles in Active Issues."""
   cycleLockToActive: Boolean
 
   """How many upcoming cycles to create."""
@@ -39802,6 +39879,12 @@ input TeamUpdateInput {
 
   """Whether to enable AI discussion summaries for issues."""
   aiDiscussionSummariesEnabled: Boolean
+
+  """[Internal] Whether the team has enabled agent automation."""
+  agentAutomationEnabled: Boolean
+
+  """[Internal] Whether the team has enabled Coding Sessions."""
+  codingAgentEnabled: Boolean
 
   """The identifier of the default template for members of this team."""
   defaultTemplateForMembersId: String
