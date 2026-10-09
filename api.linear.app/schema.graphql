@@ -11790,8 +11790,7 @@ type Initiative implements Node {
   """
   [Internal] The human-readable identifier of the initiative. Returns the custom
   identifier override when set, otherwise the workspace default
-  `<prefix>-<number>`. Null for legacy initiatives that have not been backfilled
-  and while initiative identifiers are not enabled for the workspace.
+  `<prefix>-<number>`. Null for legacy initiatives that have not been backfilled.
   """
   identifier: String
 
@@ -27831,9 +27830,8 @@ type Project implements Node {
   """
   [Internal] The human-readable identifier of the project. Returns the custom
   identifier override when set, otherwise the default
-  `P-<leadTeamKey>-<number>`. Null for projects without a lead team, for legacy
-  projects that have not been backfilled, and while project identifiers are not
-  enabled for the workspace.
+  `P-<leadTeamKey>-<number>`. Null for projects without a lead team and for
+  legacy projects that have not been backfilled.
   """
   identifier: String
 
@@ -30260,9 +30258,8 @@ type ProjectSearchResult implements Node {
   """
   [Internal] The human-readable identifier of the project. Returns the custom
   identifier override when set, otherwise the default
-  `P-<leadTeamKey>-<number>`. Null for projects without a lead team, for legacy
-  projects that have not been backfilled, and while project identifiers are not
-  enabled for the workspace.
+  `P-<leadTeamKey>-<number>`. Null for projects without a lead team and for
+  legacy projects that have not been backfilled.
   """
   identifier: String
 
@@ -38921,6 +38918,20 @@ type Team implements Node {
   `teamMembershipCreate` applies to a viewer joining on their own.
   """
   viewerCanJoin: Boolean!
+
+  """
+  The viewer's membership in the team. Null when the viewer is not a member.
+  """
+  viewerMembership: TeamMembership
+
+  """
+  Whether the viewer can remove themselves from the team. False when the viewer
+  is not a member, the team is SCIM-managed, the viewer is an app user the team
+  does not accept, or leaving would leave the viewer without an active team.
+  Otherwise mirrors the checks `teamMembershipDelete` applies to a viewer
+  leaving on their own.
+  """
+  viewerCanLeave: Boolean!
 
   """
   Memberships associated with the team. For easier access of the same data, use `members` query.
