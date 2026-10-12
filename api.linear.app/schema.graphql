@@ -3035,6 +3035,7 @@ enum AiConversationTool {
   GetPullRequestFile
   GetPullRequestCheckLogs
   RetryPullRequestCheck
+  UpdatePullRequestReviewFinding
   HandoffToCodingSession
   SubscribeToEvent
   UnsubscribeFromEvent
@@ -3055,7 +3056,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -3150,6 +3151,27 @@ type AiConversationUpdateEntityToolCallArgs {
 type AiConversationUpdateEntityToolCallResult {
   updatedEntities: [AiConversationCreateEntityToolCallResultCreatedEntities!]
   startedAgentSessions: [AiConversationSearchEntitiesToolCallResultEntities!]
+}
+
+type AiConversationUpdatePullRequestReviewFindingToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationUpdatePullRequestReviewFindingToolCallArgs
+}
+
+type AiConversationUpdatePullRequestReviewFindingToolCallArgs {
+  entity: AiConversationSearchEntitiesToolCallResultEntities!
+  findingId: String!
+  rejected: Boolean!
 }
 
 """
