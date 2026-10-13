@@ -2564,6 +2564,25 @@ type AiConversationRemoveSpendLimitToolCallArgs {
   summary: String
 }
 
+type AiConversationRerunPullRequestReviewToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationRerunPullRequestReviewToolCallArgs
+}
+
+type AiConversationRerunPullRequestReviewToolCallArgs {
+  entity: AiConversationSearchEntitiesToolCallResultEntities!
+}
+
 type AiConversationResearchToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -3035,6 +3054,7 @@ enum AiConversationTool {
   GetPullRequestFile
   GetPullRequestCheckLogs
   RetryPullRequestCheck
+  RerunPullRequestReview
   UpdatePullRequestReviewFinding
   HandoffToCodingSession
   SubscribeToEvent
@@ -3056,7 +3076,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -9183,6 +9203,12 @@ type DocumentSearchResultEdge {
 
   """Used in `before` and `after` args"""
   cursor: String!
+}
+
+"""[Internal] The role of a user a personal document is shared with."""
+enum DocumentShareRole {
+  """The user can read, edit, and comment on the document."""
+  edit
 }
 
 """Document sorting options."""
@@ -20335,6 +20361,34 @@ type Mutation {
     """
     The identifier of the document to update. Also the identifier from the URL is accepted.
     """
+    id: String!
+  ): DocumentPayload!
+
+  """
+  [Internal] Shares a personal document and its sub-documents with workspace
+  members. Only the owner of the document can share it. New collaborators are
+  subscribed to the document.
+  """
+  documentShare(
+    """The role of the new collaborators."""
+    role: DocumentShareRole = edit
+
+    """The identifiers of the users to share the document with."""
+    userIds: [String!]!
+
+    """The identifier of the personal document to share."""
+    id: String!
+  ): DocumentPayload!
+
+  """
+  [Internal] Stops sharing a personal document and its sub-documents with users.
+  The owner can remove any collaborator; a collaborator can only remove themselves.
+  """
+  documentUnshare(
+    """The identifiers of the users to remove from the document."""
+    userIds: [String!]!
+
+    """The identifier of the personal document to stop sharing."""
     id: String!
   ): DocumentPayload!
 
@@ -38034,20 +38088,140 @@ input StringItemComparator {
 }
 
 type Subscription {
-  """Triggered when a comment is created"""
-  commentCreated: Comment!
+  """Triggered when a workflow state is created"""
+  workflowStateCreated: WorkflowState!
 
-  """Triggered when a comment is updated"""
-  commentUpdated: Comment!
+  """Triggered when a workflow state is updated"""
+  workflowStateUpdated: WorkflowState!
 
-  """Triggered when a comment is archived"""
-  commentArchived: Comment!
+  """Triggered when a workflow state is archived"""
+  workflowStateArchived: WorkflowState!
 
-  """Triggered when a comment is unarchived"""
-  commentUnarchived: Comment!
+  """Triggered when an issue relation is created"""
+  issueRelationCreated: IssueRelation!
 
-  """Triggered when a comment is deleted"""
-  commentDeleted: Comment!
+  """Triggered when an issue relation is updated"""
+  issueRelationUpdated: IssueRelation!
+
+  """Triggered when an issue relation is deleted"""
+  issueRelationDeleted: IssueRelation!
+
+  """Triggered when a draft is created"""
+  draftCreated: Draft!
+
+  """Triggered when a draft is updated"""
+  draftUpdated: Draft!
+
+  """Triggered when a draft is deleted"""
+  draftDeleted: Draft!
+
+  """Triggered when an user settings is updated"""
+  userSettingsUpdated: UserSettings!
+
+  """Triggered when an issue draft is created"""
+  issueDraftCreated: IssueDraft!
+
+  """Triggered when an issue draft is updated"""
+  issueDraftUpdated: IssueDraft!
+
+  """Triggered when an issue draft is deleted"""
+  issueDraftDeleted: IssueDraft!
+
+  """Triggered when a team membership is created"""
+  teamMembershipCreated: TeamMembership!
+
+  """Triggered when a team membership is updated"""
+  teamMembershipUpdated: TeamMembership!
+
+  """Triggered when a team membership is deleted"""
+  teamMembershipDeleted: TeamMembership!
+
+  """Triggered when an agent activity is created"""
+  agentActivityCreated: AgentActivity!
+
+  """Triggered when an agent activity is updated"""
+  agentActivityUpdated: AgentActivity!
+
+  """Triggered when an agent activity is archived"""
+  agentActivityArchived: AgentActivity!
+
+  """Triggered when a document content revision is created"""
+  documentContentRevisionCreated: DocumentContentRevision!
+
+  """Triggered when a document content revision is updated"""
+  documentContentRevisionUpdated: DocumentContentRevision!
+
+  """Triggered when a document content revision is deleted"""
+  documentContentRevisionDeleted: DocumentContentRevision!
+
+  """Triggered when a notification is created"""
+  notificationCreated: Notification!
+
+  """Triggered when a notification is updated"""
+  notificationUpdated: Notification!
+
+  """Triggered when a notification is archived"""
+  notificationArchived: Notification!
+
+  """Triggered when a notification is unarchived"""
+  notificationUnarchived: Notification!
+
+  """Triggered when a notification is deleted"""
+  notificationDeleted: Notification!
+
+  """Triggered when a project update is created"""
+  projectUpdateCreated: ProjectUpdate!
+
+  """Triggered when a project update is updated"""
+  projectUpdateUpdated: ProjectUpdate!
+
+  """Triggered when a project update is archived"""
+  projectUpdateArchived: ProjectUpdate!
+
+  """Triggered when a project update is deleted"""
+  projectUpdateDeleted: ProjectUpdate!
+
+  """Triggered when a pull request is updated"""
+  pullRequestUpdated: PullRequest!
+
+  """Triggered when an issue history is created"""
+  issueHistoryCreated: IssueHistory!
+
+  """Triggered when an issue history is updated"""
+  issueHistoryUpdated: IssueHistory!
+
+  """Triggered when a team is created"""
+  teamCreated: Team!
+
+  """Triggered when a team is updated"""
+  teamUpdated: Team!
+
+  """Triggered when a team is deleted"""
+  teamDeleted: Team!
+
+  """Triggered when a document content is created"""
+  documentContentCreated: DocumentContent!
+
+  """Triggered when a document content is updated"""
+  documentContentUpdated: DocumentContent!
+
+  """Triggered when a roadmap is created"""
+  roadmapCreated: Roadmap!
+
+  """Triggered when a roadmap is updated"""
+  roadmapUpdated: Roadmap!
+
+  """Triggered when a roadmap is deleted"""
+  roadmapDeleted: Roadmap!
+
+  """Triggered when an initiative is created"""
+  initiativeCreated: Initiative!
+
+  """Triggered when an initiative is updated"""
+  initiativeUpdated: Initiative!
+
+  """Triggered when an initiative is deleted"""
+  initiativeDeleted: Initiative!
 
   """Triggered when a cycle is created"""
   cycleCreated: Cycle!
@@ -38070,39 +38244,6 @@ type Subscription {
   """Triggered when a document is unarchived"""
   documentUnarchived: Document!
 
-  """Triggered when a document content is created"""
-  documentContentCreated: DocumentContent!
-
-  """Triggered when a document content is updated"""
-  documentContentUpdated: DocumentContent!
-
-  """Triggered when a document content draft is created"""
-  documentContentDraftCreated: DocumentContentDraft!
-
-  """Triggered when a document content draft is updated"""
-  documentContentDraftUpdated: DocumentContentDraft!
-
-  """Triggered when a document content draft is deleted"""
-  documentContentDraftDeleted: DocumentContentDraft!
-
-  """Triggered when a document content revision is created"""
-  documentContentRevisionCreated: DocumentContentRevision!
-
-  """Triggered when a document content revision is updated"""
-  documentContentRevisionUpdated: DocumentContentRevision!
-
-  """Triggered when a document content revision is deleted"""
-  documentContentRevisionDeleted: DocumentContentRevision!
-
-  """Triggered when a draft is created"""
-  draftCreated: Draft!
-
-  """Triggered when a draft is updated"""
-  draftUpdated: Draft!
-
-  """Triggered when a draft is deleted"""
-  draftDeleted: Draft!
-
   """Triggered when a favorite is created"""
   favoriteCreated: Favorite!
 
@@ -38111,75 +38252,6 @@ type Subscription {
 
   """Triggered when a favorite is deleted"""
   favoriteDeleted: Favorite!
-
-  """Triggered when an issue is created"""
-  issueCreated(
-    """Optional filter for issue subscription events."""
-    filter: IssueSubscriptionFilter
-  ): Issue!
-
-  """Triggered when an issue is updated"""
-  issueUpdated(
-    """Optional filter for issue subscription events."""
-    filter: IssueSubscriptionFilter
-  ): Issue!
-
-  """Triggered when an issue is archived"""
-  issueArchived: Issue!
-
-  """Triggered when an issue is unarchived"""
-  issueUnarchived: Issue!
-
-  """Triggered when an issue history is created"""
-  issueHistoryCreated: IssueHistory!
-
-  """Triggered when an issue history is updated"""
-  issueHistoryUpdated: IssueHistory!
-
-  """Triggered when an issue draft is created"""
-  issueDraftCreated: IssueDraft!
-
-  """Triggered when an issue draft is updated"""
-  issueDraftUpdated: IssueDraft!
-
-  """Triggered when an issue draft is deleted"""
-  issueDraftDeleted: IssueDraft!
-
-  """Triggered when an issue label is created"""
-  issueLabelCreated: IssueLabel!
-
-  """Triggered when an issue label is updated"""
-  issueLabelUpdated: IssueLabel!
-
-  """Triggered when an issue label is deleted"""
-  issueLabelDeleted: IssueLabel!
-
-  """Triggered when an issue relation is created"""
-  issueRelationCreated: IssueRelation!
-
-  """Triggered when an issue relation is updated"""
-  issueRelationUpdated: IssueRelation!
-
-  """Triggered when an issue relation is deleted"""
-  issueRelationDeleted: IssueRelation!
-
-  """Triggered when a notification is created"""
-  notificationCreated: Notification!
-
-  """Triggered when a notification is updated"""
-  notificationUpdated: Notification!
-
-  """Triggered when a notification is archived"""
-  notificationArchived: Notification!
-
-  """Triggered when a notification is unarchived"""
-  notificationUnarchived: Notification!
-
-  """Triggered when a notification is deleted"""
-  notificationDeleted: Notification!
-
-  """Triggered when an organization is updated"""
-  organizationUpdated: Organization!
 
   """Triggered when a project is created"""
   projectCreated: Project!
@@ -38202,56 +38274,35 @@ type Subscription {
   """Triggered when a project label is deleted"""
   projectLabelDeleted: ProjectLabel!
 
-  """Triggered when a project update is created"""
-  projectUpdateCreated: ProjectUpdate!
+  """Triggered when an issue label is created"""
+  issueLabelCreated: IssueLabel!
 
-  """Triggered when a project update is updated"""
-  projectUpdateUpdated: ProjectUpdate!
+  """Triggered when an issue label is updated"""
+  issueLabelUpdated: IssueLabel!
 
-  """Triggered when a project update is archived"""
-  projectUpdateArchived: ProjectUpdate!
+  """Triggered when an issue label is deleted"""
+  issueLabelDeleted: IssueLabel!
 
-  """Triggered when a project update is deleted"""
-  projectUpdateDeleted: ProjectUpdate!
+  """Triggered when an user is created"""
+  userCreated: User!
 
-  """Triggered when a pull request is updated"""
-  pullRequestUpdated: PullRequest!
+  """Triggered when an user is updated"""
+  userUpdated: User!
 
-  """Triggered when a roadmap is created"""
-  roadmapCreated: Roadmap!
+  """Triggered when a comment is created"""
+  commentCreated: Comment!
 
-  """Triggered when a roadmap is updated"""
-  roadmapUpdated: Roadmap!
+  """Triggered when a comment is updated"""
+  commentUpdated: Comment!
 
-  """Triggered when a roadmap is deleted"""
-  roadmapDeleted: Roadmap!
+  """Triggered when a comment is archived"""
+  commentArchived: Comment!
 
-  """Triggered when an initiative is created"""
-  initiativeCreated: Initiative!
+  """Triggered when a comment is unarchived"""
+  commentUnarchived: Comment!
 
-  """Triggered when an initiative is updated"""
-  initiativeUpdated: Initiative!
-
-  """Triggered when an initiative is deleted"""
-  initiativeDeleted: Initiative!
-
-  """Triggered when an agent session is created"""
-  agentSessionCreated: AgentSession!
-
-  """Triggered when an agent session is updated"""
-  agentSessionUpdated: AgentSession!
-
-  """Triggered when an agent activity is created"""
-  agentActivityCreated: AgentActivity!
-
-  """Triggered when an agent activity is updated"""
-  agentActivityUpdated: AgentActivity!
-
-  """Triggered when an agent activity is archived"""
-  agentActivityArchived: AgentActivity!
-
-  """Triggered when an ai conversation is updated"""
-  aiConversationUpdated: AiConversation!
+  """Triggered when a comment is deleted"""
+  commentDeleted: Comment!
 
   """Triggered when an ai prompt progress is created"""
   aiPromptProgressCreated(
@@ -38265,41 +38316,44 @@ type Subscription {
     filter: AiPromptProgressSubscriptionFilter
   ): AiPromptProgress!
 
-  """Triggered when a team is created"""
-  teamCreated: Team!
+  """Triggered when an issue is created"""
+  issueCreated(
+    """Optional filter for issue subscription events."""
+    filter: IssueSubscriptionFilter
+  ): Issue!
 
-  """Triggered when a team is updated"""
-  teamUpdated: Team!
+  """Triggered when an issue is updated"""
+  issueUpdated(
+    """Optional filter for issue subscription events."""
+    filter: IssueSubscriptionFilter
+  ): Issue!
 
-  """Triggered when a team is deleted"""
-  teamDeleted: Team!
+  """Triggered when an issue is archived"""
+  issueArchived: Issue!
 
-  """Triggered when a team membership is created"""
-  teamMembershipCreated: TeamMembership!
+  """Triggered when an issue is unarchived"""
+  issueUnarchived: Issue!
 
-  """Triggered when a team membership is updated"""
-  teamMembershipUpdated: TeamMembership!
+  """Triggered when an ai conversation is updated"""
+  aiConversationUpdated: AiConversation!
 
-  """Triggered when a team membership is deleted"""
-  teamMembershipDeleted: TeamMembership!
+  """Triggered when an agent session is created"""
+  agentSessionCreated: AgentSession!
 
-  """Triggered when an user is created"""
-  userCreated: User!
+  """Triggered when an agent session is updated"""
+  agentSessionUpdated: AgentSession!
 
-  """Triggered when an user is updated"""
-  userUpdated: User!
+  """Triggered when an organization is updated"""
+  organizationUpdated: Organization!
 
-  """Triggered when an user settings is updated"""
-  userSettingsUpdated: UserSettings!
+  """Triggered when a document content draft is created"""
+  documentContentDraftCreated: DocumentContentDraft!
 
-  """Triggered when a workflow state is created"""
-  workflowStateCreated: WorkflowState!
+  """Triggered when a document content draft is updated"""
+  documentContentDraftUpdated: DocumentContentDraft!
 
-  """Triggered when a workflow state is updated"""
-  workflowStateUpdated: WorkflowState!
-
-  """Triggered when a workflow state is archived"""
-  workflowStateArchived: WorkflowState!
+  """Triggered when a document content draft is deleted"""
+  documentContentDraftDeleted: DocumentContentDraft!
 }
 
 """Comparator for source type."""
@@ -43659,14 +43713,14 @@ type WorkflowDefinition implements Node {
   owner: User
 
   """
+  The edit access setting for this workflow definition. When unset, everyone can edit the workflow.
+  """
+  editAccess: WorkflowDefinitionEditAccess
+
+  """
   Whether editing the workflow is restricted to its owner, team owners, and workspace administrators.
   """
   restrictEditing: Boolean! @deprecated(reason: "Use editAccess instead.")
-
-  """
-  The edit access setting for this workflow definition. When unset, access is derived from restrictEditing.
-  """
-  editAccess: WorkflowDefinitionEditAccess
 }
 
 enum WorkflowDefinitionEditAccess {

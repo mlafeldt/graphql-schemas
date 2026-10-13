@@ -1400,12 +1400,12 @@
           },
           {
             "kind": "OBJECT",
-            "name": "DocumentContentDraft",
+            "name": "DocumentContentRevision",
             "ofType": null
           },
           {
             "kind": "OBJECT",
-            "name": "DocumentContentRevision",
+            "name": "DocumentContentDraft",
             "ofType": null
           }
         ]
@@ -55100,6 +55100,18 @@
             "deprecationReason": null
           },
           {
+            "name": "editAccess",
+            "description": "The edit access setting for this workflow definition. When unset, everyone can edit the workflow.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "WorkflowDefinitionEditAccess",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "restrictEditing",
             "description": "Whether editing the workflow is restricted to its owner, team owners, and workspace administrators.",
             "args": [],
@@ -55114,18 +55126,6 @@
             },
             "isDeprecated": true,
             "deprecationReason": "Use editAccess instead."
-          },
-          {
-            "name": "editAccess",
-            "description": "The edit access setting for this workflow definition. When unset, access is derived from restrictEditing.",
-            "args": [],
-            "type": {
-              "kind": "ENUM",
-              "name": "WorkflowDefinitionEditAccess",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -57562,6 +57562,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "AiConversationRerunPullRequestReviewToolCall",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "AiConversationUpdatePullRequestReviewFindingToolCall",
             "ofType": null
           },
@@ -57972,6 +57977,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "AiConversationRerunPullRequestReviewToolCall",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "AiConversationUpdatePullRequestReviewFindingToolCall",
             "ofType": null
           },
@@ -58252,6 +58262,12 @@
           },
           {
             "name": "RetryPullRequestCheck",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "RerunPullRequestReview",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -63148,6 +63164,118 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AiConversationRerunPullRequestReviewToolCall",
+        "description": null,
+        "fields": [
+          {
+            "name": "name",
+            "description": "The name of the tool that was called.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "AiConversationTool",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "displayInfo",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AiConversationToolDisplayInfo",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "rawArgs",
+            "description": "The arguments of the tool call.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSON",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "rawResult",
+            "description": "The result of the tool call.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSON",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "args",
+            "description": "The arguments to the tool call.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "AiConversationRerunPullRequestReviewToolCallArgs",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "AiConversationBaseToolCall",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AiConversationRerunPullRequestReviewToolCallArgs",
+        "description": null,
+        "fields": [
+          {
+            "name": "entity",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AiConversationSearchEntitiesToolCallResultEntities",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -119815,6 +119943,122 @@
             "deprecationReason": null
           },
           {
+            "name": "documentShare",
+            "description": "[Internal] Shares a personal document and its sub-documents with workspace members. Only the owner of the document can share it. New collaborators are subscribed to the document.",
+            "args": [
+              {
+                "name": "role",
+                "description": "The role of the new collaborators.",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "DocumentShareRole",
+                  "ofType": null
+                },
+                "defaultValue": "edit"
+              },
+              {
+                "name": "userIds",
+                "description": "The identifiers of the users to share the document with.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "String",
+                        "ofType": null
+                      }
+                    }
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the personal document to share.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DocumentPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentUnshare",
+            "description": "[Internal] Stops sharing a personal document and its sub-documents with users. The owner can remove any collaborator; a collaborator can only remove themselves.",
+            "args": [
+              {
+                "name": "userIds",
+                "description": "The identifiers of the users to remove from the document.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "String",
+                        "ofType": null
+                      }
+                    }
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the personal document to stop sharing.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DocumentPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "documentDelete",
             "description": "Deletes (trashes) a document. The document is marked as trashed and archived, but not permanently removed.",
             "args": [
@@ -137853,6 +138097,23 @@
         ],
         "interfaces": null,
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "DocumentShareRole",
+        "description": "[Internal] The role of a user a personal document is shared with.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "edit",
+            "description": "The user can read, edit, and comment on the document.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -160642,15 +160903,15 @@
         "description": null,
         "fields": [
           {
-            "name": "commentCreated",
-            "description": "Triggered when a comment is created",
+            "name": "workflowStateCreated",
+            "description": "Triggered when a workflow state is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Comment",
+                "name": "WorkflowState",
                 "ofType": null
               }
             },
@@ -160658,15 +160919,15 @@
             "deprecationReason": null
           },
           {
-            "name": "commentUpdated",
-            "description": "Triggered when a comment is updated",
+            "name": "workflowStateUpdated",
+            "description": "Triggered when a workflow state is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Comment",
+                "name": "WorkflowState",
                 "ofType": null
               }
             },
@@ -160674,15 +160935,15 @@
             "deprecationReason": null
           },
           {
-            "name": "commentArchived",
-            "description": "Triggered when a comment is archived",
+            "name": "workflowStateArchived",
+            "description": "Triggered when a workflow state is archived",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Comment",
+                "name": "WorkflowState",
                 "ofType": null
               }
             },
@@ -160690,15 +160951,15 @@
             "deprecationReason": null
           },
           {
-            "name": "commentUnarchived",
-            "description": "Triggered when a comment is unarchived",
+            "name": "issueRelationCreated",
+            "description": "Triggered when an issue relation is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Comment",
+                "name": "IssueRelation",
                 "ofType": null
               }
             },
@@ -160706,15 +160967,655 @@
             "deprecationReason": null
           },
           {
-            "name": "commentDeleted",
-            "description": "Triggered when a comment is deleted",
+            "name": "issueRelationUpdated",
+            "description": "Triggered when an issue relation is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Comment",
+                "name": "IssueRelation",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueRelationDeleted",
+            "description": "Triggered when an issue relation is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueRelation",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "draftCreated",
+            "description": "Triggered when a draft is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Draft",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "draftUpdated",
+            "description": "Triggered when a draft is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Draft",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "draftDeleted",
+            "description": "Triggered when a draft is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Draft",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userSettingsUpdated",
+            "description": "Triggered when an user settings is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "UserSettings",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueDraftCreated",
+            "description": "Triggered when an issue draft is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueDraft",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueDraftUpdated",
+            "description": "Triggered when an issue draft is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueDraft",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueDraftDeleted",
+            "description": "Triggered when an issue draft is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueDraft",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "teamMembershipCreated",
+            "description": "Triggered when a team membership is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "TeamMembership",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "teamMembershipUpdated",
+            "description": "Triggered when a team membership is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "TeamMembership",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "teamMembershipDeleted",
+            "description": "Triggered when a team membership is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "TeamMembership",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentActivityCreated",
+            "description": "Triggered when an agent activity is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentActivity",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentActivityUpdated",
+            "description": "Triggered when an agent activity is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentActivity",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentActivityArchived",
+            "description": "Triggered when an agent activity is archived",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentActivity",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentContentRevisionCreated",
+            "description": "Triggered when a document content revision is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DocumentContentRevision",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentContentRevisionUpdated",
+            "description": "Triggered when a document content revision is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DocumentContentRevision",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentContentRevisionDeleted",
+            "description": "Triggered when a document content revision is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DocumentContentRevision",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "notificationCreated",
+            "description": "Triggered when a notification is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "Notification",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "notificationUpdated",
+            "description": "Triggered when a notification is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "Notification",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "notificationArchived",
+            "description": "Triggered when a notification is archived",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "Notification",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "notificationUnarchived",
+            "description": "Triggered when a notification is unarchived",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "Notification",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "notificationDeleted",
+            "description": "Triggered when a notification is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "Notification",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectUpdateCreated",
+            "description": "Triggered when a project update is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectUpdate",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectUpdateUpdated",
+            "description": "Triggered when a project update is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectUpdate",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectUpdateArchived",
+            "description": "Triggered when a project update is archived",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectUpdate",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectUpdateDeleted",
+            "description": "Triggered when a project update is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectUpdate",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pullRequestUpdated",
+            "description": "Triggered when a pull request is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PullRequest",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueHistoryCreated",
+            "description": "Triggered when an issue history is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueHistory",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueHistoryUpdated",
+            "description": "Triggered when an issue history is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueHistory",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "teamCreated",
+            "description": "Triggered when a team is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Team",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "teamUpdated",
+            "description": "Triggered when a team is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Team",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "teamDeleted",
+            "description": "Triggered when a team is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Team",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentContentCreated",
+            "description": "Triggered when a document content is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DocumentContent",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentContentUpdated",
+            "description": "Triggered when a document content is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DocumentContent",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "roadmapCreated",
+            "description": "Triggered when a roadmap is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Roadmap",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "roadmapUpdated",
+            "description": "Triggered when a roadmap is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Roadmap",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "roadmapDeleted",
+            "description": "Triggered when a roadmap is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Roadmap",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "initiativeCreated",
+            "description": "Triggered when an initiative is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Initiative",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "initiativeUpdated",
+            "description": "Triggered when an initiative is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Initiative",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "initiativeDeleted",
+            "description": "Triggered when an initiative is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Initiative",
                 "ofType": null
               }
             },
@@ -160834,182 +161735,6 @@
             "deprecationReason": null
           },
           {
-            "name": "documentContentCreated",
-            "description": "Triggered when a document content is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "DocumentContent",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "documentContentUpdated",
-            "description": "Triggered when a document content is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "DocumentContent",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "documentContentDraftCreated",
-            "description": "Triggered when a document content draft is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "DocumentContentDraft",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "documentContentDraftUpdated",
-            "description": "Triggered when a document content draft is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "DocumentContentDraft",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "documentContentDraftDeleted",
-            "description": "Triggered when a document content draft is deleted",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "DocumentContentDraft",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "documentContentRevisionCreated",
-            "description": "Triggered when a document content revision is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "DocumentContentRevision",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "documentContentRevisionUpdated",
-            "description": "Triggered when a document content revision is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "DocumentContentRevision",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "documentContentRevisionDeleted",
-            "description": "Triggered when a document content revision is deleted",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "DocumentContentRevision",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "draftCreated",
-            "description": "Triggered when a draft is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Draft",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "draftUpdated",
-            "description": "Triggered when a draft is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Draft",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "draftDeleted",
-            "description": "Triggered when a draft is deleted",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Draft",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "favoriteCreated",
             "description": "Triggered when a favorite is created",
             "args": [],
@@ -161051,364 +161776,6 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "Favorite",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueCreated",
-            "description": "Triggered when an issue is created",
-            "args": [
-              {
-                "name": "filter",
-                "description": "Optional filter for issue subscription events.",
-                "type": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "IssueSubscriptionFilter",
-                  "ofType": null
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Issue",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueUpdated",
-            "description": "Triggered when an issue is updated",
-            "args": [
-              {
-                "name": "filter",
-                "description": "Optional filter for issue subscription events.",
-                "type": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "IssueSubscriptionFilter",
-                  "ofType": null
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Issue",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueArchived",
-            "description": "Triggered when an issue is archived",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Issue",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueUnarchived",
-            "description": "Triggered when an issue is unarchived",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Issue",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueHistoryCreated",
-            "description": "Triggered when an issue history is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueHistory",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueHistoryUpdated",
-            "description": "Triggered when an issue history is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueHistory",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueDraftCreated",
-            "description": "Triggered when an issue draft is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueDraft",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueDraftUpdated",
-            "description": "Triggered when an issue draft is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueDraft",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueDraftDeleted",
-            "description": "Triggered when an issue draft is deleted",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueDraft",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueLabelCreated",
-            "description": "Triggered when an issue label is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueLabel",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueLabelUpdated",
-            "description": "Triggered when an issue label is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueLabel",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueLabelDeleted",
-            "description": "Triggered when an issue label is deleted",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueLabel",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueRelationCreated",
-            "description": "Triggered when an issue relation is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueRelation",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueRelationUpdated",
-            "description": "Triggered when an issue relation is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueRelation",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueRelationDeleted",
-            "description": "Triggered when an issue relation is deleted",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueRelation",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "notificationCreated",
-            "description": "Triggered when a notification is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "INTERFACE",
-                "name": "Notification",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "notificationUpdated",
-            "description": "Triggered when a notification is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "INTERFACE",
-                "name": "Notification",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "notificationArchived",
-            "description": "Triggered when a notification is archived",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "INTERFACE",
-                "name": "Notification",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "notificationUnarchived",
-            "description": "Triggered when a notification is unarchived",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "INTERFACE",
-                "name": "Notification",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "notificationDeleted",
-            "description": "Triggered when a notification is deleted",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "INTERFACE",
-                "name": "Notification",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizationUpdated",
-            "description": "Triggered when an organization is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Organization",
                 "ofType": null
               }
             },
@@ -161528,15 +161895,15 @@
             "deprecationReason": null
           },
           {
-            "name": "projectUpdateCreated",
-            "description": "Triggered when a project update is created",
+            "name": "issueLabelCreated",
+            "description": "Triggered when an issue label is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ProjectUpdate",
+                "name": "IssueLabel",
                 "ofType": null
               }
             },
@@ -161544,15 +161911,15 @@
             "deprecationReason": null
           },
           {
-            "name": "projectUpdateUpdated",
-            "description": "Triggered when a project update is updated",
+            "name": "issueLabelUpdated",
+            "description": "Triggered when an issue label is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ProjectUpdate",
+                "name": "IssueLabel",
                 "ofType": null
               }
             },
@@ -161560,15 +161927,15 @@
             "deprecationReason": null
           },
           {
-            "name": "projectUpdateArchived",
-            "description": "Triggered when a project update is archived",
+            "name": "issueLabelDeleted",
+            "description": "Triggered when an issue label is deleted",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ProjectUpdate",
+                "name": "IssueLabel",
                 "ofType": null
               }
             },
@@ -161576,15 +161943,15 @@
             "deprecationReason": null
           },
           {
-            "name": "projectUpdateDeleted",
-            "description": "Triggered when a project update is deleted",
+            "name": "userCreated",
+            "description": "Triggered when an user is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ProjectUpdate",
+                "name": "User",
                 "ofType": null
               }
             },
@@ -161592,15 +161959,15 @@
             "deprecationReason": null
           },
           {
-            "name": "pullRequestUpdated",
-            "description": "Triggered when a pull request is updated",
+            "name": "userUpdated",
+            "description": "Triggered when an user is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "PullRequest",
+                "name": "User",
                 "ofType": null
               }
             },
@@ -161608,15 +161975,15 @@
             "deprecationReason": null
           },
           {
-            "name": "roadmapCreated",
-            "description": "Triggered when a roadmap is created",
+            "name": "commentCreated",
+            "description": "Triggered when a comment is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Roadmap",
+                "name": "Comment",
                 "ofType": null
               }
             },
@@ -161624,15 +161991,15 @@
             "deprecationReason": null
           },
           {
-            "name": "roadmapUpdated",
-            "description": "Triggered when a roadmap is updated",
+            "name": "commentUpdated",
+            "description": "Triggered when a comment is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Roadmap",
+                "name": "Comment",
                 "ofType": null
               }
             },
@@ -161640,15 +162007,15 @@
             "deprecationReason": null
           },
           {
-            "name": "roadmapDeleted",
-            "description": "Triggered when a roadmap is deleted",
+            "name": "commentArchived",
+            "description": "Triggered when a comment is archived",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Roadmap",
+                "name": "Comment",
                 "ofType": null
               }
             },
@@ -161656,15 +162023,15 @@
             "deprecationReason": null
           },
           {
-            "name": "initiativeCreated",
-            "description": "Triggered when an initiative is created",
+            "name": "commentUnarchived",
+            "description": "Triggered when a comment is unarchived",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Initiative",
+                "name": "Comment",
                 "ofType": null
               }
             },
@@ -161672,127 +162039,15 @@
             "deprecationReason": null
           },
           {
-            "name": "initiativeUpdated",
-            "description": "Triggered when an initiative is updated",
+            "name": "commentDeleted",
+            "description": "Triggered when a comment is deleted",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Initiative",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "initiativeDeleted",
-            "description": "Triggered when an initiative is deleted",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Initiative",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentSessionCreated",
-            "description": "Triggered when an agent session is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentSession",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentSessionUpdated",
-            "description": "Triggered when an agent session is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentSession",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentActivityCreated",
-            "description": "Triggered when an agent activity is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentActivity",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentActivityUpdated",
-            "description": "Triggered when an agent activity is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentActivity",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentActivityArchived",
-            "description": "Triggered when an agent activity is archived",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentActivity",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "aiConversationUpdated",
-            "description": "Triggered when an ai conversation is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AiConversation",
+                "name": "Comment",
                 "ofType": null
               }
             },
@@ -161854,15 +162109,26 @@
             "deprecationReason": null
           },
           {
-            "name": "teamCreated",
-            "description": "Triggered when a team is created",
-            "args": [],
+            "name": "issueCreated",
+            "description": "Triggered when an issue is created",
+            "args": [
+              {
+                "name": "filter",
+                "description": "Optional filter for issue subscription events.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "IssueSubscriptionFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Team",
+                "name": "Issue",
                 "ofType": null
               }
             },
@@ -161870,15 +162136,26 @@
             "deprecationReason": null
           },
           {
-            "name": "teamUpdated",
-            "description": "Triggered when a team is updated",
-            "args": [],
+            "name": "issueUpdated",
+            "description": "Triggered when an issue is updated",
+            "args": [
+              {
+                "name": "filter",
+                "description": "Optional filter for issue subscription events.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "IssueSubscriptionFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Team",
+                "name": "Issue",
                 "ofType": null
               }
             },
@@ -161886,15 +162163,15 @@
             "deprecationReason": null
           },
           {
-            "name": "teamDeleted",
-            "description": "Triggered when a team is deleted",
+            "name": "issueArchived",
+            "description": "Triggered when an issue is archived",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Team",
+                "name": "Issue",
                 "ofType": null
               }
             },
@@ -161902,15 +162179,15 @@
             "deprecationReason": null
           },
           {
-            "name": "teamMembershipCreated",
-            "description": "Triggered when a team membership is created",
+            "name": "issueUnarchived",
+            "description": "Triggered when an issue is unarchived",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "TeamMembership",
+                "name": "Issue",
                 "ofType": null
               }
             },
@@ -161918,15 +162195,15 @@
             "deprecationReason": null
           },
           {
-            "name": "teamMembershipUpdated",
-            "description": "Triggered when a team membership is updated",
+            "name": "aiConversationUpdated",
+            "description": "Triggered when an ai conversation is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "TeamMembership",
+                "name": "AiConversation",
                 "ofType": null
               }
             },
@@ -161934,15 +162211,15 @@
             "deprecationReason": null
           },
           {
-            "name": "teamMembershipDeleted",
-            "description": "Triggered when a team membership is deleted",
+            "name": "agentSessionCreated",
+            "description": "Triggered when an agent session is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "TeamMembership",
+                "name": "AgentSession",
                 "ofType": null
               }
             },
@@ -161950,15 +162227,15 @@
             "deprecationReason": null
           },
           {
-            "name": "userCreated",
-            "description": "Triggered when an user is created",
+            "name": "agentSessionUpdated",
+            "description": "Triggered when an agent session is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "User",
+                "name": "AgentSession",
                 "ofType": null
               }
             },
@@ -161966,15 +162243,15 @@
             "deprecationReason": null
           },
           {
-            "name": "userUpdated",
-            "description": "Triggered when an user is updated",
+            "name": "organizationUpdated",
+            "description": "Triggered when an organization is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "User",
+                "name": "Organization",
                 "ofType": null
               }
             },
@@ -161982,15 +162259,15 @@
             "deprecationReason": null
           },
           {
-            "name": "userSettingsUpdated",
-            "description": "Triggered when an user settings is updated",
+            "name": "documentContentDraftCreated",
+            "description": "Triggered when a document content draft is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "UserSettings",
+                "name": "DocumentContentDraft",
                 "ofType": null
               }
             },
@@ -161998,15 +162275,15 @@
             "deprecationReason": null
           },
           {
-            "name": "workflowStateCreated",
-            "description": "Triggered when a workflow state is created",
+            "name": "documentContentDraftUpdated",
+            "description": "Triggered when a document content draft is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "WorkflowState",
+                "name": "DocumentContentDraft",
                 "ofType": null
               }
             },
@@ -162014,31 +162291,15 @@
             "deprecationReason": null
           },
           {
-            "name": "workflowStateUpdated",
-            "description": "Triggered when a workflow state is updated",
+            "name": "documentContentDraftDeleted",
+            "description": "Triggered when a document content draft is deleted",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "WorkflowState",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "workflowStateArchived",
-            "description": "Triggered when a workflow state is archived",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "WorkflowState",
+                "name": "DocumentContentDraft",
                 "ofType": null
               }
             },
@@ -162048,163 +162309,6 @@
         ],
         "inputFields": null,
         "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "DocumentContentDraft",
-        "description": "A draft revision of document content, pending user review. Each user can have at most one draft per document content. Drafts are seeded from the live document state and stored as base64-encoded Yjs state updates, allowing independent editing without affecting the published document until the user explicitly applies their changes.",
-        "fields": [
-          {
-            "name": "id",
-            "description": "The unique identifier of the entity.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "createdAt",
-            "description": "The time at which the entity was created.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "DateTime",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't\n    been updated after creation.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "DateTime",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "archivedAt",
-            "description": "The time at which the entity was archived. Null if the entity has not been archived.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTime",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "documentContent",
-            "description": "The document content that this draft is a revision of.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "DocumentContent",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "documentContentId",
-            "description": "The identifier of the document content that this draft is a revision of.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "contentState",
-            "description": "The draft content state as a base64-encoded Yjs state update. This represents the user's in-progress edits that have not yet been applied to the live document.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "user",
-            "description": "The user who created or owns this draft.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "User",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "userId",
-            "description": "The identifier of the user who owns this draft.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [
-          {
-            "kind": "INTERFACE",
-            "name": "Node",
-            "ofType": null
-          }
-        ],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -162411,6 +162515,67 @@
       },
       {
         "kind": "INPUT_OBJECT",
+        "name": "AiPromptProgressSubscriptionFilter",
+        "description": "[Internal] Filter for AI prompt progress subscription events.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "issueId",
+            "description": "[Internal] Filter by issue ID.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "commentId",
+            "description": "[Internal] Filter by comment ID.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "pullRequestCommentId",
+            "description": "[Internal] Filter by pull request comment ID.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "type",
+            "description": "[Internal] Filter by prompt workflow type.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "AiPromptTypeComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "status",
+            "description": "[Internal] Filter by prompt workflow status.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "AiPromptProgressStatusComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
         "name": "IssueSubscriptionFilter",
         "description": "Filter for issue subscription events.",
         "fields": null,
@@ -162471,63 +162636,159 @@
         "possibleTypes": null
       },
       {
-        "kind": "INPUT_OBJECT",
-        "name": "AiPromptProgressSubscriptionFilter",
-        "description": "[Internal] Filter for AI prompt progress subscription events.",
-        "fields": null,
-        "inputFields": [
+        "kind": "OBJECT",
+        "name": "DocumentContentDraft",
+        "description": "A draft revision of document content, pending user review. Each user can have at most one draft per document content. Drafts are seeded from the live document state and stored as base64-encoded Yjs state updates, allowing independent editing without affecting the published document until the user explicitly applies their changes.",
+        "fields": [
           {
-            "name": "issueId",
-            "description": "[Internal] Filter by issue ID.",
+            "name": "id",
+            "description": "The unique identifier of the entity.",
+            "args": [],
             "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
             },
-            "defaultValue": null
+            "isDeprecated": false,
+            "deprecationReason": null
           },
           {
-            "name": "commentId",
-            "description": "[Internal] Filter by comment ID.",
+            "name": "createdAt",
+            "description": "The time at which the entity was created.",
+            "args": [],
             "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
             },
-            "defaultValue": null
+            "isDeprecated": false,
+            "deprecationReason": null
           },
           {
-            "name": "pullRequestCommentId",
-            "description": "[Internal] Filter by pull request comment ID.",
+            "name": "updatedAt",
+            "description": "The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't\n    been updated after creation.",
+            "args": [],
             "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "IDComparator",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
             },
-            "defaultValue": null
+            "isDeprecated": false,
+            "deprecationReason": null
           },
           {
-            "name": "type",
-            "description": "[Internal] Filter by prompt workflow type.",
+            "name": "archivedAt",
+            "description": "The time at which the entity was archived. Null if the entity has not been archived.",
+            "args": [],
             "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "AiPromptTypeComparator",
+              "kind": "SCALAR",
+              "name": "DateTime",
               "ofType": null
             },
-            "defaultValue": null
+            "isDeprecated": false,
+            "deprecationReason": null
           },
           {
-            "name": "status",
-            "description": "[Internal] Filter by prompt workflow status.",
+            "name": "documentContent",
+            "description": "The document content that this draft is a revision of.",
+            "args": [],
             "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "AiPromptProgressStatusComparator",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DocumentContent",
+                "ofType": null
+              }
             },
-            "defaultValue": null
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentContentId",
+            "description": "The identifier of the document content that this draft is a revision of.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "contentState",
+            "description": "The draft content state as a base64-encoded Yjs state update. This represents the user's in-progress edits that have not yet been applied to the live document.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "user",
+            "description": "The user who created or owns this draft.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "User",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userId",
+            "description": "The identifier of the user who owns this draft.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
-        "interfaces": null,
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
         "enumValues": null,
         "possibleTypes": null
       },
