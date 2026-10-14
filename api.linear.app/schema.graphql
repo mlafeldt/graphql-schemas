@@ -1567,6 +1567,7 @@ type AiConversationDeleteEntityToolCallResult {
 enum AiConversationElicitationKind {
   multipleChoice
   mcpServerConnection
+  integrationConnection
   confirmation
   entitySelection
 }
@@ -1620,6 +1621,11 @@ type AiConversationElicitationPart implements AiConversationBasePart {
   """
   integrationId: String
 
+  """
+  The service of the integration to connect. Null for other elicitation kinds.
+  """
+  integrationService: IntegrationService
+
   """Entity type for entity selection."""
   entityType: String
 
@@ -1633,7 +1639,7 @@ type AiConversationElicitationPart implements AiConversationBasePart {
 """
 The kind-specific data recorded when a user answers an AI conversation elicitation.
 """
-union AiConversationElicitationResponseData = AiConversationMultipleChoiceElicitationResponseData | AiConversationConfirmationElicitationResponseData | AiConversationMcpServerConnectionElicitationResponseData | AiConversationEntitySelectionElicitationResponseData
+union AiConversationElicitationResponseData = AiConversationMultipleChoiceElicitationResponseData | AiConversationConfirmationElicitationResponseData | AiConversationMcpServerConnectionElicitationResponseData | AiConversationIntegrationConnectionElicitationResponseData | AiConversationEntitySelectionElicitationResponseData
 
 """A structured user response to an elicitation in an AI conversation."""
 type AiConversationElicitationResponsePart implements AiConversationBasePart {
@@ -2017,6 +2023,17 @@ enum AiConversationInitialSource {
   workflow
   onboarding
   subAgent
+}
+
+"""
+The integration connected to a Loop and its current run by a conversation.
+"""
+type AiConversationIntegrationConnectionElicitationResponseData {
+  """The kind of elicitation that was answered."""
+  kind: AiConversationElicitationKind!
+
+  """The identifier of the integration that was connected."""
+  integrationId: String!
 }
 
 type AiConversationInvokeMcpToolToolCall implements AiConversationBaseToolCall {
@@ -12491,6 +12508,11 @@ type InitiativeLabel implements Node {
   """[Internal] When the label was retired."""
   retiredAt: DateTime
 
+  """
+  The selection mode of this label group. Null for regular labels. Groups without a type use single-select behavior.
+  """
+  groupType: LabelGroupType
+
   """The workspace that the initiative label belongs to."""
   organization: Organization!
 
@@ -12650,6 +12672,11 @@ input InitiativeLabelCreateInput {
   The time at which the label was retired. Set to null to restore a retired label.
   """
   retiredAt: DateTime
+
+  """
+  The selection mode of the label group. Only singleSelect is currently supported. Null uses single-select behavior.
+  """
+  groupType: LabelGroupType
 }
 
 type InitiativeLabelEdge {
@@ -12724,6 +12751,12 @@ input InitiativeLabelUpdateInput {
   The time at which the label was retired. Set to null to restore a retired label.
   """
   retiredAt: DateTime
+
+  """
+  The selection mode of the label group. Omit to keep the current value. Only
+  singleSelect is currently supported. Null uses single-select behavior.
+  """
+  groupType: LabelGroupType
 }
 
 """[Internal] Impact summary for changing an initiative's lead team."""
@@ -18792,6 +18825,16 @@ type JiraProjectStatusesPayload {
 
   """The Jira project's project statuses (Epic)."""
   projectStatuses: [String!]!
+
+  """
+  The status categories of each of the Jira project's issue statuses (non-Epic).
+  """
+  issueStatusCategories: [JiraStatusNameCategoriesPayload!]!
+
+  """
+  The status categories of each of the Jira project's project statuses (Epic).
+  """
+  projectStatusCategories: [JiraStatusNameCategoriesPayload!]!
 }
 
 input JiraSettingsInput {
@@ -18836,6 +18879,16 @@ input JiraSettingsInput {
   The label of the Jira instance, for visual identification purposes only
   """
   label: String
+}
+
+type JiraStatusNameCategoriesPayload {
+  """The name of the Jira status."""
+  name: String!
+
+  """
+  The distinct status category keys (new, indeterminate, or done) of the Jira statuses with this name.
+  """
+  categories: [String!]!
 }
 
 input JiraUpdateInput {
@@ -18898,7 +18951,7 @@ input LabelGroupSort {
   labelGroupId: String!
 }
 
-"""The selection mode of an issue label group."""
+"""The selection mode of a label group."""
 enum LabelGroupType {
   singleSelect
   multiSelect
@@ -21677,6 +21730,11 @@ type Mutation {
 
     """Asana team name to choose which issues we should import."""
     asanaTeamName: String!
+
+    """
+    Name of an Asana project in the team. When set, only tasks from this project are imported.
+    """
+    asanaProjectName: String
 
     """
     Whether to instantly process the import with the default configuration mapping.
@@ -29014,6 +29072,11 @@ type ProjectLabel implements Node {
   """[Internal] When the label was retired."""
   retiredAt: DateTime
 
+  """
+  The selection mode of this label group. Null for regular labels. Groups without a type use single-select behavior.
+  """
+  groupType: LabelGroupType
+
   """The workspace that the project label belongs to."""
   organization: Organization!
 
@@ -29191,6 +29254,11 @@ input ProjectLabelCreateInput {
   retiredAt: DateTime
 
   """
+  The selection mode of the label group. Only singleSelect is currently supported. Null uses single-select behavior.
+  """
+  groupType: LabelGroupType
+
+  """
   The identifier of the team to scope the label to. If not given, the label is a
   workspace-level label available to all teams.
   """
@@ -29274,6 +29342,12 @@ input ProjectLabelUpdateInput {
   The time at which the label was retired. Set to null to restore a retired label.
   """
   retiredAt: DateTime
+
+  """
+  The selection mode of the label group. Omit to keep the current value. Only
+  singleSelect is currently supported. Null uses single-select behavior.
+  """
+  groupType: LabelGroupType
 }
 
 """Project lead sorting options."""
@@ -32101,7 +32175,9 @@ type PullRequestNotification implements Notification & Entity & Node {
 Netlify) parsed from a pull request's description or comments.
 """
 type PullRequestPreviewLink {
-  """The URL of the preview."""
+  """
+  The URL of the preview. Empty for a deployment that is still building and has not reported its URL.
+  """
   url: String!
 
   """

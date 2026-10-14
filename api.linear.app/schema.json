@@ -33539,7 +33539,7 @@
         "fields": [
           {
             "name": "url",
-            "description": "The URL of the preview.",
+            "description": "The URL of the preview. Empty for a deployment that is still building and has not reported its URL.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -41140,6 +41140,18 @@
             "deprecationReason": null
           },
           {
+            "name": "groupType",
+            "description": "The selection mode of this label group. Null for regular labels. Groups without a type use single-select behavior.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "LabelGroupType",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "organization",
             "description": "The workspace that the initiative label belongs to.",
             "args": [],
@@ -41393,6 +41405,29 @@
           }
         ],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "LabelGroupType",
+        "description": "The selection mode of a label group.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "singleSelect",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "multiSelect",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -51610,29 +51645,6 @@
         "possibleTypes": null
       },
       {
-        "kind": "ENUM",
-        "name": "LabelGroupType",
-        "description": "The selection mode of an issue label group.",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "singleSelect",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "multiSelect",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
-      },
-      {
         "kind": "OBJECT",
         "name": "IssueLabelConnection",
         "description": null,
@@ -51894,6 +51906,18 @@
             "type": {
               "kind": "SCALAR",
               "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "groupType",
+            "description": "The selection mode of this label group. Null for regular labels. Groups without a type use single-select behavior.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "LabelGroupType",
               "ofType": null
             },
             "isDeprecated": false,
@@ -67154,6 +67178,18 @@
             "deprecationReason": null
           },
           {
+            "name": "integrationService",
+            "description": "The service of the integration to connect. Null for other elicitation kinds.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "IntegrationService",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "entityType",
             "description": "Entity type for entity selection.",
             "args": [],
@@ -67225,6 +67261,12 @@
           },
           {
             "name": "mcpServerConnection",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "integrationConnection",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -67528,6 +67570,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "AiConversationIntegrationConnectionElicitationResponseData",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "AiConversationEntitySelectionElicitationResponseData",
             "ofType": null
           }
@@ -67643,6 +67690,49 @@
           {
             "name": "integrationId",
             "description": "The identifier of the MCP server integration that was connected.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AiConversationIntegrationConnectionElicitationResponseData",
+        "description": "The integration connected to a Loop and its current run by a conversation.",
+        "fields": [
+          {
+            "name": "kind",
+            "description": "The kind of elicitation that was answered.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "AiConversationElicitationKind",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "integrationId",
+            "description": "The identifier of the integration that was connected.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -102428,6 +102518,105 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "issueStatusCategories",
+            "description": "The status categories of each of the Jira project's issue statuses (non-Epic).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "JiraStatusNameCategoriesPayload",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectStatusCategories",
+            "description": "The status categories of each of the Jira project's project statuses (Epic).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "JiraStatusNameCategoriesPayload",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "JiraStatusNameCategoriesPayload",
+        "description": null,
+        "fields": [
+          {
+            "name": "name",
+            "description": "The name of the Jira status.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "categories",
+            "description": "The distinct status category keys (new, indeterminate, or done) of the Jira statuses with this name.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -125522,6 +125711,16 @@
                 "defaultValue": null
               },
               {
+                "name": "asanaProjectName",
+                "description": "Name of an Asana project in the team. When set, only tasks from this project are imported.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
                 "name": "instantProcess",
                 "description": "Whether to instantly process the import with the default configuration mapping.",
                 "type": {
@@ -140579,6 +140778,16 @@
               "ofType": null
             },
             "defaultValue": null
+          },
+          {
+            "name": "groupType",
+            "description": "The selection mode of the label group. Only singleSelect is currently supported. Null uses single-select behavior.",
+            "type": {
+              "kind": "ENUM",
+              "name": "LabelGroupType",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -140647,6 +140856,16 @@
             "type": {
               "kind": "SCALAR",
               "name": "DateTime",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "groupType",
+            "description": "The selection mode of the label group. Omit to keep the current value. Only singleSelect is currently supported. Null uses single-select behavior.",
+            "type": {
+              "kind": "ENUM",
+              "name": "LabelGroupType",
               "ofType": null
             },
             "defaultValue": null
@@ -151581,6 +151800,16 @@
             "defaultValue": null
           },
           {
+            "name": "groupType",
+            "description": "The selection mode of the label group. Only singleSelect is currently supported. Null uses single-select behavior.",
+            "type": {
+              "kind": "ENUM",
+              "name": "LabelGroupType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "teamId",
             "description": "The identifier of the team to scope the label to. If not given, the label is a workspace-level label available to all teams.",
             "type": {
@@ -151657,6 +151886,16 @@
             "type": {
               "kind": "SCALAR",
               "name": "DateTime",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "groupType",
+            "description": "The selection mode of the label group. Omit to keep the current value. Only singleSelect is currently supported. Null uses single-select behavior.",
+            "type": {
+              "kind": "ENUM",
+              "name": "LabelGroupType",
               "ofType": null
             },
             "defaultValue": null
