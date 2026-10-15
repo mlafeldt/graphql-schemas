@@ -1299,6 +1299,11 @@ type AiConversation implements Node {
   workflowDefinition: WorkflowDefinition
 
   """
+  [Internal] The published loop edited by this private setup conversation.
+  """
+  setupWorkflowDefinition: WorkflowDefinition
+
+  """
   [Internal] The cron workflow definition that created this conversation.
   """
   workflowCronJobDefinition: WorkflowCronJobDefinition
@@ -2581,6 +2586,25 @@ type AiConversationRemoveSpendLimitToolCallArgs {
   summary: String
 }
 
+type AiConversationRenameAgentChatToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationRenameAgentChatToolCallArgs
+}
+
+type AiConversationRenameAgentChatToolCallArgs {
+  name: String!
+}
+
 type AiConversationRerunPullRequestReviewToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -3079,6 +3103,7 @@ enum AiConversationTool {
   TranscribeVideo
   TranscribeMedia
   Memory
+  RenameAgentChat
   SearchDocumentation
   ContactSupport
   WebSearch
@@ -3093,7 +3118,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationRenameAgentChatToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -12674,7 +12699,7 @@ input InitiativeLabelCreateInput {
   retiredAt: DateTime
 
   """
-  The selection mode of the label group. Only singleSelect is currently supported. Null uses single-select behavior.
+  The selection mode of the label group. Null uses single-select behavior.
   """
   groupType: LabelGroupType
 }
@@ -12753,8 +12778,7 @@ input InitiativeLabelUpdateInput {
   retiredAt: DateTime
 
   """
-  The selection mode of the label group. Omit to keep the current value. Only
-  singleSelect is currently supported. Null uses single-select behavior.
+  The selection mode of the label group. Omit to keep the current value. Null uses single-select behavior.
   """
   groupType: LabelGroupType
 }
@@ -21732,9 +21756,10 @@ type Mutation {
     asanaTeamName: String!
 
     """
-    Name of an Asana project in the team. When set, only tasks from this project are imported.
+    Names of Asana projects in the team. When set, only tasks from these
+    projects are imported. When empty, all projects are imported.
     """
-    asanaProjectName: String
+    asanaProjectNames: [String!]
 
     """
     Whether to instantly process the import with the default configuration mapping.
@@ -25780,6 +25805,9 @@ type Organization implements Node {
   """[INTERNAL] SCIM settings."""
   scimSettings: JSONObject
 
+  """[Internal] Workspace restrictions for team permissions."""
+  teamSecuritySettings: JSONObject!
+
   """
   Security settings for the workspace, including role-based restrictions for
   invitations, team creation, label management, and other sensitive operations.
@@ -25952,6 +25980,36 @@ type Organization implements Node {
     """
     orderBy: PaginationOrderBy
   ): UserConnection!
+
+  """
+  Loops in the workspace that are visible to the requesting user, including team
+  and project loops. Includes enabled and disabled loops.
+  """
+  loops(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): WorkflowDefinitionConnection!
 
   """
   Teams in the workspace. Returns only teams visible to the requesting user (all
@@ -26203,6 +26261,16 @@ type OrganizationCancelDeletePayload {
 [Internal] Input for updating Coding Sessions settings for the workspace.
 """
 input OrganizationCodingAgentSettingsInput {
+  """
+  [Internal] Approval snapshot. Ignored on writes; use trustedExternalSourceUpdate to change approvals.
+  """
+  trustedExternalSources: [String!]
+
+  """
+  [Internal] Approve or remove one external source for coding-session delegation.
+  """
+  trustedExternalSourceUpdate: OrganizationCodingAgentTrustedSourceUpdateInput
+
   """[Internal] The model preference used for Coding Sessions."""
   model: String
 
@@ -26224,6 +26292,15 @@ input OrganizationCodingAgentSettingsInput {
   [Internal] Whether new Coding Session sandboxes should use workspace region pinning.
   """
   regionPinning: Boolean
+}
+
+"""[Internal] An approval change for one external coding-session source."""
+input OrganizationCodingAgentTrustedSourceUpdateInput {
+  """[Internal] The external source whose approval to change."""
+  key: String!
+
+  """[Internal] Whether this source may start coding sessions."""
+  allowed: Boolean!
 }
 
 """Workspace deletion operation response."""
@@ -26888,6 +26965,9 @@ input OrganizationUpdateInput {
 
   """The security settings for the workspace."""
   securitySettings: OrganizationSecuritySettingsInput
+
+  """[Internal] Workspace restrictions for team permissions."""
+  teamSecuritySettings: WorkspaceTeamSecuritySettingsInput
 
   """The authentication settings for the workspace."""
   authSettings: OrganizationAuthSettingsInput
@@ -29254,7 +29334,7 @@ input ProjectLabelCreateInput {
   retiredAt: DateTime
 
   """
-  The selection mode of the label group. Only singleSelect is currently supported. Null uses single-select behavior.
+  The selection mode of the label group. Null uses single-select behavior.
   """
   groupType: LabelGroupType
 
@@ -29344,8 +29424,7 @@ input ProjectLabelUpdateInput {
   retiredAt: DateTime
 
   """
-  The selection mode of the label group. Omit to keep the current value. Only
-  singleSelect is currently supported. Null uses single-select behavior.
+  The selection mode of the label group. Omit to keep the current value. Null uses single-select behavior.
   """
   groupType: LabelGroupType
 }
@@ -38194,33 +38273,6 @@ type Subscription {
   """Triggered when an user settings is updated"""
   userSettingsUpdated: UserSettings!
 
-  """Triggered when an issue draft is created"""
-  issueDraftCreated: IssueDraft!
-
-  """Triggered when an issue draft is updated"""
-  issueDraftUpdated: IssueDraft!
-
-  """Triggered when an issue draft is deleted"""
-  issueDraftDeleted: IssueDraft!
-
-  """Triggered when a team membership is created"""
-  teamMembershipCreated: TeamMembership!
-
-  """Triggered when a team membership is updated"""
-  teamMembershipUpdated: TeamMembership!
-
-  """Triggered when a team membership is deleted"""
-  teamMembershipDeleted: TeamMembership!
-
-  """Triggered when an agent activity is created"""
-  agentActivityCreated: AgentActivity!
-
-  """Triggered when an agent activity is updated"""
-  agentActivityUpdated: AgentActivity!
-
-  """Triggered when an agent activity is archived"""
-  agentActivityArchived: AgentActivity!
-
   """Triggered when a document content revision is created"""
   documentContentRevisionCreated: DocumentContentRevision!
 
@@ -38245,6 +38297,15 @@ type Subscription {
   """Triggered when a notification is deleted"""
   notificationDeleted: Notification!
 
+  """Triggered when an agent activity is created"""
+  agentActivityCreated: AgentActivity!
+
+  """Triggered when an agent activity is updated"""
+  agentActivityUpdated: AgentActivity!
+
+  """Triggered when an agent activity is archived"""
+  agentActivityArchived: AgentActivity!
+
   """Triggered when a project update is created"""
   projectUpdateCreated: ProjectUpdate!
 
@@ -38259,6 +38320,24 @@ type Subscription {
 
   """Triggered when a pull request is updated"""
   pullRequestUpdated: PullRequest!
+
+  """Triggered when an issue draft is created"""
+  issueDraftCreated: IssueDraft!
+
+  """Triggered when an issue draft is updated"""
+  issueDraftUpdated: IssueDraft!
+
+  """Triggered when an issue draft is deleted"""
+  issueDraftDeleted: IssueDraft!
+
+  """Triggered when a team membership is created"""
+  teamMembershipCreated: TeamMembership!
+
+  """Triggered when a team membership is updated"""
+  teamMembershipUpdated: TeamMembership!
+
+  """Triggered when a team membership is deleted"""
+  teamMembershipDeleted: TeamMembership!
 
   """Triggered when an issue history is created"""
   issueHistoryCreated: IssueHistory!
@@ -38986,6 +39065,35 @@ type Team implements Node {
   caller, to mirror what deleting the team cascades.
   """
   ledInitiativeCount: Int!
+
+  """
+  Loops owned by the team that are visible to the requesting user. Includes enabled and disabled loops.
+  """
+  loops(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): WorkflowDefinitionConnection!
 
   """Cycles associated with the team."""
   cycles(
@@ -43010,6 +43118,45 @@ type ViewPreferencesValues {
   """Whether to show the updated date field for documents."""
   documentFieldDateUpdated: Boolean
 
+  """[Internal] Whether to show the project column in documents lists."""
+  documentFieldProject: Boolean
+
+  """[Internal] Grouping of a documents list."""
+  documentsListGrouping: String
+
+  """[Internal] Ordering of a documents list."""
+  documentsListOrdering: String
+
+  """[Internal] Direction of a documents list when ordered by project."""
+  documentsListProjectDirection: String
+
+  """[Internal] Direction of a documents list when ordered by name."""
+  documentsListNameDirection: String
+
+  """[Internal] Direction of a documents list when ordered by owner."""
+  documentsListOwnerDirection: String
+
+  """[Internal] Direction of a documents list when ordered by last edited."""
+  documentsListLastEditedDirection: String
+
+  """[Internal] Direction of a documents list when ordered by created date."""
+  documentsListCreatedDateDirection: String
+
+  """
+  [Internal] Whether a documents list shows documents from completed or canceled projects.
+  """
+  documentsListShowInactiveProjects: Boolean
+
+  """
+  [Internal] Whether a documents list only shows documents from projects the user is part of.
+  """
+  documentsListShowOnlyMyProjects: Boolean
+
+  """
+  [Internal] Ordered ids of the documents pinned to the top of a documents list.
+  """
+  pinnedDocumentIds: [String!]
+
   """The inbox view ordering."""
   inboxViewOrdering: String
 
@@ -43151,6 +43298,18 @@ enum ViewType {
   feedFollowing
   feedPopular
   workspaceMembers
+
+  """[Internal] The My documents tab of the documents page."""
+  myDocuments
+
+  """[Internal] The Shared with me tab of the documents page."""
+  sharedDocuments
+
+  """[Internal] The All tab of the documents page."""
+  allDocuments
+
+  """[Internal] The documents list of a team."""
+  teamDocuments
   releasePipelines
   automations
   automationRunHistory
@@ -43799,6 +43958,19 @@ type WorkflowDefinition implements Node {
   restrictEditing: Boolean! @deprecated(reason: "Use editAccess instead.")
 }
 
+type WorkflowDefinitionConnection {
+  edges: [WorkflowDefinitionEdge!]!
+  nodes: [WorkflowDefinition!]!
+  pageInfo: PageInfo!
+}
+
+type WorkflowDefinitionEdge {
+  node: WorkflowDefinition!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
 enum WorkflowDefinitionEditAccess {
   everyone
   workspaceAdmins
@@ -44365,6 +44537,17 @@ type WorkspaceAnnouncementNotification implements Notification & Entity & Node {
 
   """Related workspace announcement."""
   workspaceAnnouncementId: String!
+}
+
+input WorkspaceTeamSecuritySettingsInput {
+  """Minimum role required to manage team settings."""
+  teamManagement: TeamRoleType
+
+  """Minimum role required to manage team members."""
+  memberManagement: TeamRoleType
+
+  """Whether members may join teams without an invitation."""
+  allMembersCanJoin: Boolean
 }
 
 input ZendeskSettingsInput {
