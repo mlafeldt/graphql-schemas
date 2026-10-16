@@ -14509,6 +14509,12 @@ type Issue implements Node {
   """
   suggestionsGeneratedAt: DateTime
 
+  """
+  [Internal] AI-generated analyses of the issue, keyed by feature, such as
+  coding-agent suitability. Null if no analysis has run.
+  """
+  aiAnalysis: JSONObject
+
   """[Internal] The activity summary information for this issue."""
   activitySummary: JSONObject
 
@@ -17364,6 +17370,12 @@ type IssueSearchResult implements Node {
   [Internal] The time at which the most recent suggestions for this issue were generated.
   """
   suggestionsGeneratedAt: DateTime
+
+  """
+  [Internal] AI-generated analyses of the issue, keyed by feature, such as
+  coding-agent suitability. Null if no analysis has run.
+  """
+  aiAnalysis: JSONObject
 
   """[Internal] The activity summary information for this issue."""
   activitySummary: JSONObject
@@ -21989,6 +22001,15 @@ type Mutation {
     """The identifier of the issue to add a reminder for."""
     id: String!
   ): IssuePayload!
+
+  """
+  [Internal] Requests a coding-agent suitability prediction for an issue without
+  a current one, such as an issue created before predictions existed.
+  """
+  issueRequestSolubilityPrediction(
+    """The identifier of the issue to predict suitability for."""
+    id: String!
+  ): SuccessPayload!
 
   """Subscribes a user to an issue."""
   issueSubscribe(
@@ -44386,6 +44407,8 @@ enum WorkflowTrigger {
   commentAdded
   commentResolved
   reviewSubmitted
+  addedToMergeQueue
+  removedFromMergeQueue
   updatePosted
   chatMessagePosted
   chatReactionAdded
