@@ -4058,7 +4058,23 @@
           },
           {
             "name": "codingAgentSettings",
-            "description": "[Internal] Settings for Coding Sessions features.",
+            "description": "[Internal] Settings for Coding Sessions features. OAuth responses omit the trusted external source list.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "JSONObject",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "managedTeamFeatures",
+            "description": "[Internal] The teams each managed team feature is limited to, keyed by feature. The workspace's own setting for each feature still applies.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -6067,7 +6083,7 @@
           },
           {
             "name": "codingAgentEnabled",
-            "description": "[Internal] Whether the team has enabled Coding Sessions.",
+            "description": "[Internal] Whether the team can use coding sessions. The workspace's coding sessions team list sets it.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -33584,6 +33600,18 @@
             "deprecationReason": null
           },
           {
+            "name": "externalCreator",
+            "description": "[Internal] The external user who opened the pull request, when the author is not mapped to a Linear account, such as a bot. Null if the author is a Linear user.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "ExternalUser",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "mergedByUser",
             "description": "[Internal] The Linear user who merged the pull request. This is the person who merged it, which the hosting provider reports separately from the merge commit's author. Null if the pull request has not been merged, was merged by an external user not mapped to a Linear account, or if that account has been deleted.",
             "args": [],
@@ -38836,7 +38864,7 @@
       {
         "kind": "ENUM",
         "name": "AiPromptType",
-        "description": "[Internal] The type of AI prompt workflow.",
+        "description": "The type of AI prompt workflow.",
         "fields": null,
         "inputFields": null,
         "interfaces": null,
@@ -51154,6 +51182,18 @@
             "deprecationReason": null
           },
           {
+            "name": "automationShowTemplates",
+            "description": "Whether to show templates above the workspace loops list.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "automationStatsPeriod",
             "description": "The loop stats period.",
             "args": [],
@@ -51504,6 +51544,18 @@
           {
             "name": "documentFieldProject",
             "description": "[Internal] Whether to show the project column in documents lists.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentFieldCollaborators",
+            "description": "[Internal] Whether to show the collaborators column in documents lists.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -87847,6 +87899,22 @@
             "deprecationReason": null
           },
           {
+            "name": "oauthApplicationCodingSessionTrustedSource",
+            "description": "Returns the authenticated OAuth application's trusted-source status for Coding Sessions in the workspace. Requires an OAuth access token with the `read` scope.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OAuthApplicationCodingSessionTrustedSource",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "attachments",
             "description": "All issue attachments.\n\nTo get attachments for a given URL, use `attachmentsForURL` query.",
             "args": [
@@ -90954,6 +91022,45 @@
                   "ofType": {
                     "kind": "OBJECT",
                     "name": "OriginInstallationDetails",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "integrationSyncResourceIds",
+            "description": "[INTERNAL] Jira project IDs available for issue sync.",
+            "args": [
+              {
+                "name": "integrationId",
+                "description": "The workspace integration to configure.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   }
                 }
@@ -97098,6 +97205,74 @@
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "OAuthApplicationCodingSessionTrustedSource",
+        "description": "The authenticated OAuth application's trusted-source status for Coding Sessions in the token's workspace. Combines workspace availability with the application's trust setting. This status does not grant permissions or account for team and repository access.",
+        "fields": [
+          {
+            "name": "enabled",
+            "description": "Whether Coding Sessions are available and enabled in the workspace, trusted external sources are available, and the authenticated OAuth application is trusted. A true value does not guarantee that a specific session can start.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "disabledReason",
+            "description": "The first reason that enabled is false, or null when enabled is true. Checks run in this order: workspace availability, trusted external source availability, then application approval.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "CodingSessionsDisabledReason",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "CodingSessionsDisabledReason",
+        "description": "A reason the workspace cannot trust content from the authenticated OAuth application for Coding Sessions.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "CODING_SESSIONS_DISABLED",
+            "description": "Coding Sessions or Linear Agent are disabled in the workspace, or the workspace's plan does not support Coding Sessions.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "TRUSTED_EXTERNAL_SOURCES_UNAVAILABLE",
+            "description": "Coding Sessions are enabled, but the workspace cannot use trusted external sources.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "APP_NOT_TRUSTED",
+            "description": "Coding Sessions and trusted external sources are available, but the application's source is not approved or is no longer available in the workspace.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -120761,11 +120936,11 @@
           },
           {
             "name": "documentShare",
-            "description": "[Internal] Shares a personal document and its sub-documents with workspace members. Only the owner of the document can share it. New collaborators are subscribed to the document.",
+            "description": "[Internal] Shares a personal document and its sub-documents with workspace members at a role. Only the owner of the document can share it. New collaborators are subscribed to the document. Users who already have another role move to the given one.",
             "args": [
               {
                 "name": "role",
-                "description": "The role of the new collaborators.",
+                "description": "The role of the collaborators. Defaults to edit.",
                 "type": {
                   "kind": "ENUM",
                   "name": "DocumentShareRole",
@@ -120798,6 +120973,73 @@
               {
                 "name": "id",
                 "description": "The identifier of the personal document to share.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DocumentPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentUpdateCollaboratorRole",
+            "description": "[Internal] Changes the role of users a personal document is shared with, on the document and its sub-documents. Only the owner of the document can change roles. Only users who already collaborate on a document change; no one is added.",
+            "args": [
+              {
+                "name": "role",
+                "description": "The new role of the collaborators.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "ENUM",
+                    "name": "DocumentShareRole",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "userIds",
+                "description": "The identifiers of the collaborators whose role changes.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "String",
+                        "ofType": null
+                      }
+                    }
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the personal document.",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -135885,6 +136127,26 @@
             "defaultValue": null
           },
           {
+            "name": "inlineAnchorFrom",
+            "description": "[Internal] Where the commented text starts, as a base64-encoded Y.js relative position created on the commenter's copy of the document content. Requires `inlineAnchorTo` and `documentContentId`.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "inlineAnchorTo",
+            "description": "[Internal] Where the commented text ends, as a base64-encoded Y.js relative position created on the commenter's copy of the document content. Requires `inlineAnchorFrom` and `documentContentId`.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "subscriberIds",
             "description": "[INTERNAL] The identifiers of the users subscribing to this comment thread.",
             "type": {
@@ -138976,6 +139238,18 @@
           {
             "name": "edit",
             "description": "The user can read, edit, and comment on the document.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "comment",
+            "description": "The user can read and comment on the document but not edit it.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "view",
+            "description": "The user can read the document but not edit or comment on it.",
             "isDeprecated": false,
             "deprecationReason": null
           }
@@ -142507,6 +142781,16 @@
             "defaultValue": null
           },
           {
+            "name": "origin",
+            "description": null,
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "OriginSettingsInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "jira",
             "description": null,
             "type": {
@@ -144633,6 +144917,27 @@
                 "name": "String",
                 "ofType": null
               }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "OriginSettingsInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "ownerSlug",
+            "description": "The slug of the Origin team or user that owns the installation.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "defaultValue": null
           }
@@ -151448,6 +151753,16 @@
               "ofType": null
             },
             "defaultValue": null
+          },
+          {
+            "name": "managedTeamFeatures",
+            "description": "[Internal] The teams each managed team feature is limited to. Replaces the current lists, and updates each team's matching setting.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "OrganizationManagedTeamFeaturesInput",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -152294,6 +152609,74 @@
           {
             "name": "allowed",
             "description": "[Internal] Whether this source may start coding sessions.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "OrganizationManagedTeamFeaturesInput",
+        "description": "[Internal] The teams each managed team feature is limited to in the workspace.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "codingSessions",
+            "description": "[Internal] The teams coding sessions are limited to. Omit it to not limit coding sessions by team, or pass an empty list to allow no team. `codingAgentEnabled` still turns coding sessions on or off for the workspace.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "OrganizationManagedFeatureTeamInput",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "OrganizationManagedFeatureTeamInput",
+        "description": "[Internal] One team a managed team feature is limited to.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "teamId",
+            "description": "[Internal] The identifier of the team.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "UUID",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "includeSubTeams",
+            "description": "[Internal] Whether the team's sub-teams, at any depth, can use the feature too.",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -158392,16 +158775,6 @@
           {
             "name": "agentAutomationEnabled",
             "description": "[Internal] Whether the team has enabled agent automation.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "codingAgentEnabled",
-            "description": "[Internal] Whether the team has enabled Coding Sessions.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",

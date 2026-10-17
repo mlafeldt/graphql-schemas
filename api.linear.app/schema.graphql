@@ -3459,7 +3459,7 @@ type AiPromptRules implements Node {
   updatedBy: User
 }
 
-"""[Internal] The type of AI prompt workflow."""
+"""The type of AI prompt workflow."""
 enum AiPromptType {
   productIntelligence
   internalResearch
@@ -4373,6 +4373,27 @@ type CodingAgentSandboxPayload {
 }
 
 """
+A reason the workspace cannot trust content from the authenticated OAuth application for Coding Sessions.
+"""
+enum CodingSessionsDisabledReason {
+  """
+  Coding Sessions or Linear Agent are disabled in the workspace, or the workspace's plan does not support Coding Sessions.
+  """
+  CODING_SESSIONS_DISABLED
+
+  """
+  Coding Sessions are enabled, but the workspace cannot use trusted external sources.
+  """
+  TRUSTED_EXTERNAL_SOURCES_UNAVAILABLE
+
+  """
+  Coding Sessions and trusted external sources are available, but the
+  application's source is not approved or is no longer available in the workspace.
+  """
+  APP_NOT_TRUSTED
+}
+
+"""
 A comment associated with an issue, project update, initiative update, document
 content, post, project, or initiative. Comments support rich text (ProseMirror),
 emoji reactions, and threaded replies via parentId. Comments can be created by
@@ -4870,6 +4891,20 @@ input CommentCreateInput {
   The text that this comment references. Only defined for inline comments.
   """
   quotedText: String
+
+  """
+  [Internal] Where the commented text starts, as a base64-encoded Y.js relative
+  position created on the commenter's copy of the document content. Requires
+  `inlineAnchorTo` and `documentContentId`.
+  """
+  inlineAnchorFrom: String
+
+  """
+  [Internal] Where the commented text ends, as a base64-encoded Y.js relative
+  position created on the commenter's copy of the document content. Requires
+  `inlineAnchorFrom` and `documentContentId`.
+  """
+  inlineAnchorTo: String
 
   """
   [INTERNAL] The identifiers of the users subscribing to this comment thread.
@@ -9251,6 +9286,12 @@ type DocumentSearchResultEdge {
 enum DocumentShareRole {
   """The user can read, edit, and comment on the document."""
   edit
+
+  """The user can read and comment on the document but not edit it."""
+  comment
+
+  """The user can read the document but not edit or comment on it."""
+  view
 }
 
 """Document sorting options."""
@@ -13937,6 +13978,7 @@ input IntegrationSettingsInput {
   gong: GongSettingsInput
   microsoftTeams: MicrosoftTeamsSettingsInput
   microsoftTeamsProjectPost: MicrosoftTeamsPostSettingsInput
+  origin: OriginSettingsInput
   jira: JiraSettingsInput
   notion: NotionSettingsInput
   opsgenie: OpsgenieInput
@@ -20455,17 +20497,34 @@ type Mutation {
 
   """
   [Internal] Shares a personal document and its sub-documents with workspace
-  members. Only the owner of the document can share it. New collaborators are
-  subscribed to the document.
+  members at a role. Only the owner of the document can share it. New
+  collaborators are subscribed to the document. Users who already have another
+  role move to the given one.
   """
   documentShare(
-    """The role of the new collaborators."""
+    """The role of the collaborators. Defaults to edit."""
     role: DocumentShareRole = edit
 
     """The identifiers of the users to share the document with."""
     userIds: [String!]!
 
     """The identifier of the personal document to share."""
+    id: String!
+  ): DocumentPayload!
+
+  """
+  [Internal] Changes the role of users a personal document is shared with, on
+  the document and its sub-documents. Only the owner of the document can change
+  roles. Only users who already collaborate on a document change; no one is added.
+  """
+  documentUpdateCollaboratorRole(
+    """The new role of the collaborators."""
+    role: DocumentShareRole!
+
+    """The identifiers of the collaborators whose role changes."""
+    userIds: [String!]!
+
+    """The identifier of the personal document."""
     id: String!
   ): DocumentPayload!
 
@@ -25331,6 +25390,28 @@ type OAuthApplicationArchivePayload {
   success: Boolean!
 }
 
+"""
+The authenticated OAuth application's trusted-source status for Coding Sessions
+in the token's workspace. Combines workspace availability with the application's
+trust setting. This status does not grant permissions or account for team and
+repository access.
+"""
+type OAuthApplicationCodingSessionTrustedSource {
+  """
+  Whether Coding Sessions are available and enabled in the workspace, trusted
+  external sources are available, and the authenticated OAuth application is
+  trusted. A true value does not guarantee that a specific session can start.
+  """
+  enabled: Boolean!
+
+  """
+  The first reason that enabled is false, or null when enabled is true. Checks
+  run in this order: workspace availability, trusted external source
+  availability, then application approval.
+  """
+  disabledReason: CodingSessionsDisabledReason
+}
+
 """Input for creating an OAuth application through the public API."""
 input OAuthApplicationCreateInput {
   """The OAuth application's name."""
@@ -25957,8 +26038,16 @@ type Organization implements Node {
   """[INTERNAL] Whether the workspace has enabled Coding Sessions."""
   codingAgentEnabled: Boolean!
 
-  """[Internal] Settings for Coding Sessions features."""
+  """
+  [Internal] Settings for Coding Sessions features. OAuth responses omit the trusted external source list.
+  """
   codingAgentSettings: JSONObject!
+
+  """
+  [Internal] The teams each managed team feature is limited to, keyed by
+  feature. The workspace's own setting for each feature still applies.
+  """
+  managedTeamFeatures: JSONObject!
 
   """[DEPRECATED] Which day count to use for SLA calculations."""
   slaDayCount: SLADayCountType! @deprecated(reason: "No longer in use")
@@ -26698,6 +26787,29 @@ input OrganizationLinearAgentTrustedSourcesAllowlistEntryInput {
   key: String!
 }
 
+"""[Internal] One team a managed team feature is limited to."""
+input OrganizationManagedFeatureTeamInput {
+  """[Internal] The identifier of the team."""
+  teamId: UUID!
+
+  """
+  [Internal] Whether the team's sub-teams, at any depth, can use the feature too.
+  """
+  includeSubTeams: Boolean!
+}
+
+"""
+[Internal] The teams each managed team feature is limited to in the workspace.
+"""
+input OrganizationManagedTeamFeaturesInput {
+  """
+  [Internal] The teams coding sessions are limited to. Omit it to not limit
+  coding sessions by team, or pass an empty list to allow no team.
+  `codingAgentEnabled` still turns coding sessions on or off for the workspace.
+  """
+  codingSessions: [OrganizationManagedFeatureTeamInput!]
+}
+
 """
 [INTERNAL] Workspace metadata including region and allowed authentication providers.
 """
@@ -27024,6 +27136,12 @@ input OrganizationUpdateInput {
 
   """[Internal] Settings for Coding Sessions features."""
   codingAgentSettings: OrganizationCodingAgentSettingsInput
+
+  """
+  [Internal] The teams each managed team feature is limited to. Replaces the
+  current lists, and updates each team's matching setting.
+  """
+  managedTeamFeatures: OrganizationManagedTeamFeaturesInput
 }
 
 type OriginInstallationCancelPayload {
@@ -27055,6 +27173,11 @@ type OriginInstallationDetails {
 type OriginInstallUrlPayload {
   """The Origin URL to send the user to in order to install Linear's app."""
   installUrl: String!
+}
+
+input OriginSettingsInput {
+  """The slug of the Origin team or user that owns the installation."""
+  ownerSlug: String
 }
 
 """Customer owner sorting options."""
@@ -31927,6 +32050,12 @@ type PullRequest implements Node {
   creator: User
 
   """
+  [Internal] The external user who opened the pull request, when the author is
+  not mapped to a Linear account, such as a bot. Null if the author is a Linear user.
+  """
+  externalCreator: ExternalUser
+
+  """
   [Internal] The Linear user who merged the pull request. This is the person who
   merged it, which the hosting provider reports separately from the merge
   commit's author. Null if the pull request has not been merged, was merged by
@@ -32567,6 +32696,12 @@ type Query {
     """The client ID of the application."""
     clientId: String!
   ): Application!
+
+  """
+  Returns the authenticated OAuth application's trusted-source status for Coding
+  Sessions in the workspace. Requires an OAuth access token with the `read` scope.
+  """
+  oauthApplicationCodingSessionTrustedSource: OAuthApplicationCodingSessionTrustedSource!
 
   """
   All issue attachments.
@@ -33474,6 +33609,12 @@ type Query {
   that no workspace has connected yet, matched by the user's email.
   """
   originPendingInstallations: [OriginInstallationDetails!]!
+
+  """[INTERNAL] Jira project IDs available for issue sync."""
+  integrationSyncResourceIds(
+    """The workspace integration to configure."""
+    integrationId: String!
+  ): [String!]!
 
   """
   [INTERNAL] Fetches a Jira project's status names, split into issue (non-Epic) and project (Epic) statuses.
@@ -38947,7 +39088,9 @@ type Team implements Node {
   """[Internal] Whether the team has enabled agent automation."""
   agentAutomationEnabled: Boolean!
 
-  """[Internal] Whether the team has enabled Coding Sessions."""
+  """
+  [Internal] Whether the team can use coding sessions. The workspace's coding sessions team list sets it.
+  """
   codingAgentEnabled: Boolean!
 
   """Whether to send new issue notifications to Slack."""
@@ -40177,9 +40320,6 @@ input TeamUpdateInput {
 
   """[Internal] Whether the team has enabled agent automation."""
   agentAutomationEnabled: Boolean
-
-  """[Internal] Whether the team has enabled Coding Sessions."""
-  codingAgentEnabled: Boolean
 
   """The identifier of the default template for members of this team."""
   defaultTemplateForMembersId: String
@@ -43044,6 +43184,9 @@ type ViewPreferencesValues {
   """Whether to show disabled loops."""
   automationShowDisabled: Boolean
 
+  """Whether to show templates above the workspace loops list."""
+  automationShowTemplates: Boolean
+
   """The loop stats period."""
   automationStatsPeriod: String
 
@@ -43141,6 +43284,11 @@ type ViewPreferencesValues {
 
   """[Internal] Whether to show the project column in documents lists."""
   documentFieldProject: Boolean
+
+  """
+  [Internal] Whether to show the collaborators column in documents lists.
+  """
+  documentFieldCollaborators: Boolean
 
   """[Internal] Grouping of a documents list."""
   documentsListGrouping: String
