@@ -2174,6 +2174,34 @@ enum AiConversationMemoryToolCallArgsAction {
   delete
 }
 
+type AiConversationMessageSubagentToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationMessageSubagentToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationMessageSubagentToolCallResult
+}
+
+type AiConversationMessageSubagentToolCallArgs {
+  conversationId: String!
+  prompt: String!
+  wait: Boolean
+}
+
+type AiConversationMessageSubagentToolCallResult {
+  turnId: String!
+}
+
 """The selected option in a multiple-choice AI conversation elicitation."""
 type AiConversationMultipleChoiceElicitationResponseData {
   """The kind of elicitation that was answered."""
@@ -3080,6 +3108,7 @@ enum AiConversationTool {
   RestoreEntity
   RunLoop
   SpawnSubagent
+  MessageSubagent
   Research
   CodeIntelligence
   StartCodingSession
@@ -3118,7 +3147,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationRenameAgentChatToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationMessageSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationRenameAgentChatToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -20541,6 +20570,25 @@ type Mutation {
   ): DocumentPayload!
 
   """
+  [Internal] Changes what users other than the owner can do with a document that
+  is not personal: edit, comment, or view. Only the owner of the document or a
+  workspace admin can change it. Comment and view need an owner who can access the document.
+  """
+  documentUpdateGeneralAccess(
+    """
+    Whether to also change the sub-documents whose level differs. Sub-documents
+    without an owner who can access them, and ones the user cannot loosen, keep their level.
+    """
+    applyToSubDocuments: Boolean = false
+
+    """The new general access level: edit, comment, or view."""
+    generalAccess: String!
+
+    """The identifier of the document."""
+    id: String!
+  ): DocumentPayload!
+
+  """
   Deletes (trashes) a document. The document is marked as trashed and archived, but not permanently removed.
   """
   documentDelete(
@@ -26092,8 +26140,8 @@ type Organization implements Node {
   ): UserConnection!
 
   """
-  Loops in the workspace that are visible to the requesting user, including team
-  and project loops. Includes enabled and disabled loops.
+  Loops in the workspace that are visible to the requesting user, including
+  workspace and team loops. Includes enabled and disabled loops.
   """
   loops(
     """A cursor to be used with last for backward pagination."""
@@ -26808,6 +26856,13 @@ input OrganizationManagedTeamFeaturesInput {
   `codingAgentEnabled` still turns coding sessions on or off for the workspace.
   """
   codingSessions: [OrganizationManagedFeatureTeamInput!]
+
+  """
+  [Internal] The teams Loops are limited to. Omit it to not limit Loops by team,
+  or pass an empty list to allow no team. `agentAutomationEnabled` still turns
+  Loops on or off for the workspace.
+  """
+  loops: [OrganizationManagedFeatureTeamInput!]
 }
 
 """
@@ -37566,6 +37621,13 @@ input SalesforceSettingsInput {
 
   """The Salesforce team to use when a template doesn't specify a team."""
   defaultTeam: String
+
+  """
+  Whether replies posted on the Chatter feed of a linked Salesforce case are
+  synced back into the Linear issue's synced comment thread. Requires a managed
+  package version that ships the Chatter feed trigger.
+  """
+  syncCommentsFromChatter: Boolean
 }
 
 """Filters for semantic search results."""
@@ -39085,7 +39147,9 @@ type Team implements Node {
   """Whether to enable AI discussion summaries for issues in this team."""
   aiDiscussionSummariesEnabled: Boolean!
 
-  """[Internal] Whether the team has enabled agent automation."""
+  """
+  [Internal] Whether the team can use Loops. The workspace's Loops team list sets it.
+  """
   agentAutomationEnabled: Boolean!
 
   """
@@ -40317,9 +40381,6 @@ input TeamUpdateInput {
 
   """Whether to enable AI discussion summaries for issues."""
   aiDiscussionSummariesEnabled: Boolean
-
-  """[Internal] Whether the team has enabled agent automation."""
-  agentAutomationEnabled: Boolean
 
   """The identifier of the default template for members of this team."""
   defaultTemplateForMembersId: String
@@ -44524,6 +44585,11 @@ input WorkflowStateSort {
 
   """Whether to sort closed issues by recency"""
   closedIssuesOrderedByRecency: Boolean = false
+
+  """
+  Whether to sort by status type without ordering individual statuses within each type.
+  """
+  typeOnly: Boolean = false
 }
 
 """

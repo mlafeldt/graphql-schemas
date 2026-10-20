@@ -4233,7 +4233,7 @@
           },
           {
             "name": "loops",
-            "description": "Loops in the workspace that are visible to the requesting user, including team and project loops. Includes enabled and disabled loops.",
+            "description": "Loops in the workspace that are visible to the requesting user, including workspace and team loops. Includes enabled and disabled loops.",
             "args": [
               {
                 "name": "before",
@@ -6067,7 +6067,7 @@
           },
           {
             "name": "agentAutomationEnabled",
-            "description": "[Internal] Whether the team has enabled agent automation.",
+            "description": "[Internal] Whether the team can use Loops. The workspace's Loops team list sets it.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -47835,6 +47835,16 @@
               "ofType": null
             },
             "defaultValue": "false"
+          },
+          {
+            "name": "typeOnly",
+            "description": "Whether to sort by status type without ordering individual statuses within each type.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": "false"
           }
         ],
         "interfaces": null,
@@ -58375,6 +58385,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "AiConversationMessageSubagentToolCall",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "AiConversationResearchToolCall",
             "ofType": null
           },
@@ -58795,6 +58810,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "AiConversationMessageSubagentToolCall",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "AiConversationResearchToolCall",
             "ofType": null
           },
@@ -59070,6 +59090,12 @@
           },
           {
             "name": "SpawnSubagent",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MessageSubagent",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -61848,6 +61874,185 @@
         "fields": [
           {
             "name": "conversationId",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AiConversationMessageSubagentToolCall",
+        "description": null,
+        "fields": [
+          {
+            "name": "name",
+            "description": "The name of the tool that was called.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "AiConversationTool",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "displayInfo",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AiConversationToolDisplayInfo",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "rawArgs",
+            "description": "The arguments of the tool call.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSON",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "rawResult",
+            "description": "The result of the tool call.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSON",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "args",
+            "description": "The arguments to the tool call.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "AiConversationMessageSubagentToolCallArgs",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "result",
+            "description": "The result of the tool call.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "AiConversationMessageSubagentToolCallResult",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "AiConversationBaseToolCall",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AiConversationMessageSubagentToolCallArgs",
+        "description": null,
+        "fields": [
+          {
+            "name": "conversationId",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "prompt",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "wait",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AiConversationMessageSubagentToolCallResult",
+        "description": null,
+        "fields": [
+          {
+            "name": "turnId",
             "description": null,
             "args": [],
             "type": {
@@ -121118,6 +121323,61 @@
             "deprecationReason": null
           },
           {
+            "name": "documentUpdateGeneralAccess",
+            "description": "[Internal] Changes what users other than the owner can do with a document that is not personal: edit, comment, or view. Only the owner of the document or a workspace admin can change it. Comment and view need an owner who can access the document.",
+            "args": [
+              {
+                "name": "applyToSubDocuments",
+                "description": "Whether to also change the sub-documents whose level differs. Sub-documents without an owner who can access them, and ones the user cannot loosen, keep their level.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": "false"
+              },
+              {
+                "name": "generalAccess",
+                "description": "The new general access level: edit, comment, or view.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the document.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DocumentPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "documentDelete",
             "description": "Deletes (trashes) a document. The document is marked as trashed and archived, but not permanently removed.",
             "args": [
@@ -145495,6 +145755,16 @@
               "ofType": null
             },
             "defaultValue": null
+          },
+          {
+            "name": "syncCommentsFromChatter",
+            "description": "Whether replies posted on the Chatter feed of a linked Salesforce case are synced back into the Linear issue's synced comment thread. Requires a managed package version that ships the Chatter feed trigger.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -152648,6 +152918,24 @@
               }
             },
             "defaultValue": null
+          },
+          {
+            "name": "loops",
+            "description": "[Internal] The teams Loops are limited to. Omit it to not limit Loops by team, or pass an empty list to allow no team. `agentAutomationEnabled` still turns Loops on or off for the workspace.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "OrganizationManagedFeatureTeamInput",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -158765,16 +159053,6 @@
           {
             "name": "aiDiscussionSummariesEnabled",
             "description": "Whether to enable AI discussion summaries for issues.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "agentAutomationEnabled",
-            "description": "[Internal] Whether the team has enabled agent automation.",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
