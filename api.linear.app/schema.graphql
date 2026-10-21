@@ -1467,7 +1467,26 @@ type AiConversationCodeIntelligenceToolCallArgs {
   question: String!
 }
 
-"""The affirmative response recorded for a confirmation elicitation."""
+type AiConversationCodeModeToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationCodeModeToolCallArgs
+}
+
+type AiConversationCodeModeToolCallArgs {
+  description: String!
+}
+
+"""The response recorded for a confirmation elicitation."""
 type AiConversationConfirmationElicitationResponseData {
   """The kind of elicitation that was answered."""
   kind: AiConversationElicitationKind!
@@ -1486,6 +1505,28 @@ type AiConversationContactSupportToolCall implements AiConversationBaseToolCall 
 
   """The result of the tool call."""
   rawResult: JSON
+}
+
+type AiConversationCreateAgentChatToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: JSONObject
+
+  """The result of the tool call."""
+  result: AiConversationCreateAgentChatToolCallResult
+}
+
+type AiConversationCreateAgentChatToolCallResult {
+  conversationId: String!
 }
 
 type AiConversationCreateEntityToolCall implements AiConversationBaseToolCall {
@@ -3132,6 +3173,7 @@ enum AiConversationTool {
   TranscribeVideo
   TranscribeMedia
   Memory
+  CreateAgentChat
   RenameAgentChat
   SearchDocumentation
   ContactSupport
@@ -3143,11 +3185,12 @@ enum AiConversationTool {
   SetSpendLimit
   RemoveSpendLimit
   NavigateToPage
+  CodeMode
   InvokeMcpTool
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationMessageSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationRenameAgentChatToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationMessageSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationCreateAgentChatToolCall | AiConversationRenameAgentChatToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationCodeModeToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -19529,58 +19572,6 @@ type Mutation {
     projectId: String!
   ): ProjectPayload!
 
-  """
-  XHR request payload to upload an images, video and other attachments directly to Linear's cloud storage.
-  """
-  fileUpload(
-    """Optional metadata."""
-    metaData: JSON
-
-    """Should the file be made publicly accessible (default: false)."""
-    makePublic: Boolean
-
-    """File size of the uploaded file."""
-    size: Int!
-
-    """MIME type of the uploaded file."""
-    contentType: String!
-
-    """Filename of the uploaded file."""
-    filename: String!
-  ): UploadPayload!
-
-  """
-  XHR request payload to upload a file for import, directly to Linear's cloud storage.
-  """
-  importFileUpload(
-    """Optional metadata."""
-    metaData: JSON
-
-    """File size of the uploaded file."""
-    size: Int!
-
-    """MIME type of the uploaded file."""
-    contentType: String!
-
-    """Filename of the uploaded file."""
-    filename: String!
-  ): UploadPayload!
-
-  """Upload an image from an URL to Linear."""
-  imageUploadFromUrl(
-    """URL of the file to be uploaded to Linear."""
-    url: String!
-  ): ImageUploadFromUrlPayload!
-
-  """
-  [INTERNAL] Permanently delete an uploaded file by asset URL. This should be
-  used as a last resort and will break comments and documents that reference the asset.
-  """
-  fileUploadDangerouslyDelete(
-    """The asset URL of the uploaded file to delete."""
-    assetUrl: String!
-  ): FileUploadDeletePayload!
-
   """Creates an agent activity."""
   agentActivityCreate(
     """The agent activity object to create."""
@@ -20542,11 +20533,26 @@ type Mutation {
   ): DocumentPayload!
 
   """
-  [Internal] Changes the role of users a personal document is shared with, on
-  the document and its sub-documents. Only the owner of the document can change
-  roles. Only users who already collaborate on a document change; no one is added.
+  [Internal] Changes the role of users a personal document is shared with. Only
+  the owner of the document can change roles. Only users who already collaborate
+  on the document change; no one is added. With applyToSubDocuments,
+  sub-documents where a user has the role they had on this document before the
+  change are also changed.
   """
   documentUpdateCollaboratorRole(
+    """
+    The role the users had on this document when the change was confirmed. When
+    given, the change fails if any of the users has another role on the document now.
+    """
+    previousRole: DocumentShareRole
+
+    """
+    Whether to also change the sub-documents where each user has the role they
+    had on this document before the change. Sub-documents where they have a
+    different role keep it.
+    """
+    applyToSubDocuments: Boolean = false
+
     """The new role of the collaborators."""
     role: DocumentShareRole!
 
@@ -20576,8 +20582,15 @@ type Mutation {
   """
   documentUpdateGeneralAccess(
     """
-    Whether to also change the sub-documents whose level differs. Sub-documents
-    without an owner who can access them, and ones the user cannot loosen, keep their level.
+    The general access level of this document when the change was confirmed.
+    When given, the change fails if the document has another level now.
+    """
+    previousGeneralAccess: String
+
+    """
+    Whether to also change the sub-documents whose level equals the document's
+    level before the change. Sub-documents with another level, without an owner
+    who can access them, or that the user cannot loosen keep their level.
     """
     applyToSubDocuments: Boolean = false
 
@@ -20723,6 +20736,58 @@ type Mutation {
     """The identifier of the favorite reference to delete."""
     id: String!
   ): DeletePayload!
+
+  """
+  XHR request payload to upload an images, video and other attachments directly to Linear's cloud storage.
+  """
+  fileUpload(
+    """Optional metadata."""
+    metaData: JSON
+
+    """Should the file be made publicly accessible (default: false)."""
+    makePublic: Boolean
+
+    """File size of the uploaded file."""
+    size: Int!
+
+    """MIME type of the uploaded file."""
+    contentType: String!
+
+    """Filename of the uploaded file."""
+    filename: String!
+  ): UploadPayload!
+
+  """
+  XHR request payload to upload a file for import, directly to Linear's cloud storage.
+  """
+  importFileUpload(
+    """Optional metadata."""
+    metaData: JSON
+
+    """File size of the uploaded file."""
+    size: Int!
+
+    """MIME type of the uploaded file."""
+    contentType: String!
+
+    """Filename of the uploaded file."""
+    filename: String!
+  ): UploadPayload!
+
+  """Upload an image from an URL to Linear."""
+  imageUploadFromUrl(
+    """URL of the file to be uploaded to Linear."""
+    url: String!
+  ): ImageUploadFromUrlPayload!
+
+  """
+  [INTERNAL] Permanently delete an uploaded file by asset URL. This should be
+  used as a last resort and will break comments and documents that reference the asset.
+  """
+  fileUploadDangerouslyDelete(
+    """The asset URL of the uploaded file to delete."""
+    assetUrl: String!
+  ): FileUploadDeletePayload!
 
   """
   Creates a new Git automation rule that maps a Git event to a workflow state transition for a team.
@@ -26896,10 +26961,48 @@ type OrganizationQuota implements Node {
   """Stable quota key."""
   key: String!
 
-  """Effective quota limit, including workspace overrides."""
+  """
+  The entity that the limit applies to. Workspace quotas limit the whole
+  workspace. Team, project, and initiative quotas limit each of those entities
+  separately. To get their usage, pass the ID of the entity to `usage`.
+  """
+  scope: OrganizationQuotaScope!
+
+  """
+  Effective quota limit, including workspace overrides. Scoped quotas apply this limit to each entity.
+  """
   limit: Float!
   name: String!
   description: String!
+
+  """
+  [Internal] Current usage of the quota, counted with the same rules as quota
+  enforcement. The value is not cached. Counts include data that the user cannot
+  see. Workspace quotas ignore the arguments. Team, project, and initiative
+  quotas return null unless you pass `teamId`, `projectId`, or `initiativeId`
+  that matches their scope. The user must have access to that entity.
+  """
+  usage(
+    """The initiative to count usage for initiative quotas in."""
+    initiativeId: String
+
+    """The project to count usage for project quotas in."""
+    projectId: String
+
+    """The team to count usage for team quotas in."""
+    teamId: String
+  ): Float
+
+  """
+  [Internal] The highest usage of the quota in any team, project, or initiative,
+  and the entity with that usage. Counts include data that the user cannot see.
+  Null for workspace quotas, which return their usage in `usage`. The value is
+  cached because it counts every row in the workspace. It can be up to 1 hour
+  old for `max-issues-per-team` and `max-issues-per-project`, and up to 10
+  minutes old for other quotas. Changes to the data do not refresh the cache.
+  For a current value, query `usage` with the ID of that entity.
+  """
+  maxUsage: OrganizationQuotaMaxUsage
 }
 
 type OrganizationQuotaConnection {
@@ -26915,11 +27018,47 @@ type OrganizationQuotaEdge {
   cursor: String!
 }
 
-"""Filter public workspace quotas by key."""
+"""Filter public workspace quotas by key or scope."""
 input OrganizationQuotaFilter {
   key: StringComparator
+
+  """
+  Comparator for the quota scope: workspace, team, project, or initiative.
+  """
+  scope: StringComparator
   and: [OrganizationQuotaFilter!]
   or: [OrganizationQuotaFilter!]
+}
+
+"""
+The team, project, or initiative with the highest usage of a scoped quota. The
+limit applies to each entity, so this entity is the closest to the limit.
+"""
+type OrganizationQuotaMaxUsage {
+  """The usage of the quota in the entity with the highest usage."""
+  usage: Float!
+
+  """
+  The ID of the entity with the highest usage. Null if the user cannot see the
+  entity, if no entity uses the quota, or if workspace-level templates have the
+  highest usage of a template quota.
+  """
+  entityId: String
+}
+
+"""The entity that a quota limit applies to."""
+enum OrganizationQuotaScope {
+  """The limit applies to the whole workspace."""
+  workspace
+
+  """The limit applies to each team separately."""
+  team
+
+  """The limit applies to each project separately."""
+  project
+
+  """The limit applies to each initiative separately."""
+  initiative
 }
 
 """
@@ -38476,6 +38615,15 @@ type Subscription {
   """Triggered when a workflow state is archived"""
   workflowStateArchived: WorkflowState!
 
+  """Triggered when an agent activity is created"""
+  agentActivityCreated: AgentActivity!
+
+  """Triggered when an agent activity is updated"""
+  agentActivityUpdated: AgentActivity!
+
+  """Triggered when an agent activity is archived"""
+  agentActivityArchived: AgentActivity!
+
   """Triggered when an issue relation is created"""
   issueRelationCreated: IssueRelation!
 
@@ -38484,6 +38632,27 @@ type Subscription {
 
   """Triggered when an issue relation is deleted"""
   issueRelationDeleted: IssueRelation!
+
+  """Triggered when an issue draft is created"""
+  issueDraftCreated: IssueDraft!
+
+  """Triggered when an issue draft is updated"""
+  issueDraftUpdated: IssueDraft!
+
+  """Triggered when an issue draft is deleted"""
+  issueDraftDeleted: IssueDraft!
+
+  """Triggered when a team membership is created"""
+  teamMembershipCreated: TeamMembership!
+
+  """Triggered when a team membership is updated"""
+  teamMembershipUpdated: TeamMembership!
+
+  """Triggered when a team membership is deleted"""
+  teamMembershipDeleted: TeamMembership!
+
+  """Triggered when an user settings is updated"""
+  userSettingsUpdated: UserSettings!
 
   """Triggered when a draft is created"""
   draftCreated: Draft!
@@ -38494,8 +38663,20 @@ type Subscription {
   """Triggered when a draft is deleted"""
   draftDeleted: Draft!
 
-  """Triggered when an user settings is updated"""
-  userSettingsUpdated: UserSettings!
+  """Triggered when a pull request is updated"""
+  pullRequestUpdated: PullRequest!
+
+  """Triggered when a project update is created"""
+  projectUpdateCreated: ProjectUpdate!
+
+  """Triggered when a project update is updated"""
+  projectUpdateUpdated: ProjectUpdate!
+
+  """Triggered when a project update is archived"""
+  projectUpdateArchived: ProjectUpdate!
+
+  """Triggered when a project update is deleted"""
+  projectUpdateDeleted: ProjectUpdate!
 
   """Triggered when a document content revision is created"""
   documentContentRevisionCreated: DocumentContentRevision!
@@ -38520,48 +38701,6 @@ type Subscription {
 
   """Triggered when a notification is deleted"""
   notificationDeleted: Notification!
-
-  """Triggered when an agent activity is created"""
-  agentActivityCreated: AgentActivity!
-
-  """Triggered when an agent activity is updated"""
-  agentActivityUpdated: AgentActivity!
-
-  """Triggered when an agent activity is archived"""
-  agentActivityArchived: AgentActivity!
-
-  """Triggered when a project update is created"""
-  projectUpdateCreated: ProjectUpdate!
-
-  """Triggered when a project update is updated"""
-  projectUpdateUpdated: ProjectUpdate!
-
-  """Triggered when a project update is archived"""
-  projectUpdateArchived: ProjectUpdate!
-
-  """Triggered when a project update is deleted"""
-  projectUpdateDeleted: ProjectUpdate!
-
-  """Triggered when a pull request is updated"""
-  pullRequestUpdated: PullRequest!
-
-  """Triggered when an issue draft is created"""
-  issueDraftCreated: IssueDraft!
-
-  """Triggered when an issue draft is updated"""
-  issueDraftUpdated: IssueDraft!
-
-  """Triggered when an issue draft is deleted"""
-  issueDraftDeleted: IssueDraft!
-
-  """Triggered when a team membership is created"""
-  teamMembershipCreated: TeamMembership!
-
-  """Triggered when a team membership is updated"""
-  teamMembershipUpdated: TeamMembership!
-
-  """Triggered when a team membership is deleted"""
-  teamMembershipDeleted: TeamMembership!
 
   """Triggered when an issue history is created"""
   issueHistoryCreated: IssueHistory!
