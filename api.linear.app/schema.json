@@ -905,6 +905,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "Deployment",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "ProjectMilestone",
             "ofType": null
           },
@@ -2558,7 +2563,22 @@
           {
             "name": "supportsAgentSessions",
             "description": "Whether this agent user supports agent sessions.",
-            "args": [],
+            "args": [
+              {
+                "name": "forCurrentUser",
+                "description": "Whether to require an active webhook for sessions started by the current user.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": "false"
+              }
+            ],
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -5370,6 +5390,22 @@
           {
             "name": "securitySettings",
             "description": "Security settings for the team, including role-based restrictions for issue sharing, label management, member management, template management, and agent skills.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "JSONObject",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "hierarchySettings",
+            "description": "[Internal] Inheritance requirements that this team applies to its descendants.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -33186,6 +33222,30 @@
             "deprecationReason": null
           },
           {
+            "name": "deployments",
+            "description": "[Internal] The deployments of the pull request's commits, each with its latest status.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Deployment",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "reactions",
             "description": "Reactions associated with this pull request.",
             "args": [],
@@ -34087,6 +34147,247 @@
             "type": {
               "kind": "SCALAR",
               "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "Deployment",
+        "description": "[Internal] A deployment of a pull request's commit reported by the code host, with its latest status. Preview links derive from the latest deployment of each environment.",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The unique identifier of the entity.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createdAt",
+            "description": "The time at which the entity was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't\n    been updated after creation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "archivedAt",
+            "description": "The time at which the entity was archived. Null if the entity has not been archived.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pullRequest",
+            "description": "The pull request the deployment belongs to.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PullRequest",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "provider",
+            "description": "The code host that reported the deployment.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "externalId",
+            "description": "The deployment's id on the code host.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "externalCreatedAt",
+            "description": "When the code host created the deployment. Orders the deployments of one environment.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "sha",
+            "description": "The deployed commit.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "environment",
+            "description": "The environment the deployment targets, as the code host names it.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "state",
+            "description": "The state of the latest status: `pending`, `building`, `success`, `failure`, or `inactive`. Provider states are collapsed to these.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "statusExternalId",
+            "description": "The id of the latest status on the code host. Null for a status read by a sync.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "statusCreatedAt",
+            "description": "When the code host created the latest status.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "url",
+            "description": "The URL of the deployed environment from the latest status. Null when that status had none.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "logUrl",
+            "description": "The URL of the deployer's log from the latest status. Null when that status had none.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "isDeprecated": false,
@@ -51484,6 +51785,18 @@
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userDiffsScope",
+            "description": "[Internal] Which of a user's pull requests the Diffs tab on their profile lists.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "isDeprecated": false,
@@ -117129,6 +117442,18 @@
             "deprecationReason": null
           },
           {
+            "name": "userProfileDiffs",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userProfileProjects",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "board",
             "description": null,
             "isDeprecated": false,
@@ -121354,7 +121679,7 @@
           },
           {
             "name": "documentShare",
-            "description": "[Internal] Shares a personal document and its sub-documents with workspace members at a role. Only the owner of the document can share it. New collaborators are subscribed to the document. Users who already have another role move to the given one.",
+            "description": "[Internal] Shares a document and its sub-documents with workspace members at a role. On a personal document only the owner can share it. On any other document the owner, an owner of one of its teams, or a workspace admin can, the people must be able to see the document, and the role must be above its general access. New collaborators are subscribed to the document. Users who already have another role move to the given one.",
             "args": [
               {
                 "name": "role",
@@ -121390,7 +121715,7 @@
               },
               {
                 "name": "id",
-                "description": "The identifier of the personal document to share.",
+                "description": "The identifier of the document to share.",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -121417,7 +121742,7 @@
           },
           {
             "name": "documentUpdateCollaboratorRole",
-            "description": "[Internal] Changes the role of users a personal document is shared with. Only the owner of the document can change roles. Only users who already collaborate on the document change; no one is added. With applyToSubDocuments, sub-documents where a user has the role they had on this document before the change are also changed.",
+            "description": "[Internal] Changes the role of users a document is shared with. On a personal document only the owner can change roles. On any other document the owner, an owner of one of its teams, or a workspace admin can, and the role must be above its general access. Only users who already collaborate on the document change; no one is added. With applyToSubDocuments, sub-documents where a user has the role they had on this document before the change are also changed.",
             "args": [
               {
                 "name": "previousRole",
@@ -121477,7 +121802,7 @@
               },
               {
                 "name": "id",
-                "description": "The identifier of the personal document.",
+                "description": "The identifier of the document.",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -121504,7 +121829,7 @@
           },
           {
             "name": "documentUnshare",
-            "description": "[Internal] Stops sharing a personal document and its sub-documents with users. The owner can remove any collaborator; a collaborator can only remove themselves.",
+            "description": "[Internal] Stops sharing a document and its sub-documents with users. Whoever can manage access to the document can remove any collaborator; a collaborator can only remove themselves.",
             "args": [
               {
                 "name": "userIds",
@@ -121530,7 +121855,7 @@
               },
               {
                 "name": "id",
-                "description": "The identifier of the personal document to stop sharing.",
+                "description": "The identifier of the document to stop sharing.",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -121557,7 +121882,7 @@
           },
           {
             "name": "documentUpdateGeneralAccess",
-            "description": "[Internal] Changes what users other than the owner can do with a document that is not personal: edit, comment, or view. Only the owner of the document or a workspace admin can change it. Comment and view need an owner who can access the document.",
+            "description": "[Internal] Changes what users other than the owner can do with a document that is not personal: edit, comment, or view. Only the owner of the document, an owner of one of its teams, or a workspace admin can change it. Comment and view need an owner who can access the document.",
             "args": [
               {
                 "name": "previousGeneralAccess",
@@ -159754,6 +160079,16 @@
             "defaultValue": null
           },
           {
+            "name": "hierarchySettings",
+            "description": "[Internal] Inheritance requirements that this team applies to its descendants. Omitted keys retain their current values.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "TeamHierarchySettingsInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "securitySettings",
             "description": "The security settings for the team.",
             "type": {
@@ -159789,6 +160124,47 @@
             "type": {
               "kind": "ENUM",
               "name": "TeamRetirementSubTeamHandling",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "TeamHierarchySettingsInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "requireWorkflowStatusInheritance",
+            "description": "Require sub-teams to inherit their parent’s issue statuses.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "requireProjectStatusInheritance",
+            "description": "Require sub-teams to inherit their parent’s project statuses.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "requireIssueEstimationInheritance",
+            "description": "Require sub-teams to inherit their parent’s estimate settings.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
               "ofType": null
             },
             "defaultValue": null

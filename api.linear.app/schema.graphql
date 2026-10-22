@@ -8215,6 +8215,73 @@ type DependencyPackageMetadataResult {
 }
 
 """
+[Internal] A deployment of a pull request's commit reported by the code host,
+with its latest status. Preview links derive from the latest deployment of each environment.
+"""
+type Deployment implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The pull request the deployment belongs to."""
+  pullRequest: PullRequest!
+
+  """The code host that reported the deployment."""
+  provider: String!
+
+  """The deployment's id on the code host."""
+  externalId: String!
+
+  """
+  When the code host created the deployment. Orders the deployments of one environment.
+  """
+  externalCreatedAt: DateTime!
+
+  """The deployed commit."""
+  sha: String!
+
+  """The environment the deployment targets, as the code host names it."""
+  environment: String!
+
+  """
+  The state of the latest status: `pending`, `building`, `success`, `failure`,
+  or `inactive`. Provider states are collapsed to these.
+  """
+  state: String!
+
+  """
+  The id of the latest status on the code host. Null for a status read by a sync.
+  """
+  statusExternalId: String
+
+  """When the code host created the latest status."""
+  statusCreatedAt: DateTime!
+
+  """
+  The URL of the deployed environment from the latest status. Null when that status had none.
+  """
+  url: String
+
+  """
+  The URL of the deployer's log from the latest status. Null when that status had none.
+  """
+  logUrl: String
+}
+
+"""
 [Internal] A first-class code diff. Starts as the live working-tree state of a
 coding session and is promoted to a review by linking it to a pull request,
 while continuing to represent local, uncommitted changes.
@@ -20516,10 +20583,12 @@ type Mutation {
   ): DocumentPayload!
 
   """
-  [Internal] Shares a personal document and its sub-documents with workspace
-  members at a role. Only the owner of the document can share it. New
-  collaborators are subscribed to the document. Users who already have another
-  role move to the given one.
+  [Internal] Shares a document and its sub-documents with workspace members at a
+  role. On a personal document only the owner can share it. On any other
+  document the owner, an owner of one of its teams, or a workspace admin can,
+  the people must be able to see the document, and the role must be above its
+  general access. New collaborators are subscribed to the document. Users who
+  already have another role move to the given one.
   """
   documentShare(
     """The role of the collaborators. Defaults to edit."""
@@ -20528,16 +20597,17 @@ type Mutation {
     """The identifiers of the users to share the document with."""
     userIds: [String!]!
 
-    """The identifier of the personal document to share."""
+    """The identifier of the document to share."""
     id: String!
   ): DocumentPayload!
 
   """
-  [Internal] Changes the role of users a personal document is shared with. Only
-  the owner of the document can change roles. Only users who already collaborate
-  on the document change; no one is added. With applyToSubDocuments,
-  sub-documents where a user has the role they had on this document before the
-  change are also changed.
+  [Internal] Changes the role of users a document is shared with. On a personal
+  document only the owner can change roles. On any other document the owner, an
+  owner of one of its teams, or a workspace admin can, and the role must be
+  above its general access. Only users who already collaborate on the document
+  change; no one is added. With applyToSubDocuments, sub-documents where a user
+  has the role they had on this document before the change are also changed.
   """
   documentUpdateCollaboratorRole(
     """
@@ -20559,26 +20629,28 @@ type Mutation {
     """The identifiers of the collaborators whose role changes."""
     userIds: [String!]!
 
-    """The identifier of the personal document."""
+    """The identifier of the document."""
     id: String!
   ): DocumentPayload!
 
   """
-  [Internal] Stops sharing a personal document and its sub-documents with users.
-  The owner can remove any collaborator; a collaborator can only remove themselves.
+  [Internal] Stops sharing a document and its sub-documents with users. Whoever
+  can manage access to the document can remove any collaborator; a collaborator
+  can only remove themselves.
   """
   documentUnshare(
     """The identifiers of the users to remove from the document."""
     userIds: [String!]!
 
-    """The identifier of the personal document to stop sharing."""
+    """The identifier of the document to stop sharing."""
     id: String!
   ): DocumentPayload!
 
   """
   [Internal] Changes what users other than the owner can do with a document that
-  is not personal: edit, comment, or view. Only the owner of the document or a
-  workspace admin can change it. Comment and view need an owner who can access the document.
+  is not personal: edit, comment, or view. Only the owner of the document, an
+  owner of one of its teams, or a workspace admin can change it. Comment and
+  view need an owner who can access the document.
   """
   documentUpdateGeneralAccess(
     """
@@ -32270,6 +32342,11 @@ type PullRequest implements Node {
   """
   reactionData: JSONObject!
 
+  """
+  [Internal] The deployments of the pull request's commits, each with its latest status.
+  """
+  deployments: [Deployment!]!
+
   """Reactions associated with this pull request."""
   reactions: [Reaction!]!
 }
@@ -39231,6 +39308,11 @@ type Team implements Node {
   """
   securitySettings: JSONObject!
 
+  """
+  [Internal] Inheritance requirements that this team applies to its descendants.
+  """
+  hierarchySettings: JSONObject!
+
   """[Internal] Facets associated with the team."""
   facets: [Facet!]!
 
@@ -40088,6 +40170,17 @@ input TeamFilter {
   or: [TeamFilter!]
 }
 
+input TeamHierarchySettingsInput {
+  """Require sub-teams to inherit their parent’s issue statuses."""
+  requireWorkflowStatusInheritance: Boolean
+
+  """Require sub-teams to inherit their parent’s project statuses."""
+  requireProjectStatusInheritance: Boolean
+
+  """Require sub-teams to inherit their parent’s estimate settings."""
+  requireIssueEstimationInheritance: Boolean
+}
+
 """
 A join entity that defines a user's membership in a team. Each membership record
 links a user to a team and tracks whether the user is a team owner. Users can be
@@ -40617,6 +40710,11 @@ input TeamUpdateInput {
   [Internal] Whether to automatically create a Slack channel when a new project is created in this team.
   """
   slackAutoCreateProjectChannel: Boolean
+
+  """
+  [Internal] Inheritance requirements that this team applies to its descendants. Omitted keys retain their current values.
+  """
+  hierarchySettings: TeamHierarchySettingsInput
 
   """The security settings for the team."""
   securitySettings: TeamSecuritySettingsInput
@@ -41957,7 +42055,12 @@ type User implements Node {
   isMentionable: Boolean!
 
   """Whether this agent user supports agent sessions."""
-  supportsAgentSessions: Boolean!
+  supportsAgentSessions(
+    """
+    Whether to require an active webhook for sessions started by the current user.
+    """
+    forCurrentUser: Boolean! = false
+  ): Boolean!
 
   """[DEPRECATED] Unique hash for the user to be used in invite URLs."""
   inviteHash: String! @deprecated(reason: "This hash is not in use anymore, this value will always be empty.")
@@ -43595,6 +43698,11 @@ type ViewPreferencesValues {
   """Whether team reviews are shown in the reviews list."""
   showTeamReviews: Boolean
 
+  """
+  [Internal] Which of a user's pull requests the Diffs tab on their profile lists.
+  """
+  userDiffsScope: String
+
   """No longer used. Previously controlled the review checks field."""
   reviewFieldChecks: Boolean
 
@@ -43614,6 +43722,8 @@ enum ViewType {
   myIssuesSharedWithMe
   userProfile
   userProfileCreatedByUser
+  userProfileDiffs
+  userProfileProjects
   board
   completedCycle
   cycle
