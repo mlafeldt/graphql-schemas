@@ -37036,6 +37036,18 @@
             "deprecationReason": null
           },
           {
+            "name": "promptAuthor",
+            "description": "The user who sent this prompt, including stop requests. Null for other activity types or if the user is not accessible.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "User",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "signalMetadata",
             "description": "Metadata about this agent activity's signal.",
             "args": [],
@@ -55599,6 +55611,22 @@
           {
             "name": "applyToSubTeams",
             "description": "Whether the workflow should apply to sub teams.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "postResultsToEntity",
+            "description": "Whether an issue-triggered workflow posts its results as a comment on the triggering issue. When false, results stay in the run. Approval requests and questions are still posted.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -93670,6 +93698,30 @@
             "deprecationReason": null
           },
           {
+            "name": "organizationCodingInferenceKeys",
+            "description": "[Internal] Saved workspace inference credentials for Coding Sessions, without their keys.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "CodingInferenceKey",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "archivedTeams",
             "description": "[Internal] All archived teams of the workspace.",
             "args": [],
@@ -107171,6 +107223,81 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "CodingInferenceKey",
+        "description": "[Internal] A saved workspace inference credential, without the key.",
+        "fields": [
+          {
+            "name": "harness",
+            "description": "The coding harness that uses this credential: codex or claude.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "provider",
+            "description": "The inference provider: openai, anthropic, or amazon-bedrock.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "baseUrl",
+            "description": "The inference endpoint.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "When the credential was last saved.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
                 "ofType": null
               }
             },
@@ -128313,7 +128440,7 @@
             "args": [
               {
                 "name": "trash",
-                "description": "Whether to trash the issue.",
+                "description": "Whether to trash the issue and its sub-issues.",
                 "type": {
                   "kind": "SCALAR",
                   "name": "Boolean",
@@ -128381,7 +128508,7 @@
           },
           {
             "name": "issueDelete",
-            "description": "Deletes (trashes) an issue.",
+            "description": "Deletes (trashes) an issue and its sub-issues.",
             "args": [
               {
                 "name": "permanentlyDelete",
@@ -129928,6 +130055,99 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "DeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationCodingInferenceKeyTest",
+            "description": "[Internal] Sends a minimal inference request with a workspace credential without saving it.",
+            "args": [
+              {
+                "name": "input",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "OrganizationCodingInferenceKeyInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "CodingInferenceKeyTestPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationCodingInferenceKeyUpdate",
+            "description": "[Internal] Tests and stores a workspace inference credential and selects it for new sessions.",
+            "args": [
+              {
+                "name": "input",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "OrganizationCodingInferenceKeyInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationCodingInferenceKeyDelete",
+            "description": "[Internal] Removes a workspace inference credential and switches the harness to Linear inference.",
+            "args": [
+              {
+                "name": "harness",
+                "description": "The coding harness whose credential to remove: codex or claude.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationPayload",
                 "ofType": null
               }
             },
@@ -138128,7 +138348,7 @@
         "inputFields": [
           {
             "name": "id",
-            "description": "An optional identifier in UUID v4 format. If provided, will be set as the customer need's ID.",
+            "description": "Ignored. The mutation's id argument selects the customer need to update.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -147135,7 +147355,7 @@
         "inputFields": [
           {
             "name": "apiKey",
-            "description": "Linear export API key.",
+            "description": "Linear export API key. Must be 40 random letters and digits, optionally prefixed with `lin_integration_`.",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -152199,6 +152419,106 @@
       },
       {
         "kind": "OBJECT",
+        "name": "CodingInferenceKeyTestPayload",
+        "description": "[Internal] Result of testing a workspace inference credential.",
+        "fields": [
+          {
+            "name": "success",
+            "description": "Whether the provider accepted the request.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "baseUrl",
+            "description": "The endpoint that will be saved, normalized from the input.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "message",
+            "description": "Why the test failed.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "OrganizationCodingInferenceKeyInput",
+        "description": "[Internal] Workspace inference credential for Codex or Claude Code.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "harness",
+            "description": "The coding harness that will use this credential: codex or claude.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "baseUrl",
+            "description": "Inference endpoint. OpenAI-compatible for codex; Anthropic-compatible or Amazon Bedrock runtime for claude. Defaults to the provider's public API.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "apiKey",
+            "description": "Provider API key.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "OrganizationPayload",
         "description": "Workspace update operation response.",
         "fields": [
@@ -153575,6 +153895,26 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "OrganizationCodingAgentTrustedSourceUpdateInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "codexInference",
+            "description": "[Internal] Inference credential source for Codex.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "claudeInference",
+            "description": "[Internal] Inference credential source for Claude Code.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "defaultValue": null

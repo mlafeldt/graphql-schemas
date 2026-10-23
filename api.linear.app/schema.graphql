@@ -248,6 +248,11 @@ type AgentActivity implements Node {
   """
   sentAt: DateTime
 
+  """
+  The user who sent this prompt, including stop requests. Null for other activity types or if the user is not accessible.
+  """
+  promptAuthor: User
+
   """Metadata about this agent activity's signal."""
   signalMetadata: JSON
 }
@@ -3568,7 +3573,9 @@ input AiPromptTypeComparator {
 }
 
 input AirbyteConfigurationInput {
-  """Linear export API key."""
+  """
+  Linear export API key. Must be 40 random letters and digits, optionally prefixed with `lin_integration_`.
+  """
   apiKey: String!
 }
 
@@ -4442,6 +4449,33 @@ type CodingAgentSandboxPayload {
 
   """Temporal URL to view workflows for this session."""
   temporalWorkflowsUrl: String
+}
+
+"""[Internal] A saved workspace inference credential, without the key."""
+type CodingInferenceKey {
+  """The coding harness that uses this credential: codex or claude."""
+  harness: String!
+
+  """The inference provider: openai, anthropic, or amazon-bedrock."""
+  provider: String!
+
+  """The inference endpoint."""
+  baseUrl: String!
+
+  """When the credential was last saved."""
+  updatedAt: DateTime!
+}
+
+"""[Internal] Result of testing a workspace inference credential."""
+type CodingInferenceKeyTestPayload {
+  """Whether the provider accepted the request."""
+  success: Boolean!
+
+  """The endpoint that will be saved, normalized from the input."""
+  baseUrl: String
+
+  """Why the test failed."""
+  message: String
 }
 
 """
@@ -5956,7 +5990,7 @@ a different issue or project, changing priority, and updating body content.
 """
 input CustomerNeedUpdateInput {
   """
-  An optional identifier in UUID v4 format. If provided, will be set as the customer need's ID.
+  Ignored. The mutation's id argument selects the customer need to update.
   """
   id: String
 
@@ -22166,7 +22200,7 @@ type Mutation {
 
   """Archives an issue."""
   issueArchive(
-    """Whether to trash the issue."""
+    """Whether to trash the issue and its sub-issues."""
     trash: Boolean
 
     """The identifier of the issue to archive."""
@@ -22179,7 +22213,7 @@ type Mutation {
     id: String!
   ): IssueArchivePayload!
 
-  """Deletes (trashes) an issue."""
+  """Deletes (trashes) an issue and its sub-issues."""
   issueDelete(
     """
     Whether to permanently delete the issue and skip the grace period of 30 days. Available only to admins!
@@ -22553,6 +22587,24 @@ type Mutation {
     """The identifier of the organization invite to delete."""
     id: String!
   ): DeletePayload!
+
+  """
+  [Internal] Sends a minimal inference request with a workspace credential without saving it.
+  """
+  organizationCodingInferenceKeyTest(input: OrganizationCodingInferenceKeyInput!): CodingInferenceKeyTestPayload!
+
+  """
+  [Internal] Tests and stores a workspace inference credential and selects it for new sessions.
+  """
+  organizationCodingInferenceKeyUpdate(input: OrganizationCodingInferenceKeyInput!): OrganizationPayload!
+
+  """
+  [Internal] Removes a workspace inference credential and switches the harness to Linear inference.
+  """
+  organizationCodingInferenceKeyDelete(
+    """The coding harness whose credential to remove: codex or claude."""
+    harness: String!
+  ): OrganizationPayload!
 
   """
   Updates the user's workspace settings. Different settings require different
@@ -26566,6 +26618,12 @@ input OrganizationCodingAgentSettingsInput {
   """
   trustedExternalSourceUpdate: OrganizationCodingAgentTrustedSourceUpdateInput
 
+  """[Internal] Inference credential source for Codex."""
+  codexInference: String
+
+  """[Internal] Inference credential source for Claude Code."""
+  claudeInference: String
+
   """[Internal] The model preference used for Coding Sessions."""
   model: String
 
@@ -26596,6 +26654,21 @@ input OrganizationCodingAgentTrustedSourceUpdateInput {
 
   """[Internal] Whether this source may start coding sessions."""
   allowed: Boolean!
+}
+
+"""[Internal] Workspace inference credential for Codex or Claude Code."""
+input OrganizationCodingInferenceKeyInput {
+  """The coding harness that will use this credential: codex or claude."""
+  harness: String!
+
+  """
+  Inference endpoint. OpenAI-compatible for codex; Anthropic-compatible or
+  Amazon Bedrock runtime for claude. Defaults to the provider's public API.
+  """
+  baseUrl: String
+
+  """Provider API key."""
+  apiKey: String!
 }
 
 """Workspace deletion operation response."""
@@ -34427,6 +34500,11 @@ type Query {
     """The URL key of the workspace to check."""
     urlKey: String!
   ): OrganizationExistsPayload!
+
+  """
+  [Internal] Saved workspace inference credentials for Coding Sessions, without their keys.
+  """
+  organizationCodingInferenceKeys: [CodingInferenceKey!]!
 
   """[Internal] All archived teams of the workspace."""
   archivedTeams: [Team!]!
@@ -44363,6 +44441,13 @@ type WorkflowDefinition implements Node {
 
   """Whether the workflow should apply to sub teams."""
   applyToSubTeams: Boolean!
+
+  """
+  Whether an issue-triggered workflow posts its results as a comment on the
+  triggering issue. When false, results stay in the run. Approval requests and
+  questions are still posted.
+  """
+  postResultsToEntity: Boolean!
 
   """
   The team associated with the workflow. If not set, the workflow is associated with the entire workspace.
