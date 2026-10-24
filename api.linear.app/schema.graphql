@@ -1427,6 +1427,44 @@ interface AiConversationBaseWidget {
   displayInfo: AiConversationWidgetDisplayInfo
 }
 
+type AiConversationBashKillToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationBashKillToolCallArgs
+}
+
+type AiConversationBashKillToolCallArgs {
+  jobId: String!
+}
+
+type AiConversationBashOutputToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationBashOutputToolCallArgs
+}
+
+type AiConversationBashOutputToolCallArgs {
+  jobId: String!
+}
+
 type AiConversationBashToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -1612,6 +1650,25 @@ type AiConversationDeleteEntityToolCallArgs {
 
 type AiConversationDeleteEntityToolCallResult {
   deletedEntities: [AiConversationCreateEntityToolCallResultCreatedEntities!]
+}
+
+type AiConversationEditSandboxFileToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationEditSandboxFileToolCallArgs
+}
+
+type AiConversationEditSandboxFileToolCallArgs {
+  path: String!
 }
 
 """The kind of input an AI conversation elicitation asks for."""
@@ -2040,6 +2097,25 @@ type AiConversationGetSlackConversationHistoryToolCallResult {
   messageCount: Float
   hasMore: Boolean
   error: String
+}
+
+type AiConversationGitPushToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationGitPushToolCallArgs
+}
+
+type AiConversationGitPushToolCallArgs {
+  force: Boolean
 }
 
 type AiConversationHandoffToCodingSessionToolCall implements AiConversationBaseToolCall {
@@ -2847,6 +2923,32 @@ enum AiConversationSandboxGitHistoryToolCallArgsOperation {
   show
 }
 
+type AiConversationSandboxPullRequestToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationSandboxPullRequestToolCallArgs
+
+  """The result of the tool call."""
+  result: AiConversationSandboxPullRequestToolCallResult
+}
+
+type AiConversationSandboxPullRequestToolCallArgs {
+  title: String
+}
+
+type AiConversationSandboxPullRequestToolCallResult {
+  pullRequest: AiConversationSearchEntitiesToolCallResultEntities
+}
+
 type AiConversationSearchChatChannelsToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -3165,6 +3267,12 @@ enum AiConversationTool {
   Bash
   SandboxGitHistory
   ReadSandboxFile
+  WriteSandboxFile
+  EditSandboxFile
+  BashOutput
+  BashKill
+  GitPush
+  SandboxPullRequest
   ReadFile
   GetPullRequestDiff
   GetPullRequestFile
@@ -3195,7 +3303,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationMessageSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationCreateAgentChatToolCall | AiConversationRenameAgentChatToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationCodeModeToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationMessageSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationWriteSandboxFileToolCall | AiConversationEditSandboxFileToolCall | AiConversationBashOutputToolCall | AiConversationBashKillToolCall | AiConversationGitPushToolCall | AiConversationSandboxPullRequestToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationCreateAgentChatToolCall | AiConversationRenameAgentChatToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationCodeModeToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -3210,6 +3318,12 @@ type AiConversationToolCallPart implements AiConversationBasePart {
 
   """The tool call part."""
   toolCall: AiConversationToolCall!
+
+  """
+  The tool calls this tool call made, such as those of a code mode program, in
+  the order they completed. Null when it made none.
+  """
+  subParts: [AiConversationToolCallPart!]
 }
 
 type AiConversationToolDisplayInfo {
@@ -3378,6 +3492,25 @@ type AiConversationWidgetPart implements AiConversationBasePart {
 
   """The widget."""
   widget: AiConversationWidget!
+}
+
+type AiConversationWriteSandboxFileToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationWriteSandboxFileToolCallArgs
+}
+
+type AiConversationWriteSandboxFileToolCallArgs {
+  path: String!
 }
 
 """
@@ -8980,6 +9113,11 @@ input DocumentCreateInput {
   """[Internal] Related cycle for the document."""
   cycleId: String
 
+  """
+  [Internal] The workspace for a workspace-level document. Must be the acting user's workspace.
+  """
+  parentOrganizationId: String
+
   """[Internal] The resource folder containing the document."""
   resourceFolderId: String
 
@@ -9540,6 +9678,11 @@ input DocumentUpdateInput {
 
   """[Internal] Related cycle for the document."""
   cycleId: String
+
+  """
+  [Internal] Moves the document and its sub-documents to the workspace level. Must be the acting user's workspace.
+  """
+  parentOrganizationId: String
 
   """[Internal] The resource folder containing the document."""
   resourceFolderId: String
@@ -19142,6 +19285,51 @@ type JiraStatusNameCategoriesPayload {
   categories: [String!]!
 }
 
+"""
+[INTERNAL] Jira project settings that will make Jira reject the changes Linear sends during sync.
+"""
+type JiraSyncHealthCheckPayload {
+  """The problems found, errors first."""
+  findings: [JiraSyncHealthFindingPayload!]!
+
+  """
+  How the workflow transitions were read: `workflow` (every transition and its
+  validators), `transitions` (only those out of one recent issue's status,
+  without validators), or `none`.
+  """
+  transitionCoverage: String!
+
+  """
+  The steps that failed to read Jira, whose checks are missing from findings.
+  """
+  failedSteps: [String!]!
+
+  """
+  Why the check stopped before reading the project, such as Jira rejecting the
+  integration's credentials. Null when the check ran.
+  """
+  blockedReason: String
+}
+
+"""
+[INTERNAL] A Jira setting that makes Jira reject some of the changes Linear sends.
+"""
+type JiraSyncHealthFindingPayload {
+  """Which check found the problem."""
+  checkId: String!
+
+  """
+  `error` when every change of the affected kind fails, `warning` when only some do.
+  """
+  severity: String!
+
+  """The Jira issue type the problem applies to, if only one."""
+  issueTypeName: String
+
+  """The Jira fields, permissions, or transitions involved."""
+  details: [String!]!
+}
+
 input JiraUpdateInput {
   """The id of the integration to update."""
   id: String!
@@ -19369,6 +19557,9 @@ type LoopExecution implements Node {
 
   """[Internal] The AI conversation created for this Loop execution."""
   aiConversation: AiConversation!
+
+  """[Internal] The user who manually started this Loop execution."""
+  triggeredBy: User
 
   """[Internal] The Loop that was executed."""
   workflowDefinition: WorkflowDefinition
@@ -22976,8 +23167,9 @@ type Mutation {
   ): ReleasePayload!
 
   """
-  Updates a release by pipeline identifier. Finds the release by version or
-  latest started/planned release, and optionally transitions it to a new stage by name.
+  Updates a release by pipeline identifier. Finds the release by version,
+  otherwise the latest started release or else the planned release with the
+  earliest target date, and optionally transitions it to a new stage by name.
   """
   releaseUpdateByPipeline(
     """
@@ -32790,6 +32982,12 @@ enum PullRequestStatus {
   closed
 }
 
+"""[Internal] Filter for pull request subscription events."""
+input PullRequestSubscriptionFilter {
+  """[Internal] Filter by pull request ID."""
+  id: IDComparator
+}
+
 """
 A device registration for receiving push notifications. Each PushSubscription
 represents a specific browser or mobile device endpoint where a user has opted
@@ -33970,6 +34168,24 @@ type Query {
     """The id of the Jira integration."""
     integrationId: String!
   ): JiraProjectStatusesPayload!
+
+  """
+  [INTERNAL] Checks a Jira project for settings that will make Jira reject the
+  changes Linear sends during sync. Reads Jira on every call.
+  """
+  integrationJiraSyncHealthCheck(
+    """Whether Linear creates Jira issues for this project."""
+    bidirectional: Boolean!
+
+    """The Linear team the project syncs with."""
+    teamId: String!
+
+    """The Jira project ID to check."""
+    jiraProjectId: String!
+
+    """The id of the Jira integration."""
+    integrationId: String!
+  ): JiraSyncHealthCheckPayload!
 
   """
   [Internal] Lists Microsoft Teams teams and channels accessible to the
@@ -37373,7 +37589,8 @@ Input for updating a release by pipeline identifier. Extends the base update inp
 """
 input ReleaseUpdateByPipelineInput {
   """
-  The version of the release to update. If not provided, the latest started or latest planned release will be updated.
+  The version of the release to update. If not provided, the latest started
+  release is updated, or else the planned release with the earliest target date.
   """
   version: String
 
@@ -37412,7 +37629,8 @@ stage name. The pipeline ID is provided separately or inferred from the access k
 """
 input ReleaseUpdateByPipelineInputBase {
   """
-  The version of the release to update. If not provided, the latest started or latest planned release will be updated.
+  The version of the release to update. If not provided, the latest started
+  release is updated, or else the planned release with the earliest target date.
   """
   version: String
 
@@ -37897,12 +38115,6 @@ input SalesforceSettingsInput {
 
   """Whether Linear Agent should be enabled for this integration."""
   enableAiIntake: Boolean
-
-  """The Salesforce subdomain."""
-  subdomain: String
-
-  """The Salesforce instance URL."""
-  url: String
 
   """The Salesforce case status to use to reopen cases."""
   reopenCaseStatus: String
@@ -38819,7 +39031,10 @@ type Subscription {
   draftDeleted: Draft!
 
   """Triggered when a pull request is updated"""
-  pullRequestUpdated: PullRequest!
+  pullRequestUpdated(
+    """[Internal] Optional filter for pull request subscription events."""
+    filter: PullRequestSubscriptionFilter
+  ): PullRequest!
 
   """Triggered when a project update is created"""
   projectUpdateCreated: ProjectUpdate!
@@ -43728,6 +43943,20 @@ type ViewPreferencesValues {
   """The review grouping."""
   reviewGrouping: String
 
+  """[Internal] The top-level grouping of the reviews list."""
+  reviewOuterGrouping: String
+
+  """
+  [Internal] The grouping inside the top-level groups of the reviews list.
+  """
+  reviewSubGrouping: String
+
+  """[Internal] The review grouping on the board layout."""
+  reviewBoardGrouping: String
+
+  """[Internal] The review sub-grouping on the board layout."""
+  reviewBoardSubGrouping: String
+
   """The review view ordering."""
   reviewViewOrdering: String
 
@@ -43772,6 +44001,11 @@ type ViewPreferencesValues {
   Whether to show the most pressing SLA from connected issues on review list items. Null if the preference is unset.
   """
   reviewFieldSla: Boolean
+
+  """
+  Whether to show GitHub labels on review list items. Null if the preference is unset.
+  """
+  reviewFieldLabels: Boolean
 
   """Whether team reviews are shown in the reviews list."""
   showTeamReviews: Boolean
