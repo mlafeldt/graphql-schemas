@@ -9991,6 +9991,17 @@ type EmailIntakeAddress implements Node {
   The last time an inbound email was successfully ingested for this address.
   """
   lastUsedAt: DateTime
+
+  """
+  The full email address, including the domain, to which incoming emails can be sent.
+  """
+  emailAddress: String!
+}
+
+type EmailIntakeAddressConnection {
+  edges: [EmailIntakeAddressEdge!]!
+  nodes: [EmailIntakeAddress!]!
+  pageInfo: PageInfo!
 }
 
 """Input for creating a new email intake address."""
@@ -10052,6 +10063,13 @@ input EmailIntakeAddressCreateInput {
   Whether to reopen completed or canceled issues when a substantive email reply is received.
   """
   reopenOnReply: Boolean
+}
+
+type EmailIntakeAddressEdge {
+  node: EmailIntakeAddress!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
 }
 
 """The result of an email intake address mutation."""
@@ -26478,6 +26496,11 @@ type Organization implements Node {
   """
   managedTeamFeatures: JSONObject!
 
+  """
+  [Internal] Linear Review settings: whether reviews are on and which repositories they cover. Empty until saved.
+  """
+  linearReviewSettings: JSONObject!
+
   """[DEPRECATED] Which day count to use for SLA calculations."""
   slaDayCount: SLADayCountType! @deprecated(reason: "No longer in use")
 
@@ -33770,6 +33793,33 @@ type Query {
 
   """One specific email intake address."""
   emailIntakeAddress(id: String!): EmailIntakeAddress!
+
+  """Email intake addresses accessible to the user in the workspace."""
+  emailIntakeAddresses(
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): EmailIntakeAddressConnection!
 
   """All custom emojis in the workspace."""
   emojis(
