@@ -1968,6 +1968,7 @@ enum AiConversationErrorType {
   billing
   usageLimit
   untrustedSources
+  providerPolicy
   unknown
 }
 
@@ -2492,6 +2493,7 @@ type AiConversationPostChatMessageToolCallResult {
   posted: Boolean!
   error: String
   message: String
+  snippet: String
   conversationUrl: String
   destination: AiConversationPostChatMessageToolCallResultDestination
 }
@@ -6842,6 +6844,9 @@ input CustomerTierFilter {
 
   """Comparator for the updated at date."""
   updatedAt: DateComparator
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
 
   """Comparator for the customer tier display name."""
   displayName: StringComparator
@@ -14257,6 +14262,7 @@ enum IntegrationService {
   githubPersonal
   githubCodeAccessPersonal
   gitlab
+  gitlabPersonal
   origin
   googleCalendarPersonal
   googleSheets
@@ -32055,7 +32061,7 @@ type ProjectUpdate implements Node {
 
   """
   [Internal] A snapshot of project properties at the time the update was posted,
-  including team, milestone, and issue statistics. Used to compute diffs between
+  including milestone and issue progress. Used to compute diffs between
   consecutive updates.
   """
   infoSnapshot: JSONObject
@@ -43251,6 +43257,9 @@ type ViewPreferencesValues {
   """Whether to show sub-team issues."""
   showSubTeamIssues: Boolean
 
+  """Whether clicking a board card opens it in a split view panel."""
+  openInSplitView: Boolean
+
   """Whether to show supervised issues."""
   showSupervisedIssues: Boolean
 
@@ -43847,6 +43856,12 @@ type ViewPreferencesValues {
 
   """Whether to show the run duration in Loop run history."""
   automationRunHistoryShowDuration: Boolean
+
+  """Whether to show the number of recorded changes in Loop run history."""
+  automationRunHistoryShowChangeCount: Boolean
+
+  """Whether to group consecutive runs with no changes in Loop run history."""
+  automationRunHistoryGroupNoChanges: Boolean
 
   """The release pipeline grouping."""
   releasePipelineGrouping: String
