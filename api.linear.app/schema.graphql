@@ -1320,6 +1320,11 @@ type AiConversation implements Node {
   initialSource: AiConversationInitialSource!
 
   """
+  The immutable special-purpose UI launch that created this conversation, if recorded.
+  """
+  sourceMetadata: JSONObject
+
+  """
   The client platform from which this conversation was initiated, such as web, desktop, or mobile.
   """
   clientPlatform: AiConversationClientPlatform
@@ -1388,6 +1393,45 @@ type AiConversationAckPart implements AiConversationBasePart {
   Null when the agent acknowledged without describing an action.
   """
   summary: String
+}
+
+"""An agent-origin message in a conversation turn."""
+type AiConversationAgentMessagePart implements AiConversationBasePart {
+  """The ID of the part."""
+  id: String!
+
+  """The type of the part."""
+  type: AiConversationPartType!
+
+  """The metadata of the part."""
+  metadata: AiConversationPartMetadata!
+
+  """Source identity, full message and display summary."""
+  agentMessage: JSONObject!
+
+  """The human owner whose access authorizes this exchange."""
+  ownerUserId: String!
+
+  """The reserved assistant response identity."""
+  assistantTurnId: String!
+
+  """When the message was saved."""
+  createdAt: String!
+
+  """When durable submission was acknowledged."""
+  acceptedAt: String
+
+  """The acknowledged delivery job."""
+  deliveryRunId: String
+
+  """When the recipient consumed this message."""
+  consumedAt: String
+
+  """The accepted substantive reply identity."""
+  fulfilledByMessageId: String
+
+  """Whether removal canceled the exchange."""
+  canceled: Boolean
 }
 
 """A base part in an AI conversation."""
@@ -2254,6 +2298,21 @@ type AiConversationListCodingSessionsToolCallResultAgentSessions {
   pullRequests: [AiConversationSearchEntitiesToolCallResultEntities!]
 }
 
+type AiConversationListSubagentsToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: JSONObject
+}
+
 """The integration connected by an MCP server connection elicitation."""
 type AiConversationMcpServerConnectionElicitationResponseData {
   """The kind of elicitation that was answered."""
@@ -2344,6 +2403,7 @@ type AiConversationMessageSubagentToolCall implements AiConversationBaseToolCall
 type AiConversationMessageSubagentToolCallArgs {
   conversationId: String!
   prompt: String!
+  description: String
   wait: Boolean
 }
 
@@ -2421,7 +2481,7 @@ type AiConversationNotifyUsersToolCallResult {
 }
 
 """A part in an AI conversation."""
-union AiConversationPart = AiConversationPromptPart | AiConversationTextPart | AiConversationReasoningPart | AiConversationEventPart | AiConversationErrorPart | AiConversationToolCallPart | AiConversationWidgetPart | AiConversationElicitationPart | AiConversationElicitationResponsePart | AiConversationAckPart
+union AiConversationPart = AiConversationPromptPart | AiConversationTextPart | AiConversationReasoningPart | AiConversationEventPart | AiConversationAgentMessagePart | AiConversationErrorPart | AiConversationToolCallPart | AiConversationWidgetPart | AiConversationElicitationPart | AiConversationElicitationResponsePart | AiConversationAckPart
 
 """Metadata about a part in an AI conversation."""
 type AiConversationPartMetadata {
@@ -2457,6 +2517,7 @@ enum AiConversationPartType {
   reasoning
   text
   event
+  agentMessage
   error
   widget
   widgetPlaceholder
@@ -3284,6 +3345,7 @@ enum AiConversationTool {
   RestoreEntity
   RunLoop
   SpawnSubagent
+  ListSubagents
   MessageSubagent
   Research
   CodeIntelligence
@@ -3332,7 +3394,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationMessageSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationWriteSandboxFileToolCall | AiConversationEditSandboxFileToolCall | AiConversationBashOutputToolCall | AiConversationBashKillToolCall | AiConversationDevServerToolCall | AiConversationGitPushToolCall | AiConversationSandboxPullRequestToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationCreateAgentChatToolCall | AiConversationRenameAgentChatToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationCodeModeToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationListSubagentsToolCall | AiConversationMessageSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationWriteSandboxFileToolCall | AiConversationEditSandboxFileToolCall | AiConversationBashOutputToolCall | AiConversationBashKillToolCall | AiConversationDevServerToolCall | AiConversationGitPushToolCall | AiConversationSandboxPullRequestToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationCreateAgentChatToolCall | AiConversationRenameAgentChatToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationCodeModeToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -26606,6 +26668,9 @@ type Organization implements Node {
   """[INTERNAL] Whether the workspace has enabled agent automation."""
   agentAutomationEnabled: Boolean!
 
+  """[Internal] Whether Loop webhook triggers are enabled."""
+  loopWebhooksEnabled: Boolean!
+
   """[INTERNAL] Whether the workspace has enabled generated updates."""
   generatedUpdatesEnabled: Boolean!
 
@@ -27473,6 +27538,14 @@ input OrganizationManagedTeamFeaturesInput {
   `agentAutomationEnabled` still turns Loops on or off for the workspace.
   """
   loops: [OrganizationManagedFeatureTeamInput!]
+
+  """
+  [Internal] The teams Loop webhook triggers are limited to. Omit it to allow
+  all teams. A changed list needs at least one team. If every team left in it
+  was deleted, the list is saved empty, so no Loop can use webhook triggers.
+  `loopWebhooksEnabled` turns webhook triggers on or off for the workspace.
+  """
+  loopWebhooks: [OrganizationManagedFeatureTeamInput!]
 }
 
 """
@@ -27809,6 +27882,9 @@ input OrganizationUpdateInput {
 
   """[INTERNAL] Whether the workspace has enabled loops."""
   agentAutomationEnabled: Boolean
+
+  """[Internal] Whether Loop webhook triggers are enabled."""
+  loopWebhooksEnabled: Boolean
 
   """[INTERNAL] Whether the workspace has enabled generated updates."""
   generatedUpdatesEnabled: Boolean
@@ -39915,6 +39991,9 @@ type Team implements Node {
   [Internal] Whether the team can use Loops. The workspace's Loops team list sets it.
   """
   agentAutomationEnabled: Boolean!
+
+  """[Internal] Whether Loop webhook triggers are enabled."""
+  loopWebhooksEnabled: Boolean!
 
   """
   [Internal] Whether the team can use coding sessions. The workspace's coding sessions team list sets it.
