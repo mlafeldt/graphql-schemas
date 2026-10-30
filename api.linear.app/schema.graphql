@@ -19479,22 +19479,9 @@ input JiraSettingsInput {
   isJiraServer: Boolean = false
 
   """
-  Whether this integration uses custom OAuth authentication (enterprise SSO).
-  """
-  isCustomOAuth: Boolean
-
-  """
   Whether this integration authenticates with a Jira Cloud service account API key.
   """
   isCloudServiceAccount: Boolean
-
-  """
-  The OAuth client ID for the personal connection OAuth app, when using custom OAuth.
-  """
-  personalOAuthClientId: String
-
-  """The custom OAuth server token endpoint URL (enterprise SSO)."""
-  customOAuthServerUrl: String
 
   """
   Whether the user needs to provide setup information about the webhook to
@@ -27506,6 +27493,11 @@ input OrganizationLinearReviewSettingsInput {
 
   """[Internal] Whether Linear also reviews drafts without being asked."""
   reviewDrafts: Boolean!
+
+  """
+  [Internal] Whether Linear resolves other bots' comments that raise a problem Linear already reported. Defaults to true.
+  """
+  resolveDuplicates: Boolean
 }
 
 """[Internal] One team a managed team feature is limited to."""
@@ -33088,6 +33080,13 @@ type PullRequestMergeSettings {
   is not enabled or the method is not specified.
   """
   mergeQueueMergeMethod: PullRequestMergeMethod
+
+  """
+  Whether the merge queue takes pull requests that carry a label, such as
+  Trunk's, instead of GitHub's merge queue. Such a queue merges a native stack's
+  pull requests below a queued one together with it.
+  """
+  isLabelMergeQueue: Boolean
 }
 
 """
