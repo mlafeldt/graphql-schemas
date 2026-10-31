@@ -1469,6 +1469,13 @@ interface AiConversationBaseWidget {
   Display information for the widget, including ProseMirror and Markdown representations.
   """
   displayInfo: AiConversationWidgetDisplayInfo
+
+  """
+  A Markdown fallback for the widget, for clients that can't render this widget
+  natively. Always present for every widget, and never contains internal model
+  names or identifiers.
+  """
+  fallbackText: String!
 }
 
 type AiConversationBashKillToolCall implements AiConversationBaseToolCall {
@@ -1858,6 +1865,13 @@ type AiConversationEntityCardWidget implements AiConversationBaseWidget {
   """
   displayInfo: AiConversationWidgetDisplayInfo
 
+  """
+  A Markdown fallback for the widget, for clients that can't render this widget
+  natively. Always present for every widget, and never contains internal model
+  names or identifiers.
+  """
+  fallbackText: String!
+
   """The arguments to the widget."""
   args: AiConversationEntityCardWidgetArgs
 }
@@ -1931,6 +1945,13 @@ type AiConversationEntityListWidget implements AiConversationBaseWidget {
   Display information for the widget, including ProseMirror and Markdown representations.
   """
   displayInfo: AiConversationWidgetDisplayInfo
+
+  """
+  A Markdown fallback for the widget, for clients that can't render this widget
+  natively. Always present for every widget, and never contains internal model
+  names or identifiers.
+  """
+  fallbackText: String!
 
   """The arguments to the widget."""
   args: AiConversationEntityListWidgetArgs
@@ -2289,6 +2310,7 @@ type AiConversationListCodingSessionsToolCallArgs {
 
 type AiConversationListCodingSessionsToolCallResult {
   agentSessions: [AiConversationListCodingSessionsToolCallResultAgentSessions!]!
+  codingSubagents: [AiConversationSearchEntitiesToolCallResultEntities!]
   entities: [AiConversationSearchEntitiesToolCallResultEntities!]
 }
 
@@ -3159,6 +3181,13 @@ type AiConversationSettingWidget implements AiConversationBaseWidget {
   Display information for the widget, including ProseMirror and Markdown representations.
   """
   displayInfo: AiConversationWidgetDisplayInfo
+
+  """
+  A Markdown fallback for the widget, for clients that can't render this widget
+  natively. Always present for every widget, and never contains internal model
+  names or identifiers.
+  """
+  fallbackText: String!
 
   """The arguments to the widget."""
   args: AiConversationSettingWidgetArgs
@@ -19469,9 +19498,6 @@ type JiraProjectStatusesPayload {
 }
 
 input JiraSettingsInput {
-  """The mapping of Jira project id => Linear team id."""
-  projectMapping: [JiraLinearMappingInput!]
-
   """The Jira projects for the organization."""
   projects: [JiraProjectDataInput!]!
 
@@ -26030,6 +26056,11 @@ type OAuthApplication {
   """
   grantTypes: [OAuthApplicationGrantType!]!
 
+  """
+  Whether token requests for the OAuth application, including refresh token requests, must include a DPoP proof.
+  """
+  requireTokenBinding: Boolean!
+
   """The time at which the OAuth application was created."""
   createdAt: DateTime!
 
@@ -26086,6 +26117,12 @@ input OAuthApplicationCreateInput {
   OAuth grant capabilities the app may use. authorization_code is required. Defaults to authorization_code.
   """
   grantTypes: [OAuthApplicationGrantType!]
+
+  """
+  Whether token requests for the OAuth application, including refresh token
+  requests, must include a DPoP proof. Defaults to false.
+  """
+  requireTokenBinding: Boolean
 
   """
   Optional client-supplied idempotency key. Reusing the same key with the same
@@ -26188,6 +26225,13 @@ input OAuthApplicationUpdateInput {
   OAuth grant capabilities the app may use. authorization_code is required. Omit to keep the existing grant types.
   """
   grantTypes: [OAuthApplicationGrantType!]
+
+  """
+  Whether token requests for the OAuth application, including refresh token
+  requests, must include a DPoP proof. Access tokens issued before this is
+  enabled are not affected.
+  """
+  requireTokenBinding: Boolean
 
   """URL of the OAuth application's icon."""
   imageUrl: String
@@ -32913,6 +32957,11 @@ type PullRequestCheck {
 
   """The status of the check."""
   status: String!
+
+  """
+  A short description the hosting provider shows next to the check. Null if the provider did not supply one.
+  """
+  description: String
 
   """
   The URL to view the check details on the hosting provider. Null if no URL is available.
@@ -42910,6 +42959,7 @@ enum UserFlagType {
   slackProjectChannelsPromoDismissed
   slackProjectChannelsPromoShown
   reviewsPromptToConnectGithubDismissed
+  workspaceSetupCompletedHidden
   all
 }
 
