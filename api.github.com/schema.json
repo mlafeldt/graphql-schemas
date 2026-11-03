@@ -19837,6 +19837,41 @@
         "possibleTypes": null
       },
       {
+        "kind": "ENUM",
+        "name": "CopilotCodeReviewEffort",
+        "description": "The effort level for a Copilot code review. For more information, see [Review effort level](https://docs.github.com/en/copilot/concepts/agent-capabilities/agent-powered-workflows-and-operations/code-review#review-effort-level).",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "LITE",
+            "description": "Lower effort, faster review.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BALANCED",
+            "description": "Balanced effort and depth.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MAX",
+            "description": "Highest effort, deepest review.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "AUTO",
+            "description": "Copilot picks the effort for each pull request.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
         "kind": "OBJECT",
         "name": "CopilotCodeReviewParameters",
         "description": "Request Copilot code review for new pull requests automatically if the author has access to Copilot code review and AI credits.",
@@ -19908,6 +19943,53 @@
         ],
         "interfaces": null,
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "CopilotCodeReviewRequestReason",
+        "description": "The stable reason a Copilot code review request was denied or conflicted with an existing request.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "ACTOR_INELIGIBLE",
+            "description": "The actor is not eligible to request Copilot code reviews.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "REPOSITORY_INELIGIBLE",
+            "description": "The repository is not eligible for Copilot code reviews.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "APP_NOT_INSTALLED",
+            "description": "The Copilot code review reviewer app is not installed.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NO_QUOTA_REMAINING",
+            "description": "The actor has no Copilot code review quota remaining.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "LICENSED_ORGANIZATION_UNAVAILABLE",
+            "description": "The organization providing the Copilot license is unavailable.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "REQUEST_CONFLICT",
+            "description": "A Copilot code review request is already pending for this pull request.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -72725,6 +72807,33 @@
             "type": {
               "kind": "OBJECT",
               "name": "ReprioritizeSubIssuePayload",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "requestCopilotCodeReview",
+            "description": "Requests a Copilot code review.\n\nEvery call attempts to advance the Copilot code review lifecycle for the pull\nrequest: if no Copilot review has been requested yet, an initial request is created;\nif the most recent Copilot review has already completed, a new request is created\nautomatically to continue the lifecycle. If a Copilot code review request is already\npending, no new request is created and `failureReason` is `REQUEST_CONFLICT`.",
+            "args": [
+              {
+                "name": "input",
+                "description": "Parameters for RequestCopilotCodeReview",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "RequestCopilotCodeReviewInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "RequestCopilotCodeReviewPayload",
               "ofType": null
             },
             "isDeprecated": false,
@@ -140138,10 +140247,16 @@
             "deprecationReason": null
           },
           {
-            "name": "TRIAGE_PLUS",
-            "description": "Can read and clone this repository. Can also manage issues and pull requests, plus additional triage abilities",
+            "name": "MODERATE",
+            "description": "Can read and clone this repository. Can also moderate and edit issues and manage pull requests without write access",
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "TRIAGE_PLUS",
+            "description": "Can read and clone this repository. Can also moderate and edit issues and manage pull requests without write access",
+            "isDeprecated": true,
+            "deprecationReason": "TRIAGE_PLUS has been renamed to MODERATE. Use MODERATE instead. Removal on 2027-04-01 UTC."
           },
           {
             "name": "TRIAGE",
@@ -143270,6 +143385,134 @@
             "type": {
               "kind": "OBJECT",
               "name": "Issue",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "RequestCopilotCodeReviewInput",
+        "description": "Autogenerated input type of RequestCopilotCodeReview",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "clientMutationId",
+            "description": "A unique identifier for the client performing the mutation.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "pullRequestId",
+            "description": "The Node ID of the pull request to modify.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "reviewEffort",
+            "description": "The effort level to use for the Copilot code review. Omit to use the default effort level.",
+            "type": {
+              "kind": "ENUM",
+              "name": "CopilotCodeReviewEffort",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "RequestCopilotCodeReviewPayload",
+        "description": "Autogenerated return type of RequestCopilotCodeReview.",
+        "fields": [
+          {
+            "name": "actor",
+            "description": "Identifies the actor who performed the event.",
+            "args": [],
+            "type": {
+              "kind": "INTERFACE",
+              "name": "Actor",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "clientMutationId",
+            "description": "A unique identifier for the client performing the mutation.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "failureReason",
+            "description": "The stable reason the request was denied or conflicted with an existing request. Null when the request succeeded.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "CopilotCodeReviewRequestReason",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pullRequest",
+            "description": "The pull request that is getting requests.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PullRequest",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "reviewRequest",
+            "description": "The Copilot code review request that was created or is already pending. Null when the request was denied or conflicted with an existing request.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "ReviewRequest",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Did the operation succeed?",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
               "ofType": null
             },
             "isDeprecated": false,
