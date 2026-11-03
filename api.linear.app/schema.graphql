@@ -888,6 +888,134 @@ input AgentSessionExternalUrlInput {
   label: String!
 }
 
+"""
+A notification about an agent session awaiting input, failing, or completing a turn.
+"""
+type AgentSessionNotification implements Notification & Entity & Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """
+  Notification type. Determines the kind of event that triggered this
+  notification and which associated entity fields will be populated.
+  """
+  type: String!
+
+  """
+  The user that caused the notification. Null if the notification was triggered
+  by a non-user actor such as an integration, external user, or system event.
+  """
+  actor: User
+
+  """
+  The external user that caused the notification. Populated when the
+  notification was triggered by an external user (e.g., a commenter from a
+  connected integration like Slack or GitHub) rather than a Linear workspace member.
+  """
+  externalUserActor: ExternalUser
+
+  """The recipient user of this notification."""
+  user: User!
+
+  """
+  The time at which the user marked the notification as read. Null if the notification is unread.
+  """
+  readAt: DateTime
+
+  """
+  The time at which an email reminder for this notification was sent to the user. Null if no email reminder has been sent.
+  """
+  emailedAt: DateTime
+
+  """
+  The time until which a notification is snoozed. After this time, the
+  notification reappears in the user's inbox. Null if the notification is not
+  currently snoozed.
+  """
+  snoozedUntilAt: DateTime
+
+  """
+  The time at which a notification was unsnoozed. Null if the notification has not been unsnoozed.
+  """
+  unsnoozedAt: DateTime
+
+  """The category of the notification."""
+  category: NotificationCategory!
+
+  """[Internal] URL to the target of the notification."""
+  url: String!
+
+  """[Internal] Inbox URL for the notification."""
+  inboxUrl: String!
+
+  """[Internal] Notification title."""
+  title: String!
+
+  """[Internal] Notification subtitle."""
+  subtitle: String!
+
+  """[Internal] If notification actor was Linear."""
+  isLinearActor: Boolean!
+
+  """[Internal] Notification avatar URL."""
+  actorAvatarUrl: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorInitials: String
+
+  """[Internal] Notification actor initials if avatar is not available."""
+  actorAvatarColor: String!
+
+  """
+  [Internal] Whether the notification's user actor is deactivated in the workspace.
+  """
+  actorInactive: Boolean!
+
+  """[Internal] Issue's status type for issue notifications."""
+  issueStatusType: String
+
+  """[Internal] Project update health for new updates."""
+  projectUpdateHealth: String
+
+  """[Internal] Initiative update health for new updates."""
+  initiativeUpdateHealth: String
+
+  """
+  [Internal] Notifications with the same grouping key will be grouped together in the UI.
+  """
+  groupingKey: String!
+
+  """
+  [Internal] Priority of the notification with the same grouping key. Higher
+  number means higher priority. If priority is the same, notifications should be
+  sorted by `createdAt`.
+  """
+  groupingPriority: Float!
+
+  """The bot that caused the notification."""
+  botActor: ActorBot
+
+  """The session that produced the notification."""
+  agentSessionId: String!
+
+  """The activity that produced the notification."""
+  agentActivityId: String
+}
+
 type AgentSessionPayload {
   """The identifier of the last sync operation."""
   lastSyncId: Float!
@@ -5914,8 +6042,9 @@ type CustomerNeed implements Node {
   customer: Customer
 
   """
-  The issue this need is linked to. Either issueId or projectId must be set.
-  When set, the need's projectId is denormalized from the issue's project.
+  The issue this need is linked to. Either issueId or projectId must be set,
+  unless the need is linked to an internal customer signal. When set, the need's
+  projectId is denormalized from the issue's project.
   """
   issue: Issue
 
@@ -8988,6 +9117,52 @@ type Document implements Node {
 
   """The canonical url for the document."""
   url: String!
+
+  """
+  [Internal] Whether the viewer can edit the document's fields and content. On a
+  personal document, the owner and people it is shared with as editors can. On
+  any other document, its owner can, and so can everyone else when its general
+  access is edit or they are shared on it as editors. False when the request has no user.
+  """
+  viewerCanEdit: Boolean!
+
+  """
+  [Internal] Whether the viewer can comment on the document. On a personal
+  document, the owner and people it is shared with as editors or commenters can.
+  On any other document, its owner can, and so can everyone else when its
+  general access is edit or comment or they are shared on it as editors or
+  commenters. False when the request has no user.
+  """
+  viewerCanComment: Boolean!
+
+  """
+  [Internal] Whether the viewer can change who has access to the document: share
+  it, change collaborator roles, and set its general access. On a personal
+  document, only the owner can. On any other document, its owner, an owner of a
+  team it belongs to, or a workspace admin can. False when the request has no user.
+  """
+  viewerCanManageAccess: Boolean!
+
+  """
+  [Internal] The user whose personal space holds the document, who owns and
+  manages it. Null if the document belongs to a different parent entity type.
+  """
+  personalUser: User
+
+  """
+  [Internal] What users other than the owner can do with a document that is not
+  personal: edit, comment, or view. People shared on the document with a higher
+  role keep it. Null on a personal document, which only its owner and
+  collaborators can access.
+  """
+  generalAccess: DocumentShareRole
+
+  """
+  [Internal] The users the document is shared with and their roles, in the order
+  they were shared within each role: editors, then commenters, then viewers. The
+  owner of a personal document is its `personalUser` and is not listed.
+  """
+  collaborators: [DocumentCollaborator!]!
 }
 
 """A generic payload return from entity archive mutations."""
@@ -9000,6 +9175,15 @@ type DocumentArchivePayload implements ArchivePayload {
 
   """The archived/unarchived entity. Null if entity was deleted."""
   entity: Document
+}
+
+"""[Internal] A user a document is shared with, and their role on it."""
+type DocumentCollaborator {
+  """The user the document is shared with."""
+  user: User!
+
+  """What the user can do with the document."""
+  role: DocumentShareRole!
 }
 
 type DocumentConnection {
@@ -9823,6 +10007,52 @@ type DocumentSearchResult implements Node {
   """The canonical url for the document."""
   url: String!
 
+  """
+  [Internal] Whether the viewer can edit the document's fields and content. On a
+  personal document, the owner and people it is shared with as editors can. On
+  any other document, its owner can, and so can everyone else when its general
+  access is edit or they are shared on it as editors. False when the request has no user.
+  """
+  viewerCanEdit: Boolean!
+
+  """
+  [Internal] Whether the viewer can comment on the document. On a personal
+  document, the owner and people it is shared with as editors or commenters can.
+  On any other document, its owner can, and so can everyone else when its
+  general access is edit or comment or they are shared on it as editors or
+  commenters. False when the request has no user.
+  """
+  viewerCanComment: Boolean!
+
+  """
+  [Internal] Whether the viewer can change who has access to the document: share
+  it, change collaborator roles, and set its general access. On a personal
+  document, only the owner can. On any other document, its owner, an owner of a
+  team it belongs to, or a workspace admin can. False when the request has no user.
+  """
+  viewerCanManageAccess: Boolean!
+
+  """
+  [Internal] The user whose personal space holds the document, who owns and
+  manages it. Null if the document belongs to a different parent entity type.
+  """
+  personalUser: User
+
+  """
+  [Internal] What users other than the owner can do with a document that is not
+  personal: edit, comment, or view. People shared on the document with a higher
+  role keep it. Null on a personal document, which only its owner and
+  collaborators can access.
+  """
+  generalAccess: DocumentShareRole
+
+  """
+  [Internal] The users the document is shared with and their roles, in the order
+  they were shared within each role: editors, then commenters, then viewers. The
+  owner of a personal document is its `personalUser` and is not listed.
+  """
+  collaborators: [DocumentCollaborator!]!
+
   """Metadata related to search result."""
   metadata: JSONObject!
 }
@@ -9834,7 +10064,7 @@ type DocumentSearchResultEdge {
   cursor: String!
 }
 
-"""[Internal] The role of a user a personal document is shared with."""
+"""[Internal] What a user can do with a document: edit, comment, or view."""
 enum DocumentShareRole {
   """The user can read, edit, and comment on the document."""
   edit
@@ -33132,6 +33362,13 @@ type PullRequestMergeSettings {
   mergeQueueMergeMethod: PullRequestMergeMethod
 
   """
+  The merge method the repository uses by default. GitLab projects report one
+  through their squash option. Null for GitHub, which has no default, and for
+  settings synced before Linear stored it.
+  """
+  defaultMergeMethod: PullRequestMergeMethod
+
+  """
   Whether the merge queue takes pull requests that carry a label, such as
   Trunk's, instead of GitHub's merge queue. Such a queue merges a native stack's
   pull requests below a queued one together with it.
@@ -43181,9 +43418,18 @@ type UserSettings implements Node {
   autoAssignToSelf: Boolean!
 
   """
-  [Internal] The user's preferred merge method for pull requests. Null if the user chooses a method for each pull request.
+  [Internal] The user's preferred merge method for pull requests. Null if the
+  user chooses a method for each pull request. Squash when the user merges with
+  each repository's default method.
   """
   pullRequestMergeStrategyPreference: PullRequestMergeMethod
+
+  """
+  [Internal] Whether the user merges each pull request with its repository's
+  default merge method, as `mergeSettings.defaultMergeMethod` reports it. When
+  true, `pullRequestMergeStrategyPreference` reports squash.
+  """
+  pullRequestMergeStrategyIsRepositoryDefault: Boolean!
 
   """
   The user's notification category preferences, indicating which notification
