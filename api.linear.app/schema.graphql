@@ -665,6 +665,12 @@ type AgentSession implements Node {
   endedAt: DateTime
 
   """
+  [Internal] The time the agent last replied in this session with a response,
+  elicitation, or error. Null if the agent has not replied.
+  """
+  lastAgentReplyAt: DateTime
+
+  """
   The time a user dismissed this agent session. When dismissed, the agent is
   removed as delegate from the associated issue. Null if the session has not
   been dismissed.
@@ -5637,6 +5643,11 @@ input ContactCreateInput {
   extremely disappointed.
   """
   disappointmentRating: Int
+
+  """
+  [INTERNAL] Where the message was sent from: `app` (default) or `website`.
+  """
+  source: String
 }
 
 """Return type for contact mutations."""
@@ -14715,6 +14726,7 @@ type IntegrationRequestPayload {
 """Linear supported integration services."""
 enum IntegrationService {
   airbyte
+  claudeSecurity
   datadog
   discord
   figma
@@ -26985,6 +26997,12 @@ type Organization implements Node {
   """
   linearReviewSettings: JSONObject!
 
+  """
+  [Internal] Workspace admin policy for the Linear MCP server, such as the teams
+  MCP connections can access. Empty until saved, which allows every team.
+  """
+  mcpSettings: JSONObject!
+
   """[DEPRECATED] Which day count to use for SLA calculations."""
   slaDayCount: SLADayCountType! @deprecated(reason: "No longer in use")
 
@@ -27815,6 +27833,17 @@ input OrganizationManagedTeamFeaturesInput {
   loopWebhooks: [OrganizationManagedFeatureTeamInput!]
 }
 
+"""[Internal] Workspace admin policy for the Linear MCP server."""
+input OrganizationMcpSettingsInput {
+  """
+  [Internal] The teams MCP connections can access. Omit it to allow every team,
+  including teams created later. A changed list needs at least one team, and
+  teams created later are not added to it. Workspace-level data, such as users
+  and initiatives, stays available.
+  """
+  allowedTeamIds: [UUID!]
+}
+
 """
 [INTERNAL] Workspace metadata including region and allowed authentication providers.
 """
@@ -28229,6 +28258,12 @@ input OrganizationUpdateInput {
   [Internal] Linear Review settings: whether reviews are on and which repositories they cover.
   """
   linearReviewSettings: OrganizationLinearReviewSettingsInput
+
+  """
+  [Internal] Workspace admin policy for the Linear MCP server. Replaces the
+  current policy, so omitted settings return to their defaults.
+  """
+  mcpSettings: OrganizationMcpSettingsInput
 }
 
 type OriginInstallationCancelPayload {
@@ -44522,6 +44557,11 @@ type ViewPreferencesValues {
   """
   documentFieldCollaborators: Boolean
 
+  """
+  [Internal] Whether to show the viewer's access column in documents lists.
+  """
+  documentFieldAccess: Boolean
+
   """[Internal] Grouping of a documents list."""
   documentsListGrouping: String
 
@@ -45846,6 +45886,7 @@ enum WorkflowTriggerType {
   webhook
   chat
   pullRequest
+  aiConversation
 }
 
 enum WorkflowType {
@@ -45986,6 +46027,9 @@ input WorkspaceTeamSecuritySettingsInput {
 
   """Minimum role required to manage team members."""
   memberManagement: TeamRoleType
+
+  """Minimum role required to manage team loops."""
+  automationManagement: TeamRoleType
 
   """Whether members may join teams without an invitation."""
   allMembersCanJoin: Boolean
