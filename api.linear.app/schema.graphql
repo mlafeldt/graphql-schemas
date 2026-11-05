@@ -3694,6 +3694,11 @@ type AiConversationUserState {
 
   """The ID of the elicitation part the user dismissed."""
   dismissedElicitationId: String
+
+  """
+  The IDs of the elicitation parts the user resolved without replying, oldest first. Updates add to the recorded IDs.
+  """
+  resolvedElicitationIds: [String!]
 }
 
 type AiConversationWebSearchToolCall implements AiConversationBaseToolCall {
@@ -4941,12 +4946,20 @@ type CodingEnvironment implements Node {
   generatedDependencyMiseConfig: String
 }
 
+"""[Internal] Start of an Anthropic organization connection."""
+type CodingInferenceAnthropicConnectPayload {
+  """The URL where an Anthropic organization admin approves the connection."""
+  authorizationUrl: String!
+}
+
 """[Internal] A saved workspace inference credential, without the key."""
 type CodingInferenceKey {
   """The coding harness that uses this credential: codex or claude."""
   harness: String!
 
-  """The inference provider: openai, anthropic, or amazon-bedrock."""
+  """
+  The inference provider: openai, anthropic, amazon-bedrock, or anthropic-connection.
+  """
   provider: String!
 
   """The inference endpoint."""
@@ -12532,6 +12545,21 @@ type ImageUploadFromUrlPayload {
   success: Boolean!
 }
 
+"""Which users of the source service an import maps to Linear users."""
+enum ImportUsersOption {
+  """
+  Map users who match a Linear user by email, and invite the users whose email
+  is on one of the workspace's domains. Skip the rest.
+  """
+  matchAndInvite
+
+  """Map users who match a Linear user by email, and skip the rest."""
+  matchOnly
+
+  """Import no users."""
+  skip
+}
+
 """Which Inbox notifications contribute to Inbox badges."""
 enum InboxBadgeScope {
   all
@@ -19711,6 +19739,173 @@ input JiraPersonalSettingsInput {
   workspaceIntegrationId: String
 }
 
+"""
+A Jira project that the workspace syncs with a Linear team, imported issues
+from, or both. Projects of a connected Jira site that the workspace never synced
+or imported have no Jira project; read them from the Jira integration's settings.
+"""
+type JiraProject implements Node {
+  """The unique identifier of the entity."""
+  id: ID!
+
+  """The time at which the entity was created."""
+  createdAt: DateTime!
+
+  """
+  The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+
+  """The Jira integration of the site that hosts the project."""
+  integration: Integration!
+
+  """The Jira project ID, such as 10016. Unique only within one Jira site."""
+  externalId: String!
+
+  """
+  The Jira project key, such as ENG. Jira admins can change it, and Linear then updates it.
+  """
+  key: String!
+
+  """The Jira project name."""
+  name: String!
+
+  """
+  The Linear team the project syncs with. Null when the project does not sync with a team.
+  """
+  team: Team
+
+  """
+  The direction in which the project syncs with its team. Null when the project does not sync.
+  """
+  syncDirection: JiraSyncDirection
+
+  """
+  Whether issues created in the team go to this Jira project. A team has at most
+  one default project, and only a two-way sync can be it.
+  """
+  isDefault: Boolean!
+
+  """
+  The time at which sync last turned on for the project. Null if the project never synced.
+  """
+  syncEnabledAt: DateTime
+
+  """
+  The user who linked the project or first imported it. For a link made by a
+  background job, the user who connected the Jira site. Null if the user has been deleted.
+  """
+  creator: User
+
+  """
+  The Linear team the Jira projects table shows for the project: the team it
+  syncs with, or else the team its latest import goes into. Null when the import
+  has not created its new team yet, or the user cannot see the team.
+  """
+  linearTeam: Team
+
+  """
+  How the project syncs with its team, as the Jira projects table shows it.
+  `afterImport` while its running import is about to link it.
+  """
+  syncStatus: JiraProjectSyncStatus!
+
+  """
+  Where the project's latest import stands, as the Jira projects table shows it.
+  """
+  importStatus: JiraProjectImportStatus!
+
+  """
+  The project's newest import that the user can see, with its status, progress, and error. Null when the project has none.
+  """
+  latestImport: IssueImport
+
+  """
+  The number of issues the project's latest import created. Null until that import completes.
+  """
+  importedIssueCount: Int
+
+  """
+  Why Linear cannot read the configuration of a project that syncs, such as its
+  issue types and fields, from Jira. The Jira projects table shows it as a
+  warning. Null when the last read succeeded.
+  """
+  configurationError: String
+}
+
+"""The Jira projects of one connected Jira site to migrate to Linear."""
+input JiraProjectBatchMigrateInput {
+  """
+  The identifier of the Jira integration of the site that hosts every project.
+  """
+  integrationId: String!
+
+  """The projects to migrate: 1 to 50, each at most once."""
+  projects: [JiraProjectBatchMigrateProjectInput!]!
+}
+
+"""The result of a migration of Jira projects."""
+type JiraProjectBatchMigratePayload {
+  """The identifier of the last sync operation."""
+  lastSyncId: Float!
+
+  """
+  Whether every project is migrating. False when a project failed its checks; the projects that passed still started.
+  """
+  success: Boolean!
+
+  """One result per project, in input order."""
+  projects: [JiraProjectMigrationResult!]!
+}
+
+"""
+One Jira project to migrate, with the choices of the Migrate Jira project form.
+Give exactly one of `externalId` and `key`, and at least one of `import` and `sync`.
+"""
+input JiraProjectBatchMigrateProjectInput {
+  """The Jira project ID, such as 10016."""
+  externalId: String
+
+  """The Jira project key, such as ENG. Case-insensitive."""
+  key: String
+
+  """
+  The identifier or key of the team to import into and sync with. An import of a
+  project that already syncs must go into the team it syncs with.
+  """
+  teamId: String
+
+  """
+  The name of a team for the import to create, when no team identifier is given.
+  Requires an import and the team creation permission. A name that a team
+  already has gets a number added.
+  """
+  teamName: String
+
+  """
+  The import of the project's existing issues. Omit to only sync. Several imports into one team run one at a time.
+  """
+  import: JiraProjectMigrateImportInput
+
+  """
+  How the project syncs. With an import, sync starts once the import completes.
+  Omit to only import. Requires a team identifier when there is no import.
+  """
+  sync: JiraProjectMigrateSyncInput
+}
+
+type JiraProjectConnection {
+  edges: [JiraProjectEdge!]!
+  nodes: [JiraProject!]!
+  pageInfo: PageInfo!
+}
+
 input JiraProjectDataInput {
   """The Jira id for this project."""
   id: String!
@@ -19720,6 +19915,274 @@ input JiraProjectDataInput {
 
   """The Jira name for this project, such as Engineering."""
   name: String!
+}
+
+type JiraProjectEdge {
+  node: JiraProject!
+
+  """Used in `before` and `after` args"""
+  cursor: String!
+}
+
+"""Jira project filtering options."""
+input JiraProjectFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """
+  Comparator for the identifier of the Jira integration of the site that hosts the project.
+  """
+  integrationId: IDComparator
+
+  """Comparator for the Jira project key, such as ENG."""
+  key: StringComparator
+
+  """
+  Filters that the team the project syncs with must satisfy. Use `{ null: true }` to find the projects that do not sync.
+  """
+  team: NullableTeamFilter
+
+  """Compound filters, all of which need to be matched by the Jira project."""
+  and: [JiraProjectFilter!]
+
+  """
+  Compound filters, one of which needs to be matched by the Jira project.
+  """
+  or: [JiraProjectFilter!]
+}
+
+"""
+Where a Jira project's latest import stands, as the Jira projects table in the settings shows it.
+"""
+enum JiraProjectImportStatus {
+  """The project has no import."""
+  none
+
+  """
+  The import has not started. It waits for the imports into its team that were
+  requested before it, or for the workspace's other Jira imports.
+  """
+  queued
+
+  """The import is reading issues from Jira or creating them in Linear."""
+  importing
+
+  """The import completed."""
+  imported
+
+  """The import failed before it completed."""
+  failed
+
+  """The import expired before it completed."""
+  expired
+
+  """The import is being deleted, with the issues it created."""
+  deleting
+}
+
+"""
+The import of a Jira project's existing issues through the site's connection,
+with the choices of the Migrate Jira project form.
+"""
+input JiraProjectMigrateImportInput {
+  """
+  A JQL filter that limits which of the project's issues are imported. Linear
+  adds it to the project's query, so it cannot reach other projects.
+  """
+  jql: String
+
+  """
+  Whether to import issues not updated in the last 6 months. They are imported archived.
+  """
+  includeStaleIssues: Boolean!
+
+  """Whether to import closed and done issues. They are imported archived."""
+  includeClosedIssues: Boolean!
+
+  """Which Jira users to map to Linear users."""
+  users: ImportUsersOption!
+}
+
+"""How a Jira project syncs with its team."""
+input JiraProjectMigrateSyncInput {
+  """
+  The direction in which the project syncs with the team. The legacy one-way mode is not accepted.
+  """
+  syncDirection: JiraSyncDirection!
+}
+
+"""Why one project of a Jira project migration failed its checks."""
+type JiraProjectMigrationError {
+  """The stable code of the failure."""
+  code: JiraProjectMigrationErrorCode!
+
+  """A message that explains the failure to the user."""
+  message: String!
+}
+
+"""Why one project of a Jira project migration failed its checks."""
+enum JiraProjectMigrationErrorCode {
+  """
+  The project has no import and no sync, no team, a new team without an import, or not exactly one of an ID and a key.
+  """
+  invalidOptions
+
+  """The project appears more than once in the migration."""
+  duplicateProject
+
+  """The ID or key is not in the site's project list."""
+  projectNotFound
+
+  """
+  Sync was asked for a project that already syncs. A project that only syncs,
+  and already syncs with the same team in the same direction, counts as started instead.
+  """
+  projectAlreadySyncing
+
+  """
+  An import was asked into a team other than the one the project syncs with.
+  """
+  projectSyncsWithAnotherTeam
+
+  """
+  The project has a queued import, or a running one that changed in the last 24
+  hours. An import by the same user with the same choices counts as started instead.
+  """
+  projectBeingImported
+
+  """
+  A Jira import of the workspace is being deleted, or, for a project that only
+  syncs, one of its own imports. Retry once it finishes.
+  """
+  importDeletionRunning
+
+  """
+  The project was already migrating as asked when the checks began, but its
+  import completed or its link changed before the migration could start. Send
+  the project again.
+  """
+  projectChanged
+
+  """The team does not exist or is archived."""
+  teamNotFound
+
+  """The user cannot access the team."""
+  teamNotAccessible
+
+  """
+  The team inherits its parent's workflow statuses, which an import would need to create.
+  """
+  teamInheritsWorkflowStatuses
+
+  """
+  The project's new team would exceed the workspace's team limit. The projects
+  that pass their other checks take the room left under the limit in input order.
+  """
+  teamQuotaExceeded
+
+  """
+  The legacy one-way sync was asked for. Only links that already use it keep it.
+  """
+  legacySyncDirection
+
+  """A new team was asked for without the team creation permission."""
+  missingTeamCreationPermission
+
+  """Inviting users was asked for without the permission to invite users."""
+  missingInvitePermission
+
+  """
+  The user's own Jira account cannot access the project, or cannot sign in to Jira.
+  """
+  missingJiraAccess
+
+  """
+  The site's connection lacks the global ADMINISTER permission, which Linear needs to create the project's webhook.
+  """
+  missingWebhookPermission
+
+  """
+  Two-way sync was asked for, and the site's connection lacks Create Issues on the project.
+  """
+  missingCreateIssuesPermission
+
+  """The site's connection cannot read the project."""
+  projectNotReadable
+
+  """The JQL filter does not parse."""
+  invalidJql
+
+  """The import would read no issues."""
+  noMatchingIssues
+
+  """Linear cannot sign in to Jira with the site's connection."""
+  jiraAuthFailed
+
+  """Jira rate limited the checks. Retry later."""
+  jiraRateLimited
+
+  """
+  Jira did not answer the checks, or answered with something they cannot read. Retry later.
+  """
+  jiraUnavailable
+}
+
+"""What happened to one project of a Jira project migration."""
+type JiraProjectMigrationResult {
+  """The position of the project in the input, from 0."""
+  index: Int!
+
+  """The Jira project ID. Null when the project was not found on the site."""
+  externalId: String
+
+  """
+  The Jira project key, read from Jira when the checks counted the project's
+  issues. Null when the project was not found on the site.
+  """
+  key: String
+
+  """
+  The Jira project name. Null when the project was not found on the site.
+  """
+  name: String
+
+  """
+  Whether the project is migrating: the migration started it, or an earlier call already migrates it as asked.
+  """
+  success: Boolean!
+
+  """
+  Why the project failed its checks and did not start. Null when the project is migrating.
+  """
+  error: JiraProjectMigrationError
+
+  """
+  The number of issues the import reads, counted by the checks before it
+  started. Null when the checks did not count them: for a project that only
+  syncs, one that failed before the count, or one that was already migrating
+  when the checks began.
+  """
+  issueCount: Int
+
+  """
+  The Jira project that the migration wrote, or the existing one of a project
+  that was already migrating. For a project that failed its checks, its existing
+  Jira project, if any.
+  """
+  jiraProject: JiraProject
+
+  """
+  The import that the migration started, or the queued or running import of a
+  project that was already migrating. Null for a project that only syncs, or one
+  that failed its checks.
+  """
+  issueImport: IssueImport
 }
 
 type JiraProjectStatusesPayload {
@@ -19738,6 +20201,25 @@ type JiraProjectStatusesPayload {
   The status categories of each of the Jira project's project statuses (Epic).
   """
   projectStatusCategories: [JiraStatusNameCategoriesPayload!]!
+}
+
+"""
+How a Jira project syncs with its Linear team, as the Jira projects table in the settings shows it.
+"""
+enum JiraProjectSyncStatus {
+  """The project syncs both ways with its team."""
+  bidirectional
+
+  """
+  The project syncs from Jira to its team, in the one-way or legacy one-way mode.
+  """
+  jiraToLinear
+
+  """The project starts syncing once its running import completes."""
+  afterImport
+
+  """The project does not sync with a team."""
+  notSyncing
 }
 
 input JiraSettingsInput {
@@ -19776,6 +20258,24 @@ type JiraStatusNameCategoriesPayload {
   The distinct status category keys (new, indeterminate, or done) of the Jira statuses with this name.
   """
   categories: [String!]!
+}
+
+"""The direction in which a Jira project syncs with its Linear team."""
+enum JiraSyncDirection {
+  """
+  Changes sync both ways, and issues created in the Linear team can create issues in Jira.
+  """
+  bidirectional
+
+  """
+  Issues are created from Jira only. Changes to synced issues still sync back to Jira.
+  """
+  jiraToLinear
+
+  """
+  Issues are created from Jira only, and no changes sync back to Jira. Only links that already use it keep it.
+  """
+  legacyJiraToLinear
 }
 
 """
@@ -23017,6 +23517,15 @@ type Mutation {
   ): IssuePayload!
 
   """
+  [INTERNAL] Dismisses a saved GitHub issue creation failure on an issue that
+  has no linked GitHub issue. Linked GitHub issues and attachments are not changed.
+  """
+  issueGitHubSyncFailureDismiss(
+    """The identifier of the issue whose GitHub sync failure to dismiss."""
+    id: String!
+  ): IssuePayload!
+
+  """
   Creates a new association between an issue and a release, linking the issue to the release for tracking purposes.
   """
   issueToReleaseCreate(
@@ -23045,6 +23554,23 @@ type Mutation {
     """The identifier of the issue-to-release association to delete."""
     id: String!
   ): DeletePayload!
+
+  """
+  Migrates Jira projects of one connected Jira site to Linear. Each project is
+  imported through the site's connection, synced with a team, or both. With
+  both, sync starts once the import completes. Starts every project that passes
+  its checks. A project that fails has an error and does not start, and does not
+  stop the others; to retry, send only the failed projects again. Imports into
+  one team run one at a time. A project that is already migrating as asked, such
+  as when a call that timed out is sent again, counts as started: nothing new
+  starts for it, and its result has the existing Jira project and import.
+  Requires the `admin` scope, and the permissions the Migrate Jira project form
+  needs. Takes up to 50 projects.
+  """
+  jiraProjectBatchMigrate(
+    """The Jira projects to migrate."""
+    input: JiraProjectBatchMigrateInput!
+  ): JiraProjectBatchMigratePayload!
 
   """Updates a notification."""
   notificationUpdate(
@@ -23281,6 +23807,22 @@ type Mutation {
   [Internal] Tests and stores a workspace inference credential and selects it for new sessions.
   """
   organizationCodingInferenceKeyUpdate(input: OrganizationCodingInferenceKeyInput!): OrganizationPayload!
+
+  """
+  [Internal] Starts connecting the workspace's Anthropic organization to bill Claude Code sessions.
+  """
+  organizationCodingInferenceAnthropicConnectStart: CodingInferenceAnthropicConnectPayload!
+
+  """
+  [Internal] Completes connecting the workspace's Anthropic organization and selects it for new Claude Code sessions.
+  """
+  organizationCodingInferenceAnthropicConnectComplete(
+    """The state from the callback."""
+    state: String!
+
+    """The authorization code from the callback."""
+    code: String!
+  ): OrganizationPayload!
 
   """
   [Internal] Removes a workspace inference credential and switches the harness to Linear inference.
@@ -33149,7 +33691,8 @@ type PullRequest implements Node {
   mergeCommit: PullRequestCommit
 
   """
-  [Internal] The deploy/build preview links parsed from the pull request description and comments.
+  [Internal] The preview links to show: the pull request's deployments and the
+  links parsed from its description and comments.
   """
   previewLinks: [PullRequestPreviewLink!]!
 
@@ -35169,6 +35712,51 @@ type Query {
     id: String!
   ): IssueToRelease!
 
+  """
+  Jira projects that the workspace syncs with a Linear team or imported issues
+  from, with the sync and import status of the Jira projects table in the
+  settings. Lists the projects that sync with teams the user can administer, and
+  those whose imports the user can see.
+  """
+  jiraProjects(
+    """Filter returned Jira projects."""
+    filter: JiraProjectFilter
+
+    """A cursor to be used with last for backward pagination."""
+    before: String
+
+    """A cursor to be used with first for forward pagination"""
+    after: String
+
+    """
+    The number of items to forward paginate (used with after). Defaults to 50.
+    """
+    first: Int
+
+    """
+    The number of items to backward paginate (used with before). Defaults to 50.
+    """
+    last: Int
+
+    """Should archived resources be included (default: false)"""
+    includeArchived: Boolean
+
+    """
+    By which field should the pagination order by. Available options are createdAt (default) and updatedAt.
+    """
+    orderBy: PaginationOrderBy
+  ): JiraProjectConnection!
+
+  """
+  One Jira project that the Jira projects table lists. Poll it until its import
+  completes and its sync starts: `importStatus` is `imported`, `failed`, or
+  `expired`, and `syncStatus` is no longer `afterImport`.
+  """
+  jiraProject(
+    """The identifier of the Jira project to retrieve."""
+    id: String!
+  ): JiraProject!
+
   """The authenticated user's notifications."""
   notifications(
     """Filters returned notifications."""
@@ -35358,6 +35946,11 @@ type Query {
   [Internal] Saved workspace inference credentials for Coding Sessions, without their keys.
   """
   organizationCodingInferenceKeys: [CodingInferenceKey!]!
+
+  """
+  [Internal] Whether this workspace can connect an Anthropic organization to bill Claude Code sessions.
+  """
+  organizationCodingInferenceAnthropicAvailable: Boolean!
 
   """[Internal] All archived teams of the workspace."""
   archivedTeams: [Team!]!
@@ -44568,6 +45161,9 @@ type ViewPreferencesValues {
   """[Internal] Ordering of a documents list."""
   documentsListOrdering: String
 
+  """[Internal] Ordering of the sub-documents listed on a document."""
+  subDocumentsOrdering: String
+
   """[Internal] Direction of a documents list when ordered by project."""
   documentsListProjectDirection: String
 
@@ -44726,6 +45322,9 @@ enum ViewType {
   activeIssues
   backlog
   subIssues
+
+  """[Internal] The sub-documents list of a document."""
+  subDocuments
   allIssues
   dashboards
   customView

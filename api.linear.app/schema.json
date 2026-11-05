@@ -294,6 +294,36 @@
         "possibleTypes": null
       },
       {
+        "kind": "SCALAR",
+        "name": "ID",
+        "description": "The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `\"4\"`) or integer (such as `4`) input value will be accepted as an ID.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "SCALAR",
+        "name": "Boolean",
+        "description": "The `Boolean` scalar type represents `true` or `false`.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "SCALAR",
+        "name": "String",
+        "description": "The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "INTERFACE",
         "name": "NotificationSubscription",
         "description": "A subscription that controls which notifications a user receives for a specific entity such as a team, project, cycle, label, custom view, initiative, or user. This is not a billing subscription -- it determines notification preferences. Each subscription is scoped to exactly one target entity and specifies the notification types the subscriber wants to receive. When active, matching events on the target entity generate notifications for the subscriber.",
@@ -1370,6 +1400,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "JiraProject",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "OrganizationInvite",
             "ofType": null
           },
@@ -1434,16 +1469,6 @@
             "ofType": null
           }
         ]
-      },
-      {
-        "kind": "SCALAR",
-        "name": "ID",
-        "description": "The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `\"4\"`) or integer (such as `4`) input value will be accepted as an ID.",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
       },
       {
         "kind": "SCALAR",
@@ -2669,8 +2694,8 @@
       },
       {
         "kind": "SCALAR",
-        "name": "String",
-        "description": "The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.",
+        "name": "Int",
+        "description": "The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.",
         "fields": null,
         "inputFields": null,
         "interfaces": null,
@@ -10927,16 +10952,6 @@
             "deprecationReason": null
           }
         ],
-        "possibleTypes": null
-      },
-      {
-        "kind": "SCALAR",
-        "name": "Boolean",
-        "description": "The `Boolean` scalar type represents `true` or `false`.",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
         "possibleTypes": null
       },
       {
@@ -29282,16 +29297,6 @@
         "possibleTypes": null
       },
       {
-        "kind": "SCALAR",
-        "name": "Int",
-        "description": "The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
         "kind": "ENUM",
         "name": "PaginationOrderBy",
         "description": "By which field should the pagination order by",
@@ -33277,7 +33282,7 @@
           },
           {
             "name": "previewLinks",
-            "description": "[Internal] The deploy/build preview links parsed from the pull request description and comments.",
+            "description": "[Internal] The preview links to show: the pull request's deployments and the links parsed from its description and comments.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -47006,6 +47011,18 @@
             "deprecationReason": null
           },
           {
+            "name": "subDocumentsOrdering",
+            "description": "[Internal] Ordering of the sub-documents listed on a document.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "documentsListProjectDirection",
             "description": "[Internal] Direction of a documents list when ordered by project.",
             "args": [],
@@ -50795,6 +50812,26 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "resolvedElicitationIds",
+            "description": "The IDs of the elicitation parts the user resolved without replying, oldest first. Updates add to the recorded IDs.",
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -95984,6 +96021,124 @@
             "deprecationReason": null
           },
           {
+            "name": "jiraProjects",
+            "description": "Jira projects that the workspace syncs with a Linear team or imported issues from, with the sync and import status of the Jira projects table in the settings. Lists the projects that sync with teams the user can administer, and those whose imports the user can see.",
+            "args": [
+              {
+                "name": "filter",
+                "description": "Filter returned Jira projects.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "JiraProjectFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "A cursor to be used with last for backward pagination.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "after",
+                "description": "A cursor to be used with first for forward pagination",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "The number of items to forward paginate (used with after). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "The number of items to backward paginate (used with before). Defaults to 50.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeArchived",
+                "description": "Should archived resources be included (default: false)",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt.",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "PaginationOrderBy",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "JiraProjectConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "jiraProject",
+            "description": "One Jira project that the Jira projects table lists. Poll it until its import completes and its sync starts: `importStatus` is `imported`, `failed`, or `expired`, and `syncStatus` is no longer `afterImport`.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The identifier of the Jira project to retrieve.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "JiraProject",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "notifications",
             "description": "The authenticated user's notifications.",
             "args": [
@@ -96630,6 +96785,22 @@
                     "ofType": null
                   }
                 }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationCodingInferenceAnthropicAvailable",
+            "description": "[Internal] Whether this workspace can connect an Anthropic organization to bill Claude Code sessions.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
               }
             },
             "isDeprecated": false,
@@ -108412,6 +108583,633 @@
       },
       {
         "kind": "OBJECT",
+        "name": "JiraProjectConnection",
+        "description": null,
+        "fields": [
+          {
+            "name": "edges",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "JiraProjectEdge",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "nodes",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "JiraProject",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pageInfo",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PageInfo",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "JiraProjectEdge",
+        "description": null,
+        "fields": [
+          {
+            "name": "node",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "JiraProject",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cursor",
+            "description": "Used in `before` and `after` args",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "JiraProject",
+        "description": "A Jira project that the workspace syncs with a Linear team, imported issues from, or both. Projects of a connected Jira site that the workspace never synced or imported have no Jira project; read them from the Jira integration's settings.",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The unique identifier of the entity.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createdAt",
+            "description": "The time at which the entity was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't\n    been updated after creation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "archivedAt",
+            "description": "The time at which the entity was archived. Null if the entity has not been archived.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "integration",
+            "description": "The Jira integration of the site that hosts the project.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Integration",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "externalId",
+            "description": "The Jira project ID, such as 10016. Unique only within one Jira site.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "key",
+            "description": "The Jira project key, such as ENG. Jira admins can change it, and Linear then updates it.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": "The Jira project name.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "team",
+            "description": "The Linear team the project syncs with. Null when the project does not sync with a team.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Team",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "syncDirection",
+            "description": "The direction in which the project syncs with its team. Null when the project does not sync.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "JiraSyncDirection",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "isDefault",
+            "description": "Whether issues created in the team go to this Jira project. A team has at most one default project, and only a two-way sync can be it.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "syncEnabledAt",
+            "description": "The time at which sync last turned on for the project. Null if the project never synced.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "creator",
+            "description": "The user who linked the project or first imported it. For a link made by a background job, the user who connected the Jira site. Null if the user has been deleted.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "User",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "linearTeam",
+            "description": "The Linear team the Jira projects table shows for the project: the team it syncs with, or else the team its latest import goes into. Null when the import has not created its new team yet, or the user cannot see the team.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Team",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "syncStatus",
+            "description": "How the project syncs with its team, as the Jira projects table shows it. `afterImport` while its running import is about to link it.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "JiraProjectSyncStatus",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "importStatus",
+            "description": "Where the project's latest import stands, as the Jira projects table shows it.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "JiraProjectImportStatus",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "latestImport",
+            "description": "The project's newest import that the user can see, with its status, progress, and error. Null when the project has none.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "IssueImport",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "importedIssueCount",
+            "description": "The number of issues the project's latest import created. Null until that import completes.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "configurationError",
+            "description": "Why Linear cannot read the configuration of a project that syncs, such as its issue types and fields, from Jira. The Jira projects table shows it as a warning. Null when the last read succeeded.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "JiraSyncDirection",
+        "description": "The direction in which a Jira project syncs with its Linear team.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "bidirectional",
+            "description": "Changes sync both ways, and issues created in the Linear team can create issues in Jira.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "jiraToLinear",
+            "description": "Issues are created from Jira only. Changes to synced issues still sync back to Jira.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "legacyJiraToLinear",
+            "description": "Issues are created from Jira only, and no changes sync back to Jira. Only links that already use it keep it.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "JiraProjectSyncStatus",
+        "description": "How a Jira project syncs with its Linear team, as the Jira projects table in the settings shows it.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "bidirectional",
+            "description": "The project syncs both ways with its team.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "jiraToLinear",
+            "description": "The project syncs from Jira to its team, in the one-way or legacy one-way mode.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "afterImport",
+            "description": "The project starts syncing once its running import completes.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "notSyncing",
+            "description": "The project does not sync with a team.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "JiraProjectImportStatus",
+        "description": "Where a Jira project's latest import stands, as the Jira projects table in the settings shows it.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "none",
+            "description": "The project has no import.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "queued",
+            "description": "The import has not started. It waits for the imports into its team that were requested before it, or for the workspace's other Jira imports.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "importing",
+            "description": "The import is reading issues from Jira or creating them in Linear.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "imported",
+            "description": "The import completed.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "failed",
+            "description": "The import failed before it completed.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "expired",
+            "description": "The import expired before it completed.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "deleting",
+            "description": "The import is being deleted, with the issues it created.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "JiraProjectFilter",
+        "description": "Jira project filtering options.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "Comparator for the identifier.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createdAt",
+            "description": "Comparator for the created at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "Comparator for the updated at date.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "DateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "integrationId",
+            "description": "Comparator for the identifier of the Jira integration of the site that hosts the project.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "IDComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "key",
+            "description": "Comparator for the Jira project key, such as ENG.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "StringComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "team",
+            "description": "Filters that the team the project syncs with must satisfy. Use `{ null: true }` to find the projects that do not sync.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableTeamFilter",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "and",
+            "description": "Compound filters, all of which need to be matched by the Jira project.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "JiraProjectFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "or",
+            "description": "Compound filters, one of which needs to be matched by the Jira project.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "JiraProjectFilter",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "NotificationConnection",
         "description": null,
         "fields": [
@@ -110488,7 +111286,7 @@
           },
           {
             "name": "provider",
-            "description": "The inference provider: openai, anthropic, or amazon-bedrock.",
+            "description": "The inference provider: openai, anthropic, amazon-bedrock, or anthropic-connection.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -121003,6 +121801,12 @@
           {
             "name": "subIssues",
             "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "subDocuments",
+            "description": "[Internal] The sub-documents list of a document.",
             "isDeprecated": false,
             "deprecationReason": null
           },
@@ -132324,6 +133128,37 @@
             "deprecationReason": null
           },
           {
+            "name": "issueGitHubSyncFailureDismiss",
+            "description": "[INTERNAL] Dismisses a saved GitHub issue creation failure on an issue that has no linked GitHub issue. Linked GitHub issues and attachments are not changed.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The identifier of the issue whose GitHub sync failure to dismiss.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssuePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "issueToReleaseCreate",
             "description": "Creates a new association between an issue and a release, linking the issue to the release for tracking purposes.",
             "args": [
@@ -132424,6 +133259,37 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "DeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "jiraProjectBatchMigrate",
+            "description": "Migrates Jira projects of one connected Jira site to Linear. Each project is imported through the site's connection, synced with a team, or both. With both, sync starts once the import completes. Starts every project that passes its checks. A project that fails has an error and does not start, and does not stop the others; to retry, send only the failed projects again. Imports into one team run one at a time. A project that is already migrating as asked, such as when a call that timed out is sent again, counts as started: nothing new starts for it, and its result has the existing Jira project and import. Requires the `admin` scope, and the permissions the Migrate Jira project form needs. Takes up to 50 projects.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The Jira projects to migrate.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "JiraProjectBatchMigrateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "JiraProjectBatchMigratePayload",
                 "ofType": null
               }
             },
@@ -133447,6 +134313,67 @@
                   "ofType": {
                     "kind": "INPUT_OBJECT",
                     "name": "OrganizationCodingInferenceKeyInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationCodingInferenceAnthropicConnectStart",
+            "description": "[Internal] Starts connecting the workspace's Anthropic organization to bill Claude Code sessions.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "CodingInferenceAnthropicConnectPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationCodingInferenceAnthropicConnectComplete",
+            "description": "[Internal] Completes connecting the workspace's Anthropic organization and selects it for new Claude Code sessions.",
+            "args": [
+              {
+                "name": "state",
+                "description": "The state from the callback.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "code",
+                "description": "The authorization code from the callback.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   }
                 },
@@ -153905,6 +154832,633 @@
       },
       {
         "kind": "OBJECT",
+        "name": "JiraProjectBatchMigratePayload",
+        "description": "The result of a migration of Jira projects.",
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "The identifier of the last sync operation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether every project is migrating. False when a project failed its checks; the projects that passed still started.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projects",
+            "description": "One result per project, in input order.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "JiraProjectMigrationResult",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "JiraProjectMigrationResult",
+        "description": "What happened to one project of a Jira project migration.",
+        "fields": [
+          {
+            "name": "index",
+            "description": "The position of the project in the input, from 0.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "externalId",
+            "description": "The Jira project ID. Null when the project was not found on the site.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "key",
+            "description": "The Jira project key, read from Jira when the checks counted the project's issues. Null when the project was not found on the site.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": "The Jira project name. Null when the project was not found on the site.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the project is migrating: the migration started it, or an earlier call already migrates it as asked.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "error",
+            "description": "Why the project failed its checks and did not start. Null when the project is migrating.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "JiraProjectMigrationError",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueCount",
+            "description": "The number of issues the import reads, counted by the checks before it started. Null when the checks did not count them: for a project that only syncs, one that failed before the count, or one that was already migrating when the checks began.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "jiraProject",
+            "description": "The Jira project that the migration wrote, or the existing one of a project that was already migrating. For a project that failed its checks, its existing Jira project, if any.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "JiraProject",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueImport",
+            "description": "The import that the migration started, or the queued or running import of a project that was already migrating. Null for a project that only syncs, or one that failed its checks.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "IssueImport",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "JiraProjectMigrationError",
+        "description": "Why one project of a Jira project migration failed its checks.",
+        "fields": [
+          {
+            "name": "code",
+            "description": "The stable code of the failure.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "JiraProjectMigrationErrorCode",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "message",
+            "description": "A message that explains the failure to the user.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "JiraProjectMigrationErrorCode",
+        "description": "Why one project of a Jira project migration failed its checks.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "invalidOptions",
+            "description": "The project has no import and no sync, no team, a new team without an import, or not exactly one of an ID and a key.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "duplicateProject",
+            "description": "The project appears more than once in the migration.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectNotFound",
+            "description": "The ID or key is not in the site's project list.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectAlreadySyncing",
+            "description": "Sync was asked for a project that already syncs. A project that only syncs, and already syncs with the same team in the same direction, counts as started instead.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectSyncsWithAnotherTeam",
+            "description": "An import was asked into a team other than the one the project syncs with.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectBeingImported",
+            "description": "The project has a queued import, or a running one that changed in the last 24 hours. An import by the same user with the same choices counts as started instead.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "importDeletionRunning",
+            "description": "A Jira import of the workspace is being deleted, or, for a project that only syncs, one of its own imports. Retry once it finishes.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectChanged",
+            "description": "The project was already migrating as asked when the checks began, but its import completed or its link changed before the migration could start. Send the project again.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "teamNotFound",
+            "description": "The team does not exist or is archived.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "teamNotAccessible",
+            "description": "The user cannot access the team.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "teamInheritsWorkflowStatuses",
+            "description": "The team inherits its parent's workflow statuses, which an import would need to create.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "teamQuotaExceeded",
+            "description": "The project's new team would exceed the workspace's team limit. The projects that pass their other checks take the room left under the limit in input order.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "legacySyncDirection",
+            "description": "The legacy one-way sync was asked for. Only links that already use it keep it.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "missingTeamCreationPermission",
+            "description": "A new team was asked for without the team creation permission.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "missingInvitePermission",
+            "description": "Inviting users was asked for without the permission to invite users.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "missingJiraAccess",
+            "description": "The user's own Jira account cannot access the project, or cannot sign in to Jira.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "missingWebhookPermission",
+            "description": "The site's connection lacks the global ADMINISTER permission, which Linear needs to create the project's webhook.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "missingCreateIssuesPermission",
+            "description": "Two-way sync was asked for, and the site's connection lacks Create Issues on the project.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectNotReadable",
+            "description": "The site's connection cannot read the project.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "invalidJql",
+            "description": "The JQL filter does not parse.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "noMatchingIssues",
+            "description": "The import would read no issues.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "jiraAuthFailed",
+            "description": "Linear cannot sign in to Jira with the site's connection.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "jiraRateLimited",
+            "description": "Jira rate limited the checks. Retry later.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "jiraUnavailable",
+            "description": "Jira did not answer the checks, or answered with something they cannot read. Retry later.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "JiraProjectBatchMigrateInput",
+        "description": "The Jira projects of one connected Jira site to migrate to Linear.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "integrationId",
+            "description": "The identifier of the Jira integration of the site that hosts every project.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projects",
+            "description": "The projects to migrate: 1 to 50, each at most once.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "JiraProjectBatchMigrateProjectInput",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "JiraProjectBatchMigrateProjectInput",
+        "description": "One Jira project to migrate, with the choices of the Migrate Jira project form. Give exactly one of `externalId` and `key`, and at least one of `import` and `sync`.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "externalId",
+            "description": "The Jira project ID, such as 10016.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "key",
+            "description": "The Jira project key, such as ENG. Case-insensitive.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "teamId",
+            "description": "The identifier or key of the team to import into and sync with. An import of a project that already syncs must go into the team it syncs with.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "teamName",
+            "description": "The name of a team for the import to create, when no team identifier is given. Requires an import and the team creation permission. A name that a team already has gets a number added.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "import",
+            "description": "The import of the project's existing issues. Omit to only sync. Several imports into one team run one at a time.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "JiraProjectMigrateImportInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "sync",
+            "description": "How the project syncs. With an import, sync starts once the import completes. Omit to only import. Requires a team identifier when there is no import.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "JiraProjectMigrateSyncInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "JiraProjectMigrateImportInput",
+        "description": "The import of a Jira project's existing issues through the site's connection, with the choices of the Migrate Jira project form.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "jql",
+            "description": "A JQL filter that limits which of the project's issues are imported. Linear adds it to the project's query, so it cannot reach other projects.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "includeStaleIssues",
+            "description": "Whether to import issues not updated in the last 6 months. They are imported archived.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "includeClosedIssues",
+            "description": "Whether to import closed and done issues. They are imported archived.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "users",
+            "description": "Which Jira users to map to Linear users.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "ImportUsersOption",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "ImportUsersOption",
+        "description": "Which users of the source service an import maps to Linear users.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "matchAndInvite",
+            "description": "Map users who match a Linear user by email, and invite the users whose email is on one of the workspace's domains. Skip the rest.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "matchOnly",
+            "description": "Map users who match a Linear user by email, and skip the rest.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "skip",
+            "description": "Import no users.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "JiraProjectMigrateSyncInput",
+        "description": "How a Jira project syncs with its team.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "syncDirection",
+            "description": "The direction in which the project syncs with the team. The legacy one-way mode is not accepted.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "JiraSyncDirection",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "NotificationPayload",
         "description": "Return type for notification mutations.",
         "fields": [
@@ -155855,6 +157409,33 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "CodingInferenceAnthropicConnectPayload",
+        "description": "[Internal] Start of an Anthropic organization connection.",
+        "fields": [
+          {
+            "name": "authorizationUrl",
+            "description": "The URL where an Anthropic organization admin approves the connection.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
                 "ofType": null
               }
             },
