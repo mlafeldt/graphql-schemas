@@ -1529,6 +1529,33 @@ type AiConversationAckPart implements AiConversationBasePart {
   summary: String
 }
 
+type AiConversationAddToWorkbenchToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: JSONObject
+
+  """The result of the tool call."""
+  result: AiConversationAddToWorkbenchToolCallResult
+}
+
+type AiConversationAddToWorkbenchToolCallResult {
+  operation: AiConversationAddToWorkbenchToolCallResultOperation
+}
+
+enum AiConversationAddToWorkbenchToolCallResultOperation {
+  added
+  alreadyInWorkbench
+}
+
 """An agent-origin message in a conversation turn."""
 type AiConversationAgentMessagePart implements AiConversationBasePart {
   """The ID of the part."""
@@ -3537,12 +3564,14 @@ enum AiConversationTool {
   UpdatePullRequestReviewFinding
   HandoffToCodingSession
   SubscribeToEvent
+  UpdateEventSubscription
   UnsubscribeFromEvent
   TranscribeVideo
   TranscribeMedia
   Memory
   CreateAgentChat
   RenameAgentChat
+  AddToWorkbench
   SearchDocumentation
   ContactSupport
   WebSearch
@@ -3558,7 +3587,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationListSubagentsToolCall | AiConversationMessageSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationWriteSandboxFileToolCall | AiConversationEditSandboxFileToolCall | AiConversationBashOutputToolCall | AiConversationBashKillToolCall | AiConversationDevServerToolCall | AiConversationGitPushToolCall | AiConversationSandboxPullRequestToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationCreateAgentChatToolCall | AiConversationRenameAgentChatToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationCodeModeToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationListSubagentsToolCall | AiConversationMessageSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationWriteSandboxFileToolCall | AiConversationEditSandboxFileToolCall | AiConversationBashOutputToolCall | AiConversationBashKillToolCall | AiConversationDevServerToolCall | AiConversationGitPushToolCall | AiConversationSandboxPullRequestToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUpdateEventSubscriptionToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationCreateAgentChatToolCall | AiConversationRenameAgentChatToolCall | AiConversationAddToWorkbenchToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationCodeModeToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -3659,6 +3688,26 @@ type AiConversationUpdateEntityToolCallArgs {
 type AiConversationUpdateEntityToolCallResult {
   updatedEntities: [AiConversationCreateEntityToolCallResultCreatedEntities!]
   startedAgentSessions: [AiConversationSearchEntitiesToolCallResultEntities!]
+}
+
+type AiConversationUpdateEventSubscriptionToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationUpdateEventSubscriptionToolCallArgs
+}
+
+type AiConversationUpdateEventSubscriptionToolCallArgs {
+  subscriptionId: String!
+  message: String
 }
 
 type AiConversationUpdatePullRequestReviewFindingToolCall implements AiConversationBaseToolCall {
@@ -28304,6 +28353,38 @@ input OrganizationLinearAgentTrustedSourcesAllowlistEntryInput {
   key: String!
 }
 
+"""[Internal] A review category that Linear checks in its own research."""
+input OrganizationLinearReviewCategoryInput {
+  """[Internal] The identifier of the category."""
+  id: String!
+
+  """
+  [Internal] Short name shown in settings and on the findings the category raises.
+  """
+  name: String!
+
+  """
+  [Internal] Markdown instructions that tell the researcher what to check.
+  """
+  instructions: String!
+
+  """[Internal] How deeply the researcher reasons. Absent means auto."""
+  intelligence: WorkflowIntelligence
+
+  """
+  [Internal] Whether the category runs in every reviewed repository or only the selected ones.
+  """
+  repositoryScope: RepositoryScope!
+
+  """
+  [Internal] Repositories the category runs in when the scope is selected.
+  """
+  repositories: [OrganizationLinearReviewRepositoryInput!]!
+
+  """[Internal] Whether Linear checks the category in reviews."""
+  enabled: Boolean!
+}
+
 """[Internal] A repository that Linear Review covers."""
 input OrganizationLinearReviewRepositoryInput {
   """[Internal] Host of the repository, such as github.com."""
@@ -28333,6 +28414,11 @@ input OrganizationLinearReviewSettingsInput {
   [Internal] Whether Linear resolves other bots' comments that raise a problem Linear already reported. Defaults to true.
   """
   resolveDuplicates: Boolean
+
+  """
+  [Internal] Review categories the workspace wrote. Omit to keep the saved categories.
+  """
+  categories: [OrganizationLinearReviewCategoryInput!]
 }
 
 """[Internal] One team a managed team feature is limited to."""
@@ -34330,14 +34416,6 @@ type Query {
     """The identifier of the agent session to retrieve."""
     id: String!
   ): AgentSession!
-
-  """
-  [Internal] SSH address of the current user's running coding sandbox for this agent session.
-  """
-  agentSessionSshAddress(
-    """The identifier of the agent session."""
-    agentSessionId: String!
-  ): String
 
   """
   [Internal] Retrieves coding agent sandbox details for a given agent session ID.
@@ -45311,6 +45389,7 @@ enum ViewType {
   board
   completedCycle
   cycle
+  upcomingCycle
   release
   releaseOverviewIssues
   continuousPipelineReleases
@@ -45370,6 +45449,9 @@ enum ViewType {
 
   """[Internal] The Shared with me tab of the documents page."""
   sharedDocuments
+
+  """[Internal] The Recent tab of the documents page."""
+  recentDocuments
 
   """[Internal] The All tab of the documents page."""
   allDocuments
