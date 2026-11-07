@@ -1434,6 +1434,11 @@ type AiConversation implements Node {
   """The conversation's unique URL slug."""
   slugId: String!
 
+  """
+  [Internal] The conversation that spawned this independent conversation.
+  """
+  spawnedFromConversationId: String
+
   """[Internal] The workflow definition that created this conversation."""
   workflowDefinition: WorkflowDefinition
 
@@ -1556,6 +1561,42 @@ enum AiConversationAddToWorkbenchToolCallResultOperation {
   alreadyInWorkbench
 }
 
+"""A message one agent conversation sent to another."""
+type AiConversationAgentMessage {
+  """The message identifier."""
+  id: String!
+
+  """The identifier of the message's thread."""
+  threadId: String!
+
+  """The identifier of the message this one replies to."""
+  inReplyToId: String
+
+  """The conversation that sent the message."""
+  senderConversationId: String!
+
+  """The conversation that receives the message."""
+  recipientConversationId: String!
+
+  """The name of the sending conversation."""
+  senderName: String!
+
+  """Where the sending conversation started."""
+  senderSource: AiConversationInitialSource
+
+  """The Markdown body of the message."""
+  message: String!
+
+  """The data of the message. Messages sent before it was saved have none."""
+  bodyData: JSONObject
+
+  """The short summary people read."""
+  summary: String!
+
+  """Whether the sender asked for a reply."""
+  shouldReply: Boolean!
+}
+
 """An agent-origin message in a conversation turn."""
 type AiConversationAgentMessagePart implements AiConversationBasePart {
   """The ID of the part."""
@@ -1568,7 +1609,7 @@ type AiConversationAgentMessagePart implements AiConversationBasePart {
   metadata: AiConversationPartMetadata!
 
   """Source identity, full message and display summary."""
-  agentMessage: JSONObject!
+  agentMessage: AiConversationAgentMessage!
 
   """The human owner whose access authorizes this exchange."""
   ownerUserId: String!
@@ -2767,6 +2808,17 @@ type AiConversationPostChatMessageToolCallResult {
   snippet: String
   conversationUrl: String
   destination: AiConversationPostChatMessageToolCallResultDestination
+  author: AiConversationPostChatMessageToolCallResultAuthor
+}
+
+type AiConversationPostChatMessageToolCallResultAuthor {
+  kind: AiConversationPostChatMessageToolCallResultAuthorKind!
+  name: String!
+  iconUrl: String
+}
+
+enum AiConversationPostChatMessageToolCallResultAuthorKind {
+  custom
 }
 
 type AiConversationPostChatMessageToolCallResultDestination {
@@ -2988,6 +3040,34 @@ type AiConversationReasoningPart implements AiConversationBasePart {
 
   """The Markdown body of the reasoning part."""
   body: String!
+}
+
+type AiConversationRemoveFromWorkbenchToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: JSONObject
+
+  """The result of the tool call."""
+  result: AiConversationRemoveFromWorkbenchToolCallResult
+}
+
+type AiConversationRemoveFromWorkbenchToolCallResult {
+  operation: AiConversationRemoveFromWorkbenchToolCallResultOperation
+}
+
+enum AiConversationRemoveFromWorkbenchToolCallResultOperation {
+  removed
+  alreadyArchived
+  notInWorkbench
 }
 
 type AiConversationRemoveSpendLimitToolCall implements AiConversationBaseToolCall {
@@ -3435,6 +3515,25 @@ enum AiConversationStatus {
   waiting
 }
 
+type AiConversationSubmitEvidenceToolCall implements AiConversationBaseToolCall {
+  """The name of the tool that was called."""
+  name: AiConversationTool!
+  displayInfo: AiConversationToolDisplayInfo!
+
+  """The arguments of the tool call."""
+  rawArgs: JSON
+
+  """The result of the tool call."""
+  rawResult: JSON
+
+  """The arguments to the tool call."""
+  args: AiConversationSubmitEvidenceToolCallArgs
+}
+
+type AiConversationSubmitEvidenceToolCallArgs {
+  summary: String
+}
+
 type AiConversationSubscribeToEventToolCall implements AiConversationBaseToolCall {
   """The name of the tool that was called."""
   name: AiConversationTool!
@@ -3555,6 +3654,7 @@ enum AiConversationTool {
   DevServer
   GitPush
   SandboxPullRequest
+  SubmitEvidence
   ReadFile
   GetPullRequestDiff
   GetPullRequestFile
@@ -3572,6 +3672,7 @@ enum AiConversationTool {
   CreateAgentChat
   RenameAgentChat
   AddToWorkbench
+  RemoveFromWorkbench
   SearchDocumentation
   ContactSupport
   WebSearch
@@ -3587,7 +3688,7 @@ enum AiConversationTool {
 }
 
 """The tool call."""
-union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationListSubagentsToolCall | AiConversationMessageSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationWriteSandboxFileToolCall | AiConversationEditSandboxFileToolCall | AiConversationBashOutputToolCall | AiConversationBashKillToolCall | AiConversationDevServerToolCall | AiConversationGitPushToolCall | AiConversationSandboxPullRequestToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUpdateEventSubscriptionToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationCreateAgentChatToolCall | AiConversationRenameAgentChatToolCall | AiConversationAddToWorkbenchToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationCodeModeToolCall | AiConversationInvokeMcpToolToolCall
+union AiConversationToolCall = AiConversationSearchEntitiesToolCall | AiConversationSearchSettingsToolCall | AiConversationReadSettingToolCall | AiConversationPatchSettingsToolCall | AiConversationNotifyUsersToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationQueryViewToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationSuggestValuesToolCall | AiConversationCreateEntityToolCall | AiConversationUpdateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationRestoreEntityToolCall | AiConversationRunLoopToolCall | AiConversationSpawnSubagentToolCall | AiConversationListSubagentsToolCall | AiConversationMessageSubagentToolCall | AiConversationResearchToolCall | AiConversationCodeIntelligenceToolCall | AiConversationStartCodingSessionToolCall | AiConversationPromptCodingSessionToolCall | AiConversationListCodingSessionsToolCall | AiConversationSuggestRepositoryToolCall | AiConversationCreateSandboxToolCall | AiConversationBashToolCall | AiConversationSandboxGitHistoryToolCall | AiConversationReadSandboxFileToolCall | AiConversationWriteSandboxFileToolCall | AiConversationEditSandboxFileToolCall | AiConversationBashOutputToolCall | AiConversationBashKillToolCall | AiConversationDevServerToolCall | AiConversationGitPushToolCall | AiConversationSandboxPullRequestToolCall | AiConversationSubmitEvidenceToolCall | AiConversationReadFileToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationRerunPullRequestReviewToolCall | AiConversationUpdatePullRequestReviewFindingToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationUpdateEventSubscriptionToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationTranscribeVideoToolCall | AiConversationTranscribeMediaToolCall | AiConversationMemoryToolCall | AiConversationCreateAgentChatToolCall | AiConversationRenameAgentChatToolCall | AiConversationAddToWorkbenchToolCall | AiConversationRemoveFromWorkbenchToolCall | AiConversationSearchDocumentationToolCall | AiConversationContactSupportToolCall | AiConversationWebSearchToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationPostChatMessageToolCall | AiConversationSearchChatChannelsToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationSetSpendLimitToolCall | AiConversationRemoveSpendLimitToolCall | AiConversationNavigateToPageToolCall | AiConversationCodeModeToolCall | AiConversationInvokeMcpToolToolCall
 
 """A tool call part in an AI conversation."""
 type AiConversationToolCallPart implements AiConversationBasePart {
@@ -9705,6 +9806,18 @@ input DocumentFilter {
 
   """Filters that the document's release must satisfy."""
   release: ReleaseFilter
+
+  """
+  [Internal] Filters that the document's parent document must satisfy. Use
+  `null: true` for documents that are not sub-documents.
+  """
+  parentDocument: NullableDocumentFilter
+
+  """
+  [Internal] Filters that the user owning the personal space of a personal
+  document must satisfy. Use `null: false` for personal documents.
+  """
+  personalUser: NullableUserFilter
 
   """Compound filters, all of which need to be matched by the document."""
   and: [DocumentFilter!]
@@ -25877,6 +25990,72 @@ input NullableDocumentContentFilter {
   or: [NullableDocumentContentFilter!]
 }
 
+"""Document filtering options."""
+input NullableDocumentFilter {
+  """Comparator for the identifier."""
+  id: IDComparator
+
+  """Comparator for the created at date."""
+  createdAt: DateComparator
+
+  """Comparator for the updated at date."""
+  updatedAt: DateComparator
+
+  """Comparator for the document title."""
+  title: StringComparator
+
+  """[Internal] Comparator for the document's searchable content."""
+  searchableContent: ContentComparator
+
+  """Comparator for the document slug ID."""
+  slugId: StringComparator
+
+  """Filters that the document's creator must satisfy."""
+  creator: UserFilter
+
+  """Filters that the document's owner must satisfy."""
+  owner: NullableUserFilter
+
+  """Filters that the document's project must satisfy."""
+  project: ProjectFilter
+
+  """Filters that the document's issue must satisfy."""
+  issue: IssueFilter
+
+  """Filters that the document's initiative must satisfy."""
+  initiative: InitiativeFilter
+
+  """Filters that the document's team must satisfy."""
+  team: NullableTeamFilter
+
+  """Filters that the document's cycle must satisfy."""
+  cycle: CycleFilter
+
+  """Filters that the document's release must satisfy."""
+  release: ReleaseFilter
+
+  """
+  [Internal] Filters that the document's parent document must satisfy. Use
+  `null: true` for documents that are not sub-documents.
+  """
+  parentDocument: NullableDocumentFilter
+
+  """
+  [Internal] Filters that the user owning the personal space of a personal
+  document must satisfy. Use `null: false` for personal documents.
+  """
+  personalUser: NullableUserFilter
+
+  """Filter based on the existence of the relation."""
+  null: Boolean
+
+  """Compound filters, all of which need to be matched by the document."""
+  and: [NullableDocumentFilter!]
+
+  """Compound filters, one of which need to be matched by the document."""
+  or: [NullableDocumentFilter!]
+}
+
 """Nullable comparator for optional durations."""
 input NullableDurationComparator {
   """Equals constraint."""
@@ -27349,7 +27528,8 @@ type Organization implements Node {
   """
   The template format for Git branch names created from issues. Supports
   template variables like {issueIdentifier} and {issueTitle}. If null, the
-  default formatting will be used.
+  default formatting will be used. To get an issue's branch name, read the
+  issue's branchName field instead of rendering this format.
   """
   gitBranchFormat: String
 
