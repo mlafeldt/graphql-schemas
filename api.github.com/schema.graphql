@@ -6016,7 +6016,9 @@ input CreateIssueFieldInput {
   """A unique identifier for the client performing the mutation."""
   clientMutationId: String
 
-  """The ID of the organization where the issue field will be created."""
+  """
+  The ID of the organization or user where the issue field will be created.
+  """
   ownerId: ID!
 
   """The name of the issue field."""
@@ -6129,10 +6131,10 @@ input CreateIssueTypeInput {
   """A unique identifier for the client performing the mutation."""
   clientMutationId: String
 
-  """The ID for the organization on which the issue type is created"""
+  """The ID of the owner on which the issue type is created"""
   ownerId: ID!
 
-  """Whether or not the issue type is enabled on the org level"""
+  """Whether or not the issue type is enabled"""
   isEnabled: Boolean!
 
   """Name of the new issue type"""
@@ -15061,10 +15063,17 @@ input IssueFieldValueFilter {
 
 """The visibility of an issue field."""
 enum IssueFieldVisibility {
-  """Org Only"""
-  ORG_ONLY
+  """
+  Visible to members of the owning organization and, where repository context is supplied, collaborators on that repository.
+  """
+  ORG_ONLY @deprecated(reason: "`ORG_ONLY` will be removed. Use `RESTRICTED` instead. Removal on 2027-04-01 UTC.")
 
-  """All"""
+  """
+  Visible to the owner and to collaborators on the repository the field is read through.
+  """
+  RESTRICTED
+
+  """Visible to everyone who can see the issue."""
   ALL
 }
 
@@ -21908,7 +21917,7 @@ enum OrganizationOrderField {
   LOGIN
 }
 
-"""Used for argument of CreateProjectV2 mutation."""
+"""An organization or user that can own resources."""
 union OrganizationOrUser = Organization | User
 
 """Parameters to be used for the organization_property condition"""
@@ -26032,14 +26041,10 @@ type ProjectV2Field implements Node & ProjectV2FieldCommon {
   """The Node ID of the ProjectV2Field object"""
   id: ID!
 
-  """
-  Returns true if this field is associated with an organization issue field
-  """
+  """Returns true if this field is associated with an issue field"""
   isIssueField: Boolean!
 
-  """
-  The organization issue field associated with this project field, if any
-  """
+  """The issue field associated with this project field, if any"""
   issueField: IssueFields
 
   """The project field's name."""
@@ -26066,9 +26071,7 @@ interface ProjectV2FieldCommon {
   """The Node ID of the ProjectV2FieldCommon object"""
   id: ID!
 
-  """
-  Returns true if this field is associated with an organization issue field
-  """
+  """Returns true if this field is associated with an issue field"""
   isIssueField: Boolean!
 
   """The project field's name."""
@@ -26828,9 +26831,7 @@ type ProjectV2IterationField implements Node & ProjectV2FieldCommon {
   """The Node ID of the ProjectV2IterationField object"""
   id: ID!
 
-  """
-  Returns true if this field is associated with an organization issue field
-  """
+  """Returns true if this field is associated with an issue field"""
   isIssueField: Boolean!
 
   """The project field's name."""
@@ -26902,14 +26903,10 @@ type ProjectV2MultiSelectField implements Node & ProjectV2FieldCommon {
   """The Node ID of the ProjectV2MultiSelectField object"""
   id: ID!
 
-  """
-  Returns true if this field is associated with an organization issue field
-  """
+  """Returns true if this field is associated with an issue field"""
   isIssueField: Boolean!
 
-  """
-  The organization issue field associated with this project field, if any
-  """
+  """The issue field associated with this project field, if any"""
   issueField: IssueFields
 
   """Options for the multi select field"""
@@ -27098,14 +27095,10 @@ type ProjectV2SingleSelectField implements Node & ProjectV2FieldCommon {
   """The Node ID of the ProjectV2SingleSelectField object"""
   id: ID!
 
-  """
-  Returns true if this field is associated with an organization issue field
-  """
+  """Returns true if this field is associated with an issue field"""
   isIssueField: Boolean!
 
-  """
-  The organization issue field associated with this project field, if any
-  """
+  """The issue field associated with this project field, if any"""
   issueField: IssueFields
 
   """The project field's name."""
@@ -34124,7 +34117,7 @@ type Repository implements Node & PackageOwner & ProjectOwner & ProjectV2Recent 
   issueCreationPolicy: IssueCreationPolicy
 
   """
-  A list of the repository's issue fields, inherited from the organization
+  A list of the repository's issue fields, inherited from the repository's owner
   """
   issueFields(
     """Returns the elements in the list that come after the specified cursor."""
@@ -34438,6 +34431,28 @@ type Repository implements Node & PackageOwner & ProjectOwner & ProjectV2Recent 
     """Ordering options for the environments"""
     orderBy: PinnedEnvironmentOrder = {field: POSITION, direction: ASC}
   ): PinnedEnvironmentConnection
+
+  """
+  An ordered list of the repository owner's issue fields pinned to issues when no type is selected.
+  """
+  pinnedIssueFields(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """The order in which to return pinned issue fields."""
+    orderBy: PinnedIssueFieldOrder = {field: POSITION, direction: ASC}
+  ): IssueFieldsConnection
 
   """A list of pinned issues for this repository."""
   pinnedIssues(
@@ -44125,7 +44140,7 @@ input UpdateIssueTypeInput {
   """The ID of the issue type to update"""
   issueTypeId: ID!
 
-  """Whether or not the issue type is enabled for the organization"""
+  """Whether or not the issue type is enabled"""
   isEnabled: Boolean
 
   """The name of the issue type"""
@@ -45601,6 +45616,46 @@ type User implements Actor & Agentic & Node & PackageOwner & ProfileOwner & Proj
     last: Int
   ): IssueCommentConnection!
 
+  """A list of the user's issue fields"""
+  issueFields(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for issue fields returned from the connection."""
+    orderBy: IssueFieldOrder = {field: CREATED_AT, direction: ASC}
+  ): IssueFieldsConnection
+
+  """A list of the user's issue types"""
+  issueTypes(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for issue types returned from the connection."""
+    orderBy: IssueTypeOrder = {field: CREATED_AT, direction: ASC}
+  ): IssueTypeConnection
+
   """A list of issues associated with this user."""
   issues(
     """Ordering options for issues returned from the connection."""
@@ -45774,6 +45829,28 @@ type User implements Actor & Agentic & Node & PackageOwner & ProfileOwner & Proj
     """Returns the last _n_ elements from the list."""
     last: Int
   ): PinnableItemConnection!
+
+  """
+  An ordered list of issue fields pinned to issues when no type is selected.
+  """
+  pinnedIssueFields(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """The order in which to return pinned issue fields."""
+    orderBy: PinnedIssueFieldOrder = {field: POSITION, direction: ASC}
+  ): IssueFieldsConnection
 
   """
   A list of repositories and gists this profile owner has pinned to their profile

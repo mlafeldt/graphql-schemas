@@ -22059,7 +22059,7 @@
           },
           {
             "name": "ownerId",
-            "description": "The ID of the organization where the issue field will be created.",
+            "description": "The ID of the organization or user where the issue field will be created.",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -22525,7 +22525,7 @@
           },
           {
             "name": "ownerId",
-            "description": "The ID for the organization on which the issue type is created",
+            "description": "The ID of the owner on which the issue type is created",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -22539,7 +22539,7 @@
           },
           {
             "name": "isEnabled",
-            "description": "Whether or not the issue type is enabled on the org level",
+            "description": "Whether or not the issue type is enabled",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -57101,13 +57101,19 @@
         "enumValues": [
           {
             "name": "ORG_ONLY",
-            "description": "Org Only",
+            "description": "Visible to members of the owning organization and, where repository context is supplied, collaborators on that repository.",
+            "isDeprecated": true,
+            "deprecationReason": "`ORG_ONLY` will be removed. Use `RESTRICTED` instead. Removal on 2027-04-01 UTC."
+          },
+          {
+            "name": "RESTRICTED",
+            "description": "Visible to the owner and to collaborators on the repository the field is read through.",
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
             "name": "ALL",
-            "description": "All",
+            "description": "Visible to everyone who can see the issue.",
             "isDeprecated": false,
             "deprecationReason": null
           }
@@ -93087,7 +93093,7 @@
       {
         "kind": "UNION",
         "name": "OrganizationOrUser",
-        "description": "Used for argument of CreateProjectV2 mutation.",
+        "description": "An organization or user that can own resources.",
         "fields": null,
         "inputFields": null,
         "interfaces": null,
@@ -102021,7 +102027,7 @@
           },
           {
             "name": "isIssueField",
-            "description": "Returns true if this field is associated with an organization issue field",
+            "description": "Returns true if this field is associated with an issue field",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -102037,7 +102043,7 @@
           },
           {
             "name": "issueField",
-            "description": "The organization issue field associated with this project field, if any",
+            "description": "The issue field associated with this project field, if any",
             "args": [],
             "type": {
               "kind": "UNION",
@@ -102179,7 +102185,7 @@
           },
           {
             "name": "isIssueField",
-            "description": "Returns true if this field is associated with an organization issue field",
+            "description": "Returns true if this field is associated with an issue field",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -105472,7 +105478,7 @@
           },
           {
             "name": "isIssueField",
-            "description": "Returns true if this field is associated with an organization issue field",
+            "description": "Returns true if this field is associated with an issue field",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -105861,7 +105867,7 @@
           },
           {
             "name": "isIssueField",
-            "description": "Returns true if this field is associated with an organization issue field",
+            "description": "Returns true if this field is associated with an issue field",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -105877,7 +105883,7 @@
           },
           {
             "name": "issueField",
-            "description": "The organization issue field associated with this project field, if any",
+            "description": "The issue field associated with this project field, if any",
             "args": [],
             "type": {
               "kind": "UNION",
@@ -106616,7 +106622,7 @@
           },
           {
             "name": "isIssueField",
-            "description": "Returns true if this field is associated with an organization issue field",
+            "description": "Returns true if this field is associated with an issue field",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -106632,7 +106638,7 @@
           },
           {
             "name": "issueField",
-            "description": "The organization issue field associated with this project field, if any",
+            "description": "The issue field associated with this project field, if any",
             "args": [],
             "type": {
               "kind": "UNION",
@@ -134532,7 +134538,7 @@
           },
           {
             "name": "issueFields",
-            "description": "A list of the repository's issue fields, inherited from the organization",
+            "description": "A list of the repository's issue fields, inherited from the repository's owner",
             "args": [
               {
                 "name": "after",
@@ -135635,6 +135641,69 @@
             "type": {
               "kind": "OBJECT",
               "name": "PinnedEnvironmentConnection",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pinnedIssueFields",
+            "description": "An ordered list of the repository owner's issue fields pinned to issues when no type is selected.",
+            "args": [
+              {
+                "name": "after",
+                "description": "Returns the elements in the list that come after the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "Returns the elements in the list that come before the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "Returns the first _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "Returns the last _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "The order in which to return pinned issue fields.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "PinnedIssueFieldOrder",
+                  "ofType": null
+                },
+                "defaultValue": "{field: POSITION, direction: ASC}"
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "IssueFieldsConnection",
               "ofType": null
             },
             "isDeprecated": false,
@@ -170762,7 +170831,7 @@
           },
           {
             "name": "isEnabled",
-            "description": "Whether or not the issue type is enabled for the organization",
+            "description": "Whether or not the issue type is enabled",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -176056,6 +176125,132 @@
             "deprecationReason": null
           },
           {
+            "name": "issueFields",
+            "description": "A list of the user's issue fields",
+            "args": [
+              {
+                "name": "after",
+                "description": "Returns the elements in the list that come after the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "Returns the elements in the list that come before the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "Returns the first _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "Returns the last _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "Ordering options for issue fields returned from the connection.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "IssueFieldOrder",
+                  "ofType": null
+                },
+                "defaultValue": "{field: CREATED_AT, direction: ASC}"
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "IssueFieldsConnection",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueTypes",
+            "description": "A list of the user's issue types",
+            "args": [
+              {
+                "name": "after",
+                "description": "Returns the elements in the list that come after the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "Returns the elements in the list that come before the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "Returns the first _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "Returns the last _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "Ordering options for issue types returned from the connection.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "IssueTypeOrder",
+                  "ofType": null
+                },
+                "defaultValue": "{field: CREATED_AT, direction: ASC}"
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "IssueTypeConnection",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "issues",
             "description": "A list of issues associated with this user.",
             "args": [
@@ -176669,6 +176864,69 @@
                 "name": "PinnableItemConnection",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pinnedIssueFields",
+            "description": "An ordered list of issue fields pinned to issues when no type is selected.",
+            "args": [
+              {
+                "name": "after",
+                "description": "Returns the elements in the list that come after the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "Returns the elements in the list that come before the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "Returns the first _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "Returns the last _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "The order in which to return pinned issue fields.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "PinnedIssueFieldOrder",
+                  "ofType": null
+                },
+                "defaultValue": "{field: POSITION, direction: ASC}"
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "IssueFieldsConnection",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
