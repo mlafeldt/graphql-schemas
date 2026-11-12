@@ -1842,6 +1842,12 @@ type AttachmentPayload {
   success: Boolean!
 }
 
+"""The result of an attachment sources query."""
+type AttachmentSourcesPayload {
+  """A unique list of all source types used in this workspace."""
+  sources: JSONObject!
+}
+
 """
 The display details to update on an existing attachment. title is required;
 omitted optional fields keep their values. Supplied metadata replaces the entire
@@ -9300,6 +9306,11 @@ enum FeedSummarySchedule {
   daily
   weekly
   never
+}
+
+type FileUploadDeletePayload {
+  """Whether the operation was successful."""
+  success: Boolean!
 }
 
 """By which resolution is frequency defined."""
@@ -20342,6 +20353,15 @@ type Mutation {
     """URL of the file to be uploaded to Linear."""
     url: String!
   ): ImageUploadFromUrlPayload!
+
+  """
+  Permanently delete an uploaded file by asset URL. This should be used as a
+  last resort and will break comments and documents that reference the asset.
+  """
+  fileUploadDangerouslyDelete(
+    """The asset URL of the uploaded file to delete."""
+    assetUrl: String!
+  ): FileUploadDeletePayload!
 
   """
   Creates a rule that maps a Git event to an issue status for a team. Requires
@@ -33779,6 +33799,19 @@ type Query {
   ): Issue! @deprecated(reason: "Will be removed in near future, please use `attachmentsForURL` to get attachments and their issues instead.")
 
   """
+  Lists distinct sources on accessible, non-archived issue attachments. API and
+  OAuth attachment sources are grouped by URL domain; other sources are grouped
+  by type. Each group includes the oldest attachment's source metadata. Results
+  may be cached for up to one hour.
+  """
+  attachmentSources(
+    """
+    (optional) if provided will only return attachment sources for the given team.
+    """
+    teamId: String
+  ): AttachmentSourcesPayload!
+
+  """
   Lists supported audit action identifiers and a description of each action. Use
   the returned type values to interpret AuditEntry.type or filter auditEntries.
   Requires permission to view the workspace audit log.
@@ -46632,6 +46665,9 @@ enum ViewType {
 
   """[Internal] The documents list of a team."""
   teamDocuments
+
+  """[Internal] The documents list of the workspace."""
+  workspaceDocuments
   releasePipelines
   automations
   automationRunHistory
