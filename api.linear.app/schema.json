@@ -13378,7 +13378,7 @@
           },
           {
             "name": "leadTime",
-            "description": "Lead time (created -> completed) comparator.",
+            "description": "Compares the elapsed time from creation to completion. The duration is null for issues without a completion time. Accepts ISO 8601 durations or milliseconds.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDurationComparator",
@@ -13388,7 +13388,7 @@
           },
           {
             "name": "cycleTime",
-            "description": "Cycle time (started -> completed) comparator.",
+            "description": "Compares the elapsed time from work starting to completion. The duration is null if either timestamp is missing. Accepts ISO 8601 durations or milliseconds.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDurationComparator",
@@ -13398,7 +13398,7 @@
           },
           {
             "name": "ageTime",
-            "description": "Age (created -> now) comparator, defined if the issue is still open.",
+            "description": "Compares the elapsed time from creation to the start of the query's database transaction. The duration is null for completed or canceled issues. Accepts ISO 8601 durations or milliseconds.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDurationComparator",
@@ -13408,7 +13408,7 @@
           },
           {
             "name": "triageTime",
-            "description": "Triage time (entered triaged -> triaged) comparator.",
+            "description": "Compares the elapsed time from entering triage to leaving triage. The duration is null if either timestamp is missing. Accepts ISO 8601 durations or milliseconds.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDurationComparator",
@@ -15695,7 +15695,7 @@
           },
           {
             "name": "leadTime",
-            "description": "Lead time (created -> completed) comparator.",
+            "description": "Compares the elapsed time from creation to completion. The duration is null for issues without a completion time. Accepts ISO 8601 durations or milliseconds.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDurationComparator",
@@ -15705,7 +15705,7 @@
           },
           {
             "name": "cycleTime",
-            "description": "Cycle time (started -> completed) comparator.",
+            "description": "Compares the elapsed time from work starting to completion. The duration is null if either timestamp is missing. Accepts ISO 8601 durations or milliseconds.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDurationComparator",
@@ -15715,7 +15715,7 @@
           },
           {
             "name": "ageTime",
-            "description": "Age (created -> now) comparator, defined if the issue is still open.",
+            "description": "Compares the elapsed time from creation to the start of the query's database transaction. The duration is null for completed or canceled issues. Accepts ISO 8601 durations or milliseconds.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDurationComparator",
@@ -15725,7 +15725,7 @@
           },
           {
             "name": "triageTime",
-            "description": "Triage time (entered triaged -> triaged) comparator.",
+            "description": "Compares the elapsed time from entering triage to leaving triage. The duration is null if either timestamp is missing. Accepts ISO 8601 durations or milliseconds.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDurationComparator",
@@ -18209,7 +18209,7 @@
           },
           {
             "name": "leadTime",
-            "description": "Lead time (created -> completed) comparator.",
+            "description": "Compares the elapsed time from creation to completion. The duration is null for issues without a completion time. Accepts ISO 8601 durations or milliseconds.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDurationComparator",
@@ -18219,7 +18219,7 @@
           },
           {
             "name": "cycleTime",
-            "description": "Cycle time (started -> completed) comparator.",
+            "description": "Compares the elapsed time from work starting to completion. The duration is null if either timestamp is missing. Accepts ISO 8601 durations or milliseconds.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDurationComparator",
@@ -18229,7 +18229,7 @@
           },
           {
             "name": "ageTime",
-            "description": "Age (created -> now) comparator, defined if the issue is still open.",
+            "description": "Compares the elapsed time from creation to the start of the query's database transaction. The duration is null for completed or canceled issues. Accepts ISO 8601 durations or milliseconds.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDurationComparator",
@@ -18239,7 +18239,7 @@
           },
           {
             "name": "triageTime",
-            "description": "Triage time (entered triaged -> triaged) comparator.",
+            "description": "Compares the elapsed time from entering triage to leaving triage. The duration is null if either timestamp is missing. Accepts ISO 8601 durations or milliseconds.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDurationComparator",
@@ -32715,7 +32715,7 @@
       {
         "kind": "OBJECT",
         "name": "CustomerNeed",
-        "description": "A request or piece of feedback associated with a customer and linked to an issue or project. It can include a written message, priority, and an attachment pointing to the original conversation. Multiple needs can connect the same customer to the same work, preserving each source of feedback.",
+        "description": "A request or piece of feedback optionally associated with a customer and linked to work. It can include a written message, priority, and an attachment pointing to the original conversation. Multiple needs can connect the same customer to the same work, preserving each source of feedback.",
         "fields": [
           {
             "name": "id",
@@ -56642,6 +56642,30 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "failures",
+            "description": "Up to 50 recorded delivery failures for this webhook in the current workspace, newest first.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "WebhookFailureEvent",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -56652,6 +56676,121 @@
             "ofType": null
           }
         ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "WebhookFailureEvent",
+        "description": "A record of a failed webhook delivery attempt. Created when a webhook payload could not be successfully delivered to the destination URL, either due to an HTTP error response or a network failure. Each failure event captures the HTTP status code (if available), the response body or error message, and a stable execution ID that is shared across retries of the same delivery.",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The unique identifier of the entity.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createdAt",
+            "description": "The time at which the entity was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "webhook",
+            "description": "The webhook that this failure event is associated with.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Webhook",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "url",
+            "description": "The URL that the webhook was trying to push to.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "httpStatus",
+            "description": "The HTTP status code returned by the webhook recipient. Null if the request failed before receiving a response (e.g., DNS resolution failure, connection timeout).",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "responseOrError",
+            "description": "The HTTP response body returned by the recipient, or the error message if the request failed before receiving a response. Truncated to 1000 characters.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "executionId",
+            "description": "A stable identifier for the webhook delivery attempt. This ID remains the same across retries of the same payload, making it useful for correlating multiple failure events that belong to the same logical delivery.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -64401,183 +64540,6 @@
         "description": null,
         "fields": [
           {
-            "name": "projects",
-            "description": "Returns projects visible to you in the workspace. Use filter to narrow the results and the connection arguments to page or sort them.",
-            "args": [
-              {
-                "name": "filter",
-                "description": "Filter returned projects.",
-                "type": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ProjectFilter",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "before",
-                "description": "Returns results before this cursor. Pair with `last` to paginate backward, using a cursor returned by the same connection. Keep the filters and ordering unchanged between pages. Cannot be combined with `first` or `after`.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "after",
-                "description": "Returns results after this cursor. Pair with `first` and the previous page's `endCursor` to fetch the next page. Keep the filters and ordering unchanged between pages. Cannot be combined with `last` or `before`.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "first",
-                "description": "The maximum number of results to return, starting after `after` if supplied. Between 1 and 250. Defaults to 50 when neither `first` nor `last` is supplied. Cannot be combined with `last` or `before`.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "last",
-                "description": "The maximum number of results to return, ending before `before` if supplied. Between 1 and 250. Cannot be combined with `first` or `after`.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "includeArchived",
-                "description": "Includes archived resources alongside active ones. Defaults to false, which returns only active resources. This does not include deleted resources.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Boolean",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "orderBy",
-                "description": "Orders results by creation time or last meaningful update time. Defaults to `createdAt`. Results are newest first with `first` and oldest first with `last`; use the returned `endCursor` as `before` to continue backward. Cannot be combined with custom `sort` options on fields that support them.",
-                "type": {
-                  "kind": "ENUM",
-                  "name": "PaginationOrderBy",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "sort",
-                "description": "Sort returned projects.",
-                "type": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "INPUT_OBJECT",
-                      "name": "ProjectSortInput",
-                      "ofType": null
-                    }
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectConnection",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "project",
-            "description": "Returns a project you can access by UUID, URL slug, or human-readable project identifier. Archived projects can also be retrieved.",
-            "args": [
-              {
-                "name": "id",
-                "description": "The project UUID, slug ID, or human-readable identifier.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Project",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectFilterSuggestion",
-            "description": "Suggests filters for a project view based on a text prompt.",
-            "args": [
-              {
-                "name": "teamId",
-                "description": "[Internal] The ID of the team if filtering a team view.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "prompt",
-                "description": "Text describing the projects to match.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectFilterSuggestionPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "agentActivities",
             "description": "Accessible agent activities, with filters and cursor-based pagination.",
             "args": [
@@ -65559,6 +65521,183 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "Comment",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projects",
+            "description": "Returns projects visible to you in the workspace. Use filter to narrow the results and the connection arguments to page or sort them.",
+            "args": [
+              {
+                "name": "filter",
+                "description": "Filter returned projects.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "Returns results before this cursor. Pair with `last` to paginate backward, using a cursor returned by the same connection. Keep the filters and ordering unchanged between pages. Cannot be combined with `first` or `after`.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "after",
+                "description": "Returns results after this cursor. Pair with `first` and the previous page's `endCursor` to fetch the next page. Keep the filters and ordering unchanged between pages. Cannot be combined with `last` or `before`.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "The maximum number of results to return, starting after `after` if supplied. Between 1 and 250. Defaults to 50 when neither `first` nor `last` is supplied. Cannot be combined with `last` or `before`.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "The maximum number of results to return, ending before `before` if supplied. Between 1 and 250. Cannot be combined with `first` or `after`.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeArchived",
+                "description": "Includes archived resources alongside active ones. Defaults to false, which returns only active resources. This does not include deleted resources.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "Orders results by creation time or last meaningful update time. Defaults to `createdAt`. Results are newest first with `first` and oldest first with `last`; use the returned `endCursor` as `before` to continue backward. Cannot be combined with custom `sort` options on fields that support them.",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "PaginationOrderBy",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "sort",
+                "description": "Sort returned projects.",
+                "type": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "ProjectSortInput",
+                      "ofType": null
+                    }
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "project",
+            "description": "Returns a project you can access by UUID, URL slug, or human-readable project identifier. Archived projects can also be retrieved.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The project UUID, slug ID, or human-readable identifier.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Project",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectFilterSuggestion",
+            "description": "Suggests filters for a project view based on a text prompt.",
+            "args": [
+              {
+                "name": "teamId",
+                "description": "[Internal] The ID of the team if filtering a team view.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "prompt",
+                "description": "Text describing the projects to match.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectFilterSuggestionPayload",
                 "ofType": null
               }
             },
@@ -72941,41 +73080,6 @@
       },
       {
         "kind": "OBJECT",
-        "name": "ProjectFilterSuggestionPayload",
-        "description": "The result of a project filter suggestion query.",
-        "fields": [
-          {
-            "name": "filter",
-            "description": "The json filter that is suggested.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "JSONObject",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "logId",
-            "description": "The log id of the prompt, that created this filter.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
         "name": "AgentSkillConnection",
         "description": "A page of results. Read `nodes` for the resources, or `edges` if you also need a cursor for each result. Use `pageInfo` to fetch further pages; a connection may contain fewer results than the requested page size.",
         "fields": [
@@ -75244,6 +75348,41 @@
                 "name": "String",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "ProjectFilterSuggestionPayload",
+        "description": "The result of a project filter suggestion query.",
+        "fields": [
+          {
+            "name": "filter",
+            "description": "The json filter that is suggested.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSONObject",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "logId",
+            "description": "The log id of the prompt, that created this filter.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -92016,350 +92155,6 @@
         "description": null,
         "fields": [
           {
-            "name": "projectCreate",
-            "description": "Creates a project in the supplied teams. You can apply a project template to fill in defaults and create its milestones, initial issues, and initiative associations. The new project must have at least one accessible team.",
-            "args": [
-              {
-                "name": "aiConversationId",
-                "description": "[Internal] The identifier of the project draft conversation to attach to this project.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "projectDraftId",
-                "description": "[Internal] The identifier of the project draft that produced this project.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "slackChannelName",
-                "description": "The full name for the Slack channel to create (including prefix). When provided, a Slack channel will be created and connected to the project.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "input",
-                "description": "The project properties to set on the new project.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "ProjectCreateInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectUpdate",
-            "description": "Updates the supplied fields of a project you can edit. Omitted fields keep their current values. List inputs such as memberIds and labelIds replace the corresponding lists; see each input for clearing rules and team-access behavior.",
-            "args": [
-              {
-                "name": "input",
-                "description": "A partial project object to update the project with.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "ProjectUpdateInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "id",
-                "description": "The identifier of the project to update. Also the identifier from the URL is accepted.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectDelete",
-            "description": "Moves a project to the trash. This archives the project rather than immediately deleting it permanently. You can restore it with projectUnarchive while it remains available in the trash.",
-            "args": [
-              {
-                "name": "id",
-                "description": "The identifier of the project to delete.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectArchivePayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectArchive",
-            "description": "Archives a project.",
-            "args": [
-              {
-                "name": "trash",
-                "description": "Whether to trash the project.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Boolean",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "id",
-                "description": "The identifier of the project to archive. Also the identifier from the URL is accepted.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectArchivePayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Deprecated in favor of projectDelete."
-          },
-          {
-            "name": "projectUnarchive",
-            "description": "Restores an archived or trashed project. The operation checks the project quota of each associated team before restoring it.",
-            "args": [
-              {
-                "name": "id",
-                "description": "The identifier of the project to restore. Also the identifier from the URL is accepted.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectArchivePayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectAddLabel",
-            "description": "Adds a project label while keeping the project’s other labels. The label must be available to the project; label-group and team-scoping rules still apply.",
-            "args": [
-              {
-                "name": "labelId",
-                "description": "The identifier of the label to add.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "id",
-                "description": "The identifier of the project to add the label to.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectRemoveLabel",
-            "description": "Removes a project label while keeping the project’s other labels. The label itself is not deleted.",
-            "args": [
-              {
-                "name": "labelId",
-                "description": "The identifier of the label to remove.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "id",
-                "description": "The identifier of the project to remove the label from.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectExternalSyncDisable",
-            "description": "Disables external sync on a project.",
-            "args": [
-              {
-                "name": "syncSource",
-                "description": "The source of the external sync to disable.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "ENUM",
-                    "name": "ExternalSyncService",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "projectId",
-                "description": "The ID of the project to disable external sync for.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "agentActivityCreate",
             "description": "Publishes an activity to your agent’s session and updates its lifecycle. Thoughts and actions report ongoing work; a response completes the turn unless it has the continue signal, an elicitation waits for user input, and an error records a failed turn. The session must be unarchived and owned by the authenticated app user. Use the agent app’s OAuth or workload identity token; personal API keys cannot publish agent activities.",
             "args": [
@@ -94285,6 +94080,350 @@
             "deprecationReason": null
           },
           {
+            "name": "projectCreate",
+            "description": "Creates a project in the supplied teams. You can apply a project template to fill in defaults and create its milestones, initial issues, and initiative associations. The new project must have at least one accessible team.",
+            "args": [
+              {
+                "name": "aiConversationId",
+                "description": "[Internal] The identifier of the project draft conversation to attach to this project.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "projectDraftId",
+                "description": "[Internal] The identifier of the project draft that produced this project.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "slackChannelName",
+                "description": "The full name for the Slack channel to create (including prefix). When provided, a Slack channel will be created and connected to the project.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "input",
+                "description": "The project properties to set on the new project.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ProjectCreateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectUpdate",
+            "description": "Updates the supplied fields of a project you can edit. Omitted fields keep their current values. List inputs such as memberIds and labelIds replace the corresponding lists; see each input for clearing rules and team-access behavior.",
+            "args": [
+              {
+                "name": "input",
+                "description": "A partial project object to update the project with.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ProjectUpdateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the project to update. Also the identifier from the URL is accepted.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectDelete",
+            "description": "Moves a project to the trash. This archives the project rather than immediately deleting it permanently. You can restore it with projectUnarchive while it remains available in the trash.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The identifier of the project to delete.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectArchivePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectArchive",
+            "description": "Archives a project.",
+            "args": [
+              {
+                "name": "trash",
+                "description": "Whether to trash the project.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the project to archive. Also the identifier from the URL is accepted.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectArchivePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Deprecated in favor of projectDelete."
+          },
+          {
+            "name": "projectUnarchive",
+            "description": "Restores an archived or trashed project. The operation checks the project quota of each associated team before restoring it.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The identifier of the project to restore. Also the identifier from the URL is accepted.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectArchivePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectAddLabel",
+            "description": "Adds a project label while keeping the project’s other labels. The label must be available to the project; label-group and team-scoping rules still apply.",
+            "args": [
+              {
+                "name": "labelId",
+                "description": "The identifier of the label to add.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the project to add the label to.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectRemoveLabel",
+            "description": "Removes a project label while keeping the project’s other labels. The label itself is not deleted.",
+            "args": [
+              {
+                "name": "labelId",
+                "description": "The identifier of the label to remove.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the project to remove the label from.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectExternalSyncDisable",
+            "description": "Disables external sync on a project.",
+            "args": [
+              {
+                "name": "syncSource",
+                "description": "The source of the external sync to disable.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "ENUM",
+                    "name": "ExternalSyncService",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "projectId",
+                "description": "The ID of the project to disable external sync for.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "customViewCreate",
             "description": "Creates a saved view owned by you. Choose an issue, project, initiative, or update filter and set shared if others in its scope should use it. Display settings can be saved separately with viewPreferencesCreate.",
             "args": [
@@ -94393,7 +94532,7 @@
           },
           {
             "name": "customerNeedCreate",
-            "description": "Records a customer request against an issue. Provide input.issueId and optionally identify the customer, add Markdown feedback, or link a source attachment. Multiple needs can be recorded for the same customer and issue.",
+            "description": "Records customer feedback, optionally linked to an issue. Unlinked requests require Customer Signals to be enabled. You can identify the customer, add Markdown feedback, or link a source attachment. Multiple requests can be recorded for the same customer and issue.",
             "args": [
               {
                 "name": "input",
@@ -102307,6 +102446,51 @@
             "deprecationReason": null
           },
           {
+            "name": "projectMilestoneMove",
+            "description": "Moves a milestone and its issues to another project, including archived issues. The caller must have access to every issue in the milestone, and the milestone and destination project must be writable. If an issue's team is not part of the destination project, provide newIssueTeamId or addIssueTeamToProject. The returned team snapshots can be passed to the undo inputs when moving the milestone back to its original project.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The project to move the milestone to, as well as any additional options need to make a successful move, or undo a previous move.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ProjectMilestoneMoveInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the project milestone to move.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectMilestoneMovePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "projectRelationCreate",
             "description": "Creates a dependency between two different projects using date or milestone anchors.",
             "args": [
@@ -105626,902 +105810,6 @@
       },
       {
         "kind": "OBJECT",
-        "name": "ProjectPayload",
-        "description": "The result of a project mutation.",
-        "fields": [
-          {
-            "name": "lastSyncId",
-            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "project",
-            "description": "The project that was created or updated.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "Project",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ProjectCreateInput",
-        "description": "The details for a new project. Provide a name and the teams that will own its issues. A project template can supply defaults and create related milestones or issues; see templateId for how template values and your input are combined.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "name",
-            "description": "The name of the project.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "icon",
-            "description": "The icon of the project.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "color",
-            "description": "The project color as a hexadecimal color string, such as #5E6AD2.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "statusId",
-            "description": "The UUID of an active project status available to the project’s lead team. Without an explicit status or a template default, the project uses the first backlog status in that team’s status scope.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "description",
-            "description": "A short plain-text summary. Use content for the full Markdown overview.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "content",
-            "description": "The full project overview in Markdown, separate from the short description.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "teamIds",
-            "description": "UUIDs of the teams that the project belongs to. At least one accessible team must remain after template processing. Issues in the project must belong to one of these teams.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "convertedFromIssueId",
-            "description": "The ID of the issue that was converted into this project.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "lastAppliedTemplateId",
-            "description": "Records the last applied template UUID. To create the project from a template, use templateId.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "templateId",
-            "description": "The UUID of a project template to apply. Non-null input values override template defaults for icon, color, summary, status, priority, lead, and members. A nonempty teamIds list replaces the template’s teams; an empty list uses them. Nonempty content replaces the template overview. Labels are combined, with your selection taking precedence within a single-select group. The template can also create milestones, initial issues, and initiative associations. A nonempty name is still required. Omit useDefaultTemplate when supplying this field.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "useDefaultTemplate",
-            "description": "Whether to apply the first supplied team’s default project template. The request fails if that team has no default template. Omit or use false to create without a default template. This field cannot be supplied alongside templateId, even when false.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "leadId",
-            "description": "UUID of the project lead. Application users cannot be leads. The lead is also added as a member.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "memberIds",
-            "description": "UUIDs of users to add as project members. Application users cannot be members, and the project lead is added even when not listed. Without this input, a template can supply members; otherwise the list starts empty.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "startDate",
-            "description": "The planned start date in YYYY-MM-DD format.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "TimelessDate",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "startDateResolution",
-            "description": "The precision of startDate: month, quarter, halfYear, or year. Omit for an exact date.",
-            "type": {
-              "kind": "ENUM",
-              "name": "DateResolutionType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "targetDate",
-            "description": "The planned completion date in YYYY-MM-DD format.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "TimelessDate",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "targetDateResolution",
-            "description": "The precision of targetDate: month, quarter, halfYear, or year. Omit for an exact date.",
-            "type": {
-              "kind": "ENUM",
-              "name": "DateResolutionType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "sortOrder",
-            "description": "Position in shared project views, in ascending order. Omit or pass 0 to append; collisions are adjusted.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Float",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "prioritySortOrder",
-            "description": "The sort order for the project within shared views, when ordered by priority.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Float",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "priority",
-            "description": "The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "labelIds",
-            "description": "UUIDs of project labels to apply. When using a template, these are combined with its applicable labels; an explicitly supplied label takes precedence over a template label in the same group. Label groups themselves cannot be applied.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ProjectUpdateInput",
-        "description": "Changes to a project. Omit a field to keep its current value. Lists replace the corresponding selections unless their description says otherwise; null only clears fields that explicitly support it.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "statusId",
-            "description": "The UUID of an active project status available to the project’s lead team. Moving between status types updates startedAt, completedAt, or canceledAt as appropriate. Omit to keep the current status.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "name",
-            "description": "The name of the project.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "description",
-            "description": "A short plain-text summary. Use an empty string to clear it; null is not accepted.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "content",
-            "description": "Replacement project overview in Markdown. Empty strings, null, and omission leave the existing content unchanged.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "convertedFromIssueId",
-            "description": "The ID of the issue from which that project is created.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "lastAppliedTemplateId",
-            "description": "Records the last applied template UUID without applying its contents.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "icon",
-            "description": "The icon of the project.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "color",
-            "description": "The color of the project.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "teamIds",
-            "description": "The replacement list of team UUIDs. Teams you cannot access are preserved, so omitting a private team does not remove it. At least one team must remain, and a team with active project issues cannot be removed until those issues are moved.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "projectUpdateRemindersPausedUntilAt",
-            "description": "The time until which project update reminders are paused. Set null to remove the project-specific pause; reminders still follow the configured schedule. Omit to leave the pause unchanged.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTime",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updateReminderFrequencyInWeeks",
-            "description": "The interval between update reminders in weeks. Null inherits the workspace setting; omit to leave unchanged.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Float",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updateReminderFrequency",
-            "description": "The interval between update reminders, in the unit given by frequencyResolution. Null inherits the workspace setting; omit to leave unchanged.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Float",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "frequencyResolution",
-            "description": "The unit of updateReminderFrequency: daily or weekly.",
-            "type": {
-              "kind": "ENUM",
-              "name": "FrequencyResolutionType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updateRemindersDay",
-            "description": "The day of the week on which to prompt for project updates.",
-            "type": {
-              "kind": "ENUM",
-              "name": "Day",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "updateRemindersHour",
-            "description": "The hour of the day (0-23) at which to prompt for project updates.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "leadId",
-            "description": "UUID of the project lead. Pass null to remove the lead. Application users cannot be leads; a new lead is added as a member.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "memberIds",
-            "description": "The replacement list of project member UUIDs. Use [] to remove all members except the project lead, who remains a member. Application users cannot be added; omit the field to keep the current members.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "startDate",
-            "description": "The planned start date in YYYY-MM-DD format. Null clears the date.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "TimelessDate",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "startDateResolution",
-            "description": "The precision of startDate: month, quarter, halfYear, or year. Null uses an exact date.",
-            "type": {
-              "kind": "ENUM",
-              "name": "DateResolutionType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "targetDate",
-            "description": "The planned completion date in YYYY-MM-DD format. Null clears the date.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "TimelessDate",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "targetDateResolution",
-            "description": "The precision of targetDate: month, quarter, halfYear, or year. Null uses an exact date.",
-            "type": {
-              "kind": "ENUM",
-              "name": "DateResolutionType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "completedAt",
-            "description": "The time at which the project was completed.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTime",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "canceledAt",
-            "description": "The time at which the project was canceled.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTime",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "slackNewIssue",
-            "description": "Whether to send new issue notifications to Slack.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "slackIssueComments",
-            "description": "Whether to send new issue comment notifications to Slack.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "slackIssueStatuses",
-            "description": "Whether to send issue status update notifications to Slack.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "sortOrder",
-            "description": "Position in shared project views, in ascending order. Pass 0 to append; collisions are adjusted.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Float",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "prioritySortOrder",
-            "description": "The sort order for the project within shared views, when ordered by priority.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Float",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "trashed",
-            "description": "The stored trash flag. This field does not archive or restore the project. Use projectDelete to move it to the trash and projectUnarchive to restore it.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "priority",
-            "description": "The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "labelIds",
-            "description": "The replacement list of project label UUIDs. Use [] to remove all labels, or omit the field to keep them. Use projectAddLabel or projectRemoveLabel when you only need to change one label; team and label-group rules apply to both approaches.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "SuccessPayload",
-        "description": "Result of an operation that returns a success flag.",
-        "fields": [
-          {
-            "name": "lastSyncId",
-            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "ProjectArchivePayload",
-        "description": "The result of archiving or restoring a resource.",
-        "fields": [
-          {
-            "name": "lastSyncId",
-            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "entity",
-            "description": "The resource after the operation, when returned. This can be null when the mutation does not return a resource, including after deletion. Check `success` for the operation's result.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "Project",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [
-          {
-            "kind": "INTERFACE",
-            "name": "ArchivePayload",
-            "ofType": null
-          }
-        ],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INTERFACE",
-        "name": "ArchivePayload",
-        "description": "The result of archiving, restoring, or deleting a resource.",
-        "fields": [
-          {
-            "name": "lastSyncId",
-            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": [
-          {
-            "kind": "OBJECT",
-            "name": "ProjectArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "DeletePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "CustomerNeedArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "CycleArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "DocumentArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "InitiativeArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "InitiativeUpdateArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "IssueArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "NotificationArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "ProjectStatusArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "ProjectUpdateArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "ReleasePipelineArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "ReleaseArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "ReleaseStageArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "RoadmapArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "TeamArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "WorkflowStateArchivePayload",
-            "ofType": null
-          }
-        ]
-      },
-      {
-        "kind": "OBJECT",
         "name": "AgentActivityPayload",
         "description": "The result of an agent activity mutation.",
         "fields": [
@@ -107301,6 +106589,135 @@
         ],
         "enumValues": null,
         "possibleTypes": null
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "ArchivePayload",
+        "description": "The result of archiving, restoring, or deleting a resource.",
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "DeletePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ProjectArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "CustomerNeedArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "CycleArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "DocumentArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "InitiativeArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "InitiativeUpdateArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "IssueArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "NotificationArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ProjectStatusArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ProjectUpdateArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ReleasePipelineArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ReleaseArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ReleaseStageArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "RoadmapArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "TeamArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "WorkflowStateArchivePayload",
+            "ofType": null
+          }
+        ]
       },
       {
         "kind": "OBJECT",
@@ -108323,6 +107740,773 @@
       },
       {
         "kind": "OBJECT",
+        "name": "ProjectPayload",
+        "description": "The result of a project mutation.",
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "project",
+            "description": "The project that was created or updated.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Project",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectCreateInput",
+        "description": "The details for a new project. Provide a name and the teams that will own its issues. A project template can supply defaults and create related milestones or issues; see templateId for how template values and your input are combined.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "The name of the project.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "icon",
+            "description": "The icon of the project.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "color",
+            "description": "The project color as a hexadecimal color string, such as #5E6AD2.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "statusId",
+            "description": "The UUID of an active project status available to the project’s lead team. Without an explicit status or a template default, the project uses the first backlog status in that team’s status scope.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "description",
+            "description": "A short plain-text summary. Use content for the full Markdown overview.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "content",
+            "description": "The full project overview in Markdown, separate from the short description.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "teamIds",
+            "description": "UUIDs of the teams that the project belongs to. At least one accessible team must remain after template processing. Issues in the project must belong to one of these teams.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "convertedFromIssueId",
+            "description": "The ID of the issue that was converted into this project.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "lastAppliedTemplateId",
+            "description": "Records the last applied template UUID. To create the project from a template, use templateId.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "templateId",
+            "description": "The UUID of a project template to apply. Non-null input values override template defaults for icon, color, summary, status, priority, lead, and members. A nonempty teamIds list replaces the template’s teams; an empty list uses them. Nonempty content replaces the template overview. Labels are combined, with your selection taking precedence within a single-select group. The template can also create milestones, initial issues, and initiative associations. A nonempty name is still required. Omit useDefaultTemplate when supplying this field.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "useDefaultTemplate",
+            "description": "Whether to apply the first supplied team’s default project template. The request fails if that team has no default template. Omit or use false to create without a default template. This field cannot be supplied alongside templateId, even when false.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "leadId",
+            "description": "UUID of the project lead. Application users cannot be leads. The lead is also added as a member.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "memberIds",
+            "description": "UUIDs of users to add as project members. Application users cannot be members, and the project lead is added even when not listed. Without this input, a template can supply members; otherwise the list starts empty.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "startDate",
+            "description": "The planned start date in YYYY-MM-DD format.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "TimelessDate",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "startDateResolution",
+            "description": "The precision of startDate: month, quarter, halfYear, or year. Omit for an exact date.",
+            "type": {
+              "kind": "ENUM",
+              "name": "DateResolutionType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "targetDate",
+            "description": "The planned completion date in YYYY-MM-DD format.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "TimelessDate",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "targetDateResolution",
+            "description": "The precision of targetDate: month, quarter, halfYear, or year. Omit for an exact date.",
+            "type": {
+              "kind": "ENUM",
+              "name": "DateResolutionType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "sortOrder",
+            "description": "Position in shared project views, in ascending order. Omit or pass 0 to append; collisions are adjusted.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "prioritySortOrder",
+            "description": "The sort order for the project within shared views, when ordered by priority.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "priority",
+            "description": "The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "labelIds",
+            "description": "UUIDs of project labels to apply. When using a template, these are combined with its applicable labels; an explicitly supplied label takes precedence over a template label in the same group. Label groups themselves cannot be applied.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectUpdateInput",
+        "description": "Changes to a project. Omit a field to keep its current value. Lists replace the corresponding selections unless their description says otherwise; null only clears fields that explicitly support it.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "statusId",
+            "description": "The UUID of an active project status available to the project’s lead team. Moving between status types updates startedAt, completedAt, or canceledAt as appropriate. Omit to keep the current status.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "The name of the project.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "description",
+            "description": "A short plain-text summary. Use an empty string to clear it; null is not accepted.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "content",
+            "description": "Replacement project overview in Markdown. Empty strings, null, and omission leave the existing content unchanged.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "convertedFromIssueId",
+            "description": "The ID of the issue from which that project is created.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "lastAppliedTemplateId",
+            "description": "Records the last applied template UUID without applying its contents.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "icon",
+            "description": "The icon of the project.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "color",
+            "description": "The color of the project.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "teamIds",
+            "description": "The replacement list of team UUIDs. Teams you cannot access are preserved, so omitting a private team does not remove it. At least one team must remain, and a team with active project issues cannot be removed until those issues are moved.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectUpdateRemindersPausedUntilAt",
+            "description": "The time until which project update reminders are paused. Set null to remove the project-specific pause; reminders still follow the configured schedule. Omit to leave the pause unchanged.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updateReminderFrequencyInWeeks",
+            "description": "The interval between update reminders in weeks. Null inherits the workspace setting; omit to leave unchanged.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updateReminderFrequency",
+            "description": "The interval between update reminders, in the unit given by frequencyResolution. Null inherits the workspace setting; omit to leave unchanged.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "frequencyResolution",
+            "description": "The unit of updateReminderFrequency: daily or weekly.",
+            "type": {
+              "kind": "ENUM",
+              "name": "FrequencyResolutionType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updateRemindersDay",
+            "description": "The day of the week on which to prompt for project updates.",
+            "type": {
+              "kind": "ENUM",
+              "name": "Day",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "updateRemindersHour",
+            "description": "The hour of the day (0-23) at which to prompt for project updates.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "leadId",
+            "description": "UUID of the project lead. Pass null to remove the lead. Application users cannot be leads; a new lead is added as a member.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "memberIds",
+            "description": "The replacement list of project member UUIDs. Use [] to remove all members except the project lead, who remains a member. Application users cannot be added; omit the field to keep the current members.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "startDate",
+            "description": "The planned start date in YYYY-MM-DD format. Null clears the date.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "TimelessDate",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "startDateResolution",
+            "description": "The precision of startDate: month, quarter, halfYear, or year. Null uses an exact date.",
+            "type": {
+              "kind": "ENUM",
+              "name": "DateResolutionType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "targetDate",
+            "description": "The planned completion date in YYYY-MM-DD format. Null clears the date.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "TimelessDate",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "targetDateResolution",
+            "description": "The precision of targetDate: month, quarter, halfYear, or year. Null uses an exact date.",
+            "type": {
+              "kind": "ENUM",
+              "name": "DateResolutionType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "completedAt",
+            "description": "The time at which the project was completed.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "canceledAt",
+            "description": "The time at which the project was canceled.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slackNewIssue",
+            "description": "Whether to send new issue notifications to Slack.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slackIssueComments",
+            "description": "Whether to send new issue comment notifications to Slack.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slackIssueStatuses",
+            "description": "Whether to send issue status update notifications to Slack.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "sortOrder",
+            "description": "Position in shared project views, in ascending order. Pass 0 to append; collisions are adjusted.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "prioritySortOrder",
+            "description": "The sort order for the project within shared views, when ordered by priority.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "trashed",
+            "description": "The stored trash flag. This field does not archive or restore the project. Use projectDelete to move it to the trash and projectUnarchive to restore it.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "priority",
+            "description": "The priority of the project. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "labelIds",
+            "description": "The replacement list of project label UUIDs. Use [] to remove all labels, or omit the field to keep them. Use projectAddLabel or projectRemoveLabel when you only need to change one label; team and label-group rules apply to both approaches.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "SuccessPayload",
+        "description": "Result of an operation that returns a success flag.",
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "ProjectArchivePayload",
+        "description": "The result of archiving or restoring a resource.",
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "entity",
+            "description": "The resource after the operation, when returned. This can be null when the mutation does not return a resource, including after deletion. Check `success` for the operation's result.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Project",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "ArchivePayload",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "CustomViewPayload",
         "description": "The result of a custom view mutation.",
         "fields": [
@@ -108718,7 +108902,7 @@
       {
         "kind": "INPUT_OBJECT",
         "name": "CustomerNeedCreateInput",
-        "description": "The issue and optional customer details for a new request. Provide issueId when using the public API. You can include Markdown feedback and a source attachment, and identify the customer by either its UUID or external-system ID.",
+        "description": "The feedback and optional customer and work links for a new request. Requests may be created without a linked issue, project, or signal when Customer Signals is enabled. You can include Markdown feedback and a source attachment, and identify the customer by either its UUID or external-system ID.",
         "fields": null,
         "inputFields": [
           {
@@ -108753,7 +108937,7 @@
           },
           {
             "name": "issueId",
-            "description": "The issue UUID or identifier, such as LIN-123. Required for public API calls.",
+            "description": "The optional issue UUID or identifier, such as LIN-123.",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -120741,6 +120925,350 @@
       },
       {
         "kind": "OBJECT",
+        "name": "ProjectMilestoneMovePayload",
+        "description": "The result of a project milestone move mutation.",
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectMilestone",
+            "description": "The project milestone that was created or updated.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectMilestone",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "previousIssueTeamIds",
+            "description": "A snapshot of the issues that were moved to new teams, if the user selected to do it, containing an array of mappings between an issue and its previous team. Store on the client to use for undoing a previous milestone move.",
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "ProjectMilestoneMoveIssueToTeam",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "previousProjectTeamIds",
+            "description": "A snapshot of the project that had new teams added to it, if the user selected to do it, containing an array of mappings between a project and its previous teams. Store on the client to use for undoing a previous milestone move.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "ProjectMilestoneMoveProjectTeams",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "ProjectMilestoneMoveIssueToTeam",
+        "description": null,
+        "fields": [
+          {
+            "name": "issueId",
+            "description": "The identifier of the issue to restore to its previous team. Must match an issue in the milestone.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "teamId",
+            "description": "The team id in this relationship",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "ProjectMilestoneMoveProjectTeams",
+        "description": null,
+        "fields": [
+          {
+            "name": "projectId",
+            "description": "The project id",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "teamIds",
+            "description": "The team ids for the project",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectMilestoneMoveInput",
+        "description": "Input for moving a project milestone to another project.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "projectId",
+            "description": "The identifier of the project to move the milestone to.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "newIssueTeamId",
+            "description": "The team id to move the attached issues to. This is needed when there is a mismatch between a project's teams and the milestone's issues' teams. Either this or addIssueTeamToProject is required in that situation to resolve constraints.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "addIssueTeamToProject",
+            "description": "Whether to add each milestone issue's team to the project. This is needed when there is a mismatch between a project's teams and the milestone's issues' teams. Either this or newIssueTeamId is required in that situation to resolve constraints.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "undoIssueTeamIds",
+            "description": "A list of issue id to team ids, used for undoing a previous milestone move where the specified issues were moved from the specified teams.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProjectMilestoneMoveIssueToTeamInput",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "undoProjectTeamIds",
+            "description": "A mapping of project id to a previous set of team ids, used for undoing a previous milestone move where the specified teams were added to the project.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "ProjectMilestoneMoveProjectTeamsInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectMilestoneMoveIssueToTeamInput",
+        "description": "Used for ProjectMilestoneMoveInput to describe a mapping between an issue and its team.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "issueId",
+            "description": "The identifier of the issue to restore to its previous team. Must match an issue in the milestone.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "teamId",
+            "description": "The team id in this relationship",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ProjectMilestoneMoveProjectTeamsInput",
+        "description": "Used for ProjectMilestoneMoveInput to describe a snapshot of a project and its team ids",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "projectId",
+            "description": "The project id",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "teamIds",
+            "description": "The team ids for the project",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "ProjectRelationPayload",
         "description": "The result of a project relation mutation.",
         "fields": [
@@ -128016,6 +128544,12 @@
             "deprecationReason": null
           },
           {
+            "name": "homeCardsEmptyStateDismissed",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "all",
             "description": null,
             "isDeprecated": false,
@@ -129075,102 +129609,6 @@
             "deprecationReason": null
           },
           {
-            "name": "agentActivityCreated",
-            "description": "Triggered when an agent activity is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentActivity",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentActivityUpdated",
-            "description": "Triggered when an agent activity is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentActivity",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentActivityArchived",
-            "description": "Triggered when an agent activity is archived",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentActivity",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "draftCreated",
-            "description": "Triggered when a draft is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Draft",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "draftUpdated",
-            "description": "Triggered when a draft is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Draft",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "draftDeleted",
-            "description": "Triggered when a draft is deleted",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Draft",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "issueRelationCreated",
             "description": "Triggered when an issue relation is created",
             "args": [],
@@ -129219,15 +129657,15 @@
             "deprecationReason": null
           },
           {
-            "name": "teamMembershipCreated",
-            "description": "Triggered when a team membership is created",
+            "name": "agentActivityCreated",
+            "description": "Triggered when an agent activity is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "TeamMembership",
+                "name": "AgentActivity",
                 "ofType": null
               }
             },
@@ -129235,15 +129673,15 @@
             "deprecationReason": null
           },
           {
-            "name": "teamMembershipUpdated",
-            "description": "Triggered when a team membership is updated",
+            "name": "agentActivityUpdated",
+            "description": "Triggered when an agent activity is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "TeamMembership",
+                "name": "AgentActivity",
                 "ofType": null
               }
             },
@@ -129251,15 +129689,63 @@
             "deprecationReason": null
           },
           {
-            "name": "teamMembershipDeleted",
-            "description": "Triggered when a team membership is deleted",
+            "name": "agentActivityArchived",
+            "description": "Triggered when an agent activity is archived",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "TeamMembership",
+                "name": "AgentActivity",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectLabelCreated",
+            "description": "Triggered when a project label is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectLabel",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectLabelUpdated",
+            "description": "Triggered when a project label is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectLabel",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectLabelDeleted",
+            "description": "Triggered when a project label is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectLabel",
                 "ofType": null
               }
             },
@@ -129283,15 +129769,15 @@
             "deprecationReason": null
           },
           {
-            "name": "projectUpdateCreated",
-            "description": "Triggered when a project update is created",
+            "name": "favoriteCreated",
+            "description": "Triggered when a favorite is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ProjectUpdate",
+                "name": "Favorite",
                 "ofType": null
               }
             },
@@ -129299,15 +129785,15 @@
             "deprecationReason": null
           },
           {
-            "name": "projectUpdateUpdated",
-            "description": "Triggered when a project update is updated",
+            "name": "favoriteUpdated",
+            "description": "Triggered when a favorite is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ProjectUpdate",
+                "name": "Favorite",
                 "ofType": null
               }
             },
@@ -129315,31 +129801,15 @@
             "deprecationReason": null
           },
           {
-            "name": "projectUpdateArchived",
-            "description": "Triggered when a project update is archived",
+            "name": "favoriteDeleted",
+            "description": "Triggered when a favorite is deleted",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ProjectUpdate",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectUpdateDeleted",
-            "description": "Triggered when a project update is deleted",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectUpdate",
+                "name": "Favorite",
                 "ofType": null
               }
             },
@@ -129475,15 +129945,15 @@
             "deprecationReason": null
           },
           {
-            "name": "teamCreated",
-            "description": "Triggered when a team is created",
+            "name": "teamMembershipCreated",
+            "description": "Triggered when a team membership is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Team",
+                "name": "TeamMembership",
                 "ofType": null
               }
             },
@@ -129491,15 +129961,15 @@
             "deprecationReason": null
           },
           {
-            "name": "teamUpdated",
-            "description": "Triggered when a team is updated",
+            "name": "teamMembershipUpdated",
+            "description": "Triggered when a team membership is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Team",
+                "name": "TeamMembership",
                 "ofType": null
               }
             },
@@ -129507,15 +129977,15 @@
             "deprecationReason": null
           },
           {
-            "name": "teamDeleted",
-            "description": "Triggered when a team is deleted",
+            "name": "teamMembershipDeleted",
+            "description": "Triggered when a team membership is deleted",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Team",
+                "name": "TeamMembership",
                 "ofType": null
               }
             },
@@ -129523,15 +129993,15 @@
             "deprecationReason": null
           },
           {
-            "name": "documentContentCreated",
-            "description": "Triggered when a document content is created",
+            "name": "issueLabelCreated",
+            "description": "Triggered when an issue label is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "DocumentContent",
+                "name": "IssueLabel",
                 "ofType": null
               }
             },
@@ -129539,15 +130009,143 @@
             "deprecationReason": null
           },
           {
-            "name": "documentContentUpdated",
-            "description": "Triggered when a document content is updated",
+            "name": "issueLabelUpdated",
+            "description": "Triggered when an issue label is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "DocumentContent",
+                "name": "IssueLabel",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueLabelDeleted",
+            "description": "Triggered when an issue label is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueLabel",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectUpdateCreated",
+            "description": "Triggered when a project update is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectUpdate",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectUpdateUpdated",
+            "description": "Triggered when a project update is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectUpdate",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectUpdateArchived",
+            "description": "Triggered when a project update is archived",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectUpdate",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectUpdateDeleted",
+            "description": "Triggered when a project update is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectUpdate",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "draftCreated",
+            "description": "Triggered when a draft is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Draft",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "draftUpdated",
+            "description": "Triggered when a draft is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Draft",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "draftDeleted",
+            "description": "Triggered when a draft is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Draft",
                 "ofType": null
               }
             },
@@ -129651,54 +130249,6 @@
             "deprecationReason": null
           },
           {
-            "name": "cycleCreated",
-            "description": "Triggered when a cycle is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Cycle",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "cycleUpdated",
-            "description": "Triggered when a cycle is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Cycle",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "cycleArchived",
-            "description": "Triggered when a cycle is archived",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Cycle",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "documentCreated",
             "description": "Triggered when a document is created",
             "args": [],
@@ -129763,15 +130313,15 @@
             "deprecationReason": null
           },
           {
-            "name": "favoriteCreated",
-            "description": "Triggered when a favorite is created",
+            "name": "cycleCreated",
+            "description": "Triggered when a cycle is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Favorite",
+                "name": "Cycle",
                 "ofType": null
               }
             },
@@ -129779,15 +130329,15 @@
             "deprecationReason": null
           },
           {
-            "name": "favoriteUpdated",
-            "description": "Triggered when a favorite is updated",
+            "name": "cycleUpdated",
+            "description": "Triggered when a cycle is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Favorite",
+                "name": "Cycle",
                 "ofType": null
               }
             },
@@ -129795,15 +130345,15 @@
             "deprecationReason": null
           },
           {
-            "name": "favoriteDeleted",
-            "description": "Triggered when a favorite is deleted",
+            "name": "cycleArchived",
+            "description": "Triggered when a cycle is archived",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Favorite",
+                "name": "Cycle",
                 "ofType": null
               }
             },
@@ -129811,15 +130361,15 @@
             "deprecationReason": null
           },
           {
-            "name": "projectCreated",
-            "description": "Triggered when a project is created",
+            "name": "teamCreated",
+            "description": "Triggered when a team is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Project",
+                "name": "Team",
                 "ofType": null
               }
             },
@@ -129827,15 +130377,15 @@
             "deprecationReason": null
           },
           {
-            "name": "projectUpdated",
-            "description": "Triggered when a project is updated",
+            "name": "teamUpdated",
+            "description": "Triggered when a team is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Project",
+                "name": "Team",
                 "ofType": null
               }
             },
@@ -129843,127 +130393,15 @@
             "deprecationReason": null
           },
           {
-            "name": "projectArchived",
-            "description": "Triggered when a project is archived",
+            "name": "teamDeleted",
+            "description": "Triggered when a team is deleted",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Project",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectUnarchived",
-            "description": "Triggered when a project is unarchived",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Project",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectLabelCreated",
-            "description": "Triggered when a project label is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectLabel",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectLabelUpdated",
-            "description": "Triggered when a project label is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectLabel",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectLabelDeleted",
-            "description": "Triggered when a project label is deleted",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "ProjectLabel",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueLabelCreated",
-            "description": "Triggered when an issue label is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueLabel",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueLabelUpdated",
-            "description": "Triggered when an issue label is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueLabel",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueLabelDeleted",
-            "description": "Triggered when an issue label is deleted",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueLabel",
+                "name": "Team",
                 "ofType": null
               }
             },
@@ -130162,6 +130600,102 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "Issue",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectCreated",
+            "description": "Triggered when a project is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Project",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectUpdated",
+            "description": "Triggered when a project is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Project",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectArchived",
+            "description": "Triggered when a project is archived",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Project",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectUnarchived",
+            "description": "Triggered when a project is unarchived",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Project",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentContentCreated",
+            "description": "Triggered when a document content is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DocumentContent",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentContentUpdated",
+            "description": "Triggered when a document content is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DocumentContent",
                 "ofType": null
               }
             },
