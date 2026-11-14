@@ -22458,6 +22458,16 @@
             "defaultValue": null
           },
           {
+            "name": "statusId",
+            "description": "The Node ID of the planning status the issue starts in. It must be an open one listed in the owner's planningStatuses. If you don't have permission to set the status, it's ignored and the issue starts in Backlog. Issue statuses are in preview and only available to accounts enrolled in the preview.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "agentAssignment",
             "description": "Configuration for assigning Copilot to this issue.",
             "type": {
@@ -37808,7 +37818,7 @@
           },
           {
             "name": "bandwidthQuota",
-            "description": "The bandwidth quota in GB for all organizations owned by the enterprise.",
+            "description": "The bandwidth quota in GB for all organizations owned by the enterprise. May return 0 while deprecation in progress.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -37819,12 +37829,12 @@
                 "ofType": null
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "Quotas based on LFS data packs have been removed. May return 0."
           },
           {
             "name": "bandwidthUsage",
-            "description": "The bandwidth usage in GB for all organizations owned by the enterprise.",
+            "description": "The bandwidth usage in GB for all organizations owned by the enterprise. May return 0 while deprecation in progress.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -37835,12 +37845,12 @@
                 "ofType": null
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "LFS bandwidth usage is now reported through the REST API. May return 0."
           },
           {
             "name": "bandwidthUsagePercentage",
-            "description": "The bandwidth usage as a percentage of the bandwidth quota.",
+            "description": "The bandwidth usage as a percentage of the bandwidth quota. May return 0 while deprecation in progress.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -37851,8 +37861,8 @@
                 "ofType": null
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "Quotas based on LFS data packs have been removed. May return 0."
           },
           {
             "name": "storageQuota",
@@ -52237,6 +52247,18 @@
             "deprecationReason": null
           },
           {
+            "name": "status",
+            "description": "The status of this issue, or null when it has none or issue statuses aren't available in the repository. Issue statuses are in preview and only available to accounts enrolled in the preview.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PlanningStatus",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "subIssues",
             "description": "A list of sub-issues associated with the Issue.",
             "args": [
@@ -52911,6 +52933,22 @@
           {
             "name": "viewerCanSetMilestone",
             "description": "Indicates if the viewer can edit the milestone of the issue.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "viewerCanSetStatus",
+            "description": "Whether the viewer can set this issue's status. Issue statuses are in preview and only available to accounts enrolled in the preview.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -73421,6 +73459,33 @@
             "deprecationReason": null
           },
           {
+            "name": "setIssueStatus",
+            "description": "Sets the status of an issue, closing or reopening it when the status calls for it. Issue statuses are in preview and only available to accounts enrolled in the preview.",
+            "args": [
+              {
+                "name": "input",
+                "description": "Parameters for SetIssueStatus",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "SetIssueStatusInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "SetIssueStatusPayload",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "setOrganizationInteractionLimit",
             "description": "Set an organization level interaction limit for an organization's public repositories.",
             "args": [
@@ -76963,6 +77028,11 @@
           {
             "kind": "OBJECT",
             "name": "PinnedIssueComment",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "PlanningStatus",
             "ofType": null
           },
           {
@@ -88507,6 +88577,59 @@
             "deprecationReason": null
           },
           {
+            "name": "planningStatuses",
+            "description": "The planning statuses issues in the organization's repositories can be in, or null when issue statuses aren't available. Planning statuses are returned in display order. Issue statuses are in preview and only available to accounts enrolled in the preview.",
+            "args": [
+              {
+                "name": "after",
+                "description": "Returns the elements in the list that come after the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "Returns the elements in the list that come before the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "Returns the first _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "Returns the last _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PlanningStatusConnection",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "project",
             "description": "Find project by number.",
             "args": [
@@ -97687,6 +97810,256 @@
             "deprecationReason": null
           }
         ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "PlanningStatus",
+        "description": "A planning status an issue can be in. Issue statuses are in preview and only available to accounts enrolled in the preview.",
+        "fields": [
+          {
+            "name": "category",
+            "description": "The category of the planning status, which decides whether the issue is open or closed.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PlanningStatusCategory",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "id",
+            "description": "The Node ID of the PlanningStatus object",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": "The display name of the planning status.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "PlanningStatusCategory",
+        "description": "The category of a planning status, which decides whether the issue is open or closed. Issue statuses are in preview and only available to accounts enrolled in the preview.",
+        "fields": [
+          {
+            "name": "key",
+            "description": "A stable identifier for the category, such as `new`, `backlog`, `planned`, `started`, `completed`, `not_planned` or `duplicate`. Clients should expect new keys to be added.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": "The display name of the category.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "state",
+            "description": "The state an issue in this category has.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "IssueState",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "stateReason",
+            "description": "The reason a closed issue in this category was closed, or null when the category is open.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "IssueStateReason",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "PlanningStatusConnection",
+        "description": "The connection type for PlanningStatus.",
+        "fields": [
+          {
+            "name": "edges",
+            "description": "A list of edges.",
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PlanningStatusEdge",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "nodes",
+            "description": "A list of nodes.",
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PlanningStatus",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pageInfo",
+            "description": "Information to aid in pagination.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PageInfo",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "totalCount",
+            "description": "Identifies the total count of items in the connection.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "PlanningStatusEdge",
+        "description": "An edge in a connection.",
+        "fields": [
+          {
+            "name": "cursor",
+            "description": "A cursor for use in pagination.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "node",
+            "description": "The item at the end of the edge.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PlanningStatus",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
         "possibleTypes": null
       },
       {
@@ -135832,6 +136205,59 @@
             "deprecationReason": null
           },
           {
+            "name": "planningStatuses",
+            "description": "The planning statuses issues in this repository can be in, or null when issue statuses aren't available for this repository or viewer. Planning statuses are returned in display order. Issue statuses are in preview and only available to accounts enrolled in the preview.",
+            "args": [
+              {
+                "name": "after",
+                "description": "Returns the elements in the list that come after the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "Returns the elements in the list that come before the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "Returns the first _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "Returns the last _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PlanningStatusConnection",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "primaryLanguage",
             "description": "The primary language of the repository's code.",
             "args": [],
@@ -150099,6 +150525,100 @@
                   "ofType": null
                 }
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "SetIssueStatusInput",
+        "description": "Autogenerated input type of SetIssueStatus",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "clientMutationId",
+            "description": "A unique identifier for the client performing the mutation.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "issueId",
+            "description": "The ID of the issue to update.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "statusId",
+            "description": "The ID of the planning status to set.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "duplicateIssueId",
+            "description": "The ID of the issue this issue duplicates. Required when closing an issue as a duplicate.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "SetIssueStatusPayload",
+        "description": "Autogenerated return type of SetIssueStatus.",
+        "fields": [
+          {
+            "name": "clientMutationId",
+            "description": "A unique identifier for the client performing the mutation.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issue",
+            "description": "The updated issue.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Issue",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -170655,6 +171175,16 @@
             "defaultValue": null
           },
           {
+            "name": "statusId",
+            "description": "The Node ID of the planning status to move the issue into. It must be one listed in the owner's planningStatuses. The planning status decides whether the issue is open or closed and why, so the issue is closed or reopened if needed. `state` or `stateInput` can also be sent, but only with the same state and close reason as the planning status, and without `suggest: true`. When the planning status closes the issue, `stateInput.rationale` is used as the close rationale, and a Duplicate planning status takes the issue it duplicates from `stateInput.duplicateIssueId`. The issue's status can't be cleared. Issue statuses are in preview and only available to accounts enrolled in the preview.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "projectIds",
             "description": "An array of Node IDs for projects associated with this issue.",
             "type": {
@@ -177071,6 +177601,59 @@
                 "name": "Int",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "planningStatuses",
+            "description": "The planning statuses issues in the user's repositories can be in, or null when issue statuses aren't available. Planning statuses are returned in display order. Issue statuses are in preview and only available to accounts enrolled in the preview.",
+            "args": [
+              {
+                "name": "after",
+                "description": "Returns the elements in the list that come after the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "Returns the elements in the list that come before the specified cursor.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "Returns the first _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "Returns the last _n_ elements from the list.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "PlanningStatusConnection",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -183700,6 +184283,11 @@
           {
             "kind": "OBJECT",
             "name": "PinnedIssueComment",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "PlanningStatus",
             "ofType": null
           },
           {
