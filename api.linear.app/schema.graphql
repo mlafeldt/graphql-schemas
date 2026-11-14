@@ -7221,8 +7221,9 @@ type DocumentSearchPayload {
   archivePayload: ArchiveResponse!
 
   """
-  Number of candidates retrieved before filtering and pagination. Search caps
-  candidates, so this is not an exact count of all matching documents.
+  Number of candidates retrieved that match the document filter, before
+  pagination. Search caps candidates, so this is not an exact count of all
+  matching documents.
   """
   totalCount: Float!
 }
@@ -10667,6 +10668,9 @@ input InitiativeCollectionFilter {
   """Comparator for the initiative's custom identifier."""
   customIdentifier: NullableStringComparator
 
+  """Comparator for the initiative's name and summary."""
+  searchableContent: ContentComparator
+
   """Filters that the initiative creator must satisfy."""
   creator: NullableUserFilter
 
@@ -10715,7 +10719,9 @@ input InitiativeCollectionFilter {
   """
   healthWithAge: StringComparator
 
-  """Comparator for the initiative activity type."""
+  """
+  Not supported. Initiative activity is not stored on the server, so filters that set this field are rejected.
+  """
   activityType: StringComparator
 
   """
@@ -10904,6 +10910,9 @@ input InitiativeFilter {
   """Comparator for the initiative's custom identifier."""
   customIdentifier: NullableStringComparator
 
+  """Comparator for the initiative's name and summary."""
+  searchableContent: ContentComparator
+
   """Filters that the initiative creator must satisfy."""
   creator: NullableUserFilter
 
@@ -10952,7 +10961,9 @@ input InitiativeFilter {
   """
   healthWithAge: StringComparator
 
-  """Comparator for the initiative activity type."""
+  """
+  Not supported. Initiative activity is not stored on the server, so filters that set this field are rejected.
+  """
   activityType: StringComparator
 
   """
@@ -24780,6 +24791,9 @@ input NullableInitiativeFilter {
   """Comparator for the initiative's custom identifier."""
   customIdentifier: NullableStringComparator
 
+  """Comparator for the initiative's name and summary."""
+  searchableContent: ContentComparator
+
   """Filters that the initiative creator must satisfy."""
   creator: NullableUserFilter
 
@@ -24828,7 +24842,9 @@ input NullableInitiativeFilter {
   """
   healthWithAge: StringComparator
 
-  """Comparator for the initiative activity type."""
+  """
+  Not supported. Initiative activity is not stored on the server, so filters that set this field are rejected.
+  """
   activityType: StringComparator
 
   """
@@ -36580,6 +36596,9 @@ type Query {
   Limited to 30 requests per minute.
   """
   searchDocuments(
+    """Filter returned documents."""
+    filter: DocumentFilter
+
     """
     Returns results before this cursor. Pair with `last` to paginate backward,
     using a cursor returned by the same connection. Keep the filters and
@@ -44425,6 +44444,9 @@ enum UsageAlertType {
 
   """A promotional usage credit grant is nearing its expiration."""
   expiringPromoCredit
+
+  """Workspace spend reached a workspace spend limit."""
+  spendLimitReached
 }
 
 """Comparator for the condition a usage alert was triggered by."""
