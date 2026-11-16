@@ -19019,6 +19019,52 @@ input MilestoneSort {
 
 type Mutation {
   """
+  Updates the workspace associated with your credentials. Omitted fields keep
+  their current values. Most changes require workspace-settings permission;
+  project and initiative reminder schedules require schedule-management
+  permission. Some settings also depend on the workspace’s plan.
+  """
+  organizationUpdate(
+    """A partial workspace object to update the workspace with."""
+    input: OrganizationUpdateInput!
+  ): OrganizationPayload!
+
+  """
+  Requests a deletion confirmation code for the workspace. The code is sent to
+  the requesting user's email and must be used with the organizationDelete
+  mutation to confirm deletion.
+  """
+  organizationDeleteChallenge: OrganizationDeletePayload!
+
+  """
+  Schedules deletion of the workspace and its data after validating the code
+  from organizationDeleteChallenge. This does not finish the deletion during the
+  request. Use organizationCancelDelete while cancellation is still available.
+  """
+  organizationDelete(
+    """Information required to delete the workspace."""
+    input: DeleteOrganizationInput!
+  ): OrganizationDeletePayload!
+
+  """
+  Cancels a scheduled workspace deletion while the deletion process still
+  permits cancellation. Requires workspace-settings permission.
+  """
+  organizationCancelDelete: OrganizationCancelDeletePayload!
+
+  """
+  Starts a trial for the workspace on the specified plan type. The workspace
+  must not already be on a paid plan or in an active trial.
+  """
+  organizationStartTrialForPlan(
+    """Plan details for trial"""
+    input: OrganizationStartTrialInput!
+  ): OrganizationStartTrialPayload!
+
+  """[DEPRECATED] Starts a trial for the workspace."""
+  organizationStartTrial: OrganizationStartTrialPayload! @deprecated(reason: "Use organizationStartTrialForPlan")
+
+  """
   Publishes an activity to your agent’s session and updates its lifecycle.
   Thoughts and actions report ongoing work; a response completes the turn unless
   it has the continue signal, an elicitation waits for user input, and an error
@@ -20035,7 +20081,7 @@ type Mutation {
   Updates a cycle’s name, description, or schedule and returns the resulting
   cycle. Date changes can shorten adjacent cycles to prevent overlap. You cannot
   change an active cycle’s start or a completed cycle’s dates, or edit inherited
-  cycles directly.
+  cycles directly. Requires permission to manage the team.
   """
   cycleUpdate(
     """A partial cycle object to update the cycle with."""
@@ -20048,6 +20094,7 @@ type Mutation {
   """
   Archives a cycle and removes its current issues from it. The issues themselves
   are not archived. An inherited cycle must be managed through its parent team.
+  Requires permission to manage the team.
   """
   cycleArchive(
     """The identifier of the cycle to archive."""
@@ -20070,7 +20117,7 @@ type Mutation {
   """
   Starts the upcoming cycle as of midnight today. Completes the previous cycle
   if it has not yet ended. Only the next upcoming (not yet started) cycle for
-  the team can be started.
+  the team can be started. Requires permission to manage the team.
   """
   cycleStartUpcomingCycleToday(
     """
@@ -22263,52 +22310,6 @@ type Mutation {
     """The identifier of the organization invite to delete."""
     id: String!
   ): DeletePayload!
-
-  """
-  Updates the workspace associated with your credentials. Omitted fields keep
-  their current values. Most changes require workspace-settings permission;
-  project and initiative reminder schedules require schedule-management
-  permission. Some settings also depend on the workspace’s plan.
-  """
-  organizationUpdate(
-    """A partial workspace object to update the workspace with."""
-    input: OrganizationUpdateInput!
-  ): OrganizationPayload!
-
-  """
-  Requests a deletion confirmation code for the workspace. The code is sent to
-  the requesting user's email and must be used with the organizationDelete
-  mutation to confirm deletion.
-  """
-  organizationDeleteChallenge: OrganizationDeletePayload!
-
-  """
-  Schedules deletion of the workspace and its data after validating the code
-  from organizationDeleteChallenge. This does not finish the deletion during the
-  request. Use organizationCancelDelete while cancellation is still available.
-  """
-  organizationDelete(
-    """Information required to delete the workspace."""
-    input: DeleteOrganizationInput!
-  ): OrganizationDeletePayload!
-
-  """
-  Cancels a scheduled workspace deletion while the deletion process still
-  permits cancellation. Requires workspace-settings permission.
-  """
-  organizationCancelDelete: OrganizationCancelDeletePayload!
-
-  """
-  Starts a trial for the workspace on the specified plan type. The workspace
-  must not already be on a paid plan or in an active trial.
-  """
-  organizationStartTrialForPlan(
-    """Plan details for trial"""
-    input: OrganizationStartTrialInput!
-  ): OrganizationStartTrialPayload!
-
-  """[DEPRECATED] Starts a trial for the workspace."""
-  organizationStartTrial: OrganizationStartTrialPayload! @deprecated(reason: "Use organizationStartTrialForPlan")
 
   """
   Creates a label or label group for projects. Workspace labels require
@@ -33607,6 +33608,19 @@ enum PushSubscriptionType {
 }
 
 type Query {
+  """
+  Returns the workspace associated with the credentials used for this request.
+  Its ID and URL key identify the workspace, and its fields expose shared
+  settings and resources.
+  """
+  organization: Organization!
+
+  """Checks whether a workspace with the given URL key exists."""
+  organizationExists(
+    """The URL key of the workspace to check."""
+    urlKey: String!
+  ): OrganizationExistsPayload!
+
   """Accessible agent activities, with filters and cursor-based pagination."""
   agentActivities(
     """Filter returned agent activities."""
@@ -35910,19 +35924,6 @@ type Query {
     """
     last: Int
   ): OrganizationQuotaConnection!
-
-  """
-  Returns the workspace associated with the credentials used for this request.
-  Its ID and URL key identify the workspace, and its fields expose shared
-  settings and resources.
-  """
-  organization: Organization!
-
-  """Checks whether a workspace with the given URL key exists."""
-  organizationExists(
-    """The URL key of the workspace to check."""
-    urlKey: String!
-  ): OrganizationExistsPayload!
 
   """
   All project labels. Returns a paginated list of labels visible to the
@@ -41183,12 +41184,6 @@ type Subscription {
   """Triggered when a team is deleted"""
   teamDeleted: Team!
 
-  """Triggered when an user is created"""
-  userCreated: User!
-
-  """Triggered when an user is updated"""
-  userUpdated: User!
-
   """Triggered when a comment is created"""
   commentCreated: Comment!
 
@@ -41221,6 +41216,12 @@ type Subscription {
 
   """Triggered when an issue is unarchived"""
   issueUnarchived: Issue!
+
+  """Triggered when an user is created"""
+  userCreated: User!
+
+  """Triggered when an user is updated"""
+  userUpdated: User!
 
   """Triggered when a project is created"""
   projectCreated: Project!

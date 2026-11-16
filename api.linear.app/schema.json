@@ -18593,6 +18593,16 @@
         "possibleTypes": null
       },
       {
+        "kind": "SCALAR",
+        "name": "JSON",
+        "description": "JSON data whose shape is defined by the field using it. Inputs accept a JSON-encoded string or a value that the API encodes for you. Responses preserve the field's stored representation: some fields return an encoded string to parse, while others return a JSON object or array directly. Check the field's description for its format.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "INPUT_OBJECT",
         "name": "RelationExistsComparator",
         "description": "Tests whether any related records exist.",
@@ -32069,16 +32079,6 @@
             "ofType": null
           }
         ],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "SCALAR",
-        "name": "JSON",
-        "description": "JSON data whose shape is defined by the field using it. Inputs accept a JSON-encoded string or a value that the API encodes for you. Responses preserve the field's stored representation: some fields return an encoded string to parse, while others return a JSON object or array directly. Check the field's description for its format.",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },
@@ -64570,6 +64570,53 @@
         "description": null,
         "fields": [
           {
+            "name": "organization",
+            "description": "Returns the workspace associated with the credentials used for this request. Its ID and URL key identify the workspace, and its fields expose shared settings and resources.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Organization",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationExists",
+            "description": "Checks whether a workspace with the given URL key exists.",
+            "args": [
+              {
+                "name": "urlKey",
+                "description": "The URL key of the workspace to check.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationExistsPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "agentActivities",
             "description": "Accessible agent activities, with filters and cursor-based pagination.",
             "args": [
@@ -69854,53 +69901,6 @@
             "deprecationReason": null
           },
           {
-            "name": "organization",
-            "description": "Returns the workspace associated with the credentials used for this request. Its ID and URL key identify the workspace, and its fields expose shared settings and resources.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Organization",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizationExists",
-            "description": "Checks whether a workspace with the given URL key exists.",
-            "args": [
-              {
-                "name": "urlKey",
-                "description": "The URL key of the workspace to check.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationExistsPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "projectLabels",
             "description": "All project labels. Returns a paginated list of labels visible to the authenticated user, including both workspace-level and team-scoped labels, with optional filtering.",
             "args": [
@@ -73106,6 +73106,49 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "WorkflowState",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "OrganizationExistsPayload",
+        "description": "Response for checking whether a workspace exists.",
+        "fields": [
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "exists",
+            "description": "Whether the organization exists.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
                 "ofType": null
               }
             },
@@ -82531,49 +82574,6 @@
           }
         ],
         "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "OrganizationExistsPayload",
-        "description": "Response for checking whether a workspace exists.",
-        "fields": [
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "exists",
-            "description": "Whether the organization exists.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -92201,6 +92201,147 @@
         "description": null,
         "fields": [
           {
+            "name": "organizationUpdate",
+            "description": "Updates the workspace associated with your credentials. Omitted fields keep their current values. Most changes require workspace-settings permission; project and initiative reminder schedules require schedule-management permission. Some settings also depend on the workspace’s plan.",
+            "args": [
+              {
+                "name": "input",
+                "description": "A partial workspace object to update the workspace with.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "OrganizationUpdateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationDeleteChallenge",
+            "description": "Requests a deletion confirmation code for the workspace. The code is sent to the requesting user's email and must be used with the organizationDelete mutation to confirm deletion.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationDeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationDelete",
+            "description": "Schedules deletion of the workspace and its data after validating the code from organizationDeleteChallenge. This does not finish the deletion during the request. Use organizationCancelDelete while cancellation is still available.",
+            "args": [
+              {
+                "name": "input",
+                "description": "Information required to delete the workspace.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeleteOrganizationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationDeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationCancelDelete",
+            "description": "Cancels a scheduled workspace deletion while the deletion process still permits cancellation. Requires workspace-settings permission.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationCancelDeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationStartTrialForPlan",
+            "description": "Starts a trial for the workspace on the specified plan type. The workspace must not already be on a paid plan or in an active trial.",
+            "args": [
+              {
+                "name": "input",
+                "description": "Plan details for trial",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "OrganizationStartTrialInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationStartTrialPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationStartTrial",
+            "description": "[DEPRECATED] Starts a trial for the workspace.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationStartTrialPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use organizationStartTrialForPlan"
+          },
+          {
             "name": "agentActivityCreate",
             "description": "Publishes an activity to your agent’s session and updates its lifecycle. Thoughts and actions report ongoing work; a response completes the turn unless it has the continue signal, an elicitation waits for user input, and an error records a failed turn. The session must be unarchived and owned by the authenticated app user. Use the agent app’s OAuth or workload identity token; personal API keys cannot publish agent activities.",
             "args": [
@@ -95257,7 +95398,7 @@
           },
           {
             "name": "cycleUpdate",
-            "description": "Updates a cycle’s name, description, or schedule and returns the resulting cycle. Date changes can shorten adjacent cycles to prevent overlap. You cannot change an active cycle’s start or a completed cycle’s dates, or edit inherited cycles directly.",
+            "description": "Updates a cycle’s name, description, or schedule and returns the resulting cycle. Date changes can shorten adjacent cycles to prevent overlap. You cannot change an active cycle’s start or a completed cycle’s dates, or edit inherited cycles directly. Requires permission to manage the team.",
             "args": [
               {
                 "name": "input",
@@ -95302,7 +95443,7 @@
           },
           {
             "name": "cycleArchive",
-            "description": "Archives a cycle and removes its current issues from it. The issues themselves are not archived. An inherited cycle must be managed through its parent team.",
+            "description": "Archives a cycle and removes its current issues from it. The issues themselves are not archived. An inherited cycle must be managed through its parent team. Requires permission to manage the team.",
             "args": [
               {
                 "name": "id",
@@ -95364,7 +95505,7 @@
           },
           {
             "name": "cycleStartUpcomingCycleToday",
-            "description": "Starts the upcoming cycle as of midnight today. Completes the previous cycle if it has not yet ended. Only the next upcoming (not yet started) cycle for the team can be started.",
+            "description": "Starts the upcoming cycle as of midnight today. Completes the previous cycle if it has not yet ended. Only the next upcoming (not yet started) cycle for the team can be started. Requires permission to manage the team.",
             "args": [
               {
                 "name": "id",
@@ -102055,147 +102196,6 @@
             "deprecationReason": null
           },
           {
-            "name": "organizationUpdate",
-            "description": "Updates the workspace associated with your credentials. Omitted fields keep their current values. Most changes require workspace-settings permission; project and initiative reminder schedules require schedule-management permission. Some settings also depend on the workspace’s plan.",
-            "args": [
-              {
-                "name": "input",
-                "description": "A partial workspace object to update the workspace with.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "OrganizationUpdateInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizationDeleteChallenge",
-            "description": "Requests a deletion confirmation code for the workspace. The code is sent to the requesting user's email and must be used with the organizationDelete mutation to confirm deletion.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationDeletePayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizationDelete",
-            "description": "Schedules deletion of the workspace and its data after validating the code from organizationDeleteChallenge. This does not finish the deletion during the request. Use organizationCancelDelete while cancellation is still available.",
-            "args": [
-              {
-                "name": "input",
-                "description": "Information required to delete the workspace.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "DeleteOrganizationInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationDeletePayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizationCancelDelete",
-            "description": "Cancels a scheduled workspace deletion while the deletion process still permits cancellation. Requires workspace-settings permission.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationCancelDeletePayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizationStartTrialForPlan",
-            "description": "Starts a trial for the workspace on the specified plan type. The workspace must not already be on a paid plan or in an active trial.",
-            "args": [
-              {
-                "name": "input",
-                "description": "Plan details for trial",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "OrganizationStartTrialInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationStartTrialPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizationStartTrial",
-            "description": "[DEPRECATED] Starts a trial for the workspace.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationStartTrialPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Use organizationStartTrialForPlan"
-          },
-          {
             "name": "projectLabelCreate",
             "description": "Creates a label or label group for projects. Workspace labels require workspace label-management permission; team labels require label-management permission in that team and a plan that supports team project labels. replaceTeamLabels can migrate matching labels into the new scope.",
             "args": [
@@ -105851,6 +105851,764 @@
         ],
         "inputFields": null,
         "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "OrganizationPayload",
+        "description": "Workspace update operation response.",
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organization",
+            "description": "The workspace that was created or updated.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Organization",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "OrganizationUpdateInput",
+        "description": "Changes to the workspace associated with your credentials. Omitted fields keep their current values. Most settings require workspace-settings permission, while update reminder schedules require schedule-management permission.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "name",
+            "description": "The name of the workspace.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "logoUrl",
+            "description": "The logo URL of the workspace.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "urlKey",
+            "description": "The URL key of the workspace.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "gitBranchFormat",
+            "description": "How git branches are formatted. If null, default formatting will be used.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "gitLinkbackMessagesEnabled",
+            "description": "Whether the Git integration linkback messages should be sent for private repositories.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "gitPublicLinkbackMessagesEnabled",
+            "description": "Whether the Git integration linkback messages should be sent for public repositories.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "gitLinkbackDescriptionsEnabled",
+            "description": "Whether issue descriptions should be included in Git integration linkback messages.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "suggestedBranchNameEnabled",
+            "description": "Whether the default prompt for copying an issue or opening it in a coding tool includes a suggested Git branch name.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "roadmapEnabled",
+            "description": "Whether initiatives are enabled for the workspace. The field keeps its legacy roadmap name, but controls access to initiative creation.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectUpdateReminderFrequencyInWeeks",
+            "description": "Weeks between project update reminders, from 0 to 8. Null disables workspace reminders.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectUpdateRemindersDay",
+            "description": "The day at which project updates are sent.",
+            "type": {
+              "kind": "ENUM",
+              "name": "Day",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "projectUpdateRemindersHour",
+            "description": "The hour for project update reminders, from 0 to 23.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "initiativeUpdateReminderFrequencyInWeeks",
+            "description": "[ALPHA] Weeks between initiative update reminders, from 0 to 8. Null disables workspace reminders.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "initiativeUpdateRemindersDay",
+            "description": "[ALPHA] The day at which initiative updates are sent.",
+            "type": {
+              "kind": "ENUM",
+              "name": "Day",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "initiativeUpdateRemindersHour",
+            "description": "[ALPHA] The hour for initiative update reminders, from 0 to 23.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "fiscalYearStartMonth",
+            "description": "The fiscal year’s first month, from 0 for January to 11 for December.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "defaultHomeView",
+            "description": "The default home view for members of the workspace who have not chosen their own default.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "defaultHomeViewTargetId",
+            "description": "The id of the specific initiative, project, view, or dashboard used as the default home view. The type of entity is given by defaultHomeView.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "reducedPersonalInformation",
+            "description": "Whether the workspace has opted for reduced customer support attachment information.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "oauthAppReview",
+            "description": "Whether the workspace has opted for having to approve all OAuth applications for install.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "restrictAgentInvocationToMembers",
+            "description": "Whether agent invocation is restricted to full workspace members.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "allowedFileUploadContentTypes",
+            "description": "The allowed file MIME types or patterns, such as application/pdf or text/*. This replaces the workspace’s upload restriction list. Use null to remove the workspace-specific restriction; configuring restrictions requires the corresponding plan feature.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "feedEnabled",
+            "description": "Whether the workspace has enabled the feed feature.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "defaultFeedSummarySchedule",
+            "description": "Default schedule for how often feed summaries are generated.",
+            "type": {
+              "kind": "ENUM",
+              "name": "FeedSummarySchedule",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "aiDiscussionSummariesEnabled",
+            "description": "Whether the workspace has enabled AI discussion summaries for issues.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "aiThreadSummariesEnabled",
+            "description": "Whether the workspace has enabled resolved thread AI summaries.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "pullRequestTourEnabled",
+            "description": "Whether the workspace generates AI Pull Request guides for new pull requests.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "pullRequestIssueMode",
+            "description": "How Linear suggests and links issues for pull requests that have none linked: 'off', 'suggest', or 'autoOnMerge'.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "hipaaComplianceEnabled",
+            "description": "Whether HIPAA compliance is enabled for the workspace.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "securitySettings",
+            "description": "The security settings for the workspace.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "OrganizationSecuritySettingsInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "authSettings",
+            "description": "The authentication settings for the workspace.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "OrganizationAuthSettingsInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slackProjectChannelIntegrationId",
+            "description": "The ID of the Slack integration to use for auto-creating project channels.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slackProjectChannelPrefix",
+            "description": "The prefix to use for auto-created Slack project channels (p-, proj-, or project-).",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "OrganizationSecuritySettingsInput",
+        "description": "Minimum workspace roles required for individual actions, such as inviting members or creating API keys. These settings control who can perform the actions; they do not change users’ assigned roles.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "adminManagementRole",
+            "description": "The minimum role required to grant or revoke the workspace admin role.",
+            "type": {
+              "kind": "ENUM",
+              "name": "UserRoleType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "personalApiKeysRole",
+            "description": "The minimum role required to create personal API keys.",
+            "type": {
+              "kind": "ENUM",
+              "name": "UserRoleType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "invitationsRole",
+            "description": "The minimum role required to invite users.",
+            "type": {
+              "kind": "ENUM",
+              "name": "UserRoleType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "teamCreationRole",
+            "description": "The minimum role required to create teams.",
+            "type": {
+              "kind": "ENUM",
+              "name": "UserRoleType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "workspaceInitiativesRole",
+            "description": "The minimum role required to create initiatives without a lead team or move initiatives between workspace and team scopes.",
+            "type": {
+              "kind": "ENUM",
+              "name": "UserRoleType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "labelManagementRole",
+            "description": "The minimum role required to manage workspace labels.",
+            "type": {
+              "kind": "ENUM",
+              "name": "UserRoleType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "apiSettingsRole",
+            "description": "The minimum role required to manage API settings.",
+            "type": {
+              "kind": "ENUM",
+              "name": "UserRoleType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "templateManagementRole",
+            "description": "The minimum role required to manage workspace templates.",
+            "type": {
+              "kind": "ENUM",
+              "name": "UserRoleType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "automationManagementRole",
+            "description": "The minimum role required to manage workspace loops.",
+            "type": {
+              "kind": "ENUM",
+              "name": "UserRoleType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "importRole",
+            "description": "The minimum role required to import data.",
+            "type": {
+              "kind": "ENUM",
+              "name": "UserRoleType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "agentGuidanceRole",
+            "description": "The minimum role required to manage agent guidance prompts and settings.",
+            "type": {
+              "kind": "ENUM",
+              "name": "UserRoleType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "integrationCreationRole",
+            "description": "The minimum role required to install and connect new integrations.",
+            "type": {
+              "kind": "ENUM",
+              "name": "UserRoleType",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "pinnedViewManagementRole",
+            "description": "The minimum role required to pin views to workspace pages and to change the views pinned there.",
+            "type": {
+              "kind": "ENUM",
+              "name": "UserRoleType",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "TeamRoleType",
+        "description": "All possible roles within a team in terms of access to team settings and operations.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "owner",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "member",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "OrganizationAuthSettingsInput",
+        "description": "Workspace authentication restrictions and sign-in behavior. Use allowedAuthServices to limit login providers and the bypass setting to control whether administrators can use other providers.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "allowedAuthServices",
+            "description": "The replacement list of authentication providers allowed for sign-in. An empty array allows all providers. Omit to keep the existing list; restricting providers requires the corresponding plan feature.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "hideNonPrimaryOrganizations",
+            "description": "Whether to hide non-primary workspaces during signup for users with matching email domains.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "disableAuthServiceBypass",
+            "description": "Whether to disable admin/owner auth service bypass.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "SCALAR",
+        "name": "UUID",
+        "description": "An RFC 4122 UUID string, such as `550e8400-e29b-41d4-a716-446655440000`. Accepts versions 1 through 5 in the standard hyphenated form and normalizes letters to lowercase. Human-readable identifiers such as `ENG-123` are not UUIDs.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "OrganizationDeletePayload",
+        "description": "Workspace deletion operation response.",
+        "fields": [
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "DeleteOrganizationInput",
+        "description": "Input for confirming workspace deletion with a verification code.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "deletionCode",
+            "description": "The deletion code to confirm operation.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "OrganizationCancelDeletePayload",
+        "description": "Workspace deletion cancellation response.",
+        "fields": [
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "OrganizationStartTrialPayload",
+        "description": "Workspace trial start response.",
+        "fields": [
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "OrganizationStartTrialInput",
+        "description": "Input for starting a workspace trial on a specific plan.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "planType",
+            "description": "The plan type to trial.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },
@@ -117384,16 +118142,6 @@
         "possibleTypes": null
       },
       {
-        "kind": "SCALAR",
-        "name": "UUID",
-        "description": "An RFC 4122 UUID string, such as `550e8400-e29b-41d4-a716-446655440000`. Accepts versions 1 through 5 in the standard hyphenated form and normalizes letters to lowercase. Human-readable identifiers such as `ENG-123` are not UUIDs.",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
         "kind": "OBJECT",
         "name": "IssueArchivePayload",
         "description": "The result of archiving or restoring a resource.",
@@ -119768,754 +120516,6 @@
                     "ofType": null
                   }
                 }
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "OrganizationPayload",
-        "description": "Workspace update operation response.",
-        "fields": [
-          {
-            "name": "lastSyncId",
-            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organization",
-            "description": "The workspace that was created or updated.",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "Organization",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "OrganizationUpdateInput",
-        "description": "Changes to the workspace associated with your credentials. Omitted fields keep their current values. Most settings require workspace-settings permission, while update reminder schedules require schedule-management permission.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "name",
-            "description": "The name of the workspace.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "logoUrl",
-            "description": "The logo URL of the workspace.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "urlKey",
-            "description": "The URL key of the workspace.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "gitBranchFormat",
-            "description": "How git branches are formatted. If null, default formatting will be used.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "gitLinkbackMessagesEnabled",
-            "description": "Whether the Git integration linkback messages should be sent for private repositories.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "gitPublicLinkbackMessagesEnabled",
-            "description": "Whether the Git integration linkback messages should be sent for public repositories.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "gitLinkbackDescriptionsEnabled",
-            "description": "Whether issue descriptions should be included in Git integration linkback messages.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "suggestedBranchNameEnabled",
-            "description": "Whether the default prompt for copying an issue or opening it in a coding tool includes a suggested Git branch name.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "roadmapEnabled",
-            "description": "Whether initiatives are enabled for the workspace. The field keeps its legacy roadmap name, but controls access to initiative creation.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "projectUpdateReminderFrequencyInWeeks",
-            "description": "Weeks between project update reminders, from 0 to 8. Null disables workspace reminders.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Float",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "projectUpdateRemindersDay",
-            "description": "The day at which project updates are sent.",
-            "type": {
-              "kind": "ENUM",
-              "name": "Day",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "projectUpdateRemindersHour",
-            "description": "The hour for project update reminders, from 0 to 23.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Float",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "initiativeUpdateReminderFrequencyInWeeks",
-            "description": "[ALPHA] Weeks between initiative update reminders, from 0 to 8. Null disables workspace reminders.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Float",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "initiativeUpdateRemindersDay",
-            "description": "[ALPHA] The day at which initiative updates are sent.",
-            "type": {
-              "kind": "ENUM",
-              "name": "Day",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "initiativeUpdateRemindersHour",
-            "description": "[ALPHA] The hour for initiative update reminders, from 0 to 23.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Float",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "fiscalYearStartMonth",
-            "description": "The fiscal year’s first month, from 0 for January to 11 for December.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Float",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "defaultHomeView",
-            "description": "The default home view for members of the workspace who have not chosen their own default.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "defaultHomeViewTargetId",
-            "description": "The id of the specific initiative, project, view, or dashboard used as the default home view. The type of entity is given by defaultHomeView.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "reducedPersonalInformation",
-            "description": "Whether the workspace has opted for reduced customer support attachment information.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "oauthAppReview",
-            "description": "Whether the workspace has opted for having to approve all OAuth applications for install.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "restrictAgentInvocationToMembers",
-            "description": "Whether agent invocation is restricted to full workspace members.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "allowedFileUploadContentTypes",
-            "description": "The allowed file MIME types or patterns, such as application/pdf or text/*. This replaces the workspace’s upload restriction list. Use null to remove the workspace-specific restriction; configuring restrictions requires the corresponding plan feature.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "feedEnabled",
-            "description": "Whether the workspace has enabled the feed feature.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "defaultFeedSummarySchedule",
-            "description": "Default schedule for how often feed summaries are generated.",
-            "type": {
-              "kind": "ENUM",
-              "name": "FeedSummarySchedule",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "aiDiscussionSummariesEnabled",
-            "description": "Whether the workspace has enabled AI discussion summaries for issues.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "aiThreadSummariesEnabled",
-            "description": "Whether the workspace has enabled resolved thread AI summaries.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "pullRequestTourEnabled",
-            "description": "Whether the workspace generates AI Pull Request guides for new pull requests.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "pullRequestIssueMode",
-            "description": "How Linear suggests and links issues for pull requests that have none linked: 'off', 'suggest', or 'autoOnMerge'.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "hipaaComplianceEnabled",
-            "description": "Whether HIPAA compliance is enabled for the workspace.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "securitySettings",
-            "description": "The security settings for the workspace.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "OrganizationSecuritySettingsInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "authSettings",
-            "description": "The authentication settings for the workspace.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "OrganizationAuthSettingsInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "slackProjectChannelIntegrationId",
-            "description": "The ID of the Slack integration to use for auto-creating project channels.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "slackProjectChannelPrefix",
-            "description": "The prefix to use for auto-created Slack project channels (p-, proj-, or project-).",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "OrganizationSecuritySettingsInput",
-        "description": "Minimum workspace roles required for individual actions, such as inviting members or creating API keys. These settings control who can perform the actions; they do not change users’ assigned roles.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "adminManagementRole",
-            "description": "The minimum role required to grant or revoke the workspace admin role.",
-            "type": {
-              "kind": "ENUM",
-              "name": "UserRoleType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "personalApiKeysRole",
-            "description": "The minimum role required to create personal API keys.",
-            "type": {
-              "kind": "ENUM",
-              "name": "UserRoleType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "invitationsRole",
-            "description": "The minimum role required to invite users.",
-            "type": {
-              "kind": "ENUM",
-              "name": "UserRoleType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "teamCreationRole",
-            "description": "The minimum role required to create teams.",
-            "type": {
-              "kind": "ENUM",
-              "name": "UserRoleType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "workspaceInitiativesRole",
-            "description": "The minimum role required to create initiatives without a lead team or move initiatives between workspace and team scopes.",
-            "type": {
-              "kind": "ENUM",
-              "name": "UserRoleType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "labelManagementRole",
-            "description": "The minimum role required to manage workspace labels.",
-            "type": {
-              "kind": "ENUM",
-              "name": "UserRoleType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "apiSettingsRole",
-            "description": "The minimum role required to manage API settings.",
-            "type": {
-              "kind": "ENUM",
-              "name": "UserRoleType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "templateManagementRole",
-            "description": "The minimum role required to manage workspace templates.",
-            "type": {
-              "kind": "ENUM",
-              "name": "UserRoleType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "automationManagementRole",
-            "description": "The minimum role required to manage workspace loops.",
-            "type": {
-              "kind": "ENUM",
-              "name": "UserRoleType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "importRole",
-            "description": "The minimum role required to import data.",
-            "type": {
-              "kind": "ENUM",
-              "name": "UserRoleType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "agentGuidanceRole",
-            "description": "The minimum role required to manage agent guidance prompts and settings.",
-            "type": {
-              "kind": "ENUM",
-              "name": "UserRoleType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "integrationCreationRole",
-            "description": "The minimum role required to install and connect new integrations.",
-            "type": {
-              "kind": "ENUM",
-              "name": "UserRoleType",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "pinnedViewManagementRole",
-            "description": "The minimum role required to pin views to workspace pages and to change the views pinned there.",
-            "type": {
-              "kind": "ENUM",
-              "name": "UserRoleType",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "ENUM",
-        "name": "TeamRoleType",
-        "description": "All possible roles within a team in terms of access to team settings and operations.",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "owner",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "member",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "OrganizationAuthSettingsInput",
-        "description": "Workspace authentication restrictions and sign-in behavior. Use allowedAuthServices to limit login providers and the bypass setting to control whether administrators can use other providers.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "allowedAuthServices",
-            "description": "The replacement list of authentication providers allowed for sign-in. An empty array allows all providers. Omit to keep the existing list; restricting providers requires the corresponding plan feature.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "hideNonPrimaryOrganizations",
-            "description": "Whether to hide non-primary workspaces during signup for users with matching email domains.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "disableAuthServiceBypass",
-            "description": "Whether to disable admin/owner auth service bypass.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "OrganizationDeletePayload",
-        "description": "Workspace deletion operation response.",
-        "fields": [
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "DeleteOrganizationInput",
-        "description": "Input for confirming workspace deletion with a verification code.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "deletionCode",
-            "description": "The deletion code to confirm operation.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "OrganizationCancelDeletePayload",
-        "description": "Workspace deletion cancellation response.",
-        "fields": [
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "OrganizationStartTrialPayload",
-        "description": "Workspace trial start response.",
-        "fields": [
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "OrganizationStartTrialInput",
-        "description": "Input for starting a workspace trial on a specific plan.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "planType",
-            "description": "The plan type to trial.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
               }
             },
             "defaultValue": null
@@ -130455,38 +130455,6 @@
             "deprecationReason": null
           },
           {
-            "name": "userCreated",
-            "description": "Triggered when an user is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "User",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "userUpdated",
-            "description": "Triggered when an user is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "User",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "commentCreated",
             "description": "Triggered when a comment is created",
             "args": [],
@@ -130646,6 +130614,38 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "Issue",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userCreated",
+            "description": "Triggered when an user is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "User",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userUpdated",
+            "description": "Triggered when an user is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "User",
                 "ofType": null
               }
             },
