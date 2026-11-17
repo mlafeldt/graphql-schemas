@@ -950,12 +950,12 @@
           },
           {
             "kind": "OBJECT",
-            "name": "CodeRepository",
+            "name": "PullRequestComment",
             "ofType": null
           },
           {
             "kind": "OBJECT",
-            "name": "PullRequestComment",
+            "name": "CodeRepository",
             "ofType": null
           },
           {
@@ -31323,6 +31323,187 @@
       },
       {
         "kind": "OBJECT",
+        "name": "PullRequestComment",
+        "description": "A comment on a pull request, synced bidirectionally with the hosting provider (e.g., GitHub). Comments can be top-level or threaded replies, and may be associated with specific code locations via an anchor. Comments belonging to a pending review are not visible to other users or synced to the provider until the review is submitted.",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The resource's unique UUID. This stays unchanged when the resource is renamed or moved; use it for stored references and mutations.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createdAt",
+            "description": "The resource’s recorded creation time, in UTC. Imports may preserve an earlier creation time.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updatedAt",
+            "description": "When the resource was last meaningfully updated, in UTC. Some background or housekeeping changes do not advance this timestamp.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "archivedAt",
+            "description": "When the resource was archived, in UTC. Null while active, including after unarchiving. Archived resources still exist but are normally excluded from lists unless `includeArchived` is true.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "bodyData",
+            "description": "The comment content as a ProseMirror document.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "JSONObject",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "externalThreadId",
+            "description": "Provider-specific thread identifier. Null if the provider did not provide a thread identifier.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "externalReviewId",
+            "description": "Provider-specific identifier of the review this comment was submitted with (e.g., the GitHub review ID). All comments from one review submission share the same value. Null if the comment was not part of a provider review, or the identifier has not synced from the provider yet.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "decision",
+            "description": "The review decision this comment was submitted with (approved, changes requested, commented, or dismissed). Set on the summary comment of a submitted review. Null for all other comments.",
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "PullRequestReviewerDecision",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "editedAt",
+            "description": "The time at which the comment was edited. Null if never edited.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "resolvedAt",
+            "description": "The time at which the top-level thread was resolved. Null if unresolved.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pendingReviewId",
+            "description": "Identifier of the review this comment was created in when composed in Linear. Comments submitted together keep the same value after submission. Null if the comment was not created through a review composed in Linear.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "reactionData",
+            "description": "Emoji reaction summary for this pull request comment, grouped by emoji type. Each entry contains the emoji name, count, and the IDs of users who reacted.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "JSONObject",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "CodeRepository",
         "description": "[ALPHA] A code repository connected to the workspace from a supported version control provider (e.g., GitHub, GitLab). Normalizes repository metadata that was previously stored as JSONB on individual pull requests, providing a single source of truth for repository owner, name, visibility, and default branch.",
         "fields": [
@@ -31508,187 +31689,6 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [
-          {
-            "kind": "INTERFACE",
-            "name": "Node",
-            "ofType": null
-          }
-        ],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "PullRequestComment",
-        "description": "A comment on a pull request, synced bidirectionally with the hosting provider (e.g., GitHub). Comments can be top-level or threaded replies, and may be associated with specific code locations via an anchor. Comments belonging to a pending review are not visible to other users or synced to the provider until the review is submitted.",
-        "fields": [
-          {
-            "name": "id",
-            "description": "The resource's unique UUID. This stays unchanged when the resource is renamed or moved; use it for stored references and mutations.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "createdAt",
-            "description": "The resource’s recorded creation time, in UTC. Imports may preserve an earlier creation time.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "DateTime",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "updatedAt",
-            "description": "When the resource was last meaningfully updated, in UTC. Some background or housekeeping changes do not advance this timestamp.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "DateTime",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "archivedAt",
-            "description": "When the resource was archived, in UTC. Null while active, including after unarchiving. Archived resources still exist but are normally excluded from lists unless `includeArchived` is true.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTime",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "bodyData",
-            "description": "The comment content as a ProseMirror document.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "JSONObject",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "externalThreadId",
-            "description": "Provider-specific thread identifier. Null if the provider did not provide a thread identifier.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "externalReviewId",
-            "description": "Provider-specific identifier of the review this comment was submitted with (e.g., the GitHub review ID). All comments from one review submission share the same value. Null if the comment was not part of a provider review, or the identifier has not synced from the provider yet.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "decision",
-            "description": "The review decision this comment was submitted with (approved, changes requested, commented, or dismissed). Set on the summary comment of a submitted review. Null for all other comments.",
-            "args": [],
-            "type": {
-              "kind": "ENUM",
-              "name": "PullRequestReviewerDecision",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "editedAt",
-            "description": "The time at which the comment was edited. Null if never edited.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTime",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "resolvedAt",
-            "description": "The time at which the top-level thread was resolved. Null if unresolved.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "DateTime",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "pendingReviewId",
-            "description": "Identifier of the review this comment was created in when composed in Linear. Comments submitted together keep the same value after submission. Null if the comment was not created through a review composed in Linear.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "reactionData",
-            "description": "Emoji reaction summary for this pull request comment, grouped by emoji type. Each entry contains the emoji name, count, and the IDs of users who reacted.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "JSONObject",
                 "ofType": null
               }
             },
@@ -40478,7 +40478,7 @@
           },
           {
             "name": "projectGrouping",
-            "description": "The project grouping. Values: statusType, activity, leadTeam, lead, member, health, none, status, priority, label, labelGroup, roadmap, initiative, subInitiative, team, startDate, targetDate, rolloutStage.",
+            "description": "The project grouping. Values: statusType, activity, leadTeam, lead, member, health, none, status, priority, label, labelGroup, roadmap, initiative, subInitiative, team, startDate, targetDate, rolloutStage, customer.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -40490,7 +40490,7 @@
           },
           {
             "name": "projectSubGrouping",
-            "description": "The project sub-grouping. Values: statusType, activity, leadTeam, lead, member, health, none, status, priority, label, labelGroup, roadmap, initiative, subInitiative, team, startDate, targetDate, rolloutStage.",
+            "description": "The project sub-grouping. Values: statusType, activity, leadTeam, lead, member, health, none, status, priority, label, labelGroup, roadmap, initiative, subInitiative, team, startDate, targetDate, rolloutStage, customer.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -70819,6 +70819,26 @@
             "name": "recentReleasesByAccessKey",
             "description": "Returns releases for the pipeline associated with the access key, ordered with the most recently completed or updated first.",
             "args": [
+              {
+                "name": "after",
+                "description": "Returns releases after this release in the same order. Pass the ID of the last release from the previous page, and keep `includeArchived` unchanged between pages. A started release moves up when it is updated, so it can be skipped or repeated while you page.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeArchived",
+                "description": "Includes archived releases alongside active ones. Defaults to false. Completed releases are archived automatically six months after completion when they have no unarchived issues. Deleted releases and releases of archived pipelines are never returned.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": "false"
+              },
               {
                 "name": "limit",
                 "description": "Maximum number of releases to return. Defaults to 20 and is capped at 100.",

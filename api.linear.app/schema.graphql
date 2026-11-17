@@ -36351,6 +36351,22 @@ type Query {
   """
   recentReleasesByAccessKey(
     """
+    Returns releases after this release in the same order. Pass the ID of the
+    last release from the previous page, and keep `includeArchived` unchanged
+    between pages. A started release moves up when it is updated, so it can be
+    skipped or repeated while you page.
+    """
+    after: String
+
+    """
+    Includes archived releases alongside active ones. Defaults to false.
+    Completed releases are archived automatically six months after completion
+    when they have no unarchived issues. Deleted releases and releases of
+    archived pipelines are never returned.
+    """
+    includeArchived: Boolean = false
+
+    """
     Maximum number of releases to return. Defaults to 20 and is capped at 100.
     """
     limit: Int
@@ -46074,14 +46090,14 @@ type ViewPreferencesValues {
   """
   The project grouping. Values: statusType, activity, leadTeam, lead, member,
   health, none, status, priority, label, labelGroup, roadmap, initiative,
-  subInitiative, team, startDate, targetDate, rolloutStage.
+  subInitiative, team, startDate, targetDate, rolloutStage, customer.
   """
   projectGrouping: String
 
   """
   The project sub-grouping. Values: statusType, activity, leadTeam, lead,
   member, health, none, status, priority, label, labelGroup, roadmap,
-  initiative, subInitiative, team, startDate, targetDate, rolloutStage.
+  initiative, subInitiative, team, startDate, targetDate, rolloutStage, customer.
   """
   projectSubGrouping: String
 
