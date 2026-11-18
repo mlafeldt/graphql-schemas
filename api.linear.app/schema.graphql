@@ -6696,57 +6696,6 @@ type DocumentContent implements Node {
 }
 
 """
-A user’s unpublished changes to a DocumentContent record. Each user can have one
-active draft for the same content, and the live body stays unchanged until the
-draft is applied. Use documentContentId to associate the draft with the resource being edited.
-"""
-type DocumentContentDraft implements Node {
-  """
-  The resource's unique UUID. This stays unchanged when the resource is renamed
-  or moved; use it for stored references and mutations.
-  """
-  id: ID!
-
-  """
-  The resource’s recorded creation time, in UTC. Imports may preserve an earlier creation time.
-  """
-  createdAt: DateTime!
-
-  """
-  When the resource was last meaningfully updated, in UTC. Some background or
-  housekeeping changes do not advance this timestamp.
-  """
-  updatedAt: DateTime!
-
-  """
-  When the resource was archived, in UTC. Null while active, including after
-  unarchiving. Archived resources still exist but are normally excluded from
-  lists unless `includeArchived` is true.
-  """
-  archivedAt: DateTime
-
-  """The document content that this draft is a revision of."""
-  documentContent: DocumentContent!
-
-  """
-  The identifier of the document content that this draft is a revision of.
-  """
-  documentContentId: String!
-
-  """
-  The draft’s full content as a base64-encoded Yjs update. This is the
-  unpublished version, not a Markdown string or a list of changed lines.
-  """
-  contentState: String!
-
-  """The user who created or owns this draft."""
-  user: User!
-
-  """The identifier of the user who owns this draft."""
-  userId: String!
-}
-
-"""
 A saved version of rich-text content, with its capture time and contributors.
 """
 type DocumentContentHistory implements Node {
@@ -21312,9 +21261,6 @@ type Mutation {
   Sentry issues are resolved and reopening them when Sentry issues are unresolved.
   """
   integrationSentryConnect(
-    """The slug of the Sentry organization being connected."""
-    organizationSlug: String!
-
     """The Sentry grant code that's exchanged for OAuth tokens."""
     code: String!
 
@@ -41265,15 +41211,6 @@ type Subscription {
 
   """Triggered when an organization is updated"""
   organizationUpdated: Organization!
-
-  """Triggered when a document content draft is created"""
-  documentContentDraftCreated: DocumentContentDraft!
-
-  """Triggered when a document content draft is updated"""
-  documentContentDraftUpdated: DocumentContentDraft!
-
-  """Triggered when a document content draft is deleted"""
-  documentContentDraftDeleted: DocumentContentDraft!
 }
 
 """
