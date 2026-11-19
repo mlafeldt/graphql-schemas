@@ -4155,8 +4155,10 @@ type CustomerNotificationSubscription implements NotificationSubscription & Enti
   """The user who will receive notifications from this subscription."""
   subscriber: User!
 
-  """The customer subscribed to."""
-  customer: Customer!
+  """
+  The customer subscribed to. Null if the subscriber can no longer access it.
+  """
+  customer: Customer
 
   """
   The custom view that this notification subscription is scoped to. Null if the
@@ -4847,8 +4849,9 @@ input CustomerUpsertInput {
 
   """
   The customer tier’s name or display name. An existing matching tier is reused;
-  otherwise a tier is created. Use this when importing named tiers, or use
-  tierId to select a known tier. The two fields cannot be combined.
+  otherwise a tier is created, which requires permission to manage customer
+  settings. Use this when importing named tiers, or use tierId to select a known
+  tier. The two fields cannot be combined.
   """
   tierName: String
 }
@@ -4939,6 +4942,11 @@ type CustomView implements Node {
   The filter applied to feed items in the custom view. When set, this view displays feed items (updates) instead of issues.
   """
   feedItemFilterData: JSONObject
+
+  """
+  [Internal] The timezone captured when the view was created. Missing values use UTC.
+  """
+  filterTimezone: String
 
   """
   Whether the view is shared rather than personal. Sharing makes the view
@@ -5369,8 +5377,10 @@ type CustomViewNotificationSubscription implements NotificationSubscription & En
   """
   customer: Customer
 
-  """The custom view subscribed to."""
-  customView: CustomView!
+  """
+  The custom view subscribed to. Null if the subscriber can no longer access it.
+  """
+  customView: CustomView
 
   """
   The cycle that this notification subscription is scoped to. Null if the subscription targets a different entity type.
@@ -5998,8 +6008,10 @@ type CycleNotificationSubscription implements NotificationSubscription & Entity 
   """
   customView: CustomView
 
-  """The cycle subscribed to."""
-  cycle: Cycle!
+  """
+  The cycle subscribed to. Null if the subscriber can no longer access it.
+  """
+  cycle: Cycle
 
   """
   The issue label that this notification subscription is scoped to. Null if the
@@ -6186,7 +6198,8 @@ input CycleUpdateInput {
 Compares timestamps at millisecond precision. Accepts ISO 8601 timestamps or
 durations relative to when the filter runs; `{ gte: "-P7D" }` includes times
 from seven days ago onward. Combine `gte` and `lt` for a time window. A
-YYYY-MM-DD value means midnight UTC, so equality with a date does not match the whole day.
+YYYY-MM-DD value means midnight in `timezone`, or UTC by default, so equality
+with a date does not match the whole day. Use `today` to match the whole current day.
 """
 input DateComparator {
   """Matches the given value."""
@@ -6216,6 +6229,16 @@ input DateComparator {
 
   """Matches values greater than or equal to the given value."""
   gte: DateTimeOrDuration
+
+  """
+  Matches today's calendar day, or its complement when false. Uses timezone, defaulting to UTC.
+  """
+  today: Boolean
+
+  """
+  Timezone for calendar dates. Saved views use one timezone for all date filters.
+  """
+  timezone: String
 }
 
 """By which resolution is a date defined."""
@@ -11654,8 +11677,10 @@ type InitiativeNotificationSubscription implements NotificationSubscription & En
   """
   project: Project
 
-  """The initiative subscribed to."""
-  initiative: Initiative!
+  """
+  The initiative subscribed to. Null if the subscriber can no longer access it.
+  """
+  initiative: Initiative
 
   """
   The team that this notification subscription is scoped to. Null if the subscription targets a different entity type.
@@ -18868,8 +18893,10 @@ type LabelNotificationSubscription implements NotificationSubscription & Entity 
   """
   cycle: Cycle
 
-  """The label subscribed to."""
-  label: IssueLabel!
+  """
+  The label subscribed to. Null if the subscriber can no longer access it.
+  """
+  label: IssueLabel
 
   """
   The project that this notification subscription is scoped to. Null if the subscription targets a different entity type.
@@ -19944,7 +19971,8 @@ type Mutation {
   Finds a customer using the supplied UUID, external ID, Slack channel, or
   domains, and updates it; otherwise creates one. A name is required when no
   customer matches. Unlike customerUpdate, this operation can override
-  integration-managed fields, and a tierName can create a new customer tier.
+  integration-managed fields, and a tierName can create a new customer tier when
+  the caller has permission to manage customer settings.
   """
   customerUpsert(
     """The customer to create."""
@@ -24502,6 +24530,16 @@ input NullableDateComparator {
 
   """Matches values greater than or equal to the given value."""
   gte: DateTimeOrDuration
+
+  """
+  Matches today's calendar day, or its complement when false. Uses timezone, defaulting to UTC.
+  """
+  today: Boolean
+
+  """
+  Timezone for calendar dates. Saved views use one timezone for all date filters.
+  """
+  timezone: String
 }
 
 """
@@ -25841,6 +25879,16 @@ input NullableTimelessDateComparator {
 
   """Matches values greater than or equal to the given value."""
   gte: TimelessDateOrDuration
+
+  """
+  Matches today's calendar day, or its complement when false. Uses timezone, defaulting to UTC.
+  """
+  today: Boolean
+
+  """
+  Timezone for calendar dates. Saved views use one timezone for all date filters.
+  """
+  timezone: String
 }
 
 """
@@ -30955,8 +31003,10 @@ type ProjectNotificationSubscription implements NotificationSubscription & Entit
   """
   label: IssueLabel
 
-  """The project subscribed to."""
-  project: Project!
+  """
+  The project subscribed to. Null if the subscriber can no longer access it.
+  """
+  project: Project
 
   """
   The initiative that this notification subscription is scoped to. Null if the subscription targets a different entity type.
@@ -42854,8 +42904,10 @@ type TeamNotificationSubscription implements NotificationSubscription & Entity &
   """
   initiative: Initiative
 
-  """The team subscribed to."""
-  team: Team!
+  """
+  The team subscribed to. Null if the subscriber can no longer access it.
+  """
+  team: Team
 
   """
   The user that this notification subscription is scoped to, for user-specific
@@ -45239,8 +45291,10 @@ type UserNotificationSubscription implements NotificationSubscription & Entity &
   """
   team: Team
 
-  """The user subscribed to."""
-  user: User!
+  """
+  The user subscribed to. Null if the subscriber can no longer access it.
+  """
+  user: User
 
   """
   The type of contextual view (e.g., active issues, backlog) that further scopes
@@ -46703,6 +46757,11 @@ type ViewPreferencesValues {
   Whether to show GitHub labels on review list items. Null if the preference is unset.
   """
   reviewFieldLabels: Boolean
+
+  """
+  Whether to show the pull request risk level on review list items. Null if the preference is unset.
+  """
+  reviewFieldRisk: Boolean
 
   """Whether team reviews are shown in the reviews list."""
   showTeamReviews: Boolean
