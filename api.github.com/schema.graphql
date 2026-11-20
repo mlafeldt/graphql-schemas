@@ -5158,6 +5158,18 @@ enum CopilotCodeReviewRunnerType {
   LABELED
 }
 
+"""The severity Copilot code review assigned to a review comment."""
+enum CopilotCodeReviewSeverity {
+  """Low severity."""
+  LOW
+
+  """Medium severity."""
+  MEDIUM
+
+  """High severity."""
+  HIGH
+}
+
 """Which review comment severities Copilot code review leaves out."""
 enum CopilotCodeReviewSeverityFilter {
   """Keep every comment."""
@@ -29361,6 +29373,11 @@ type PullRequestReviewComment implements Comment & Deletable & Minimizable & Nod
 
   """Identifies the commit associated with the comment."""
   commit: Commit
+
+  """
+  The Copilot code review severity of this comment, or null if unavailable.
+  """
+  copilotCodeReviewSeverity: CopilotCodeReviewSeverity
 
   """Sources reported as contributing to this comment; may be incomplete."""
   copilotCodeReviewSources: [CopilotCodeReviewSource!]!
