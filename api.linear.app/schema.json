@@ -100260,7 +100260,7 @@
           },
           {
             "name": "issueImportProcess",
-            "description": "Saves the supplied mappings and schedules creation of Linear records from the fetched source data. The import must be inProgress; otherwise the mappings are saved but success is false. A successful response means processing was accepted, not that it has finished. Linear-to-Linear migrations can only be managed from the Linear app.",
+            "description": "Saves the supplied mappings and schedules creation of Linear records from the fetched source data. Fails without saving the mappings when an external-service import has not finished fetching its source data. The import must be inProgress; otherwise the mappings are saved but success is false. A successful response means processing was accepted, not that it has finished. Linear-to-Linear migrations can only be managed from the Linear app.",
             "args": [
               {
                 "name": "mapping",
@@ -100305,7 +100305,7 @@
           },
           {
             "name": "issueImportUpdate",
-            "description": "Saves mapping choices without starting the import. For external-service imports, supply the full replacement mapping. Requires workspace import permission; Linear-to-Linear migrations can only be managed from the Linear app.",
+            "description": "Saves mapping choices without starting the import. For external-service imports, supply the full replacement mapping, and wait until the import has fetched its source data. Requires workspace import permission; Linear-to-Linear migrations can only be managed from the Linear app.",
             "args": [
               {
                 "name": "input",
@@ -101988,7 +101988,7 @@
           },
           {
             "name": "oauthApplicationRotateSecret",
-            "description": "[ALPHA] Replaces the client secret for an application created by the caller and returns the new secret. Store it before discarding the response; it cannot be retrieved later. Tokens issued through client_credentials are revoked, while tokens from the authorization-code flow remain valid. The caller must be able to manage the application’s credentials, including its private-team access, as well as have workspace API management permission.",
+            "description": "[ALPHA] Replaces the client secret for an application created by the caller and returns the new secret. Store it before discarding the response; it cannot be retrieved later. The old secret stops working at once, as does a previous secret that a planned rotation kept working. Tokens issued through client_credentials are revoked, while tokens from the authorization-code flow remain valid. The caller must be able to manage the application’s credentials, including its private-team access, as well as have workspace API management permission.",
             "args": [
               {
                 "name": "id",
@@ -129628,134 +129628,6 @@
         "description": null,
         "fields": [
           {
-            "name": "workflowStateCreated",
-            "description": "Triggered when a workflow state is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "WorkflowState",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "workflowStateUpdated",
-            "description": "Triggered when a workflow state is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "WorkflowState",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "workflowStateArchived",
-            "description": "Triggered when a workflow state is archived",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "WorkflowState",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueHistoryCreated",
-            "description": "Triggered when an issue history is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueHistory",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueHistoryUpdated",
-            "description": "Triggered when an issue history is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueHistory",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueRelationCreated",
-            "description": "Triggered when an issue relation is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueRelation",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueRelationUpdated",
-            "description": "Triggered when an issue relation is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueRelation",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "issueRelationDeleted",
-            "description": "Triggered when an issue relation is deleted",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "IssueRelation",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "agentActivityCreated",
             "description": "Triggered when an agent activity is created",
             "args": [],
@@ -129852,6 +129724,102 @@
             "deprecationReason": null
           },
           {
+            "name": "workflowStateCreated",
+            "description": "Triggered when a workflow state is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "WorkflowState",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "workflowStateUpdated",
+            "description": "Triggered when a workflow state is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "WorkflowState",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "workflowStateArchived",
+            "description": "Triggered when a workflow state is archived",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "WorkflowState",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueRelationCreated",
+            "description": "Triggered when an issue relation is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueRelation",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueRelationUpdated",
+            "description": "Triggered when an issue relation is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueRelation",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueRelationDeleted",
+            "description": "Triggered when an issue relation is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueRelation",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "userSettingsUpdated",
             "description": "Triggered when an user settings is updated",
             "args": [],
@@ -129868,15 +129836,15 @@
             "deprecationReason": null
           },
           {
-            "name": "favoriteCreated",
-            "description": "Triggered when a favorite is created",
+            "name": "projectUpdateCreated",
+            "description": "Triggered when a project update is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Favorite",
+                "name": "ProjectUpdate",
                 "ofType": null
               }
             },
@@ -129884,15 +129852,15 @@
             "deprecationReason": null
           },
           {
-            "name": "favoriteUpdated",
-            "description": "Triggered when a favorite is updated",
+            "name": "projectUpdateUpdated",
+            "description": "Triggered when a project update is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Favorite",
+                "name": "ProjectUpdate",
                 "ofType": null
               }
             },
@@ -129900,15 +129868,31 @@
             "deprecationReason": null
           },
           {
-            "name": "favoriteDeleted",
-            "description": "Triggered when a favorite is deleted",
+            "name": "projectUpdateArchived",
+            "description": "Triggered when a project update is archived",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Favorite",
+                "name": "ProjectUpdate",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "projectUpdateDeleted",
+            "description": "Triggered when a project update is deleted",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ProjectUpdate",
                 "ofType": null
               }
             },
@@ -130044,15 +130028,15 @@
             "deprecationReason": null
           },
           {
-            "name": "teamMembershipCreated",
-            "description": "Triggered when a team membership is created",
+            "name": "favoriteCreated",
+            "description": "Triggered when a favorite is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "TeamMembership",
+                "name": "Favorite",
                 "ofType": null
               }
             },
@@ -130060,15 +130044,15 @@
             "deprecationReason": null
           },
           {
-            "name": "teamMembershipUpdated",
-            "description": "Triggered when a team membership is updated",
+            "name": "favoriteUpdated",
+            "description": "Triggered when a favorite is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "TeamMembership",
+                "name": "Favorite",
                 "ofType": null
               }
             },
@@ -130076,15 +130060,15 @@
             "deprecationReason": null
           },
           {
-            "name": "teamMembershipDeleted",
-            "description": "Triggered when a team membership is deleted",
+            "name": "favoriteDeleted",
+            "description": "Triggered when a favorite is deleted",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "TeamMembership",
+                "name": "Favorite",
                 "ofType": null
               }
             },
@@ -130140,15 +130124,15 @@
             "deprecationReason": null
           },
           {
-            "name": "projectUpdateCreated",
-            "description": "Triggered when a project update is created",
+            "name": "teamMembershipCreated",
+            "description": "Triggered when a team membership is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ProjectUpdate",
+                "name": "TeamMembership",
                 "ofType": null
               }
             },
@@ -130156,15 +130140,15 @@
             "deprecationReason": null
           },
           {
-            "name": "projectUpdateUpdated",
-            "description": "Triggered when a project update is updated",
+            "name": "teamMembershipUpdated",
+            "description": "Triggered when a team membership is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ProjectUpdate",
+                "name": "TeamMembership",
                 "ofType": null
               }
             },
@@ -130172,15 +130156,15 @@
             "deprecationReason": null
           },
           {
-            "name": "projectUpdateArchived",
-            "description": "Triggered when a project update is archived",
+            "name": "teamMembershipDeleted",
+            "description": "Triggered when a team membership is deleted",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ProjectUpdate",
+                "name": "TeamMembership",
                 "ofType": null
               }
             },
@@ -130188,15 +130172,15 @@
             "deprecationReason": null
           },
           {
-            "name": "projectUpdateDeleted",
-            "description": "Triggered when a project update is deleted",
+            "name": "teamCreated",
+            "description": "Triggered when a team is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ProjectUpdate",
+                "name": "Team",
                 "ofType": null
               }
             },
@@ -130204,15 +130188,15 @@
             "deprecationReason": null
           },
           {
-            "name": "draftCreated",
-            "description": "Triggered when a draft is created",
+            "name": "teamUpdated",
+            "description": "Triggered when a team is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Draft",
+                "name": "Team",
                 "ofType": null
               }
             },
@@ -130220,15 +130204,15 @@
             "deprecationReason": null
           },
           {
-            "name": "draftUpdated",
-            "description": "Triggered when a draft is updated",
+            "name": "teamDeleted",
+            "description": "Triggered when a team is deleted",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Draft",
+                "name": "Team",
                 "ofType": null
               }
             },
@@ -130236,15 +130220,143 @@
             "deprecationReason": null
           },
           {
-            "name": "draftDeleted",
-            "description": "Triggered when a draft is deleted",
+            "name": "issueHistoryCreated",
+            "description": "Triggered when an issue history is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Draft",
+                "name": "IssueHistory",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "issueHistoryUpdated",
+            "description": "Triggered when an issue history is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "IssueHistory",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cycleCreated",
+            "description": "Triggered when a cycle is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Cycle",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cycleUpdated",
+            "description": "Triggered when a cycle is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Cycle",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cycleArchived",
+            "description": "Triggered when a cycle is archived",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Cycle",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentCreated",
+            "description": "Triggered when a document is created",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Document",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentUpdated",
+            "description": "Triggered when a document is updated",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Document",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentArchived",
+            "description": "Triggered when a document is archived",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Document",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "documentUnarchived",
+            "description": "Triggered when a document is unarchived",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Document",
                 "ofType": null
               }
             },
@@ -130348,15 +130460,15 @@
             "deprecationReason": null
           },
           {
-            "name": "documentCreated",
-            "description": "Triggered when a document is created",
+            "name": "draftCreated",
+            "description": "Triggered when a draft is created",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Document",
+                "name": "Draft",
                 "ofType": null
               }
             },
@@ -130364,15 +130476,15 @@
             "deprecationReason": null
           },
           {
-            "name": "documentUpdated",
-            "description": "Triggered when a document is updated",
+            "name": "draftUpdated",
+            "description": "Triggered when a draft is updated",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Document",
+                "name": "Draft",
                 "ofType": null
               }
             },
@@ -130380,127 +130492,15 @@
             "deprecationReason": null
           },
           {
-            "name": "documentArchived",
-            "description": "Triggered when a document is archived",
+            "name": "draftDeleted",
+            "description": "Triggered when a draft is deleted",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Document",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "documentUnarchived",
-            "description": "Triggered when a document is unarchived",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Document",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "cycleCreated",
-            "description": "Triggered when a cycle is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Cycle",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "cycleUpdated",
-            "description": "Triggered when a cycle is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Cycle",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "cycleArchived",
-            "description": "Triggered when a cycle is archived",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Cycle",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "teamCreated",
-            "description": "Triggered when a team is created",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Team",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "teamUpdated",
-            "description": "Triggered when a team is updated",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Team",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "teamDeleted",
-            "description": "Triggered when a team is deleted",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Team",
+                "name": "Draft",
                 "ofType": null
               }
             },

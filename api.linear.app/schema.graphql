@@ -21671,10 +21671,11 @@ type Mutation {
 
   """
   Saves the supplied mappings and schedules creation of Linear records from the
-  fetched source data. The import must be inProgress; otherwise the mappings are
-  saved but success is false. A successful response means processing was
-  accepted, not that it has finished. Linear-to-Linear migrations can only be
-  managed from the Linear app.
+  fetched source data. Fails without saving the mappings when an
+  external-service import has not finished fetching its source data. The import
+  must be inProgress; otherwise the mappings are saved but success is false. A
+  successful response means processing was accepted, not that it has finished.
+  Linear-to-Linear migrations can only be managed from the Linear app.
   """
   issueImportProcess(
     """The mapping configuration to use for processing the import."""
@@ -21686,8 +21687,9 @@ type Mutation {
 
   """
   Saves mapping choices without starting the import. For external-service
-  imports, supply the full replacement mapping. Requires workspace import
-  permission; Linear-to-Linear migrations can only be managed from the Linear app.
+  imports, supply the full replacement mapping, and wait until the import has
+  fetched its source data. Requires workspace import permission;
+  Linear-to-Linear migrations can only be managed from the Linear app.
   """
   issueImportUpdate(
     """The properties of the issue import to update."""
@@ -22207,10 +22209,11 @@ type Mutation {
   """
   [ALPHA] Replaces the client secret for an application created by the caller
   and returns the new secret. Store it before discarding the response; it cannot
-  be retrieved later. Tokens issued through client_credentials are revoked,
-  while tokens from the authorization-code flow remain valid. The caller must be
-  able to manage the application’s credentials, including its private-team
-  access, as well as have workspace API management permission.
+  be retrieved later. The old secret stops working at once, as does a previous
+  secret that a planned rotation kept working. Tokens issued through
+  client_credentials are revoked, while tokens from the authorization-code flow
+  remain valid. The caller must be able to manage the application’s credentials,
+  including its private-team access, as well as have workspace API management permission.
   """
   oauthApplicationRotateSecret(
     """
@@ -41031,30 +41034,6 @@ input StringItemComparator {
 }
 
 type Subscription {
-  """Triggered when a workflow state is created"""
-  workflowStateCreated: WorkflowState!
-
-  """Triggered when a workflow state is updated"""
-  workflowStateUpdated: WorkflowState!
-
-  """Triggered when a workflow state is archived"""
-  workflowStateArchived: WorkflowState!
-
-  """Triggered when an issue history is created"""
-  issueHistoryCreated: IssueHistory!
-
-  """Triggered when an issue history is updated"""
-  issueHistoryUpdated: IssueHistory!
-
-  """Triggered when an issue relation is created"""
-  issueRelationCreated: IssueRelation!
-
-  """Triggered when an issue relation is updated"""
-  issueRelationUpdated: IssueRelation!
-
-  """Triggered when an issue relation is deleted"""
-  issueRelationDeleted: IssueRelation!
-
   """Triggered when an agent activity is created"""
   agentActivityCreated: AgentActivity!
 
@@ -41073,17 +41052,38 @@ type Subscription {
   """Triggered when a project label is deleted"""
   projectLabelDeleted: ProjectLabel!
 
+  """Triggered when a workflow state is created"""
+  workflowStateCreated: WorkflowState!
+
+  """Triggered when a workflow state is updated"""
+  workflowStateUpdated: WorkflowState!
+
+  """Triggered when a workflow state is archived"""
+  workflowStateArchived: WorkflowState!
+
+  """Triggered when an issue relation is created"""
+  issueRelationCreated: IssueRelation!
+
+  """Triggered when an issue relation is updated"""
+  issueRelationUpdated: IssueRelation!
+
+  """Triggered when an issue relation is deleted"""
+  issueRelationDeleted: IssueRelation!
+
   """Triggered when an user settings is updated"""
   userSettingsUpdated: UserSettings!
 
-  """Triggered when a favorite is created"""
-  favoriteCreated: Favorite!
+  """Triggered when a project update is created"""
+  projectUpdateCreated: ProjectUpdate!
 
-  """Triggered when a favorite is updated"""
-  favoriteUpdated: Favorite!
+  """Triggered when a project update is updated"""
+  projectUpdateUpdated: ProjectUpdate!
 
-  """Triggered when a favorite is deleted"""
-  favoriteDeleted: Favorite!
+  """Triggered when a project update is archived"""
+  projectUpdateArchived: ProjectUpdate!
+
+  """Triggered when a project update is deleted"""
+  projectUpdateDeleted: ProjectUpdate!
 
   """Triggered when a document content revision is created"""
   documentContentRevisionCreated: DocumentContentRevision!
@@ -41109,14 +41109,14 @@ type Subscription {
   """Triggered when a notification is deleted"""
   notificationDeleted: Notification!
 
-  """Triggered when a team membership is created"""
-  teamMembershipCreated: TeamMembership!
+  """Triggered when a favorite is created"""
+  favoriteCreated: Favorite!
 
-  """Triggered when a team membership is updated"""
-  teamMembershipUpdated: TeamMembership!
+  """Triggered when a favorite is updated"""
+  favoriteUpdated: Favorite!
 
-  """Triggered when a team membership is deleted"""
-  teamMembershipDeleted: TeamMembership!
+  """Triggered when a favorite is deleted"""
+  favoriteDeleted: Favorite!
 
   """Triggered when an issue label is created"""
   issueLabelCreated: IssueLabel!
@@ -41127,26 +41127,50 @@ type Subscription {
   """Triggered when an issue label is deleted"""
   issueLabelDeleted: IssueLabel!
 
-  """Triggered when a project update is created"""
-  projectUpdateCreated: ProjectUpdate!
+  """Triggered when a team membership is created"""
+  teamMembershipCreated: TeamMembership!
 
-  """Triggered when a project update is updated"""
-  projectUpdateUpdated: ProjectUpdate!
+  """Triggered when a team membership is updated"""
+  teamMembershipUpdated: TeamMembership!
 
-  """Triggered when a project update is archived"""
-  projectUpdateArchived: ProjectUpdate!
+  """Triggered when a team membership is deleted"""
+  teamMembershipDeleted: TeamMembership!
 
-  """Triggered when a project update is deleted"""
-  projectUpdateDeleted: ProjectUpdate!
+  """Triggered when a team is created"""
+  teamCreated: Team!
 
-  """Triggered when a draft is created"""
-  draftCreated: Draft!
+  """Triggered when a team is updated"""
+  teamUpdated: Team!
 
-  """Triggered when a draft is updated"""
-  draftUpdated: Draft!
+  """Triggered when a team is deleted"""
+  teamDeleted: Team!
 
-  """Triggered when a draft is deleted"""
-  draftDeleted: Draft!
+  """Triggered when an issue history is created"""
+  issueHistoryCreated: IssueHistory!
+
+  """Triggered when an issue history is updated"""
+  issueHistoryUpdated: IssueHistory!
+
+  """Triggered when a cycle is created"""
+  cycleCreated: Cycle!
+
+  """Triggered when a cycle is updated"""
+  cycleUpdated: Cycle!
+
+  """Triggered when a cycle is archived"""
+  cycleArchived: Cycle!
+
+  """Triggered when a document is created"""
+  documentCreated: Document!
+
+  """Triggered when a document is updated"""
+  documentUpdated: Document!
+
+  """Triggered when a document is archived"""
+  documentArchived: Document!
+
+  """Triggered when a document is unarchived"""
+  documentUnarchived: Document!
 
   """Triggered when a roadmap is created"""
   roadmapCreated: Roadmap!
@@ -41166,35 +41190,14 @@ type Subscription {
   """Triggered when an initiative is deleted"""
   initiativeDeleted: Initiative!
 
-  """Triggered when a document is created"""
-  documentCreated: Document!
+  """Triggered when a draft is created"""
+  draftCreated: Draft!
 
-  """Triggered when a document is updated"""
-  documentUpdated: Document!
+  """Triggered when a draft is updated"""
+  draftUpdated: Draft!
 
-  """Triggered when a document is archived"""
-  documentArchived: Document!
-
-  """Triggered when a document is unarchived"""
-  documentUnarchived: Document!
-
-  """Triggered when a cycle is created"""
-  cycleCreated: Cycle!
-
-  """Triggered when a cycle is updated"""
-  cycleUpdated: Cycle!
-
-  """Triggered when a cycle is archived"""
-  cycleArchived: Cycle!
-
-  """Triggered when a team is created"""
-  teamCreated: Team!
-
-  """Triggered when a team is updated"""
-  teamUpdated: Team!
-
-  """Triggered when a team is deleted"""
-  teamDeleted: Team!
+  """Triggered when a draft is deleted"""
+  draftDeleted: Draft!
 
   """Triggered when a comment is created"""
   commentCreated: Comment!
