@@ -6586,10 +6586,24 @@ type Document implements Node {
   url: String!
 
   """
-  [Internal] What people who can open a document in a public team, or in a
-  project with a public team, but are not members of its teams can do with it:
-  edit, comment, or view. Never above general access. Null means the same as
-  general access, and is always null on a personal document.
+  The user whose personal space holds the document, who owns and manages it.
+  Null if the document belongs to a different parent entity type.
+  """
+  personalUser: User
+
+  """
+  What users other than the owner can do with a document that is not personal:
+  edit, comment, or view. People shared on the document with a higher role keep
+  it. Null on a personal document, which only its owner and the people it is
+  shared with can access.
+  """
+  generalAccess: DocumentShareRole
+
+  """
+  What people who can open a document in a public team, or in a project with a
+  public team, but are not members of its teams can do with it: edit, comment,
+  or view. Never above general access. Null means the same as general access,
+  and is always null on a personal document.
   """
   workspaceAccess: DocumentShareRole
 }
@@ -6933,6 +6947,12 @@ input DocumentCreateInput {
   container supports them, and collisions may be adjusted.
   """
   sortOrder: Float
+
+  """
+  Creates the document in this user's private documents. Must be the acting
+  user, or for a sub-document the owner of its private parent document.
+  """
+  personalUserId: String
 }
 
 """Document creator sorting options."""
@@ -7427,10 +7447,24 @@ type DocumentSearchResult implements Node {
   url: String!
 
   """
-  [Internal] What people who can open a document in a public team, or in a
-  project with a public team, but are not members of its teams can do with it:
-  edit, comment, or view. Never above general access. Null means the same as
-  general access, and is always null on a personal document.
+  The user whose personal space holds the document, who owns and manages it.
+  Null if the document belongs to a different parent entity type.
+  """
+  personalUser: User
+
+  """
+  What users other than the owner can do with a document that is not personal:
+  edit, comment, or view. People shared on the document with a higher role keep
+  it. Null on a personal document, which only its owner and the people it is
+  shared with can access.
+  """
+  generalAccess: DocumentShareRole
+
+  """
+  What people who can open a document in a public team, or in a project with a
+  public team, but are not members of its teams can do with it: edit, comment,
+  or view. Never above general access. Null means the same as general access,
+  and is always null on a personal document.
   """
   workspaceAccess: DocumentShareRole
 
@@ -7570,6 +7604,11 @@ input DocumentUpdateInput {
   documentDelete to trash an active document and documentUnarchive to restore it.
   """
   trashed: Boolean
+
+  """
+  Moves the document and its sub-documents into this user's personal space. Must be the acting user.
+  """
+  personalUserId: String
 }
 
 """
@@ -20104,9 +20143,10 @@ type Mutation {
   ): CyclePayload!
 
   """
-  Creates a document in a project, issue, or release, with optional initial
-  Markdown content. The returned document includes its assigned UUID and
-  metadata; select content to read the resulting body.
+  Creates a document in a project, issue, or release, or in your private
+  documents with personalUserId, with optional initial Markdown content. The
+  returned document includes its assigned UUID and metadata; select content to
+  read the resulting body.
   """
   documentCreate(
     """The document to create."""
@@ -20129,11 +20169,70 @@ type Mutation {
   ): DocumentPayload!
 
   """
-  [Internal] Changes what people outside a document's teams can do with a
-  document in a public team or in a project with a public team: edit, comment,
-  or view. It can't be above the document's general access. Only the owner of
-  the document, an owner of one of its teams, or a workspace admin can change
-  it. Comment and view need an owner who can access the document.
+  Shares a document and its sub-documents with workspace members at a role. On a
+  personal document only the owner can share it. On any other document the
+  owner, an owner of one of its teams, or a workspace admin can, the people must
+  be able to see the document, and the role must be above its general access.
+  People it is newly shared with are subscribed to the document. Users who
+  already have another role move to the given one.
+  """
+  documentShare(
+    """The role to share the document at. Defaults to edit."""
+    role: DocumentShareRole = edit
+
+    """The identifiers of the users to share the document with."""
+    userIds: [String!]!
+
+    """The identifier of the document to share."""
+    id: String!
+  ): DocumentPayload!
+
+  """
+  Stops sharing a document and its sub-documents with users. Whoever can manage
+  access to the document can remove anyone it is shared with; anyone else can
+  only remove themselves.
+  """
+  documentUnshare(
+    """The identifiers of the users to remove from the document."""
+    userIds: [String!]!
+
+    """The identifier of the document to stop sharing."""
+    id: String!
+  ): DocumentPayload!
+
+  """
+  Changes what users other than the owner can do with a document that is not
+  personal: edit, comment, or view. Only the owner of the document, an owner of
+  one of its teams, or a workspace admin can change it. Comment and view need an
+  owner who can access the document.
+  """
+  documentUpdateGeneralAccess(
+    """
+    The general access level of this document when the change was confirmed.
+    When given, the change fails if the document has another level now.
+    """
+    previousGeneralAccess: String
+
+    """
+    Whether to also change the sub-documents whose level equals the document's
+    level before the change. Sub-documents with another level, without an owner
+    who can access them, or that the user cannot loosen keep their level.
+    """
+    applyToSubDocuments: Boolean = false
+
+    """The new general access level: edit, comment, or view."""
+    generalAccess: String!
+
+    """The identifier of the document."""
+    id: String!
+  ): DocumentPayload!
+
+  """
+  Changes what people outside a document's teams can do with a document in a
+  public team or in a project with a public team: edit, comment, or view. It
+  can't be above the document's general access. Only the owner of the document,
+  an owner of one of its teams, or a workspace admin can change it. Comment and
+  view need an owner who can access the document.
   """
   documentUpdateWorkspaceAccess(
     """
@@ -20159,7 +20258,8 @@ type Mutation {
   """
   Moves a document to the trash and archives it, including the sub-documents
   covered by its archive cascade. It is not permanently removed by this
-  mutation. You must be allowed to manage the document; use documentUnarchive to restore it.
+  mutation. You must be allowed to manage the document, or to edit it when it is
+  a page of a private document; use documentUnarchive to restore it.
   """
   documentDelete(
     """
@@ -20174,8 +20274,9 @@ type Mutation {
 
   """
   Restores a trashed document and its eligible sub-documents. You must be
-  allowed to manage the restored documents. If the containing resource is
-  archived, restore that resource first.
+  allowed to manage the restored documents, or to edit them when they are pages
+  of a private document. If the containing resource is archived, restore that
+  resource first.
   """
   documentUnarchive(
     """The identifier of the document to restore."""
@@ -20748,6 +20849,13 @@ type Mutation {
   the corresponding workspace plan feature.
   """
   integrationGithubConnect(
+    """
+    [Internal] Set to true to keep the organization's code access integration
+    and use this basic GitHub App installation for pull request linking and
+    GitHub Issues sync in the repositories that the code access app cannot read.
+    """
+    addLinkingInstallation: Boolean = false
+
     """
     Confirm replacing an existing installation after a prior call reported lostRepositoryNames. Defaults to false.
     """
@@ -41034,6 +41142,30 @@ input StringItemComparator {
 }
 
 type Subscription {
+  """Triggered when a workflow state is created"""
+  workflowStateCreated: WorkflowState!
+
+  """Triggered when a workflow state is updated"""
+  workflowStateUpdated: WorkflowState!
+
+  """Triggered when a workflow state is archived"""
+  workflowStateArchived: WorkflowState!
+
+  """Triggered when an issue history is created"""
+  issueHistoryCreated: IssueHistory!
+
+  """Triggered when an issue history is updated"""
+  issueHistoryUpdated: IssueHistory!
+
+  """Triggered when an issue relation is created"""
+  issueRelationCreated: IssueRelation!
+
+  """Triggered when an issue relation is updated"""
+  issueRelationUpdated: IssueRelation!
+
+  """Triggered when an issue relation is deleted"""
+  issueRelationDeleted: IssueRelation!
+
   """Triggered when an agent activity is created"""
   agentActivityCreated: AgentActivity!
 
@@ -41051,24 +41183,6 @@ type Subscription {
 
   """Triggered when a project label is deleted"""
   projectLabelDeleted: ProjectLabel!
-
-  """Triggered when a workflow state is created"""
-  workflowStateCreated: WorkflowState!
-
-  """Triggered when a workflow state is updated"""
-  workflowStateUpdated: WorkflowState!
-
-  """Triggered when a workflow state is archived"""
-  workflowStateArchived: WorkflowState!
-
-  """Triggered when an issue relation is created"""
-  issueRelationCreated: IssueRelation!
-
-  """Triggered when an issue relation is updated"""
-  issueRelationUpdated: IssueRelation!
-
-  """Triggered when an issue relation is deleted"""
-  issueRelationDeleted: IssueRelation!
 
   """Triggered when an user settings is updated"""
   userSettingsUpdated: UserSettings!
@@ -41109,23 +41223,11 @@ type Subscription {
   """Triggered when a notification is deleted"""
   notificationDeleted: Notification!
 
-  """Triggered when a favorite is created"""
-  favoriteCreated: Favorite!
+  """Triggered when a document content is created"""
+  documentContentCreated: DocumentContent!
 
-  """Triggered when a favorite is updated"""
-  favoriteUpdated: Favorite!
-
-  """Triggered when a favorite is deleted"""
-  favoriteDeleted: Favorite!
-
-  """Triggered when an issue label is created"""
-  issueLabelCreated: IssueLabel!
-
-  """Triggered when an issue label is updated"""
-  issueLabelUpdated: IssueLabel!
-
-  """Triggered when an issue label is deleted"""
-  issueLabelDeleted: IssueLabel!
+  """Triggered when a document content is updated"""
+  documentContentUpdated: DocumentContent!
 
   """Triggered when a team membership is created"""
   teamMembershipCreated: TeamMembership!
@@ -41136,6 +41238,15 @@ type Subscription {
   """Triggered when a team membership is deleted"""
   teamMembershipDeleted: TeamMembership!
 
+  """Triggered when an issue label is created"""
+  issueLabelCreated: IssueLabel!
+
+  """Triggered when an issue label is updated"""
+  issueLabelUpdated: IssueLabel!
+
+  """Triggered when an issue label is deleted"""
+  issueLabelDeleted: IssueLabel!
+
   """Triggered when a team is created"""
   teamCreated: Team!
 
@@ -41145,11 +41256,35 @@ type Subscription {
   """Triggered when a team is deleted"""
   teamDeleted: Team!
 
-  """Triggered when an issue history is created"""
-  issueHistoryCreated: IssueHistory!
+  """Triggered when a favorite is created"""
+  favoriteCreated: Favorite!
 
-  """Triggered when an issue history is updated"""
-  issueHistoryUpdated: IssueHistory!
+  """Triggered when a favorite is updated"""
+  favoriteUpdated: Favorite!
+
+  """Triggered when a favorite is deleted"""
+  favoriteDeleted: Favorite!
+
+  """Triggered when a roadmap is created"""
+  roadmapCreated: Roadmap!
+
+  """Triggered when a roadmap is updated"""
+  roadmapUpdated: Roadmap!
+
+  """Triggered when a roadmap is deleted"""
+  roadmapDeleted: Roadmap!
+
+  """Triggered when a project is created"""
+  projectCreated: Project!
+
+  """Triggered when a project is updated"""
+  projectUpdated: Project!
+
+  """Triggered when a project is archived"""
+  projectArchived: Project!
+
+  """Triggered when a project is unarchived"""
+  projectUnarchived: Project!
 
   """Triggered when a cycle is created"""
   cycleCreated: Cycle!
@@ -41171,15 +41306,6 @@ type Subscription {
 
   """Triggered when a document is unarchived"""
   documentUnarchived: Document!
-
-  """Triggered when a roadmap is created"""
-  roadmapCreated: Roadmap!
-
-  """Triggered when a roadmap is updated"""
-  roadmapUpdated: Roadmap!
-
-  """Triggered when a roadmap is deleted"""
-  roadmapDeleted: Roadmap!
 
   """Triggered when an initiative is created"""
   initiativeCreated: Initiative!
@@ -41237,24 +41363,6 @@ type Subscription {
 
   """Triggered when an user is updated"""
   userUpdated: User!
-
-  """Triggered when a project is created"""
-  projectCreated: Project!
-
-  """Triggered when a project is updated"""
-  projectUpdated: Project!
-
-  """Triggered when a project is archived"""
-  projectArchived: Project!
-
-  """Triggered when a project is unarchived"""
-  projectUnarchived: Project!
-
-  """Triggered when a document content is created"""
-  documentContentCreated: DocumentContent!
-
-  """Triggered when a document content is updated"""
-  documentContentUpdated: DocumentContent!
 
   """Triggered when an agent session is created"""
   agentSessionCreated: AgentSession!
