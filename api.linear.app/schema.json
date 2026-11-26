@@ -12922,6 +12922,16 @@
             "defaultValue": null
           },
           {
+            "name": "addedToProjectAt",
+            "description": "Conditions on when the issue joined its current project. Changing projects resets this time; removing the project clears it. Issues added to a project before this time was recorded have none.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "addedToCyclePeriod",
             "description": "Conditions on when the issue joined its cycle. before includes the cycle’s first 24 hours; during covers the remaining time before closure, and after covers times at or after closure.",
             "type": {
@@ -15291,6 +15301,16 @@
           {
             "name": "addedToCycleAt",
             "description": "Conditions on when the issue joined its current cycle. Changing cycles resets this time; removing the cycle clears it.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "addedToProjectAt",
+            "description": "Conditions on when the issue joined its current project. Changing projects resets this time; removing the project clears it. Issues added to a project before this time was recorded have none.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDateComparator",
@@ -17805,6 +17825,16 @@
           {
             "name": "addedToCycleAt",
             "description": "Conditions on when the issue joined its current cycle. Changing cycles resets this time; removing the cycle clears it.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NullableDateComparator",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "addedToProjectAt",
+            "description": "Conditions on when the issue joined its current project. Changing projects resets this time; removing the project clears it. Issues added to a project before this time was recorded have none.",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "NullableDateComparator",
@@ -64641,6 +64671,273 @@
         "description": null,
         "fields": [
           {
+            "name": "attachments",
+            "description": "Issue attachments the caller can access, with cursor pagination. Use attachmentsForURL to look up a resource URL.",
+            "args": [
+              {
+                "name": "filter",
+                "description": "Filter returned attachments.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "AttachmentFilter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "before",
+                "description": "Returns results before this cursor. Pair with `last` to paginate backward, using a cursor returned by the same connection. Keep the filters and ordering unchanged between pages. Cannot be combined with `first` or `after`.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "after",
+                "description": "Returns results after this cursor. Pair with `first` and the previous page's `endCursor` to fetch the next page. Keep the filters and ordering unchanged between pages. Cannot be combined with `last` or `before`.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "The maximum number of results to return, starting after `after` if supplied. Between 1 and 250. Defaults to 50 when neither `first` nor `last` is supplied. Cannot be combined with `last` or `before`.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "The maximum number of results to return, ending before `before` if supplied. Between 1 and 250. Cannot be combined with `first` or `after`.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeArchived",
+                "description": "Includes archived resources alongside active ones. Defaults to false, which returns only active resources. This does not include deleted resources.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "Orders results by creation time or last meaningful update time. Defaults to `createdAt`. Results are newest first with `first` and oldest first with `last`; use the returned `endCursor` as `before` to continue backward. Cannot be combined with custom `sort` options on fields that support them.",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "PaginationOrderBy",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AttachmentConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "attachment",
+            "description": "An attachment by UUID or URL. A URL returns one matching attachment; use attachmentsForURL to retrieve all matches.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The attachment UUID or URL. A URL returns one matching attachment.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Attachment",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "attachmentsForURL",
+            "description": "Finds the attachments for a resource URL across issues you can access. A URL can appear on several issues, so use this connection and select each attachment’s issue to find all linked issues.",
+            "args": [
+              {
+                "name": "before",
+                "description": "Returns results before this cursor. Pair with `last` to paginate backward, using a cursor returned by the same connection. Keep the filters and ordering unchanged between pages. Cannot be combined with `first` or `after`.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "after",
+                "description": "Returns results after this cursor. Pair with `first` and the previous page's `endCursor` to fetch the next page. Keep the filters and ordering unchanged between pages. Cannot be combined with `last` or `before`.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "first",
+                "description": "The maximum number of results to return, starting after `after` if supplied. Between 1 and 250. Defaults to 50 when neither `first` nor `last` is supplied. Cannot be combined with `last` or `before`.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "last",
+                "description": "The maximum number of results to return, ending before `before` if supplied. Between 1 and 250. Cannot be combined with `first` or `after`.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "includeArchived",
+                "description": "Includes archived resources alongside active ones. Defaults to false, which returns only active resources. This does not include deleted resources.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "orderBy",
+                "description": "Orders results by creation time or last meaningful update time. Defaults to `createdAt`. Results are newest first with `first` and oldest first with `last`; use the returned `endCursor` as `before` to continue backward. Cannot be combined with custom `sort` options on fields that support them.",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "PaginationOrderBy",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "url",
+                "description": "The attachment URL.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AttachmentConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "attachmentIssue",
+            "description": "The issue linked to an attachment. Deprecated; use attachmentsForURL and select each attachment’s issue.",
+            "args": [
+              {
+                "name": "id",
+                "description": "`id` of the attachment for which you'll want to get the issue for. [Deprecated] `url` as the `id` parameter.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Issue",
+                "ofType": null
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Will be removed in near future, please use `attachmentsForURL` to get attachments and their issues instead."
+          },
+          {
+            "name": "attachmentSources",
+            "description": "Lists distinct sources on accessible, non-archived issue attachments. API and OAuth attachment sources are grouped by URL domain; other sources are grouped by type. Each group includes the oldest attachment's source metadata. Results may be cached for up to one hour.",
+            "args": [
+              {
+                "name": "teamId",
+                "description": "(optional) if provided will only return attachment sources for the given team.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AttachmentSourcesPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "organization",
             "description": "Returns the workspace associated with the credentials used for this request. Its ID and URL key identify the workspace, and its fields expose shared settings and resources.",
             "args": [],
@@ -65072,273 +65369,6 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "OAuthApplicationCodingSessionTrustedSource",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "attachments",
-            "description": "Issue attachments the caller can access, with cursor pagination. Use attachmentsForURL to look up a resource URL.",
-            "args": [
-              {
-                "name": "filter",
-                "description": "Filter returned attachments.",
-                "type": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "AttachmentFilter",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "before",
-                "description": "Returns results before this cursor. Pair with `last` to paginate backward, using a cursor returned by the same connection. Keep the filters and ordering unchanged between pages. Cannot be combined with `first` or `after`.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "after",
-                "description": "Returns results after this cursor. Pair with `first` and the previous page's `endCursor` to fetch the next page. Keep the filters and ordering unchanged between pages. Cannot be combined with `last` or `before`.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "first",
-                "description": "The maximum number of results to return, starting after `after` if supplied. Between 1 and 250. Defaults to 50 when neither `first` nor `last` is supplied. Cannot be combined with `last` or `before`.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "last",
-                "description": "The maximum number of results to return, ending before `before` if supplied. Between 1 and 250. Cannot be combined with `first` or `after`.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "includeArchived",
-                "description": "Includes archived resources alongside active ones. Defaults to false, which returns only active resources. This does not include deleted resources.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Boolean",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "orderBy",
-                "description": "Orders results by creation time or last meaningful update time. Defaults to `createdAt`. Results are newest first with `first` and oldest first with `last`; use the returned `endCursor` as `before` to continue backward. Cannot be combined with custom `sort` options on fields that support them.",
-                "type": {
-                  "kind": "ENUM",
-                  "name": "PaginationOrderBy",
-                  "ofType": null
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AttachmentConnection",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "attachment",
-            "description": "An attachment by UUID or URL. A URL returns one matching attachment; use attachmentsForURL to retrieve all matches.",
-            "args": [
-              {
-                "name": "id",
-                "description": "The attachment UUID or URL. A URL returns one matching attachment.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Attachment",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "attachmentsForURL",
-            "description": "Finds the attachments for a resource URL across issues you can access. A URL can appear on several issues, so use this connection and select each attachment’s issue to find all linked issues.",
-            "args": [
-              {
-                "name": "before",
-                "description": "Returns results before this cursor. Pair with `last` to paginate backward, using a cursor returned by the same connection. Keep the filters and ordering unchanged between pages. Cannot be combined with `first` or `after`.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "after",
-                "description": "Returns results after this cursor. Pair with `first` and the previous page's `endCursor` to fetch the next page. Keep the filters and ordering unchanged between pages. Cannot be combined with `last` or `before`.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "first",
-                "description": "The maximum number of results to return, starting after `after` if supplied. Between 1 and 250. Defaults to 50 when neither `first` nor `last` is supplied. Cannot be combined with `last` or `before`.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "last",
-                "description": "The maximum number of results to return, ending before `before` if supplied. Between 1 and 250. Cannot be combined with `first` or `after`.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "includeArchived",
-                "description": "Includes archived resources alongside active ones. Defaults to false, which returns only active resources. This does not include deleted resources.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Boolean",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "orderBy",
-                "description": "Orders results by creation time or last meaningful update time. Defaults to `createdAt`. Results are newest first with `first` and oldest first with `last`; use the returned `endCursor` as `before` to continue backward. Cannot be combined with custom `sort` options on fields that support them.",
-                "type": {
-                  "kind": "ENUM",
-                  "name": "PaginationOrderBy",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "url",
-                "description": "The attachment URL.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AttachmentConnection",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "attachmentIssue",
-            "description": "The issue linked to an attachment. Deprecated; use attachmentsForURL and select each attachment’s issue.",
-            "args": [
-              {
-                "name": "id",
-                "description": "`id` of the attachment for which you'll want to get the issue for. [Deprecated] `url` as the `id` parameter.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Issue",
-                "ofType": null
-              }
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Will be removed in near future, please use `attachmentsForURL` to get attachments and their issues instead."
-          },
-          {
-            "name": "attachmentSources",
-            "description": "Lists distinct sources on accessible, non-archived issue attachments. API and OAuth attachment sources are grouped by URL domain; other sources are grouped by type. Each group includes the oldest attachment's source metadata. Results may be cached for up to one hour.",
-            "args": [
-              {
-                "name": "teamId",
-                "description": "(optional) if provided will only return attachment sources for the given team.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AttachmentSourcesPayload",
                 "ofType": null
               }
             },
@@ -73211,6 +73241,33 @@
       },
       {
         "kind": "OBJECT",
+        "name": "AttachmentSourcesPayload",
+        "description": "The result of an attachment sources query.",
+        "fields": [
+          {
+            "name": "sources",
+            "description": "A unique list of all source types used in this workspace.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "JSONObject",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "OrganizationExistsPayload",
         "description": "Response for checking whether a workspace exists.",
         "fields": [
@@ -73931,33 +73988,6 @@
             "deprecationReason": null
           }
         ],
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "AttachmentSourcesPayload",
-        "description": "The result of an attachment sources query.",
-        "fields": [
-          {
-            "name": "sources",
-            "description": "A unique list of all source types used in this workspace.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "JSONObject",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
         "possibleTypes": null
       },
       {
@@ -92316,437 +92346,6 @@
         "description": null,
         "fields": [
           {
-            "name": "organizationUpdate",
-            "description": "Updates the workspace associated with your credentials. Omitted fields keep their current values. Most changes require workspace-settings permission; project and initiative reminder schedules require schedule-management permission. Some settings also depend on the workspace’s plan.",
-            "args": [
-              {
-                "name": "input",
-                "description": "A partial workspace object to update the workspace with.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "OrganizationUpdateInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizationDeleteChallenge",
-            "description": "Requests a deletion confirmation code for the workspace. The code is sent to the requesting user's email and must be used with the organizationDelete mutation to confirm deletion.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationDeletePayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizationDelete",
-            "description": "Schedules deletion of the workspace and its data after validating the code from organizationDeleteChallenge. This does not finish the deletion during the request. Use organizationCancelDelete while cancellation is still available.",
-            "args": [
-              {
-                "name": "input",
-                "description": "Information required to delete the workspace.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "DeleteOrganizationInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationDeletePayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizationCancelDelete",
-            "description": "Cancels a scheduled workspace deletion while the deletion process still permits cancellation. Requires workspace-settings permission.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationCancelDeletePayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizationStartTrialForPlan",
-            "description": "Starts a trial for the workspace on the specified plan type. The workspace must not already be on a paid plan or in an active trial.",
-            "args": [
-              {
-                "name": "input",
-                "description": "Plan details for trial",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "OrganizationStartTrialInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationStartTrialPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "organizationStartTrial",
-            "description": "[DEPRECATED] Starts a trial for the workspace.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OrganizationStartTrialPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Use organizationStartTrialForPlan"
-          },
-          {
-            "name": "agentActivityCreate",
-            "description": "Publishes an activity to your agent’s session and updates its lifecycle. Thoughts and actions report ongoing work; a response completes the turn unless it has the continue signal, an elicitation waits for user input, and an error records a failed turn. The session must be unarchived and owned by the authenticated app user. Use the agent app’s OAuth or workload identity token; personal API keys cannot publish agent activities.",
-            "args": [
-              {
-                "name": "input",
-                "description": "The agent activity object to create.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "AgentActivityCreateInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentActivityPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentSessionCreateOnComment",
-            "description": "Starts an active session for your authenticated agent app on an existing issue comment thread. Supply the UUID of an unarchived root comment; replies and threads that already have a session are rejected. The caller must have access to the issue. Use the returned session ID when publishing activities.",
-            "args": [
-              {
-                "name": "input",
-                "description": "The agent session object to create.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "AgentSessionCreateOnComment",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentSessionPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentSessionCreateOnIssue",
-            "description": "Starts an active session for your authenticated agent app and creates its comment thread on the issue. The issue must be accessible and writable. Supply its UUID or identifier, then use the returned session ID to publish progress and results with agentActivityCreate.",
-            "args": [
-              {
-                "name": "input",
-                "description": "The agent session object to create.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "AgentSessionCreateOnIssue",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentSessionPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentSessionUpdateExternalUrl",
-            "description": "Updates external links on a session owned by the authenticated agent app. A pending or stale session becomes active.",
-            "args": [
-              {
-                "name": "input",
-                "description": "The agent session object to update.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "AgentSessionUpdateExternalUrlInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "id",
-                "description": "The identifier of the agent session to update.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentSessionPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentSessionUpdate",
-            "description": "Updates your agent’s session title, external links, or plan. Only the app user that owns the session can change these fields. Omitted fields remain unchanged, while each supplied plan or externalUrls list replaces that value. Updates other than a title-only change acknowledge a pending or stale session by making it active; publishing an activity still determines the next turn status.",
-            "args": [
-              {
-                "name": "input",
-                "description": "A partial agent session object to update the agent session with.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "AgentSessionUpdateInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "id",
-                "description": "The identifier of the agent session to update.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentSessionPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentSkillCreate",
-            "description": "Creates reusable Markdown instructions for the Linear Agent, owned by the authenticated user. Omit teamId for a personal skill, or provide a team UUID to share it with that team. Creating a team skill requires permission to manage the team’s agent skills. The returned skill contains the saved instructions and display details.",
-            "args": [
-              {
-                "name": "input",
-                "description": "The agent skill object to create.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "AgentSkillCreateInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentSkillPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentSkillUpdate",
-            "description": "Updates a skill the caller can manage. Omitted fields remain unchanged, and a supplied body replaces the full instruction text. For a team skill, the caller needs agent skill management permission; moving it also requires that permission in the destination team. Inherited copies cannot be edited directly—update their source skill instead.",
-            "args": [
-              {
-                "name": "input",
-                "description": "Data to update the agent skill with.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "AgentSkillUpdateInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "id",
-                "description": "The identifier of the agent skill to update.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "AgentSkillPayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "agentSkillDelete",
-            "description": "Deletes an agent skill and its inherited copies. Inherited skills must be deleted from the team that owns the source skill.",
-            "args": [
-              {
-                "name": "id",
-                "description": "The identifier of the agent skill to delete.",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "DeletePayload",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "attachmentCreate",
             "description": "Creates an attachment, or updates the existing attachment with the same URL on the same issue. This is useful for links and metadata managed by your integration. Use attachmentLinkURL or a service-specific link mutation when you want Linear to fetch integration metadata and apply its supported link behavior.",
             "args": [
@@ -93901,6 +93500,437 @@
               {
                 "name": "id",
                 "description": "The identifier of the attachment to delete.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "DeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationUpdate",
+            "description": "Updates the workspace associated with your credentials. Omitted fields keep their current values. Most changes require workspace-settings permission; project and initiative reminder schedules require schedule-management permission. Some settings also depend on the workspace’s plan.",
+            "args": [
+              {
+                "name": "input",
+                "description": "A partial workspace object to update the workspace with.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "OrganizationUpdateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationDeleteChallenge",
+            "description": "Requests a deletion confirmation code for the workspace. The code is sent to the requesting user's email and must be used with the organizationDelete mutation to confirm deletion.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationDeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationDelete",
+            "description": "Schedules deletion of the workspace and its data after validating the code from organizationDeleteChallenge. This does not finish the deletion during the request. Use organizationCancelDelete while cancellation is still available.",
+            "args": [
+              {
+                "name": "input",
+                "description": "Information required to delete the workspace.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeleteOrganizationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationDeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationCancelDelete",
+            "description": "Cancels a scheduled workspace deletion while the deletion process still permits cancellation. Requires workspace-settings permission.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationCancelDeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationStartTrialForPlan",
+            "description": "Starts a trial for the workspace on the specified plan type. The workspace must not already be on a paid plan or in an active trial.",
+            "args": [
+              {
+                "name": "input",
+                "description": "Plan details for trial",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "OrganizationStartTrialInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationStartTrialPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "organizationStartTrial",
+            "description": "[DEPRECATED] Starts a trial for the workspace.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "OrganizationStartTrialPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use organizationStartTrialForPlan"
+          },
+          {
+            "name": "agentActivityCreate",
+            "description": "Publishes an activity to your agent’s session and updates its lifecycle. Thoughts and actions report ongoing work; a response completes the turn unless it has the continue signal, an elicitation waits for user input, and an error records a failed turn. The session must be unarchived and owned by the authenticated app user. Use the agent app’s OAuth or workload identity token; personal API keys cannot publish agent activities.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The agent activity object to create.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AgentActivityCreateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentActivityPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentSessionCreateOnComment",
+            "description": "Starts an active session for your authenticated agent app on an existing issue comment thread. Supply the UUID of an unarchived root comment; replies and threads that already have a session are rejected. The caller must have access to the issue. Use the returned session ID when publishing activities.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The agent session object to create.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AgentSessionCreateOnComment",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentSessionPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentSessionCreateOnIssue",
+            "description": "Starts an active session for your authenticated agent app and creates its comment thread on the issue. The issue must be accessible and writable. Supply its UUID or identifier, then use the returned session ID to publish progress and results with agentActivityCreate.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The agent session object to create.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AgentSessionCreateOnIssue",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentSessionPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentSessionUpdateExternalUrl",
+            "description": "Updates external links on a session owned by the authenticated agent app. A pending or stale session becomes active.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The agent session object to update.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AgentSessionUpdateExternalUrlInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the agent session to update.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentSessionPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentSessionUpdate",
+            "description": "Updates your agent’s session title, external links, or plan. Only the app user that owns the session can change these fields. Omitted fields remain unchanged, while each supplied plan or externalUrls list replaces that value. Updates other than a title-only change acknowledge a pending or stale session by making it active; publishing an activity still determines the next turn status.",
+            "args": [
+              {
+                "name": "input",
+                "description": "A partial agent session object to update the agent session with.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AgentSessionUpdateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the agent session to update.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentSessionPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentSkillCreate",
+            "description": "Creates reusable Markdown instructions for the Linear Agent, owned by the authenticated user. Omit teamId for a personal skill, or provide a team UUID to share it with that team. Creating a team skill requires permission to manage the team’s agent skills. The returned skill contains the saved instructions and display details.",
+            "args": [
+              {
+                "name": "input",
+                "description": "The agent skill object to create.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AgentSkillCreateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentSkillPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentSkillUpdate",
+            "description": "Updates a skill the caller can manage. Omitted fields remain unchanged, and a supplied body replaces the full instruction text. For a team skill, the caller needs agent skill management permission; moving it also requires that permission in the destination team. Inherited copies cannot be edited directly—update their source skill instead.",
+            "args": [
+              {
+                "name": "input",
+                "description": "Data to update the agent skill with.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AgentSkillUpdateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "id",
+                "description": "The identifier of the agent skill to update.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AgentSkillPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "agentSkillDelete",
+            "description": "Deletes an agent skill and its inherited copies. Inherited skills must be deleted from the team that owns the source skill.",
+            "args": [
+              {
+                "name": "id",
+                "description": "The identifier of the agent skill to delete.",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -104831,7 +104861,7 @@
           },
           {
             "name": "teamCyclesDelete",
-            "description": "Permanently deletes all cycles for a team and disables cycles. Issues are kept, but their cycle associations are removed. Requires permission to manage the team.",
+            "description": "Permanently deletes all cycles for a team. Cycles must be disabled on the team first. Issues are kept, but their cycle associations are removed. Requires permission to manage the team.",
             "args": [
               {
                 "name": "id",
@@ -106163,6 +106193,535 @@
         "interfaces": [],
         "enumValues": null,
         "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AttachmentPayload",
+        "description": "The result of an attachment mutation.",
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "attachment",
+            "description": "The attachment created or updated by the operation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Attachment",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AttachmentCreateInput",
+        "description": "The URL and display details to attach to an issue. If that URL is already attached to the issue, the existing attachment is updated. A supplied commentBody creates a linked comment only when a new attachment is created.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "id",
+            "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "title",
+            "description": "Title displayed for the attachment, up to 2,048 characters.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "subtitle",
+            "description": "Subtitle displayed below the title, up to 2,048 characters.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "url",
+            "description": "Resource URL. If the same URL is already attached to issueId, that attachment is updated.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "issueId",
+            "description": "The issue to associate the attachment with. Can be a UUID or issue identifier (e.g., 'LIN-123').",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "iconUrl",
+            "description": "An icon url to display with the attachment. Should be of jpg or png format. Maximum of 1MB in size. Dimensions should be 20x20px for optimal display quality.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "metadata",
+            "description": "Custom data to display with the attachment. messages is an array of objects with optional subject, Markdown body, and timestamp strings; attributes is an array of name/value string pairs. id may be a string or number and title a string; other top-level keys are allowed. When updating an existing URL, this replaces its metadata.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSONObject",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "groupBySource",
+            "description": "Indicates if attachments for the same source application should be grouped in the Linear UI.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "commentBody",
+            "description": "Markdown for a linked comment. Ignored when updating an attachment with the same URL.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "createAsUser",
+            "description": "Display name credited with creating the attachment. Available only to OAuth applications using actor=app.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "displayIconUrl",
+            "description": "Avatar URL for createAsUser. Requires createAsUser and an OAuth application using actor=app.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AttachmentUpdateInput",
+        "description": "The display details to update on an existing attachment. title is required; omitted optional fields keep their values. Supplied metadata replaces the entire object. The attachment’s URL and issue cannot be changed through this input.",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "title",
+            "description": "The attachment title.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "subtitle",
+            "description": "The attachment subtitle.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "metadata",
+            "description": "Replacement attachment data. messages accepts optional subject, body (Markdown), and timestamp strings; attributes accepts name/value string pairs. Include existing keys that should be kept.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "JSONObject",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "iconUrl",
+            "description": "An icon url to display with the attachment. Should be of jpg or png format. Maximum of 1MB in size. Dimensions should be 20x20px for optimal display quality.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "GitLinkKind",
+        "description": "[Internal] The kind of link between an issue and a pull request.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "closes",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "contributes",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "links",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "FrontAttachmentPayload",
+        "description": "The result of a Front attachment mutation.",
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "attachment",
+            "description": "The issue attachment that was created.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Attachment",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "DeletePayload",
+        "description": "The result of a delete mutation. The mutation determines whether the resource is deleted immediately or scheduled for deletion.",
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "entityId",
+            "description": "The ID of the resource targeted by the delete operation. Use this to remove the resource from your local state after a successful mutation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "ArchivePayload",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "ArchivePayload",
+        "description": "The result of archiving, restoring, or deleting a resource.",
+        "fields": [
+          {
+            "name": "lastSyncId",
+            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "success",
+            "description": "Whether the operation was successful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "DeletePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ProjectArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "CustomerNeedArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "CycleArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "DocumentArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "InitiativeArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "InitiativeUpdateArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "IssueArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "NotificationArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ProjectStatusArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ProjectUpdateArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ReleasePipelineArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ReleaseArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ReleaseStageArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "RoadmapArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "TeamArchivePayload",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "WorkflowStateArchivePayload",
+            "ofType": null
+          }
+        ]
       },
       {
         "kind": "OBJECT",
@@ -107636,535 +108195,6 @@
           }
         ],
         "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "DeletePayload",
-        "description": "The result of a delete mutation. The mutation determines whether the resource is deleted immediately or scheduled for deletion.",
-        "fields": [
-          {
-            "name": "lastSyncId",
-            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "entityId",
-            "description": "The ID of the resource targeted by the delete operation. Use this to remove the resource from your local state after a successful mutation.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [
-          {
-            "kind": "INTERFACE",
-            "name": "ArchivePayload",
-            "ofType": null
-          }
-        ],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INTERFACE",
-        "name": "ArchivePayload",
-        "description": "The result of archiving, restoring, or deleting a resource.",
-        "fields": [
-          {
-            "name": "lastSyncId",
-            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": [
-          {
-            "kind": "OBJECT",
-            "name": "DeletePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "ProjectArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "CustomerNeedArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "CycleArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "DocumentArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "InitiativeArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "InitiativeUpdateArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "IssueArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "NotificationArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "ProjectStatusArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "ProjectUpdateArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "ReleasePipelineArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "ReleaseArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "ReleaseStageArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "RoadmapArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "TeamArchivePayload",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "WorkflowStateArchivePayload",
-            "ofType": null
-          }
-        ]
-      },
-      {
-        "kind": "OBJECT",
-        "name": "AttachmentPayload",
-        "description": "The result of an attachment mutation.",
-        "fields": [
-          {
-            "name": "lastSyncId",
-            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "attachment",
-            "description": "The attachment created or updated by the operation.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Attachment",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "AttachmentCreateInput",
-        "description": "The URL and display details to attach to an issue. If that URL is already attached to the issue, the existing attachment is updated. A supplied commentBody creates a linked comment only when a new attachment is created.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "title",
-            "description": "Title displayed for the attachment, up to 2,048 characters.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "subtitle",
-            "description": "Subtitle displayed below the title, up to 2,048 characters.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "url",
-            "description": "Resource URL. If the same URL is already attached to issueId, that attachment is updated.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "issueId",
-            "description": "The issue to associate the attachment with. Can be a UUID or issue identifier (e.g., 'LIN-123').",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "iconUrl",
-            "description": "An icon url to display with the attachment. Should be of jpg or png format. Maximum of 1MB in size. Dimensions should be 20x20px for optimal display quality.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "metadata",
-            "description": "Custom data to display with the attachment. messages is an array of objects with optional subject, Markdown body, and timestamp strings; attributes is an array of name/value string pairs. id may be a string or number and title a string; other top-level keys are allowed. When updating an existing URL, this replaces its metadata.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "JSONObject",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "groupBySource",
-            "description": "Indicates if attachments for the same source application should be grouped in the Linear UI.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "commentBody",
-            "description": "Markdown for a linked comment. Ignored when updating an attachment with the same URL.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "createAsUser",
-            "description": "Display name credited with creating the attachment. Available only to OAuth applications using actor=app.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "displayIconUrl",
-            "description": "Avatar URL for createAsUser. Requires createAsUser and an OAuth application using actor=app.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "AttachmentUpdateInput",
-        "description": "The display details to update on an existing attachment. title is required; omitted optional fields keep their values. Supplied metadata replaces the entire object. The attachment’s URL and issue cannot be changed through this input.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "title",
-            "description": "The attachment title.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "subtitle",
-            "description": "The attachment subtitle.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "metadata",
-            "description": "Replacement attachment data. messages accepts optional subject, body (Markdown), and timestamp strings; attributes accepts name/value string pairs. Include existing keys that should be kept.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "JSONObject",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "iconUrl",
-            "description": "An icon url to display with the attachment. Should be of jpg or png format. Maximum of 1MB in size. Dimensions should be 20x20px for optimal display quality.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "ENUM",
-        "name": "GitLinkKind",
-        "description": "[Internal] The kind of link between an issue and a pull request.",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "closes",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "contributes",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "links",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "FrontAttachmentPayload",
-        "description": "The result of a Front attachment mutation.",
-        "fields": [
-          {
-            "name": "lastSyncId",
-            "description": "Synchronization cursor used by Linear clients. External integrations can ignore this field.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "attachment",
-            "description": "The issue attachment that was created.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Attachment",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "success",
-            "description": "Whether the operation was successful.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
         "enumValues": null,
         "possibleTypes": null
       },

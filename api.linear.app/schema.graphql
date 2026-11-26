@@ -14396,6 +14396,13 @@ input IssueCollectionFilter {
   addedToCycleAt: NullableDateComparator
 
   """
+  Conditions on when the issue joined its current project. Changing projects
+  resets this time; removing the project clears it. Issues added to a project
+  before this time was recorded have none.
+  """
+  addedToProjectAt: NullableDateComparator
+
+  """
   Conditions on when the issue joined its cycle. before includes the cycle’s
   first 24 hours; during covers the remaining time before closure, and after
   covers times at or after closure.
@@ -14999,6 +15006,13 @@ input IssueFilter {
   Conditions on when the issue joined its current cycle. Changing cycles resets this time; removing the cycle clears it.
   """
   addedToCycleAt: NullableDateComparator
+
+  """
+  Conditions on when the issue joined its current project. Changing projects
+  resets this time; removing the project clears it. Issues added to a project
+  before this time was recorded have none.
+  """
+  addedToProjectAt: NullableDateComparator
 
   """
   Conditions on when the issue joined its cycle. before includes the cycle’s
@@ -19034,149 +19048,6 @@ input MilestoneSort {
 
 type Mutation {
   """
-  Updates the workspace associated with your credentials. Omitted fields keep
-  their current values. Most changes require workspace-settings permission;
-  project and initiative reminder schedules require schedule-management
-  permission. Some settings also depend on the workspace’s plan.
-  """
-  organizationUpdate(
-    """A partial workspace object to update the workspace with."""
-    input: OrganizationUpdateInput!
-  ): OrganizationPayload!
-
-  """
-  Requests a deletion confirmation code for the workspace. The code is sent to
-  the requesting user's email and must be used with the organizationDelete
-  mutation to confirm deletion.
-  """
-  organizationDeleteChallenge: OrganizationDeletePayload!
-
-  """
-  Schedules deletion of the workspace and its data after validating the code
-  from organizationDeleteChallenge. This does not finish the deletion during the
-  request. Use organizationCancelDelete while cancellation is still available.
-  """
-  organizationDelete(
-    """Information required to delete the workspace."""
-    input: DeleteOrganizationInput!
-  ): OrganizationDeletePayload!
-
-  """
-  Cancels a scheduled workspace deletion while the deletion process still
-  permits cancellation. Requires workspace-settings permission.
-  """
-  organizationCancelDelete: OrganizationCancelDeletePayload!
-
-  """
-  Starts a trial for the workspace on the specified plan type. The workspace
-  must not already be on a paid plan or in an active trial.
-  """
-  organizationStartTrialForPlan(
-    """Plan details for trial"""
-    input: OrganizationStartTrialInput!
-  ): OrganizationStartTrialPayload!
-
-  """[DEPRECATED] Starts a trial for the workspace."""
-  organizationStartTrial: OrganizationStartTrialPayload! @deprecated(reason: "Use organizationStartTrialForPlan")
-
-  """
-  Publishes an activity to your agent’s session and updates its lifecycle.
-  Thoughts and actions report ongoing work; a response completes the turn unless
-  it has the continue signal, an elicitation waits for user input, and an error
-  records a failed turn. The session must be unarchived and owned by the
-  authenticated app user. Use the agent app’s OAuth or workload identity token;
-  personal API keys cannot publish agent activities.
-  """
-  agentActivityCreate(
-    """The agent activity object to create."""
-    input: AgentActivityCreateInput!
-  ): AgentActivityPayload!
-
-  """
-  Starts an active session for your authenticated agent app on an existing issue
-  comment thread. Supply the UUID of an unarchived root comment; replies and
-  threads that already have a session are rejected. The caller must have access
-  to the issue. Use the returned session ID when publishing activities.
-  """
-  agentSessionCreateOnComment(
-    """The agent session object to create."""
-    input: AgentSessionCreateOnComment!
-  ): AgentSessionPayload!
-
-  """
-  Starts an active session for your authenticated agent app and creates its
-  comment thread on the issue. The issue must be accessible and writable. Supply
-  its UUID or identifier, then use the returned session ID to publish progress
-  and results with agentActivityCreate.
-  """
-  agentSessionCreateOnIssue(
-    """The agent session object to create."""
-    input: AgentSessionCreateOnIssue!
-  ): AgentSessionPayload!
-
-  """
-  Updates external links on a session owned by the authenticated agent app. A pending or stale session becomes active.
-  """
-  agentSessionUpdateExternalUrl(
-    """The agent session object to update."""
-    input: AgentSessionUpdateExternalUrlInput!
-
-    """The identifier of the agent session to update."""
-    id: String!
-  ): AgentSessionPayload!
-
-  """
-  Updates your agent’s session title, external links, or plan. Only the app user
-  that owns the session can change these fields. Omitted fields remain
-  unchanged, while each supplied plan or externalUrls list replaces that value.
-  Updates other than a title-only change acknowledge a pending or stale session
-  by making it active; publishing an activity still determines the next turn status.
-  """
-  agentSessionUpdate(
-    """A partial agent session object to update the agent session with."""
-    input: AgentSessionUpdateInput!
-
-    """The identifier of the agent session to update."""
-    id: String!
-  ): AgentSessionPayload!
-
-  """
-  Creates reusable Markdown instructions for the Linear Agent, owned by the
-  authenticated user. Omit teamId for a personal skill, or provide a team UUID
-  to share it with that team. Creating a team skill requires permission to
-  manage the team’s agent skills. The returned skill contains the saved
-  instructions and display details.
-  """
-  agentSkillCreate(
-    """The agent skill object to create."""
-    input: AgentSkillCreateInput!
-  ): AgentSkillPayload!
-
-  """
-  Updates a skill the caller can manage. Omitted fields remain unchanged, and a
-  supplied body replaces the full instruction text. For a team skill, the caller
-  needs agent skill management permission; moving it also requires that
-  permission in the destination team. Inherited copies cannot be edited
-  directly—update their source skill instead.
-  """
-  agentSkillUpdate(
-    """Data to update the agent skill with."""
-    input: AgentSkillUpdateInput!
-
-    """The identifier of the agent skill to update."""
-    id: String!
-  ): AgentSkillPayload!
-
-  """
-  Deletes an agent skill and its inherited copies. Inherited skills must be
-  deleted from the team that owns the source skill.
-  """
-  agentSkillDelete(
-    """The identifier of the agent skill to delete."""
-    id: String!
-  ): DeletePayload!
-
-  """
   Creates an attachment, or updates the existing attachment with the same URL on
   the same issue. This is useful for links and metadata managed by your
   integration. Use attachmentLinkURL or a service-specific link mutation when
@@ -19599,6 +19470,149 @@ type Mutation {
   """
   attachmentDelete(
     """The identifier of the attachment to delete."""
+    id: String!
+  ): DeletePayload!
+
+  """
+  Updates the workspace associated with your credentials. Omitted fields keep
+  their current values. Most changes require workspace-settings permission;
+  project and initiative reminder schedules require schedule-management
+  permission. Some settings also depend on the workspace’s plan.
+  """
+  organizationUpdate(
+    """A partial workspace object to update the workspace with."""
+    input: OrganizationUpdateInput!
+  ): OrganizationPayload!
+
+  """
+  Requests a deletion confirmation code for the workspace. The code is sent to
+  the requesting user's email and must be used with the organizationDelete
+  mutation to confirm deletion.
+  """
+  organizationDeleteChallenge: OrganizationDeletePayload!
+
+  """
+  Schedules deletion of the workspace and its data after validating the code
+  from organizationDeleteChallenge. This does not finish the deletion during the
+  request. Use organizationCancelDelete while cancellation is still available.
+  """
+  organizationDelete(
+    """Information required to delete the workspace."""
+    input: DeleteOrganizationInput!
+  ): OrganizationDeletePayload!
+
+  """
+  Cancels a scheduled workspace deletion while the deletion process still
+  permits cancellation. Requires workspace-settings permission.
+  """
+  organizationCancelDelete: OrganizationCancelDeletePayload!
+
+  """
+  Starts a trial for the workspace on the specified plan type. The workspace
+  must not already be on a paid plan or in an active trial.
+  """
+  organizationStartTrialForPlan(
+    """Plan details for trial"""
+    input: OrganizationStartTrialInput!
+  ): OrganizationStartTrialPayload!
+
+  """[DEPRECATED] Starts a trial for the workspace."""
+  organizationStartTrial: OrganizationStartTrialPayload! @deprecated(reason: "Use organizationStartTrialForPlan")
+
+  """
+  Publishes an activity to your agent’s session and updates its lifecycle.
+  Thoughts and actions report ongoing work; a response completes the turn unless
+  it has the continue signal, an elicitation waits for user input, and an error
+  records a failed turn. The session must be unarchived and owned by the
+  authenticated app user. Use the agent app’s OAuth or workload identity token;
+  personal API keys cannot publish agent activities.
+  """
+  agentActivityCreate(
+    """The agent activity object to create."""
+    input: AgentActivityCreateInput!
+  ): AgentActivityPayload!
+
+  """
+  Starts an active session for your authenticated agent app on an existing issue
+  comment thread. Supply the UUID of an unarchived root comment; replies and
+  threads that already have a session are rejected. The caller must have access
+  to the issue. Use the returned session ID when publishing activities.
+  """
+  agentSessionCreateOnComment(
+    """The agent session object to create."""
+    input: AgentSessionCreateOnComment!
+  ): AgentSessionPayload!
+
+  """
+  Starts an active session for your authenticated agent app and creates its
+  comment thread on the issue. The issue must be accessible and writable. Supply
+  its UUID or identifier, then use the returned session ID to publish progress
+  and results with agentActivityCreate.
+  """
+  agentSessionCreateOnIssue(
+    """The agent session object to create."""
+    input: AgentSessionCreateOnIssue!
+  ): AgentSessionPayload!
+
+  """
+  Updates external links on a session owned by the authenticated agent app. A pending or stale session becomes active.
+  """
+  agentSessionUpdateExternalUrl(
+    """The agent session object to update."""
+    input: AgentSessionUpdateExternalUrlInput!
+
+    """The identifier of the agent session to update."""
+    id: String!
+  ): AgentSessionPayload!
+
+  """
+  Updates your agent’s session title, external links, or plan. Only the app user
+  that owns the session can change these fields. Omitted fields remain
+  unchanged, while each supplied plan or externalUrls list replaces that value.
+  Updates other than a title-only change acknowledge a pending or stale session
+  by making it active; publishing an activity still determines the next turn status.
+  """
+  agentSessionUpdate(
+    """A partial agent session object to update the agent session with."""
+    input: AgentSessionUpdateInput!
+
+    """The identifier of the agent session to update."""
+    id: String!
+  ): AgentSessionPayload!
+
+  """
+  Creates reusable Markdown instructions for the Linear Agent, owned by the
+  authenticated user. Omit teamId for a personal skill, or provide a team UUID
+  to share it with that team. Creating a team skill requires permission to
+  manage the team’s agent skills. The returned skill contains the saved
+  instructions and display details.
+  """
+  agentSkillCreate(
+    """The agent skill object to create."""
+    input: AgentSkillCreateInput!
+  ): AgentSkillPayload!
+
+  """
+  Updates a skill the caller can manage. Omitted fields remain unchanged, and a
+  supplied body replaces the full instruction text. For a team skill, the caller
+  needs agent skill management permission; moving it also requires that
+  permission in the destination team. Inherited copies cannot be edited
+  directly—update their source skill instead.
+  """
+  agentSkillUpdate(
+    """Data to update the agent skill with."""
+    input: AgentSkillUpdateInput!
+
+    """The identifier of the agent skill to update."""
+    id: String!
+  ): AgentSkillPayload!
+
+  """
+  Deletes an agent skill and its inherited copies. Inherited skills must be
+  deleted from the team that owns the source skill.
+  """
+  agentSkillDelete(
+    """The identifier of the agent skill to delete."""
     id: String!
   ): DeletePayload!
 
@@ -23105,8 +23119,9 @@ type Mutation {
   ): TeamArchivePayload!
 
   """
-  Permanently deletes all cycles for a team and disables cycles. Issues are
-  kept, but their cycle associations are removed. Requires permission to manage the team.
+  Permanently deletes all cycles for a team. Cycles must be disabled on the team
+  first. Issues are kept, but their cycle associations are removed. Requires
+  permission to manage the team.
   """
   teamCyclesDelete(
     """The identifier of the team, which cycles will be deleted."""
@@ -25168,6 +25183,13 @@ input NullableIssueFilter {
   Conditions on when the issue joined its current cycle. Changing cycles resets this time; removing the cycle clears it.
   """
   addedToCycleAt: NullableDateComparator
+
+  """
+  Conditions on when the issue joined its current project. Changing projects
+  resets this time; removing the project clears it. Issues added to a project
+  before this time was recorded have none.
+  """
+  addedToProjectAt: NullableDateComparator
 
   """
   Conditions on when the issue joined its cycle. before includes the cycle’s
@@ -33749,6 +33771,137 @@ enum PushSubscriptionType {
 
 type Query {
   """
+  Issue attachments the caller can access, with cursor pagination. Use attachmentsForURL to look up a resource URL.
+  """
+  attachments(
+    """Filter returned attachments."""
+    filter: AttachmentFilter
+
+    """
+    Returns results before this cursor. Pair with `last` to paginate backward,
+    using a cursor returned by the same connection. Keep the filters and
+    ordering unchanged between pages. Cannot be combined with `first` or `after`.
+    """
+    before: String
+
+    """
+    Returns results after this cursor. Pair with `first` and the previous page's
+    `endCursor` to fetch the next page. Keep the filters and ordering unchanged
+    between pages. Cannot be combined with `last` or `before`.
+    """
+    after: String
+
+    """
+    The maximum number of results to return, starting after `after` if supplied.
+    Between 1 and 250. Defaults to 50 when neither `first` nor `last` is
+    supplied. Cannot be combined with `last` or `before`.
+    """
+    first: Int
+
+    """
+    The maximum number of results to return, ending before `before` if supplied.
+    Between 1 and 250. Cannot be combined with `first` or `after`.
+    """
+    last: Int
+
+    """
+    Includes archived resources alongside active ones. Defaults to false, which
+    returns only active resources. This does not include deleted resources.
+    """
+    includeArchived: Boolean
+
+    """
+    Orders results by creation time or last meaningful update time. Defaults to
+    `createdAt`. Results are newest first with `first` and oldest first with
+    `last`; use the returned `endCursor` as `before` to continue backward.
+    Cannot be combined with custom `sort` options on fields that support them.
+    """
+    orderBy: PaginationOrderBy
+  ): AttachmentConnection!
+
+  """
+  An attachment by UUID or URL. A URL returns one matching attachment; use attachmentsForURL to retrieve all matches.
+  """
+  attachment(
+    """The attachment UUID or URL. A URL returns one matching attachment."""
+    id: String!
+  ): Attachment!
+
+  """
+  Finds the attachments for a resource URL across issues you can access. A URL
+  can appear on several issues, so use this connection and select each
+  attachment’s issue to find all linked issues.
+  """
+  attachmentsForURL(
+    """
+    Returns results before this cursor. Pair with `last` to paginate backward,
+    using a cursor returned by the same connection. Keep the filters and
+    ordering unchanged between pages. Cannot be combined with `first` or `after`.
+    """
+    before: String
+
+    """
+    Returns results after this cursor. Pair with `first` and the previous page's
+    `endCursor` to fetch the next page. Keep the filters and ordering unchanged
+    between pages. Cannot be combined with `last` or `before`.
+    """
+    after: String
+
+    """
+    The maximum number of results to return, starting after `after` if supplied.
+    Between 1 and 250. Defaults to 50 when neither `first` nor `last` is
+    supplied. Cannot be combined with `last` or `before`.
+    """
+    first: Int
+
+    """
+    The maximum number of results to return, ending before `before` if supplied.
+    Between 1 and 250. Cannot be combined with `first` or `after`.
+    """
+    last: Int
+
+    """
+    Includes archived resources alongside active ones. Defaults to false, which
+    returns only active resources. This does not include deleted resources.
+    """
+    includeArchived: Boolean
+
+    """
+    Orders results by creation time or last meaningful update time. Defaults to
+    `createdAt`. Results are newest first with `first` and oldest first with
+    `last`; use the returned `endCursor` as `before` to continue backward.
+    Cannot be combined with custom `sort` options on fields that support them.
+    """
+    orderBy: PaginationOrderBy
+
+    """The attachment URL."""
+    url: String!
+  ): AttachmentConnection!
+
+  """
+  The issue linked to an attachment. Deprecated; use attachmentsForURL and select each attachment’s issue.
+  """
+  attachmentIssue(
+    """
+    `id` of the attachment for which you'll want to get the issue for. [Deprecated] `url` as the `id` parameter.
+    """
+    id: String!
+  ): Issue! @deprecated(reason: "Will be removed in near future, please use `attachmentsForURL` to get attachments and their issues instead.")
+
+  """
+  Lists distinct sources on accessible, non-archived issue attachments. API and
+  OAuth attachment sources are grouped by URL domain; other sources are grouped
+  by type. Each group includes the oldest attachment's source metadata. Results
+  may be cached for up to one hour.
+  """
+  attachmentSources(
+    """
+    (optional) if provided will only return attachment sources for the given team.
+    """
+    teamId: String
+  ): AttachmentSourcesPayload!
+
+  """
   Returns the workspace associated with the credentials used for this request.
   Its ID and URL key identify the workspace, and its fields expose shared
   settings and resources.
@@ -33938,137 +34091,6 @@ type Query {
   Sessions in the workspace. Requires an OAuth access token with the `read` scope.
   """
   oauthApplicationCodingSessionTrustedSource: OAuthApplicationCodingSessionTrustedSource!
-
-  """
-  Issue attachments the caller can access, with cursor pagination. Use attachmentsForURL to look up a resource URL.
-  """
-  attachments(
-    """Filter returned attachments."""
-    filter: AttachmentFilter
-
-    """
-    Returns results before this cursor. Pair with `last` to paginate backward,
-    using a cursor returned by the same connection. Keep the filters and
-    ordering unchanged between pages. Cannot be combined with `first` or `after`.
-    """
-    before: String
-
-    """
-    Returns results after this cursor. Pair with `first` and the previous page's
-    `endCursor` to fetch the next page. Keep the filters and ordering unchanged
-    between pages. Cannot be combined with `last` or `before`.
-    """
-    after: String
-
-    """
-    The maximum number of results to return, starting after `after` if supplied.
-    Between 1 and 250. Defaults to 50 when neither `first` nor `last` is
-    supplied. Cannot be combined with `last` or `before`.
-    """
-    first: Int
-
-    """
-    The maximum number of results to return, ending before `before` if supplied.
-    Between 1 and 250. Cannot be combined with `first` or `after`.
-    """
-    last: Int
-
-    """
-    Includes archived resources alongside active ones. Defaults to false, which
-    returns only active resources. This does not include deleted resources.
-    """
-    includeArchived: Boolean
-
-    """
-    Orders results by creation time or last meaningful update time. Defaults to
-    `createdAt`. Results are newest first with `first` and oldest first with
-    `last`; use the returned `endCursor` as `before` to continue backward.
-    Cannot be combined with custom `sort` options on fields that support them.
-    """
-    orderBy: PaginationOrderBy
-  ): AttachmentConnection!
-
-  """
-  An attachment by UUID or URL. A URL returns one matching attachment; use attachmentsForURL to retrieve all matches.
-  """
-  attachment(
-    """The attachment UUID or URL. A URL returns one matching attachment."""
-    id: String!
-  ): Attachment!
-
-  """
-  Finds the attachments for a resource URL across issues you can access. A URL
-  can appear on several issues, so use this connection and select each
-  attachment’s issue to find all linked issues.
-  """
-  attachmentsForURL(
-    """
-    Returns results before this cursor. Pair with `last` to paginate backward,
-    using a cursor returned by the same connection. Keep the filters and
-    ordering unchanged between pages. Cannot be combined with `first` or `after`.
-    """
-    before: String
-
-    """
-    Returns results after this cursor. Pair with `first` and the previous page's
-    `endCursor` to fetch the next page. Keep the filters and ordering unchanged
-    between pages. Cannot be combined with `last` or `before`.
-    """
-    after: String
-
-    """
-    The maximum number of results to return, starting after `after` if supplied.
-    Between 1 and 250. Defaults to 50 when neither `first` nor `last` is
-    supplied. Cannot be combined with `last` or `before`.
-    """
-    first: Int
-
-    """
-    The maximum number of results to return, ending before `before` if supplied.
-    Between 1 and 250. Cannot be combined with `first` or `after`.
-    """
-    last: Int
-
-    """
-    Includes archived resources alongside active ones. Defaults to false, which
-    returns only active resources. This does not include deleted resources.
-    """
-    includeArchived: Boolean
-
-    """
-    Orders results by creation time or last meaningful update time. Defaults to
-    `createdAt`. Results are newest first with `first` and oldest first with
-    `last`; use the returned `endCursor` as `before` to continue backward.
-    Cannot be combined with custom `sort` options on fields that support them.
-    """
-    orderBy: PaginationOrderBy
-
-    """The attachment URL."""
-    url: String!
-  ): AttachmentConnection!
-
-  """
-  The issue linked to an attachment. Deprecated; use attachmentsForURL and select each attachment’s issue.
-  """
-  attachmentIssue(
-    """
-    `id` of the attachment for which you'll want to get the issue for. [Deprecated] `url` as the `id` parameter.
-    """
-    id: String!
-  ): Issue! @deprecated(reason: "Will be removed in near future, please use `attachmentsForURL` to get attachments and their issues instead.")
-
-  """
-  Lists distinct sources on accessible, non-archived issue attachments. API and
-  OAuth attachment sources are grouped by URL domain; other sources are grouped
-  by type. Each group includes the oldest attachment's source metadata. Results
-  may be cached for up to one hour.
-  """
-  attachmentSources(
-    """
-    (optional) if provided will only return attachment sources for the given team.
-    """
-    teamId: String
-  ): AttachmentSourcesPayload!
 
   """
   Lists supported audit action identifiers and a description of each action. Use
